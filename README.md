@@ -1,2 +1,2 @@
-# z3s5-lisp
-an arcane Lisp dialect
+# Z3S5 Lisp
+an arcane Lisp dialect containing alien technology
