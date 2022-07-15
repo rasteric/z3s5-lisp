@@ -3,7 +3,7 @@
   Originally based on Nukata Lisp 2.0 by SUZUKI Hisao.
 
 */
-package main
+package z3s5
 
 import (
 	"bufio"
@@ -18,9 +18,6 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
-	"time"
-
-	rl "github.com/gen2brain/raylib-go/raylib"
 
 	"github.com/nukata/goarith"
 )
@@ -120,7 +117,7 @@ func Same(a, b any) bool {
 
 // Reverse the list non-destructively (creating a copy first).
 func (j *Cell) Reverse() *Cell {
-	return arrayToList(reverseArray(listToArray(j)))
+	return ArrayToList(ReverseArray(ListToArray(j)))
 }
 
 // String returns a raw textual representation of j for debugging.
@@ -405,7 +402,7 @@ func (x *Closure) Externalize(interp *Interp, env *Cell) string {
 		return fmt.Sprintf("(lambda %v %v)", args, lam)
 	}
 	table := make(map[string]bool)
-	ev := listToArray(env)
+	ev := ListToArray(env)
 	env2 := &Cell{ev, x.Env}
 	s := interp.externalizeBindings(env, env2, x.Body, "", 0, table)
 	return fmt.Sprintf("(letrec (%v) (lambda %v %v))", s, args, lam)
@@ -586,7 +583,8 @@ type Interp struct {
 	lock      sync.RWMutex   // global lock, sometimes needed despite use of sync.Map
 	inputLock sync.Mutex     // for input
 	inputCond *sync.Cond     // condition to wait for when inputting
-	pc        *PC            // the PC
+	pc        Runtime        // the Runtime support, used by z3s5 engine
+	runtime   any            // the same as pc but as unrestricted interface, used by the client
 	cancel    uint32         // 1 == cancel current evaluation
 	streams   sync.Map       // a map containing any open streams for reading and writing
 	prng      [10]*rand.Rand // 10 different PRNGs
@@ -656,35 +654,34 @@ var Number1 = goarith.AsNumber(1)
 
 // NewInterp constructs an interpreter and sets built-in functions etc. as
 // the global values of symbols within the interpreter.
-func NewInterp(pc *PC) (*Interp, error) {
+func NewInterp(pc any) (*Interp, error) {
 	interp := Interp{}
 	interp.inputCond = sync.NewCond(&interp.inputLock)
-	interp.pc = pc
+	interp.pc = pc.(Runtime)
+	interp.runtime = pc
 	for i := range interp.prng {
 		interp.prng[i] = rand.New(rand.NewSource(int64(i + 5589)))
 	}
 
 	interp.SetGlobalVar(ReflectSym, Nil) // initially *reflect* is empty, each of the definitions below populate it
 
-	interp.Define_Base()        // base definitions
-	interp.Define_Float()       // floating point package with prefix fl
-	interp.Define_Graphics()    // graphics subsystem with prefix gfx
-	interp.Define_Console()     // OS terminal/console based routines like terpri and princ
-	interp.Define_Files()       // file system functions for files, streams, managed directories
-	interp.Define_System()      // PC system based routines
-	interp.Define_DB()          // database system with prefix db
-	interp.Define_Sound()       // sound system (except for beep, which is in system)
-	interp.Define_Network()     // network functions with prefix net
-	interp.Define_Editor()      // VRAM-based editor functions of PC
-	interp.Define_Ling()        // linguistic helpers such as Levenshtein distance
-	interp.Define_Decimal()     // decimal arithmetics
-	interp.Define_Interpreter() // embedded Z3S5 Lisp interpreters
+	interp.Define_Base()    // base definitions
+	interp.Define_Console() // line-based console i/o
+	interp.Define_Float()   // floating point package with prefix fl
+	interp.Define_Ling()    // linguistic helpers such as Levenshtein distance
+	interp.Define_Decimal() // decimal arithmetics
 
 	return &interp, nil
 }
 
-// expectInts returns a slice of n ints decoded from a[offset], or panics with an error.
-func (interp *Interp) expectInts(caller string, a []any, offset, n int) []int {
+// Runtime returns the runtime support system provided when a new interpreter was created, as an
+// unrestricted any interface, so the client can type cast it to whatever runtime structure they use.
+func (interp *Interp) Runtime() any {
+	return interp.runtime
+}
+
+// ExpectInts returns a slice of n ints decoded from a[offset], or panics with an error.
+func (interp *Interp) ExpectInts(caller string, a []any, offset, n int) []int {
 	if offset+n-1 > len(a)-1 {
 		panic(fmt.Sprintf(`%s: syntax error, not enough arguments, expected %d integers`, caller, n))
 	}
@@ -709,13 +706,13 @@ func (interp *Interp) MustParseBlobArgs(caller string, a []any) ([]byte, int, in
 	b := blob.Datum.([]byte)
 	var n, m int
 	if li.CdrCell() != Nil {
-		arr := listToArray(li.CdrCell())
+		arr := ListToArray(li.CdrCell())
 		if len(arr) > 1 {
-			narr := interp.expectInts(caller, arr, 0, 2)
+			narr := interp.ExpectInts(caller, arr, 0, 2)
 			n = narr[0]
 			m = narr[1]
 		} else {
-			narr := interp.expectInts(caller, arr, 0, 1)
+			narr := interp.ExpectInts(caller, arr, 0, 1)
 			n = narr[0]
 			m = len(b)
 		}
@@ -724,417 +721,6 @@ func (interp *Interp) MustParseBlobArgs(caller string, a []any) ([]byte, int, in
 		m = len(b)
 	}
 	return b, n, m
-}
-
-// expectColor checks that li is a color specification and returns color or panics
-func (interp *Interp) listToColor(caller string, li *Cell) rl.Color {
-	if li == nil {
-		panic(fmt.Sprintf(`%s: expected a color value`, caller))
-	}
-	cs := listToArray(li)
-	cols := interp.expectInts(caller, cs, 0, 4)
-	for _, n := range cols {
-		if n < 0 || n > 255 {
-			panic(fmt.Sprintf(`%s: color value out of range, expected integer in 0..255, given %d`, caller, n))
-		}
-	}
-	return rl.NewColor(uint8(cols[0]), uint8(cols[1]), uint8(cols[2]), uint8(cols[3]))
-}
-
-// symToPhysicsBodyType converts a symbol to a PhysicsBodyType from graphics subcomponent or raises an error.
-func symToPhysicsBodySort(caller string, a any) PhysicsBodyType {
-	sym, ok := a.(*Sym)
-	if !ok {
-		panic(fmt.Sprintf("%s: expected a symbol in '(kinematic static dynamic), given %v", caller, a))
-	}
-	switch sym.String() {
-	case "dynamic":
-		return DynamicBody
-	case "kinematic":
-		return KinematicBody
-	case "static":
-		return StaticBody
-	default:
-		panic(fmt.Sprintf("%s: expected a symbol in '(kinematic static dynamic), given %v", caller, a))
-	}
-}
-
-// asLispBool returns a given Go bool as a Lisp bool, i.e., using Nil for false.
-func asLispBool(b bool) any {
-	if b {
-		return true
-	}
-	return Nil
-}
-
-// toBool takes a Lisp bool and returns a Go bool. See asLispBool for more information.
-func toBool(a any) bool {
-	if a == Nil {
-		return false
-	}
-	return true
-}
-
-// toUInt8 convert a value to uint8
-func toUInt8(a any) uint8 {
-	n, _ := goarith.AsNumber(a).Int()
-	return uint8(n)
-}
-
-// toUInt32 converts a value to uint32
-func toUInt32(a any) uint32 {
-	n, _ := goarith.AsNumber(a).Int()
-	return uint32(n)
-}
-
-// toUInt64 attempts to convert a value to uint64
-func toUInt64(caller string, a any) uint64 {
-	switch a.(type) {
-	case goarith.Int32:
-		return uint64(a.(goarith.Int32))
-	case goarith.Int64:
-		return uint64(a.(goarith.Int64))
-	default:
-		n, exact := goarith.AsNumber(a).Int()
-		if !exact {
-			panic(fmt.Sprintf("%v: expected exact integer, given %v", caller, a))
-		}
-		return uint64(n)
-	}
-}
-
-// toMaybeUInt64 attempts to convert a value to uint64
-func toMaybeUInt64(a any) (uint64, bool) {
-	switch a.(type) {
-	case goarith.Int32:
-		return uint64(a.(goarith.Int32)), true
-	case goarith.Int64:
-		return uint64(a.(goarith.Int64)), true
-	default:
-		n, exact := goarith.AsNumber(a).Int()
-		if !exact {
-			return uint64(n), false
-		}
-		return uint64(n), true
-	}
-}
-
-// toInt64 attempts to convert a value to int64
-func toInt64(caller string, a any) int64 {
-	switch a.(type) {
-	case goarith.Int32:
-		return int64(a.(goarith.Int32))
-	case goarith.Int64:
-		return int64(a.(goarith.Int64))
-	default:
-		n, exact := goarith.AsNumber(a).Int()
-		if !exact {
-			panic(fmt.Sprintf("%v: expected exact integer, given %v", caller, a))
-		}
-		return int64(n)
-	}
-}
-
-// convertNumbersToInts converts any goarith.Int32 and goarith.Int64 values in a slice
-// of interface{} values to Int64, modifying the array. The array can no longer be used
-// for representing Lisp numbers afterwards.
-func convertNumbersToInts(a []any) {
-	for i := range a {
-		switch a[i].(type) {
-		case goarith.Int32:
-			a[i] = int64(a[i].(goarith.Int32))
-		case goarith.Int64:
-			a[i] = int64(a[i].(goarith.Int64))
-		}
-	}
-}
-
-// convertIntsToNumbers converts any Int64 integer values in a slice to goarith.Int64 values,
-// modifying the array. The int64 values in the array can afterwards be used in Lisp.
-func convertIntsToNumbers(a []any) {
-	for i := range a {
-		switch a[i].(type) {
-		case int32:
-			a[i] = goarith.AsNumber(a[i])
-		case int64:
-			a[i] = goarith.AsNumber(a[i])
-		}
-	}
-}
-
-func toFloat64(x any) float64 {
-	switch x.(type) {
-	case goarith.Int32:
-		return float64(x.(goarith.Int32))
-	case goarith.Int64:
-		return float64(int64(x.(goarith.Int64)))
-	case goarith.Float64:
-		return float64(x.(goarith.Float64))
-	case *goarith.BigInt:
-		z := new(big.Rat).SetInt((*big.Int)(x.(*goarith.BigInt)))
-		f, _ := z.Float64() // f may be infinity.
-		return float64(f)
-	case float32:
-		return float64(x.(float32))
-	default:
-		panic(fmt.Sprintf("expected floating point value, given %v", x))
-	}
-}
-
-func toFloat32(x any) float32 {
-	switch x.(type) {
-	case goarith.Int32:
-		return float32(x.(goarith.Int32))
-	case goarith.Int64:
-		return float32(int64(x.(goarith.Int64)))
-	case goarith.Float64:
-		return float32(x.(goarith.Float64))
-	case *goarith.BigInt:
-		z := new(big.Rat).SetInt((*big.Int)(x.(*goarith.BigInt)))
-		f, _ := z.Float64() // f may be infinity.
-		return float32(f)
-	case float32:
-		return x.(float32)
-	default:
-		panic(fmt.Sprintf("expected floating point value, given %v", x))
-	}
-}
-
-// convertTimeToDateList converts a time.Time value into a Lisp datelist.
-func convertTimeToDateList(t time.Time) *Cell {
-	arr := make([]any, 5)
-	arr[0] = t.Year()
-	arr[1] = int(t.Month())
-	arr[2] = t.Day()
-	arr[3] = int(t.Weekday())
-	_, arr[4] = t.ISOWeek()
-	arr2 := make([]any, 5)
-	arr2[0] = t.Hour()
-	arr2[1] = t.Minute()
-	arr2[2] = t.Second()
-	arr2[3] = t.Nanosecond()
-	arr2[4] = t.UnixNano()
-	return &Cell{arrayToList(arr), &Cell{arrayToList(arr2), Nil}}
-}
-
-// listToArray converts a list into an array (Go slice).
-func listToArray(li *Cell) []any {
-	arr := make([]any, 0)
-	if li == Nil {
-		return arr
-	}
-	for {
-		arr = append(arr, li.Car)
-		li = li.Cdr.(*Cell)
-		if li == Nil {
-			return arr
-		}
-	}
-}
-
-// arrayToList converts an array (Go slice) to a list.
-func arrayToList(arr []any) *Cell {
-	if len(arr) == 0 {
-		return Nil
-	}
-	start := &Cell{}
-	li := start
-	for i, _ := range arr {
-		li.Car = arr[i]
-		if i != len(arr)-1 {
-			li.Cdr = &Cell{}
-		} else {
-			li.Cdr = Nil
-		}
-		li = li.Cdr.(*Cell)
-	}
-	return start
-}
-
-// reverse array returns an array reversed as copy
-func reverseArray(arr []any) []any {
-	arr2 := make([]any, len(arr))
-	n := len(arr2)
-	for i := range arr2 {
-		arr2[i] = arr[n-i-1]
-	}
-	return arr2
-}
-
-// reverse a string
-func reverseStr(s string) string {
-	r := []rune(s)
-	n := len(r)
-	r2 := make([]rune, n)
-	for i := range r2 {
-		r2[i] = r[n-i-1]
-	}
-	return string(r2)
-}
-
-// dictToArray converts a dict (Go map) to an array.
-func dictToArray(dict any) []any {
-	m := dict.(*Dict)
-	arr := make([]any, 0, 1024)
-	m.Data.Range(func(k, v any) bool {
-		arr = append(arr, k)
-		arr = append(arr, v)
-		return true
-	})
-	return arr
-}
-
-// filespecToName returns the string name, sort for a given filespec (in interface{} raw format).
-func filespecToName(caller string, a any) (string, string) {
-	arr := listToArray(a.(*Cell))
-	fn := arr[0].(*Cell).Car.(string)
-	if arr[0].(*Cell).Cdr == Nil {
-		panic(caller + `: missing file type in file specification`)
-	}
-	s := arr[0].(*Cell).Cdr.(*Cell).Car.(string)
-	return fn, s
-}
-
-// pathspecToStr returns a selector and a string path from a path specification (in interface{} raw format).
-// The string path returned does not end in a "/". See PathSort and constants UserPath, ResPath, ..., for
-// information on the selector returned.
-func pathspecToStr(caller string, a any) (PathSort, string) {
-	cell, ok := a.(*Cell)
-	if !ok {
-		return UserPath, ""
-	}
-	arr := listToArray(cell)
-	if len(arr) == 0 {
-		return UserPath, ""
-	}
-	selector, ok := maybeSymbolToSelector(caller, arr[0])
-	if ok {
-		arr = arr[1:]
-	}
-	s := make([]string, len(arr))
-	for i := range arr {
-		s[i] = arr[i].(string)
-	}
-	return selector, strings.Join(s, "/")
-}
-
-// fileFlagsToInt converts a Lisp list of symbolic flags to the corresponding host os flag int
-// of the modes for opening and creating files.
-func fileFlagsToInt(caller string, a *Cell) int {
-	fail := func() {
-		panic(fmt.Sprintf("%v: only one of read, write, read-write can be specified in file flags, given %v",
-			caller, Str(a)))
-	}
-	arr := listToArray(a)
-	flag := 0
-	excl := false
-	for _, s := range arr {
-		sym, ok := s.(*Sym)
-		if !ok {
-			panic(fmt.Sprintf("%v: expected file mode flag symbol, given %v", caller, Str(s)))
-		}
-		switch sym.Name {
-		case "read", "r", "rdonly":
-			if excl {
-				fail()
-			}
-			flag = flag | os.O_RDONLY
-			excl = true
-		case "write", "w", "wronly":
-			if excl {
-				fail()
-			}
-			flag = flag | os.O_WRONLY
-			excl = true
-		case "read-write", "rw", "rdwr":
-			if excl {
-				fail()
-			}
-			flag = flag | os.O_RDWR
-			excl = true
-		case "append", "a":
-			flag = flag | os.O_APPEND
-		case "create", "c":
-			flag = flag | os.O_CREATE
-		case "excl", "exclusive", "e":
-			flag = flag | os.O_EXCL
-		case "sync", "s":
-			flag = flag | os.O_SYNC
-		case "trunc", "truncate", "t":
-			flag = flag | os.O_TRUNC
-		default:
-			panic(fmt.Sprintf(`%v: unknown file mode flag '%v in '%v`, caller, s, Str(a)))
-		}
-	}
-	return flag
-}
-
-// filePermissionsToInt returns the file permissions as an integer value.
-func filePermissionToInt(caller string, a any) int {
-	n, exact := goarith.AsNumber(a).Int()
-	if !exact {
-		panic(fmt.Sprintf("%v: expected integer for file permissions, given %v", caller, Str(a)))
-	}
-	return n
-}
-
-// maybeSymbolToSelector returns the PathSort based on a symbol if the input is a *Sym. If in is not a symbol,
-// then false is returned with UserPath, otherwise true is returned with the corresponding PathSort value.
-// If the input is a symbol, but not one translatable to a PathSort, then an error is raised.
-func maybeSymbolToSelector(caller string, in any) (PathSort, bool) {
-	sym, ok := in.(*Sym)
-	if !ok {
-		return UserPath, false
-	}
-	switch sym.String() {
-	case "res", "resource":
-		return ResPath, true
-	case "user":
-		return UserPath, true
-	default:
-		panic(fmt.Sprintf("%v: invalid path selector '%v, expected 'resource or 'user", caller, sym.String()))
-	}
-}
-
-// selectorToStr returns a string representation of a numeric PathSort selector.
-func selectorToStr(caller string, selector PathSort) string {
-	switch selector {
-	case ResPath:
-		return "resource"
-	case UserPath:
-		return "user"
-	default:
-		return "unknown"
-	}
-}
-
-// copyMap copies a interface{} map deeply
-func copyMap(m map[any]any) map[any]any {
-	cp := make(map[any]any)
-	for k, v := range m {
-		vm, ok := v.(map[any]any)
-		if ok {
-			cp[k] = copyMap(vm)
-		} else {
-			cp[k] = v
-		}
-	}
-	return cp
-}
-
-// copyDict copies a Dict deeply
-func copyDict(m *Dict) *Dict {
-	var cp sync.Map
-	m.Data.Range(func(k, v any) bool {
-		vm, ok := v.(*Dict)
-		if ok {
-			cp.Store(k, copyDict(vm))
-		} else {
-			cp.Store(k, v)
-		}
-		return true
-	})
-	return &Dict{Data: &cp, Protected: m.Protected}
 }
 
 // equal checks for equality recursively
@@ -1825,7 +1411,7 @@ func (rr *Reader) parseExpression() any {
 		return &Cell{UnquoteSplicingSym, &Cell{rr.parseExpression(), Nil}}
 	case HashSym:
 		rr.readToken()
-		return listToArray(rr.parseExpression().(*Cell))
+		return ListToArray(rr.parseExpression().(*Cell))
 	case DotSym, RightParenSym:
 		panic(rr.newSynatxError("unexpected \"%v\"", rr.token))
 	default:
@@ -2055,7 +1641,7 @@ func strListBody(x *Cell, count int, printed map[*Cell]bool) string {
 // lookupArgs recursively looks up args in the list and adds them to string
 func (interp *Interp) externalizeBindings(interpEnv, env, body *Cell, s string, level int,
 	table map[string]bool) string {
-	arr := listToArray(body)
+	arr := ListToArray(body)
 	for _, a := range arr {
 		switch a.(type) {
 		case *Arg:
@@ -2116,8 +1702,8 @@ func (interp *Interp) externalize5(env *Cell, a any, quoteString bool, count int
 	case *Sym:
 		return x.Name
 	case *Dict:
-		arr := dictToArray(a)
-		li := arrayToList(arr)
+		arr := DictToArray(a)
+		li := ArrayToList(arr)
 		return "(dict '" + interp.Externalize(env, li) + ")"
 	case *sync.RWMutex:
 		return "(make-mutex)"
@@ -2376,7 +1962,11 @@ func (interp *Interp) Run(input io.Reader) bool {
 			x, err = interp.SafeEval(x, Nil)
 			if err == nil {
 				if interactive {
-					fmt.Println(Str(x))
+					if s, ok := x.(*Sym); ok && s == Void {
+						fmt.Print("")
+					} else {
+						fmt.Println(Str(x))
+					}
 				}
 			}
 		}

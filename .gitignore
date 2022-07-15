@@ -1,0 +1,36 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+# Emacs backup files
+*.go~
+*.mod~
+*.lisp~
+
+# Misc data not part of a source distro
+system/user/
+system/resources/assets/
+system/resources/config/cmos.json
+system/resources/data/persisted.z3ps
+system/resources/data/persisted.z3ps-shm
+system/resources/data/persisted.z3ps-wal
+system/resources/data/remembered.z3kv
+system/resources/data/remembered.z3kv-shm
+system/resources/data/remembered.z3kv-wal
+system/snapshots/
+acrhive/
+archive/database.go
+archive/threads.go
+assets/
