@@ -30,6 +30,6 @@ Please don't complain it's not Common Lisp or R7RS Scheme! Z3S5 Lisp is delibera
 
 ## License
 
-Permissive MIT License.
+Permissive MIT License. Happy hacking! :smile_cat:
 
 
