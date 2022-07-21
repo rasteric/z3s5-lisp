@@ -7,6 +7,8 @@ package z3s5
 
 import (
 	"bufio"
+	"bytes"
+	_ "embed"
 	"errors"
 	"fmt"
 	"io"
@@ -21,6 +23,12 @@ import (
 
 	"github.com/nukata/goarith"
 )
+
+//go:embed embed/init.lisp
+var initFile []byte
+
+//go:embed embed/help.lisp
+var helpFile []byte
 
 const VERSION = "v2.3"
 const DEFAULT_BUFFSIZE = 32768  // default buffer size for reader
@@ -609,6 +617,52 @@ func (fu *Future) String() string {
 		fu.Chan, Str(&fu.Result), &fu.Lock)
 }
 
+// Lock locks the interpreter's internal RWMutex. Be careful not to create deadlocks using this mechanism and bear
+// in mind that some calls internally use this mutex.
+func (interp *Interp) Lock() {
+	interp.lock.Lock()
+}
+
+// Unlock unlocks the interpreter's internal RWMutex.
+func (interp *Interp) Unlock() {
+	interp.lock.Unlock()
+}
+
+// RLock read-locks the interpreter's internal RWMutex. Be careful not to create deadlocks using this mechanism and bear
+// in mind that some calls internally use this mutex.
+func (interp *Interp) RLock() {
+	interp.lock.RLock()
+}
+
+// RUnlock unlocks a read-lock of the interpreter's internal RWMutex.
+func (interp *Interp) RUnlock() {
+	interp.lock.RUnlock()
+}
+
+// InputLock returns a pointer to a mutex used for locking on certain input conditions.
+// It is recommended not to use this mutex unless you know what you're doing.
+func (interp *Interp) InputLock() *sync.Mutex {
+	return &interp.inputLock
+}
+
+// Break attempts to globally cancel a running process and restart the read-eval-print loop using StartREPL.
+// It is like a soft reset function and would usually be bound to a function (break).
+func (interp *Interp) Break() {
+	atomic.StoreUint32(&interp.cancel, 1)
+	interp.StartREPL()
+}
+
+// InputCond returns a pointer to an sync.Cond condition used for waiting for input. This is used
+// for asynchronously signaling EndInput.
+func (interp *Interp) InputCond() *sync.Cond {
+	return interp.inputCond
+}
+
+// Streams returns a pointer to a sync.Map containing the i/o streams managed by the interpreter.
+func (interp *Interp) Streams() *sync.Map {
+	return &interp.streams
+}
+
 // GetGlobalVar gets a global value of symbol sym within the interpreter.
 func (interp *Interp) GetGlobalVar(sym *Sym) (any, bool) {
 	val, ok := interp.globals.Load(sym)
@@ -665,11 +719,20 @@ func NewInterp(pc any) (*Interp, error) {
 
 	interp.SetGlobalVar(ReflectSym, Nil) // initially *reflect* is empty, each of the definitions below populate it
 
-	interp.Define_Base()    // base definitions
-	interp.Define_Console() // line-based console i/o
-	interp.Define_Float()   // floating point package with prefix fl
-	interp.Define_Ling()    // linguistic helpers such as Levenshtein distance
-	interp.Define_Decimal() // decimal arithmetics
+	interp.Define_Base()       // base definitions
+	interp.Define_Console()    // line-based console i/o
+	interp.Define_Float()      // floating point package with prefix fl
+	interp.Define_Ling()       // linguistic helpers such as Levenshtein distance
+	interp.Define_Decimal()    // decimal arithmetics
+	interp.Define_StyledText() // colors in terminal
+
+	if supportsSound {
+		reflect, ok := interp.GetGlobalVar(ReflectSym)
+		if !ok {
+			reflect = Nil
+		}
+		interp.SetGlobalVar(ReflectSym, &Cell{NewSym("beep"), reflect})
+	}
 
 	return &interp, nil
 }
@@ -1028,7 +1091,7 @@ func (interp *Interp) compile(arg *Cell, env *Cell,
 	arity := len(table)
 	body := arg.CdrCell()
 	body = scanForArgs(body, table).(*Cell)
-	body = interp.expandMacros(body, 200).(*Cell) // Expand up to 200 nestings.
+	body = interp.ExpandMacros(body, 200).(*Cell) // Expand up to 200 nestings.
 	body = interp.compileInners(body).(*Cell)
 	if hasRest {
 		arity = -arity
@@ -1036,8 +1099,8 @@ func (interp *Interp) compile(arg *Cell, env *Cell,
 	return factory(arity, arg.Car.(*Cell), body, env)
 }
 
-// expandMacros expands macros and quasi-quotes in x up to count nestings.
-func (interp *Interp) expandMacros(x any, count int) any {
+// ExpandMacros expands macros and quasi-quotes in x up to count nestings.
+func (interp *Interp) ExpandMacros(x any, count int) any {
 	if count > 0 {
 		if j, ok := x.(*Cell); ok {
 			if j == Nil {
@@ -1050,7 +1113,7 @@ func (interp *Interp) expandMacros(x any, count int) any {
 				d := j.CdrCell()
 				if d != Nil && d.Cdr == Nil {
 					z := QqExpand(d.Car)
-					return interp.expandMacros(z, count)
+					return interp.ExpandMacros(z, count)
 				}
 				panic(NewEvalError("bad quasiquote", j))
 			default:
@@ -1062,10 +1125,10 @@ func (interp *Interp) expandMacros(x any, count int) any {
 				if f, ok := k.(*Macro); ok {
 					d := j.CdrCell()
 					z := f.ExpandWith(interp, d)
-					return interp.expandMacros(z, count-1)
+					return interp.ExpandMacros(z, count-1)
 				} else {
 					return j.MapCar(func(y any) any {
-						return interp.expandMacros(y, count)
+						return interp.ExpandMacros(y, count)
 					})
 				}
 			}
@@ -1845,6 +1908,14 @@ func (interp *Interp) Boot() error {
 	if !interp.Run(ss) {
 		return errors.New(`Lisp standard prelude boot sequence failed`)
 	}
+	preamble := bytes.NewReader(initFile)
+	if !interp.Run(preamble) {
+		return errors.New(`Lisp preamble failed`)
+	}
+	help := bytes.NewReader(helpFile)
+	if !interp.Run(help) {
+		return errors.New(`Lisp help definitions failed`)
+	}
 	return nil
 }
 
@@ -1853,11 +1924,11 @@ func (interp *Interp) Boot() error {
 func (interp *Interp) StartREPL() {
 	atomic.StoreUint32(&interp.cancel, 0)
 	interp.inputCond.Signal() // end any active input
-	interp.pc.Editor().StartInput()
+	interp.pc.EditorInterface().StartInput(interp.EndLineInput)
 }
 
 func (interp *Interp) EndLineInput() {
-	in, ok := interp.pc.Editor().EndInput()
+	in, ok := interp.pc.EditorInterface().EndInput()
 	if !ok {
 		in = `(beep 'error)`
 	}
@@ -1873,11 +1944,11 @@ func (interp *Interp) EndLineInput() {
 			interp.PrintError(err)
 		} else {
 			if s, ok := x.(*Sym); ok && s == Void {
-				interp.pc.Editor().Print(fmt.Sprintf(""))
+				interp.pc.EditorInterface().Print(fmt.Sprintf(""))
 			} else {
-				interp.pc.Editor().Print(fmt.Sprintf("%v\n", Str(x)))
+				interp.pc.EditorInterface().Print(fmt.Sprintf("%v\n", Str(x)))
 			}
-			interp.pc.Sound().SystemSound(SND_READY)
+			interp.pc.SoundInterface().SystemSound(SND_READY)
 		}
 	}
 	// interp.pc.VRAM().SetHideCursor(cur)
@@ -1904,8 +1975,8 @@ func (interp *Interp) PrintError(err any) {
 
 // DefaultPrintError is the default error printer that simply outputs the error string.
 func (interp *Interp) DefaultPrintError(err any) {
-	interp.pc.Editor().Print(fmt.Sprintf("%v\n", err))
-	interp.pc.Sound().SystemSound(SND_ERROR)
+	interp.pc.EditorInterface().Print(fmt.Sprintf("%v\n", err))
+	interp.pc.SoundInterface().SystemSound(SND_ERROR)
 }
 
 // HandleError attempts to handle the error by invoking *error-handler* if it is defined.
@@ -1918,20 +1989,26 @@ func (interp *Interp) HandleError(err any) (any, bool) {
 		if ok && dict != nil {
 			var gid, hdl any
 			gid = int64(GetGID())
-			var handler *Closure
 			hdl, ok = dict.Data.Load(goarith.AsNumber(gid))
 			if !ok {
 				hdl, ok = dict.Data.Load(goarith.AsNumber(0))
 			}
+			// We're evaluating both lists and closures here, since both are allowed in an error handler.
+			// Lists are simply interpreted as function calls as usual.
 			if ok {
 				cell, ok := hdl.(*Cell)
-				if ok && cell != nil {
-					handler, ok = cell.Car.(*Closure)
+				if ok {
+					closure, ok := cell.Car.(*Closure)
 					if ok {
-						result, err := interp.SafeEval(&Cell{handler, &Cell{err, Nil}}, Nil)
+						result, err := interp.SafeEval(&Cell{closure, &Cell{err, Nil}}, Nil)
 						if err == nil {
 							return result, true
 						}
+					}
+					// it wasn't a closure, so let's just call the list as a function call.
+					result, err := interp.SafeEval(&Cell{cell, &Cell{err, Nil}}, Nil)
+					if err == nil {
+						return result, true
 					}
 				}
 			}
@@ -1952,7 +2029,7 @@ func (interp *Interp) Run(input io.Reader) bool {
 	reader := NewReader(input)
 	for {
 		if interactive {
-			os.Stdout.WriteString("> ")
+			interp.pc.EditorInterface().Print("> ")
 		}
 		x, err := reader.Read()
 		if err == nil {
@@ -1963,15 +2040,15 @@ func (interp *Interp) Run(input io.Reader) bool {
 			if err == nil {
 				if interactive {
 					if s, ok := x.(*Sym); ok && s == Void {
-						fmt.Print("")
+						interp.pc.EditorInterface().Print("")
 					} else {
-						fmt.Println(Str(x))
+						interp.pc.EditorInterface().Print(Str(x) + "\n")
 					}
 				}
 			}
 		}
 		if err != nil {
-			fmt.Println(err)
+			interp.HandleError(err)
 			if !interactive {
 				return false // Ceased by an error.
 			}

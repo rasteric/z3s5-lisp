@@ -10,6 +10,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/faiface/beep/effects"
 	"github.com/faiface/beep/speaker"
 	ogg "github.com/faiface/beep/vorbis"
 )
@@ -55,7 +56,14 @@ func getSoundData(snd int) []byte {
 	}
 }
 
+const supportsSound = true
+
 var soundInited bool
+var volume *effects.Volume
+
+func init() {
+	volume = &effects.Volume{Base: 2}
+}
 
 func playSystemSound(snd int) {
 	reader := bytes.NewReader(getSoundData(snd))
@@ -64,9 +72,24 @@ func playSystemSound(snd int) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	volume.Streamer = streamer
 	if !soundInited {
 		speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+		volume.Volume = 0.7
 		soundInited = true
 	}
-	speaker.Play(streamer)
+	speaker.Play(volume)
+}
+
+func setVolume(vol float64) {
+	if vol == 0.0 {
+		volume.Silent = true
+		return
+	}
+	vol = vol * 3
+	if vol > 3.0 {
+		vol = 3.0 // hearing protection
+	}
+	volume.Volume = vol
+	volume.Silent = false
 }

@@ -1,19 +1,24 @@
 package z3s5
 
 type Editing interface {
-	StartInput()
+	StartInput(cb func())
 	EndInput() (string, bool)
-	Print(s string)
+	EndInputCallback() func()
+	Print(s string) (int, int)
+	SetColor(bg bool, r, g, b, a uint8)
+	Color(bg bool) (uint8, uint8, uint8, uint8)
 }
 
 type Audio interface {
 	SystemSound(id int)
+	SetVolume(fl float64)
 }
 
 type Runtime interface {
-	Editor() Editing
-	Sound() Audio
+	EditorInterface() Editing
+	SoundInterface() Audio
 	Perm() Permissions
+	SetPerm(Permissions) error
 	RequestShutdown(errcode int)
 	Enqueue(func())
 }

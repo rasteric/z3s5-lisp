@@ -11,6 +11,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/gookit/color"
 	"github.com/loov/hrtime"
 	"github.com/nukata/goarith"
 )
@@ -315,4 +316,26 @@ func SleepHiRes(duration time.Duration, cancel *int32) {
 	for hrtime.Since(t0) < duration && atomic.LoadInt32(cancel) < 2 {
 		runtime.Gosched()
 	}
+}
+
+// colorToList converts a Raylib color to a Lisp list.
+func colorToList(c color.RGBColor) *Cell {
+	return &Cell{
+		goarith.AsNumber(int(c[0])),
+		&Cell{
+			goarith.AsNumber(int(c[1])),
+			&Cell{
+				goarith.AsNumber(int(c[2])),
+				&Cell{
+					goarith.AsNumber(255),
+					Nil}}}}
+}
+
+// listToColor converts a color list to a Raylib color.
+func listToColor(caller string, li *Cell) color.RGBColor {
+	arr := ListToArray(li)
+	r := byte(ToInt64(caller, arr[0]))
+	g := byte(ToInt64(caller, arr[1]))
+	b := byte(ToInt64(caller, arr[2]))
+	return color.RGBColor{r, g, b}
 }

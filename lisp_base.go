@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"log"
 	"math"
 	"runtime"
 	"runtime/debug"
@@ -386,12 +387,19 @@ func (interp *Interp) Define_Base() {
 		return interp.Eval(&Cell{a[0], args}, Nil)
 	})
 
-	interp.Def("exit", 1, func(a []any) any {
-		n, exact := goarith.AsNumber(a[0]).Int()
-		if !exact {
-			panic("int expected")
+	interp.Def("exit", -1, func(a []any) any {
+		arr := ListToArray(a[0].(*Cell))
+		var n int
+		var exact bool
+		if len(arr) > 0 {
+			n, exact = goarith.AsNumber(arr[0]).Int()
+			if !exact {
+				panic("int expected")
+			}
+		} else {
+			n = 0
 		}
-		interp.pc.RequestShutdown(int(n))
+		interp.pc.RequestShutdown(n)
 		return Void // reached but main PC loop will shut down ASAP
 	})
 
@@ -1917,28 +1925,187 @@ func (interp *Interp) Define_Base() {
 	// (beep selector) play a pre-defined system sound.
 	interp.Def("beep", -1, func(a []any) any {
 		if a[0].(*Cell) == Nil {
-			interp.pc.Sound().SystemSound(SND_READY)
+			interp.pc.SoundInterface().SystemSound(SND_READY)
 			return Void
 		}
 		switch Str(a[0].(*Cell).Car) {
 		case "error":
-			interp.pc.Sound().SystemSound(SND_ERROR)
+			interp.pc.SoundInterface().SystemSound(SND_ERROR)
 		case "start":
-			interp.pc.Sound().SystemSound(SND_START)
+			interp.pc.SoundInterface().SystemSound(SND_START)
 		case "ready":
-			interp.pc.Sound().SystemSound(SND_READY)
+			interp.pc.SoundInterface().SystemSound(SND_READY)
 		case "click":
-			interp.pc.Sound().SystemSound(SND_CLICK)
+			interp.pc.SoundInterface().SystemSound(SND_CLICK)
 		case "okay":
-			interp.pc.Sound().SystemSound(SND_OKAY)
+			interp.pc.SoundInterface().SystemSound(SND_OKAY)
 		case "confirm":
-			interp.pc.Sound().SystemSound(SND_CONFIRM)
+			interp.pc.SoundInterface().SystemSound(SND_CONFIRM)
 		case "info":
-			interp.pc.Sound().SystemSound(SND_INFO)
+			interp.pc.SoundInterface().SystemSound(SND_INFO)
 		default:
 			panic(fmt.Sprintf(`beep: unknown system sound '%s`, Str(a[0])))
 		}
 		return Void
+	})
+
+	// (set-volume fl) set the system volume (only has an effect if sound support is enabled)
+	interp.Def("set-volume", 1, func(a []any) any {
+		fl := ToFloat64(a[0])
+		interp.pc.SoundInterface().SetVolume(fl)
+		return Void
+	})
+
+	// EOF
+	interp.Def("eof?", 1, func(a []any) any {
+		return AsLispBool(a[0] == EofToken)
+	})
+
+	// (end-of-file) => EOF
+	interp.Def("end-of-file", 0, func(a []any) any {
+		return EofToken
+	})
+
+	// (log str) print a log entry (usually on the console)
+	interp.Def("log", 1, func(a []any) any {
+		log.Println(a[0].(string))
+		return Void
+	})
+
+	// (sys selector [default]) => any returns configuration data, default if the configuration
+	// is not supported. This is significantly scaled down from Z3S5 Machine system data. Notice that
+	// rows and columns are currently returning hardcodes dummy values.
+	interp.Def("sys", -1, func(in []any) any {
+		interp.RLock()
+		defer interp.RUnlock()
+		a := ListToArray(in[0].(*Cell))
+		if len(a) < 1 {
+			panic("sys: missing selector argument!")
+		}
+		switch Str(a[0]) {
+		case "rows":
+			return goarith.AsNumber(40)
+		case "cols", "columns":
+			return goarith.AsNumber(72)
+		case "build-info":
+			bi, ok := debug.ReadBuildInfo()
+			var buildInfoStr string
+			arr := make([]any, 0)
+			if ok {
+				buildInfoStr = fmt.Sprintf("%s", bi.Main.Version)
+				arr = append(arr, &Cell{bi.Main.Path, buildInfoStr})
+				for _, v := range bi.Deps {
+					arr = append(arr, &Cell{v.Path, fmt.Sprintf("%s", v.Version)})
+				}
+			}
+			return arr
+		case "version":
+			return &Cell{
+				VERSION,
+				&Cell{
+					goarith.AsNumber(runtime.NumCPU()),
+					&Cell{
+						fmt.Sprintf("%s/%s",
+							runtime.GOOS, runtime.GOARCH),
+						&Cell{
+							NewSym("Z3S5-Lisp"),
+							Nil,
+						}}}}
+		case "linecount":
+			return goarith.AsNumber(40)
+		case "editmode":
+			return NewSym("console")
+		case "inserting":
+			return Nil
+		case "editmodes":
+			return &Cell{NewSym("console"), Nil}
+		case "taskid":
+			return goarith.AsNumber(int64(GetGID()))
+		case "concurrency":
+			return goarith.AsNumber(runtime.NumGoroutine())
+		case "sys":
+			return ArrayToList([]any{
+				NewSym("sys"), NewSym("rows"), NewSym("cols"),
+				NewSym("columns"), NewSym("version"), NewSym("linecount"), NewSym("editmode"),
+				NewSym("inserting"), NewSym("editmodes"), NewSym("taskid"),
+				NewSym("concurrency"),
+			})
+		default:
+			if len(a) > 1 {
+				return a[1]
+			}
+			return Nil
+		}
+	})
+
+	// (setsys selector value) sets the configuration data to value.
+	// See config for more information.
+	interp.Def("setsys", 2, func(a []any) any {
+		var result any = true
+		switch Str(a[0]) {
+		default:
+			result = Nil
+		}
+		return result
+	})
+
+	// (break) attempts to break the current evaluation and return to the read-eval-print loop.
+	interp.Def("break", 0, func(a []any) any {
+		interp.Break()
+		return Void // never reached
+	})
+
+	// (eval sexpr) => any evaluate the given sexpr.
+	interp.Def("eval", 1, func(a []any) any {
+		return interp.Eval(a[0], Nil)
+	})
+
+	// (permissions) => li list of permissions
+	interp.Def("permissions", 0, func(a []any) any {
+		p := interp.pc.Perm()
+		perms := (&p).Strings()
+		sym := make([]any, len(perms))
+		for i, s := range perms {
+			sym[i] = NewSym(s)
+		}
+		return ArrayToList(sym)
+	})
+
+	// (set-permissions li) set the permissions in li, return true if all permissions could be set
+	interp.Def("set-permissions", 1, func(a []any) any {
+		arr := ListToArray(a[0].(*Cell))
+		s := make([]string, len(arr))
+		for i := range s {
+			s[i] = arr[i].(*Sym).String()
+		}
+		var err error
+		p, err := NewPermissions(interp.pc.Perm(), s)
+		if err != nil {
+			panic(fmt.Errorf("set-permissions: %w", err))
+		}
+		err = interp.pc.SetPerm(p)
+		if err != nil {
+			panic(fmt.Errorf("set-permissions: %w", err))
+		}
+		return Void
+	})
+
+	// (permission? sym) => bool return true if the permission is set, nil otherwise
+	interp.Def("permission?", -1, func(a []any) any {
+		arr := ListToArray(a[0].(*Cell))
+		if len(arr) == 0 {
+			panic("permission?: expected a symbol as first argument")
+		}
+		s := arr[0].(*Sym)
+		p := interp.pc.Perm()
+		result, err := (&p).Get(s.String())
+		if err == ErrUnknownPermission {
+			if len(arr) > 1 {
+				return arr[1]
+			}
+			return Nil
+		}
+		return AsLispBool(result.(bool))
 	})
 
 }
