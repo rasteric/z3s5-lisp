@@ -1904,17 +1904,33 @@ func NewStream(ioreader io.Reader, iowriter io.Writer, ioseeker io.Seeker, iowri
 // Boot loads the standard prelude and any other init files and ensures
 // that the interpreter is in a ready state.
 func (interp *Interp) Boot() error {
-	ss := strings.NewReader(Prelude)
-	if !interp.Run(ss) {
-		return errors.New(`Lisp standard prelude boot sequence failed`)
+	p := interp.pc.Perm()
+	if p.LoadPrelude {
+		ss := strings.NewReader(Prelude)
+		if !interp.Run(ss) {
+			return errors.New(`Z3S5 Lisp standard prelude boot sequence failed`)
+		}
+		preamble := bytes.NewReader(initFile)
+		if !interp.Run(preamble) {
+			return errors.New(`Z3S5 Lisp preamble failed`)
+		}
+		help := bytes.NewReader(helpFile)
+		if !interp.Run(help) {
+			return errors.New(`Z3S5 Lisp help definitions failed`)
+		}
 	}
-	preamble := bytes.NewReader(initFile)
-	if !interp.Run(preamble) {
-		return errors.New(`Lisp preamble failed`)
-	}
-	help := bytes.NewReader(helpFile)
-	if !interp.Run(help) {
-		return errors.New(`Lisp help definitions failed`)
+	if p.LoadUserInit {
+		file, err := os.Open(`init.lisp`)
+		defer file.Close()
+		if err != nil {
+			if !os.IsNotExist(err) {
+				return fmt.Errorf("Z3S5 Lisp could not open the init.lisp file: %w", err)
+			}
+			return nil
+		}
+		if !interp.Run(file) {
+			return errors.New(`Z3S5 Lisp encountered an error in init.lisp.`)
+		}
 	}
 	return nil
 }
