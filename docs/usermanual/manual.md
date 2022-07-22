@@ -1,6 +1,6 @@
 # Z3S5 Lisp User Manual
 
-for version 2.3
+-- for version 2.3
 
 ## Introduction
 
@@ -189,7 +189,7 @@ Error handling is very rudimentary in Z3S5 Lisp. There are no continuations and 
 
 #### Debugging
 
-Not only are error messages fairly rudimentary, they also use the expanded macro definitions and are therefore hard to read. Local bindings are implemented with lambda-terms and displayed as such. This makes debugging a challenge, as it should be. Z3S5 programmers have the habit of writing bug-free code from the start and thereby avoid debugging entirely. But you could write your own trace or stepper functions for enhanced debugging features by redefining all toplevel symbols appropriately. Then again, you could also just write your Lisp with better debugging capabilities. The choice is up to you!
+Not only are error messages fairly rudimentary, they also use the expanded macro definitions and are therefore hard to read. Local bindings are implemented with lambda-terms and displayed as such. This makes debugging a challenge, as it should be. Z3S5 programmers have the habit of writing bug-free code from the start and thereby avoid debugging entirely. But you could write your own trace or stepper functions for enhanced debugging features by redefining all toplevel symbols appropriately. Then again, you could also just write your own Lisp with better debugging capabilities. The choice is up to you!
 
 #### Concurrency
 
@@ -237,6 +237,4 @@ Custom data structures: Since there is currently no way to modify the printer fo
 
 Z3S5 Lisp was written by Erich H. Rast and based on Nukata Lisp by SUZUKI Hisao. It is licensed under the MIT License that allows free use and modification as long as the LICENSE and copyright notices remain. Please read the accompanying LICENSE file for more information.
 
-Please send inquiries and bug reports to <erich@snafu.de> or open an issue on Github.
-
-
+Please send inquiries and bug reports to <erich@snafu.de> or open an issue on Github. Happy hacking!
