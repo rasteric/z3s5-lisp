@@ -1,0 +1,2 @@
+docmake: manual.md
+     pandoc -s -o build/manual.html manual.md --number-sections

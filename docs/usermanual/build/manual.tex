@@ -1,0 +1,659 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Z3S5 Lisp User Manual},
+  pdfauthor={by Erich H. Rast, Ph.D.},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{listings}
+\newcommand{\passthrough}[1]{#1}
+\lstset{defaultdialect=[5.3]Lua}
+\lstset{defaultdialect=[x86masm]Assembler}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+\lstset{% for listings
+  basicstyle=\footnotesize\ttfamily,
+  breaklines=true,
+}
+\usepackage{xcolor}
+
+\title{Z3S5 Lisp User Manual}
+\author{by Erich H. Rast, Ph.D.}
+\date{July 22, 2022}
+
+\begin{document}
+\maketitle
+
+\emph{for Z3S5 Lisp Version 2.3+}
+
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+Z3S5 Lisp can be used as a standalone interpreter or as an extension
+language embedded into Go programs. It is a traditional Lisp-1 dialect,
+where the suffix 1 means that symbols hold one value and this value
+might either represent functions and closures or data. This is in
+contrast to Lisp-2 language like CommonLisp in which symbols may hold
+functions in a separate slot. Scheme dialects are also Lisp-1 and Z3S5
+Lisp shares many similarities with Scheme while also having features of
+traditional Lisp systems.
+
+\hypertarget{invoking-lisp}{%
+\subsection{Invoking Lisp}\label{invoking-lisp}}
+
+\hypertarget{the-standalone-interpreter}{%
+\subsubsection{The Standalone
+Interpreter}\label{the-standalone-interpreter}}
+
+In the directory \passthrough{\lstinline!cmd/z3!} there is an example
+standalone version \passthrough{\lstinline!z3.go!} that you can build on
+your system using \passthrough{\lstinline!go build z3.go!}. The
+interpreter is started in a terminal using
+\passthrough{\lstinline!./z3!}.
+
+The \passthrough{\lstinline!z3!} interpreter is fairly limited. It
+starts a read-eval-reply loop until it is quit with the command
+\passthrough{\lstinline!(exit [n])!} where the optional number
+\passthrough{\lstinline!n!} is an integer for the Unix return code of
+the program. It reads one line of input from the command line and
+returns the result of evaluating it. Better editing capabilities and
+parenthesis matching are planned for the future; for now, the
+interpreter is more of a testing tool and a proof of concept and can be
+used as an example of how to implement your own Z3S5 standalone
+executable.
+
+When an interpreter starts either in a standalone executable or when the
+\passthrough{\lstinline!interp.Boot()!} function is called in a Go
+program, then it first loads the standard prelude and help files in
+directory \passthrough{\lstinline!embed!}. These are embedded into the
+executable and so the directory is not needed to run the interpreter.
+After this start sequence, the interpreter checks whether there is a
+file named \passthrough{\lstinline!init.lisp!} in the executable
+directory -- that is, the \passthrough{\lstinline!z3!} directory for
+standalone or the directory of the program that includes Z3S5 Lisp as a
+package. If there is such a file, then it is loaded and executed.
+
+\hypertarget{using-the-interpreter-in-go}{%
+\subsubsection{Using the Interpreter in
+Go}\label{using-the-interpreter-in-go}}
+
+See \passthrough{\lstinline!cmd/z3/z3.go!} for an example of how to use
+Z3S5 Lisp in Go. It is best to include the package with
+\passthrough{\lstinline!z3 "github.com/rasteric/z3s5-lisp"!} so
+\passthrough{\lstinline!z3!} can be used as the package shortcut, since
+this has to be called often when writing extensions. The following
+snippet from \passthrough{\lstinline!z3.go!} imports the Lisp
+interpreter, boots the standard prelude, and runs an interactive
+read-eval-reply loop:
+
+\begin{lstlisting}[language=Go]
+import (
+    "fmt"
+    "os"
+
+    z3 "github.com/rasteric/z3s5-lisp"
+)
+
+func main() {
+    interp, err := z3.NewInterp(z3.NewBasicRuntime(z3.FullPermissions))
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Z3S5 Lisp failed to start: %v\n", err)
+        os.Exit(1)
+    }
+    err = interp.Boot()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Z3S5 Lisp failed to boot the standard prelude: %v\n", err)
+        os.Exit(2)
+    }
+    interp.SafeEval(&z3.Cell{Car: z3.NewSym("protect-toplevel-symbols"), Cdr: z3.Nil}, z3.Nil)
+    interp.Run(nil)
+}
+\end{lstlisting}
+
+What deserves explanation is the line starting with
+\passthrough{\lstinline!interp.SafeEval!}. This creates a list with the
+symbol \passthrough{\lstinline!protect-toplevel-symbols!} as car and an
+empty cdr and executes it within an empty environment. So it runs the
+equivalent of \passthrough{\lstinline!(protect-toplevel-symbols)!},
+which is interpreted as a function call that applies
+\passthrough{\lstinline!protect!} to all toplevel symbols defined thus
+far. It is not put in the standard prelude because a common way to
+extend Z3S5 Lisp is to simply redefine some of its primitives. Once a
+symbol is protected, attempts of redefining or mutating it result in a
+security violation error. As long as the
+\passthrough{\lstinline!Permissions!} given to
+\passthrough{\lstinline!NewBasicRuntime!} have
+\passthrough{\lstinline!AllowUnprotect!} set to true, you may use
+\passthrough{\lstinline!unprotect!} to remove this safeguard again and
+redefine existing functions. Symbols are protected in the
+\passthrough{\lstinline!z3!} interpreter because it is easy to mess up
+the system with dynamic redefinitions. For example, you could redefine
+\passthrough{\lstinline!(setq + -)!} and \passthrough{\lstinline!+!} is
+suddenly interpreted as subtraction! However, redefining toplevel
+symbols is a very important feature. By using
+\passthrough{\lstinline!unbind!} on certain functions or setting them to
+something else like
+\passthrough{\lstinline'(setq func (lambda () (error "not allowed to use func!")))'}
+it is possible to create fine-grained access control to functions even
+when they are intrinsic or defined in the standard prelude. It is not
+possible to access an intrinsic function after it has been defined away
+in this manner. After you added all your toplevel symbols and removed or
+redefined the ones you do not like, you may thus protect all symbols and
+use \passthrough{\lstinline!set-permissions!} to revoke the privilege
+\passthrough{\lstinline!AllowUnprotect!}. This fixes the base vocabulary
+and any attempt to redefine it in the future will result in a security
+violation, since permissions can only be changed from less secure to
+more secure and never vice versa.
+
+See the Chapter \protect\hyperlink{extending-z3s5-lisp}{Extending Z3S5
+Lisp} for information about how to define your own functions in Z3S5
+Lisp.
+
+\hypertarget{data-types}{%
+\subsection{Data Types}\label{data-types}}
+
+Basic data types of Z3S5 Lisp are:
+
+\begin{itemize}
+\tightlist
+\item
+  Bools: \passthrough{\lstinline!t!} and \passthrough{\lstinline!nil!}.
+  The empty list \passthrough{\lstinline!nil!} is interpreted as false
+  and any non-nil value is true; the symbol \passthrough{\lstinline!t!}
+  is predefined as non-nil and usually used for true.
+\item
+  Symbols: \passthrough{\lstinline!abracadabra!},
+  \passthrough{\lstinline!foo!}, \passthrough{\lstinline!bar!},
+  \passthrough{\lstinline!...hel\%lo*\_!}. These have few restrictions,
+  as the last example illustrates.
+\item
+  Integers: \passthrough{\lstinline!3!}, \passthrough{\lstinline!1!},
+  \passthrough{\lstinline!-28!}. These are bignums with functions such
+  as \passthrough{\lstinline!+!}, \passthrough{\lstinline!-!},
+  \passthrough{\lstinline!sub!}, \passthrough{\lstinline!div!},\ldots{}
+\item
+  Floats: \passthrough{\lstinline!3.14!},
+  \passthrough{\lstinline!1.92829!} with a large range of functions with
+  prefix \passthrough{\lstinline!fl.!}. Get a list with
+  \passthrough{\lstinline!(dump 'fl.)!}
+\item
+  UTF-8 Strings: \passthrough{\lstinline!"This is a test."!} with
+  functions such as \passthrough{\lstinline!str+!},
+  \passthrough{\lstinline!str-empty?!},
+  \passthrough{\lstinline!str-forall?!},
+  \passthrough{\lstinline!str-join!},\ldots{} Get an overview with
+  \passthrough{\lstinline!(dump 'str)!}.
+\item
+  Lists: \passthrough{\lstinline!'(a b c d e f)!} with functions such as
+  \passthrough{\lstinline!car!}, \passthrough{\lstinline!cdr!},
+  \passthrough{\lstinline!mapcar!}, \passthrough{\lstinline!1st!},
+  \passthrough{\lstinline!2nd!}, \passthrough{\lstinline!member!},
+  \passthrough{\lstinline!filter!},\ldots{}
+\item
+  Arrays: \passthrough{\lstinline!\#(a b c d e f)!} with functions such
+  as \passthrough{\lstinline!array-ref!},
+  \passthrough{\lstinline!array-set!},
+  \passthrough{\lstinline!array-len!}, \ldots{}
+\item
+  Dictionaries: \passthrough{\lstinline!(dict)!} with functions such as
+  \passthrough{\lstinline!get!}, \passthrough{\lstinline!set!},
+  \passthrough{\lstinline!dict->alist!},
+  \passthrough{\lstinline!dict->array!},
+  \passthrough{\lstinline!dict->values!},
+  \passthrough{\lstinline!dict-map!},\ldots{}
+\item
+  Blobs: These contain binary data with functions like
+  \passthrough{\lstinline!peek!}, \passthrough{\lstinline!poke!},
+  \passthrough{\lstinline!blob->base64!},\ldots{}
+\item
+  Boxed values with functions like \passthrough{\lstinline!valid?!}.
+  Boxed values are used to embed foreign types like Go structures into
+  the runtime system which cannot be automatically garbage collected.
+  They typically require manual destruction to free memory. See the
+  source code for \passthrough{\lstinline!lisp\_decimal.go!} for an
+  example of such an embedding.
+\item
+  Futures: Futures encapsulate the result of a future computation and
+  are returned by the special form
+  \passthrough{\lstinline!(future ...)!} whose body evaluates to a
+  future. The result of a future computation may be obtained with
+  \passthrough{\lstinline!(force <future>)!}.
+\item
+  Tasks: Tasks are heavyweight concurrency constructs similar to threads
+  in other programming languages. See
+  \passthrough{\lstinline!(dump 'task)!} for a list of functions.
+\end{itemize}
+
+Strings, lists, and arrays are also sequences testable with the
+\passthrough{\lstinline!seq?!} predicate. These support convenience
+successor functions like \passthrough{\lstinline!map!} and
+\passthrough{\lstinline!foreach!}. Check the
+\passthrough{\lstinline!init.lisp!} preamble in directory
+\passthrough{\lstinline!embed/!} for how these work.
+
+Numbers are generally one bignum type for which
+\passthrough{\lstinline!num?!} is true and they will extend and shrink
+in their representation as necessary. However, numbers larger than 64
+bit only support basic arithmetics and floating point arithmetics is
+limited to values that fit into a Float64. There is also a built-in
+decimal arithmetics extension with prefix \passthrough{\lstinline!dec!}
+for correct accounting and banking arithmetics and rounding -- see
+\passthrough{\lstinline!(dump 'dec.)!} for a list of available decimal
+arithmetics functions and \passthrough{\lstinline!lisp\_decimal.go!} for
+implementation details.
+
+\hypertarget{writing-programs}{%
+\section{Writing Programs}\label{writing-programs}}
+
+Currently, the only way to load programs into the
+\passthrough{\lstinline!z3!} interpreter instead of typing them by hand
+is to edit the \passthrough{\lstinline!init.lisp!} file in the same
+directory as the executable. This file is loaded and executed at
+startup.
+
+\hypertarget{finding-functions-and-online-help}{%
+\subsection{Finding Functions and Online
+Help}\label{finding-functions-and-online-help}}
+
+Built-in help on functions can be obtained with
+\passthrough{\lstinline!(help func)!} where the function name is not
+quoted. For example, \passthrough{\lstinline!(help help)!} returns the
+help entry for the \passthrough{\lstinline!help!} function. A list of
+bound toplevel symbols can be obtained with
+\passthrough{\lstinline!(dump [sym])!} where the optional symbol
+\passthrough{\lstinline!sym!} must be a quoted prefix. For example,
+\passthrough{\lstinline!(dump)!} returns all toplevel bindings and
+\passthrough{\lstinline!(dump 'str)!} returns a list of all bound
+symbols starting with ``str''. By convention, internal helper functions
+without help entry are prefixed with an underscore and omitted by
+\passthrough{\lstinline!dump!}. To get a list of all bindings, including
+those starting with an underscore, use
+\passthrough{\lstinline!(dump-bindings)!}.
+
+\hypertarget{peculiarities-of-z3s5-lisp}{%
+\subsection{Peculiarities of Z3S5
+Lisp}\label{peculiarities-of-z3s5-lisp}}
+
+\begin{itemize}
+\item
+  Iterators over sequences use the order
+  \passthrough{\lstinline!(iterator sequence function)!}, not sometimes
+  one and sometimes the other. Exception: \passthrough{\lstinline!memq!}
+  and \passthrough{\lstinline!member!} ask whether an element is a
+  member of a list and have order
+  \passthrough{\lstinline!(member element list)!}.
+\item
+  There is no meaningful \passthrough{\lstinline!eq!}, equality is
+  generally tested with \passthrough{\lstinline!equal?!}.
+\item
+  Predicate names usually end in a question mark like in Scheme
+  dialects, with a few exceptions like \passthrough{\lstinline!=!} for
+  numeric equality. Example: \passthrough{\lstinline!equal?!}. There is
+  no p-suffix like in other Lisps.
+\item
+  \passthrough{\lstinline!dict!} data structures are multi-threading
+  safe.
+\item
+  There is support for futures and concurrent tasks.
+\end{itemize}
+
+\hypertarget{basic-control-flow-and-examples}{%
+\subsection{Basic Control Flow and
+Examples}\label{basic-control-flow-and-examples}}
+
+When Z3S5 Lisp encounters an unquoted list, it attempts to interpret the
+first element of the list as a function call. Thus, if the symbol is
+bound to a function or macro, it calls the function with the remainder
+of the list as argument:
+
+\begin{lstlisting}[language=Lisp]
+> (+ 10 20 30 40 50)
+150
+\end{lstlisting}
+
+Symbols evaluate to their values and need to be quoted otherwise. They
+can be defined with \passthrough{\lstinline!setq!}:
+
+\begin{lstlisting}[language=Lisp]
+> hello
+EvalError: void variable: hello
+    hello
+> (setq hello 'world)
+world
+> hello
+world
+\end{lstlisting}
+
+To define a function, the macro \passthrough{\lstinline!defun!} can be
+used as in other Lisp dialects. The syntax is the traditional one, not
+in Scheme dialects:
+
+\begin{lstlisting}[language=Lisp]
+> (defun fib (n)
+    (if (or (= n 0) (= n 1))
+        1
+        (+ (fib (- n 1))
+           (fib (- n 2)))))
+fib
+> (fib 10)
+89
+> (fib 30)
+1346269
+\end{lstlisting}
+
+\passthrough{\lstinline!(defun foo (bar) ...)!} is really just a macro
+shortcut for \passthrough{\lstinline!(setq foo (lambda (bar) ...))!}
+like in most other Lisp dialects. Macros are expanded before a program
+is executed, which unfortunately makes error reporting in Z3S5 Lisp
+sometimes a bit obtuse. The system neither keeps track of source
+locations nor of original definitions and will present the expanded
+macros when an error occurs. This will not change in the future, so
+better get used to it! Changing this and turning Z3S5 Lisp into a real,
+full-fledged Lisp would be a gigantic task and not worth the effort, as
+there are already far more capable Lisp systems like
+\passthrough{\lstinline!CommonLisp!} and
+\passthrough{\lstinline!Racket!} out there.
+
+The above function demonstrates recursion, a feature that is often used
+in Lisp. Z3S5 Lisp eliminates tail recursion. The example also
+illustrates the use of \passthrough{\lstinline!=!} for numeric equality,
+\passthrough{\lstinline!+!} and \passthrough{\lstinline!-!} functions on
+(potential) bignums and the macro
+\passthrough{\lstinline!(if <condition> <then-clause> <else-clause>)!}.
+The more general \passthrough{\lstinline!cond!} construct is also
+available and in fact the primitive operation:
+
+\begin{lstlisting}[language=Lisp]
+>  (defun day (n)
+     (cond 
+       ((= n 0) 'sunday)
+       ((= n 1) 'monday)
+       ((= n 2) 'tuesday)
+       (t 'late-in-the-week)))
+day
+> (day 1)
+monday
+> (day 0)
+sunday
+> (day -1)
+late-in-the-week
+> (day 5)
+late-in-the-week
+\end{lstlisting}
+
+Looks like some programmer was lazy there.
+
+In Lisp languages it is common to iterate over lists and other data
+structures either using recursive functions or by using some of the
+standard iteration constructs such as \passthrough{\lstinline!map!},
+\passthrough{\lstinline!foreach!}, \passthrough{\lstinline!mapcar!}, and
+so on. Nesting calls of macros or functions like
+\passthrough{\lstinline!map!} and \passthrough{\lstinline!filter!} to
+achieve the desired data transformation is very common functional
+programming style and often desirable for performance. Here is an
+example:
+
+\begin{lstlisting}[language=Lisp]
+> (map '(1 2 3 4 5 6) add1)
+(2 3 4 5 6 7)
+\end{lstlisting}
+
+Local variables are bound with \passthrough{\lstinline!let!} or with
+\passthrough{\lstinline!letrec!} in Z3S5 Lisp. The latter needs to be
+used whenever a variable in the form depends on the other variable,
+which is not possible with \passthrough{\lstinline!let!} since it makes
+the bindings only available in the body. Here is the definition of
+\passthrough{\lstinline!apropos!} from the preamble:
+
+\begin{lstlisting}[language=Lisp]
+(defun apropos (arg)
+  (let ((info (get *help* arg nil)))
+    (if info
+      (cadr (assoc 'see info))
+      nil)))
+\end{lstlisting}
+
+The variable \passthrough{\lstinline!info!} is bound to the result of
+\passthrough{\lstinline!(get *help* arg nil)!}, which evaluates to
+default \passthrough{\lstinline!nil!} if there is no help entry for
+\passthrough{\lstinline!arg!} in the global dictionary
+\passthrough{\lstinline!*help*!}. That avoids calling
+\passthrough{\lstinline!(get *help* arg nil)!} twice, once for the check
+to nil and once in the first \passthrough{\lstinline!if!} branch. But it
+can often be better to avoid uses of \passthrough{\lstinline!let!} and
+re-use accessors; it depends a bit on clarity and intent, and whether
+the initial computation is costly or not. Here is an example where
+\passthrough{\lstinline!let!} would not do and instead
+\passthrough{\lstinline!letrec!} has to be used:
+
+\begin{lstlisting}[language=Lisp]
+> (letrec ((is-even? (lambda (n)
+                       (or (= n 0)
+                           (is-odd? (sub1 n)))))
+           (is-odd? (lambda (n)
+                      (and (not (= n 0))
+                           (is-even? (sub1 n))))))
+    (is-odd? 11))
+t
+\end{lstlisting}
+
+The reason this doesn't work with \passthrough{\lstinline!let!} is that
+\passthrough{\lstinline!is-even?!} is not bound in the definition of
+\passthrough{\lstinline!is-odd?!} and vice versa when
+\passthrough{\lstinline!let!} is used, whereas
+\passthrough{\lstinline!letrec!} makes sure that these bindings are
+mutually available. Although the current implementation always uses
+\passthrough{\lstinline!letrec!} under the hood, it is best to use
+\passthrough{\lstinline!let!} whenever it is possible since at least in
+theory it could be implemented more efficiently. Notice that
+\passthrough{\lstinline!setq!} can be used to mutate local bindings, of
+course, and is not just intended for toplevel symbols. Although
+beginners should avoid it, sometimes mutating variables with
+\passthrough{\lstinline!setq!} can make definitions simpler at the cost
+of some elegance.
+
+\hypertarget{advanced-topics}{%
+\section{Advanced Topics}\label{advanced-topics}}
+
+\hypertarget{error-handling}{%
+\subsection{Error Handling}\label{error-handling}}
+
+Error handling is very rudimentary in Z3S5 Lisp. There are no
+continuations and there is no fancy stuff like dynamic wind. Instead,
+there are primitives like \passthrough{\lstinline!push-error-handler!}
+and \passthrough{\lstinline!pop-error-handler!} and macros such as
+\passthrough{\lstinline!with-final!} and
+\passthrough{\lstinline!with-error-handler!}.
+
+\hypertarget{debugging}{%
+\subsection{Debugging}\label{debugging}}
+
+Not only are error messages fairly rudimentary, they also use the
+expanded macro definitions and are therefore hard to read. Local
+bindings are implemented with lambda-terms and displayed as such. This
+makes debugging a challenge, as it should be. Z3S5 programmers have the
+habit of writing bug-free code from the start and thereby avoid
+debugging entirely. But you could write your own trace or stepper
+functions for enhanced debugging features by redefining all toplevel
+symbols appropriately. Then again, you could also just write your own
+Lisp with better debugging capabilities. The choice is up to you!
+
+\hypertarget{concurrency}{%
+\subsection{Concurrency}\label{concurrency}}
+
+Dicts use Go's \passthrough{\lstinline!sync.Map!} under the hood and are
+therefore concurrency-safe. The global symbol table is also
+cuncurrency-safe. This means that dicts can be accessed safely from
+futures and tasks and can even be used for synchronization purposes, as
+the (admittedly horrible) current implementation of tasks in
+\passthrough{\lstinline!embed/init.lisp!} illustrates. Generally,
+futures should be used and can be spawned in large quantities without
+much of a performance penalty. Tasks need some work to become efficient
+and there are plans to include a more direct interface to Go's
+goroutines with cancelable contexts in the future.
+
+\hypertarget{file-and-network-access}{%
+\subsection{File and Network Access}\label{file-and-network-access}}
+
+These are coming soon. The reason they haven't been included yet in this
+release is that Z3S5 Lisp has been extracted from a much larger project
+called \emph{Z3S5 Machine}, a currently proprietary virtual retro Lisp
+machine with thousands of graphics and sound commands, and in this
+machine network and file access is heavily abstracted from and guarded.
+So the existing file and network functions could not be used for a more
+general-purpose Lisp and need to be re-written. You can implement your
+own, of course. Simply define functions like
+\passthrough{\lstinline!open!}, \passthrough{\lstinline!close!},
+\passthrough{\lstinline!port?!}, \passthrough{\lstinline!file-port?!},
+\passthrough{\lstinline!network-port?!}, \passthrough{\lstinline!read!},
+\passthrough{\lstinline!write!}, \passthrough{\lstinline!read-bbinary!},
+\passthrough{\lstinline!write-binary!}, etc. It's not that much work,
+just a bit tedious. Or, wait until these are available officially. You
+can expect a fairly standard system of streams and ports.
+
+\hypertarget{language-stability}{%
+\subsection{Language Stability}\label{language-stability}}
+
+At this stage, built-in commands may still change. The good news is that
+any change introduced in Z3S5 Lisp needs to be tracked and checked in
+Z3S5 Machine, and so no larger changes are planned. However, no
+guarantees can be made and you should vendor the repository or even fork
+it if you want to make sure no breaking changes occur. Once the language
+is stable, it will be marked on the home page.
+
+\hypertarget{roadmap}{%
+\subsection{Roadmap}\label{roadmap}}
+
+File and network access will be added soon. An interface to sqlite3 will
+also be ported from Z3S5 Machine, although it might involve some
+abstraction and only indirect access. A simple persistence layer might
+also be ported from Z3S5 Machine.
+
+\hypertarget{extending-z3s5-lisp}{%
+\section{Extending Z3S5 Lisp}\label{extending-z3s5-lisp}}
+
+The system is extended by calling \passthrough{\lstinline!interp.Def!}.
+As an example, consider the following function from
+\passthrough{\lstinline!lisp\_base.go!}:
+
+\begin{lstlisting}[language=Go]
+    // (str->chars s) => array of int convert a UTF-8 string into an array of runes
+    interp.Def("str->chars", 1, func(a []any) any {
+        runes := []rune(norm.NFC.String(a[0].(string)))
+        arr := make([]any, len(runes), len(runes))
+        for i := range runes {
+            arr[i] = goarith.AsNumber(runes[i])
+        }
+        return arr
+    })
+\end{lstlisting}
+
+The \passthrough{\lstinline!Def!} function takes the function symbol as
+string, the number \emph{n} of arguments, and a function that takes an
+array of \passthrough{\lstinline!any!} and returns a value
+\passthrough{\lstinline!any!} (aka
+\passthrough{\lstinline!interface\{\}!}). The function may explicitly
+check the type of the arguments for correctness but doesn't need to. It
+is normal for functions to panic and even deliberately throw an error.
+These are caught by the intepreter and displayed to the user. So how
+much you check depends primarily on what errors you want to provide. By
+convenience, custom errors thrown in function definitions start with the
+name of the function such as
+\passthrough{\lstinline!panic(error.New("foobar: the foobar function has failed"))!}
+for a function \passthrough{\lstinline!foobar!}. If a function returns
+no value, then the definition should return
+\passthrough{\lstinline!Void!}, a special Lisp value that is not printed
+in the read-eval-print loop.
+
+Care must be taken with numbers. Pure Go numbers will not do and may
+lead to bizzare and unexpected runtime behavior. Every number needs to
+be converted using \passthrough{\lstinline!goarith.AsNumber!} and other
+conversion functions from \passthrough{\lstinline!z3s5-lisp!} and the
+package \passthrough{\lstinline!github.com/nukata/goarith!}. Check the
+source code of some of the implementation files for examples. Again,
+this is really important: Always convert Go numbers to bigint numbers
+with \passthrough{\lstinline!goarith.AsNumber!}!
+
+There are a few helper functions such as
+\passthrough{\lstinline!ExpectInts!} that can be used for checking
+arguments. Other useful conversion functions are
+\passthrough{\lstinline!AsBool!}, \passthrough{\lstinline!ToLispBool!},
+\passthrough{\lstinline!ArrayToList!},
+\passthrough{\lstinline!ListToArray!}, etc.
+
+Notice that lists are structures composed by
+\passthrough{\lstinline!\&Cell\{Car: a, Cdr: b\}!}, where
+\passthrough{\lstinline!Cdr!} might be another Cell and the final Cdr is
+Nil, just like in any Lisp. If you construct these without the member
+names \passthrough{\lstinline!Car!} and \passthrough{\lstinline!Cdr!} Go
+will complain about this and refuse to compile, even though in this case
+it is perfectly fine to use anonymous access. If you want to create a
+lot of lists by hand in your function definitions without creating
+runtime performance penalties by using functions like
+\passthrough{\lstinline!ArrayToList!}, then it might make sense to
+switch off this behavior of the \passthrough{\lstinline!go vet!} command
+by running \passthrough{\lstinline!go vet -composites=false!} instead.
+Of course, this will also disable such checks for other parts of your
+application where they might be useful. The only other way is to make
+the list construction fully explicit, as in:
+\passthrough{\lstinline!\&z3.Cell\{z3.NewSym("hello"), \&z3.Cell\{z3.NewSym("world"), z3.Nil\}\}!}
+which yields the list \passthrough{\lstinline!(hello world)!}.
+
+Custom data structures: Since there is currently no way to modify the
+printer for custom structures directly in the Lisp system, it is best to
+put them into a box using \passthrough{\lstinline!interp.DefBoxed!},
+which takes a symbol for a boxed value and creates a number of auxiliary
+functions. See \passthrough{\lstinline!lisp\_decimal.go!} for an example
+of how to use boxed values.
+
+\hypertarget{license-and-contact}{%
+\section{License and Contact}\label{license-and-contact}}
+
+Z3S5 Lisp was written by Erich H. Rast and based on Nukata Lisp by
+SUZUKI Hisao. It is licensed under the MIT License that allows free use
+and modification as long as the LICENSE and copyright notices remain.
+Please read the accompanying LICENSE file for more information.
+
+Please send inquiries and bug reports to
+\href{mailto:erich@snafu.de}{\nolinkurl{erich@snafu.de}} or open an
+issue on Github. Happy hacking!
+
+\end{document}
