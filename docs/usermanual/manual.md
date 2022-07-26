@@ -1,7 +1,7 @@
 ---
 title: Z3S5 Lisp User Manual
 author: by Erich H. Rast, Ph.D.
-date: July 22, 2022
+date: 2022-7-22 16:00
 header-includes: |
   \lstset{% for listings
     basicstyle=\footnotesize\ttfamily,

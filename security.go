@@ -13,6 +13,8 @@ type Permissions struct {
 	LoadPrelude    bool
 	LoadUserInit   bool
 	Interactive    bool
+	AllowFileRead  bool
+	AllowFileWrite bool
 }
 
 // FullPermissions are the default full permissions of a machine,
@@ -23,6 +25,8 @@ var FullPermissions = Permissions{
 	LoadPrelude:    true,
 	LoadUserInit:   true,
 	Interactive:    true,
+	AllowFileRead:  true,
+	AllowFileWrite: true,
 }
 
 // SafeSilentPermissions are minimal permissions without sound, graphics, and file access
@@ -33,6 +37,8 @@ var RestrictedPermissions = Permissions{
 	LoadPrelude:    true,
 	LoadUserInit:   true,
 	Interactive:    false,
+	AllowFileRead:  false,
+	AllowFileWrite: false,
 }
 
 var ErrUnknownPermission = errors.New("unknown permission")
@@ -55,6 +61,10 @@ func NewPermissions(current Permissions, perms []string) (Permissions, error) {
 			p.AllowProtect = true
 		case "interactive":
 			p.Interactive = true
+		case "file-read":
+			p.AllowFileRead = true
+		case "file-write":
+			p.AllowFileWrite = true
 		}
 	}
 	return p, nil
@@ -76,6 +86,12 @@ func (p *Permissions) Strings() []string {
 	}
 	if p.Interactive {
 		s = append(s, "interactive")
+	}
+	if p.AllowFileRead {
+		s = append(s, "file-read")
+	}
+	if p.AllowFileWrite {
+		s = append(s, "file-write")
 	}
 	return s
 }
@@ -111,6 +127,16 @@ func (p Permissions) Set(perm string, v any) (Permissions, error) {
 			return p, ErrSecurityViolation
 		}
 		p.Interactive = value
+	case "file-read":
+		if p.AllowFileRead == false && value == true {
+			return p, ErrSecurityViolation
+		}
+		p.AllowFileRead = value
+	case "file-write":
+		if p.AllowFileWrite == false && value == true {
+			return p, ErrSecurityViolation
+		}
+		p.AllowFileWrite = value
 	default:
 		return p, ErrUnknownPermission
 	}
@@ -129,6 +155,10 @@ func (p *Permissions) Get(s string) (any, error) {
 		return p.AllowProtect, nil
 	case "interactive":
 		return p.Interactive, nil
+	case "file-read":
+		return p.AllowFileRead, nil
+	case "file-write":
+		return p.AllowFileWrite, nil
 	default:
 		return false, ErrUnknownPermission
 	}

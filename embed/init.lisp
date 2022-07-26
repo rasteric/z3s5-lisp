@@ -1,6 +1,8 @@
 ;;; This file is embedded and loaded at startup. It is best not to modify it
 ;;; and instead use a dynamic init.lisp file from the file system or embed
 ;;; your own file into an application using Z3S5 Lisp as a package.
+;;; 
+;;; Errors in this file are bugs and should be reported.
 
 (defmacro when-permission (perm &rest body)
   `(cond
@@ -282,9 +284,13 @@
 	      ((use "(help-entry sym) => list")
 	       (info "Get usage and help information for #sym.")
 	       (type proc)
+	       (topic (help))
 	       (arity 1)
 	       (result list)
 	       (see (defhelp help apropos *help*))))))
+
+(setq *help-topics*
+      (dict))
 
 (defun help-entry (sym)
   (get *help* sym nil))
@@ -308,6 +314,28 @@
      (let ((newstr (_prefix-lib-sym *_current-lib* sym)))
        (set *help* (str->sym newstr) (_transform-help-entries newstr (sym->str sym) ent))))
     (t (set *help* sym ent))))
+
+(defun set-help-topic-info (topic header info)
+  (set *help-topics* topic (list header info)))
+
+(defhelp set-help-topic-info
+    (use "(set-help-topic-info topic header info)")
+  (info "Set a human-readable information entry for help #topic with human-readable #header and #info strings.")
+  (type proc)
+  (topic (help))
+  (arity 3)
+  (see (defhelp help-topic-info)))
+
+(defun help-topic-info (topic)
+  (get *help-topics* topic))
+
+(defhelp help-topic-info
+    (use "(help-topic-info topic) => li")
+  (info "Return a list containing a heading and an info string for help #topic, or nil if no info is available.")
+  (type proc)
+  (arity 1)
+  (topic (help))
+  (see (set-help-topic-info defhelp help)))
 
 ;; transform with prefix, for use with *current-lib* when using (load 'lib)
 ;; '(strings algo) 'boyer-more => "algo.strings.boyer-more"
@@ -349,6 +377,7 @@
   (info "Display help information about #sym (unquoted).")
   (type macro)
   (arity 1)
+  (topic (help))
   (result nil)
   (see (defhelp help-entry *help* apropos)))
 
@@ -356,6 +385,7 @@
     (use "*help*")
   (info "Dict containing all help information for symbols.")
   (type dict)
+  (topic (help))
   (arity 0)
   (result nil)
   (see (help defhelp apropos)))
@@ -370,6 +400,7 @@
     (use "(apropos sym) => #li")
   (info "Get a list of procedures and symbols related to #sym from the help system.")
   (type proc)
+  (topic (help))
   (arity 1)
   (result list)
   (see (defhelp help-entry help *help*)))
@@ -485,6 +516,7 @@
     (use "(case expr (clause1 ... clausen)) => any")
   (info "Standard case macro, where you should use t for the remaining alternative. Example: (case (get dict 'key) ((a b) (out \"a or b\"))(t (out \"something else!\"))).")
   (type macro)
+  (topic (lisp))
   (arity -3)
   (see (cond)))
 
@@ -503,6 +535,7 @@
     (use "(bound? sym) => bool")
   (info "Return true if a value is bound to the symbol #sym, nil otherwise.")
   (type macro)
+  (topic (system))
   (arity 1)
   (see (bind setq)))
 
@@ -513,6 +546,7 @@
     (use "(proc? arg) => bool")
   (info "Return true if #arg is a procedure, nil otherwise.")
   (type macro)
+  (topic (system))
   (arity 1)
   (see (functional? closure?  functional-arity functional-has-rest?)))
 
@@ -526,6 +560,7 @@
     (use "(functional? arg) => bool")
   (info "Return true if #arg is either a builtin function, a closure, or a macro, nil otherwise. This is the right predicate for testing whether the argument is applicable and has an arity.")
   (type macro)
+  (topic (system))
   (arity 1)
   (see (closure? proc? functional-arity functional-has-rest?)))
 
@@ -547,6 +582,7 @@
     (use "(nth seq n) => any")
   (info "Get the #n-th element of sequence #seq. Sequences are 0-indexed.")
   (type proc)
+  (topic (seq))
   (arity 2)
   (see (nthdef list array string 1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th)))
 
@@ -566,6 +602,7 @@
     (use "(reverse seq) => sequence")
   (info "Reverse a sequence non-destructively, i.e., return a copy of the reversed sequence.")
   (type proc)
+  (topic (seq))
   (arity 1)
   (see (nth seq? 1st 2nd 3rd 4th 6th 7th 8th 9th 10th last)))
 
@@ -583,6 +620,7 @@
     (use "(nthdef seq n default) => any")
   (info "Return the #n-th element of sequence #seq (0-indexed) if #seq is a sequence and has at least #n+1 elements, default otherwise.")
   (type proc)
+  (topic (seq))
   (arity 3)
   (see (nth seq? 1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th)))
 
@@ -604,6 +642,7 @@
     (use "(index seq elem [pred]) => int")
   (info "Return the first index of #elem in #seq going from left to right, using equality predicate #pred for comparisons (default is eq?). If #elem is not in #seq, -1 is returned.")
   (type proc)
+  (topic (seq))
   (arity -3)
   (see (nth seq?)))
 
@@ -617,6 +656,7 @@
     (use "(seq? seq) => bool")
   (info "Return true if #seq is a sequence, nil otherwise.")
   (type proc)
+  (topic (seq))
   (arity 1)
   (see (list array string slice nth)))
 
@@ -638,6 +678,7 @@
     (use "(slice seq low high) => seq")
   (info "Return the subsequence of #seq starting from #low inclusive and ending at #high exclusive. Sequences are 0-indexed.")
   (type proc)
+  (topic (seq))
   (arity 3)
   (see (list array string nth seq?)))
 
@@ -655,6 +696,7 @@
     (use "(take seq n) => seq")
   (info "Return the sequence consisting of the #n first elements of #seq.")
   (type proc)
+  (topic (seq))
   (arity 3)
   (see (list array string nth seq?)))
 
@@ -675,6 +717,7 @@
     (use "(map seq proc) => seq")
   (info "Return the copy of #seq that is the result of applying #proc to each element of #seq.")
   (type proc)
+  (topic (seq))
   (arity 2)
   (see (seq? mapcar strmap)))
 
@@ -706,6 +749,7 @@
     (use "(map-pairwise seq proc) => seq")
   (info "Applies #proc in order to subsequent pairs in #seq, assembling the sequence that results from the results of #proc. Function #proc takes two arguments and must return a proper list containing two elements. If the number of elements in #seq is odd, an error is raised.")
   (type proc)
+  (topic (seq))
   (arity 2)
   (see (map)))
 
@@ -730,6 +774,7 @@
     (use "(foreach seq proc)")
   (info "Apply #proc to each element of sequence #seq in order, for the side effects.")
   (type proc)
+  (topic (seq))
   (arity 2)
   (see (seq? map)))
 
@@ -757,6 +802,7 @@
     (use "(forall? seq pred) => bool")
   (info "Return true if predicate #pred returns true for all elements of sequence #seq, nil otherwise.")
   (type proc)
+  (topic (seq))
   (arity 2)
   (see (foreach map list-forall? array-forall? str-forall? exists? str-exists? array-exists? list-exists?)))
 
@@ -776,6 +822,7 @@
     (use "(list-all? li pred) => bool")
   (info "Return true if predicate #pred returns true for all elements of list #li, nil otherwise.")
   (type proc)
+  (topic (lisp))
   (arity 2)
   (see (foreach map forall? array-forall? str-forall? exists?)))
 
@@ -798,6 +845,7 @@
     (use "(array-forall? arr pred) => bool")
   (info "Return true if predicate #pred returns true for all elements of array #arr, nil otherwise.")
   (type proc)
+  (topic (array))
   (arity 2)
   (see (foreach map forall? str-forall? list-forall? exists?)))
 
@@ -812,6 +860,7 @@
     (use "(str-forall? s pred) => bool")
   (info "Return true if predicate #pred returns true for all characters in string #s, nil otherwise.")
   (type proc)
+  (topic (str))
   (arity 2)
   (see (foreach map forall? array-forall? list-forall exists?)))
 
@@ -849,6 +898,7 @@
     (use "(exists? seq pred) => bool")
   (info "Return true if #pred returns true for at least one element in sequence #seq, nil otherwise.")
   (type proc)
+  (topic (seq))
   (arity 2)
   (see (forall? list-exists? array-exists? str-exists? seq?)))
 
@@ -856,6 +906,7 @@
     (use "(list-exists? li pred) => bool")
   (info "Return true if #pred returns true for at least one element in list #li, nil otherwise.")
   (type proc)
+  (topic (lisp))
   (arity 2)
   (see (exists? forall? array-exists? str-exists? seq?)))
 
@@ -863,6 +914,7 @@
     (use "(array-exists? arr pred) => bool")
   (info "Return true if #pred returns true for at least one element in array #arr, nil otherwise.")
   (type proc)
+  (topic (array))
   (arity 2)
   (see (exists? forall? list-exists? str-exists? seq?)))
 
@@ -870,6 +922,7 @@
     (use "(str-exists? s pred) => bool")
   (info "Return true if #pred returns true for at least one character in string #s, nil otherwise.")
   (type proc)
+  (topic (str))
   (arity 2)
   (see (exists? forall? list-exists? array-exists? seq?)))
 
@@ -884,6 +937,7 @@
     (use "(list-foreach li proc)")
   (info "Apply #proc to each element of list #li in order, for the side effects.")
   (type proc)
+  (topic (lisp))
   (arity 2)
   (see (mapcar map foreach)))
 
@@ -896,6 +950,7 @@
     (use "(array-foreach arr proc)")
   (info "Apply #proc to each element of array #arr in order, for the side effects.")
   (type proc)
+  (topic (array))
   (arity 2)
   (see (foreach list-foreach map)))
 
@@ -908,6 +963,7 @@
     (use "(str-foreach s proc)")
   (info "Apply #proc to each element of string #s in order, for the side effects.")
   (type proc)
+  (topic (str))
   (arity 2)
   (see (foreach list-foreach array-foreach map)))
 
@@ -918,6 +974,7 @@
     (use "(list->array li) => array")
   (info "Convert the list #li to an array.")
   (type proc)
+  (topic (conversion lisp array))
   (arity 1)
   (see (list array string nth seq?)))
 
@@ -939,6 +996,7 @@
     (use "(remove-duplicates seq) => seq")
   (info "Remove all duplicates in sequence #seq, return a new sequence with the duplicates removed.")
   (type proc)
+  (topic (seq))
   (arity 1)
   (see (seq? map foreach nth)))
 
@@ -951,6 +1009,7 @@
     (use "(dict-map dict proc) => dict")
   (info "Returns a copy of #dict with #proc applies to each key value pair as aruments. Keys are immutable, so #proc must take two arguments and return the new value.")
   (type proc)
+  (topic (dict))
   (arity 2)
   (see (dict-map! map)))
 
@@ -968,6 +1027,7 @@
     (use "(dict->alist d) => li")
   (info "Convert a dictionary into an association list. Note that the resulting alist will be a set of proper pairs of the form '(a . b) if the values in the dictionary are not lists.")
   (type proc)
+  (topic (conversion dict lisp))
   (arity 1)
   (see (dict dict-map dict->list)))
 
@@ -983,6 +1043,7 @@
   (use "(alist->dict li) => dict")
   (info "Convert an association list #li into a dictionary. Note that the value will be the cdr of each list element, not the second element, so you need to use an alist with proper pairs '(a . b) if you want b to be a single value.")
   (type proc)
+  (topic (conversion lisp dict))
   (arity 1)
   (see (dict->alist dict dict->list list->dict)))
 
@@ -998,6 +1059,7 @@
     (use "(dict->keys d) => li")
   (info "Return the keys of dictionary #d in arbitrary order.")
   (type proc)
+  (topic (conversion dict))
   (arity 1)
   (see (dict dict->values dict->alist dict->list)))
 
@@ -1013,6 +1075,7 @@
     (use "(dict->values d) => li")
   (info "Return the values of dictionary #d in arbitrary order.")
   (type proc)
+  (topic (conversion dict))
   (arity 1)
   (see (dict dict->keys dict->alist dict->list)))
 
@@ -1023,6 +1086,7 @@
     (use "(get dict key [default]) => any")
   (info "Get the value for #key in #dict, return #default if there is no value for #key. If #default is omitted, then nil is returned. Provide your own default if you want to store nil.")
   (type proc)
+  (topic (dict))
   (arity -3)
   (see (dict dict? set)))
 
@@ -1035,6 +1099,7 @@
     (use "(1st seq [default]) => any")
   (info "Get the first element of a sequence or the optional #default. If there is no such element and no default is provided, then an error is raised.")
   (type proc)
+  (topic (seq))
   (arity -2)
   (see (nth nthdef car list-ref array-ref string-ref 2nd 3rd 4th 5th 6th 7th 8th 9th 10th)))
 
@@ -1047,6 +1112,7 @@
     (use "(2nd seq [default]) => any")
   (info "Get the second element of a sequence or the optional #default. If there is no such element and no default is provided, then an error is raised.")
   (type proc)
+  (topic (seq))
   (arity -2)
   (see (nth nthdef car list-ref array-ref string-ref 1st 3rd 4th 5th 6th 7th 8th 9th 10th)))
 
@@ -1059,6 +1125,7 @@
     (use "(3rd seq [default]) => any")
   (info "Get the third element of a sequence or the optional #default. If there is no such element and no default is provided, then an error is raised.")
   (type proc)
+  (topic (seq))
   (arity -2)
   (see (nth nthdef car list-ref array-ref string-ref 1st 2nd 4th 5th 6th 7th 8th 9th 10th)))
 
@@ -1071,6 +1138,7 @@
     (use "(4th seq [default]) => any")
   (info "Get the fourth element of a sequence or the optional #default. If there is no such element and no default is provided, then an error is raised.")
   (type proc)
+  (topic (seq))
   (arity -2)
   (see (nth nthdef car list-ref array-ref string-ref 1st 2nd 3rd 5th 6th 7th 8th 9th 10th)))
 
@@ -1083,6 +1151,7 @@
     (use "(5th seq [default]) => any")
   (info "Get the fifth element of a sequence or the optional #default. If there is no such element and no default is provided, then an error is raised.")
   (type proc)
+  (topic (seq))
   (arity -2)
   (see (nth nthdef car list-ref array-ref string-ref 1st 2nd 3rd 4th 6th 7th 8th 9th 10th)))
 
@@ -1095,6 +1164,7 @@
     (use "(6th seq [default]) => any")
   (info "Get the sixth element of a sequence or the optional #default. If there is no such element and no default is provided, then an error is raised.")
   (type proc)
+  (topic (seq))
   (arity -2)
   (see (nth nthdef car list-ref array-ref string-ref 1st 2nd 3rd 4th 5th 7th 8th 9th 10th)))
 
@@ -1107,6 +1177,7 @@
     (use "(7th seq [default]) => any")
   (info "Get the seventh element of a sequence or the optional #default. If there is no such element and no default is provided, then an error is raised.")
   (type proc)
+  (topic (seq))
   (arity -2)
   (see (nth nthdef car list-ref array-ref string-ref 1st 2nd 3rd 4th 5th 6th 8th 9th 10th)))
 
@@ -1119,6 +1190,7 @@
     (use "(8th seq [default]) => any")
   (info "Get the eighth element of a sequence or the optional #default. If there is no such element and no default is provided, then an error is raised.")
   (type proc)
+  (topic (seq))
   (arity -2)
   (see (nth nthdef car list-ref array-ref string-ref 1st 2nd 3rd 4th 5th 6th 7th 9th 10th)))
 
@@ -1131,6 +1203,7 @@
     (use "(9th seq [default]) => any")
   (info "Get the nineth element of a sequence or the optional #default. If there is no such element and no default is provided, then an error is raised.")
   (type proc)
+  (topic (seq))
   (arity -2)
   (see (nth nthdef car list-ref array-ref string-ref 1st 2nd 3rd 4th 5th 6th 7th 8th 10th)))
 
@@ -1143,6 +1216,7 @@
     (use "(10th seq [default]) => any")
   (info "Get the tenth element of a sequence or the optional #default. If there is no such element and no default is provided, then an error is raised.")
   (type proc)
+  (topic (seq))
   (arity -2)
   (see (nth nthdef car list-ref array-ref string-ref 1st 2nd 3rd 4th 5th 6th 7th 8th 9th)))
 
@@ -1155,6 +1229,7 @@
     (use "(last seq [default]) => any")
   (info "Get the last element of sequence #seq or return #default if the sequence is empty. If #default is not given and the sequence is empty, an error is raised.")
   (type proc)
+  (topic (seq))
   (arity -2)
   (see (nth nthdef car list-ref array-ref string ref 1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th)))
 
@@ -1172,6 +1247,7 @@
     (use "(filter li pred) => li")
   (info "Return the list based on #li with each element removed for which #pred returns nil.")
   (type proc)
+  (topic (lisp))
   (arity 2)
   (see (list)))
 
@@ -1184,6 +1260,7 @@
     (use "(has dict key) => bool")
   (info "Return true if the dict #dict contains an entry for #key, nil otherwise.")
   (type proc)
+  (topic (dict))
   (arity 2)
   (see (dict get set)))
 
@@ -1220,6 +1297,7 @@
     (use "(with-mutex-rlock m ...) => any")
   (info "Execute the body with mutex #m locked for reading and unlock the mutex afterwards.")
   (type macro)
+  (topic (concurrency))
   (arity -2)
   (see (with-mutex-lock make-mutex mutex-lock mutex-rlock mutex-unlock mutex-runlock)))
 
@@ -1231,6 +1309,7 @@
     (use "(make-queue) => array")
   (info "Make a synchronized queue.")
   (type proc)
+  (topic (data concurrency))
   (arity 0)
   (see (queue? enqueue! dequeue! glance queue-empty? queue-len))
   (warn "Never change the array of a synchronized data structure directly, or your warranty is void!"))
@@ -1246,6 +1325,7 @@
     (use "(queue? q) => bool")
   (info "Return true if #q is a queue, nil otherwise.")
   (type proc)
+  (topic (data concurrency))
   (arity 1)
   (see (make-queue enqueue! dequeue glance queue-empty? queue-len)))
 
@@ -1259,6 +1339,7 @@
     (use "(enqueue! sym elem)")
   (info "Put #elem in queue #sym, where #sym is the unquoted name of a variable.")
   (type macro)
+  (topic (data concurrency))
   (arity 2)
   (see (make-queue queue? dequeue! glance queue-empty? queue-len)))
 
@@ -1278,6 +1359,7 @@
     (use "(dequeue! sym [def]) => any")
   (info "Get the next element from queue #sym, which must be the unquoted name of a variable, and return it. If a default #def is given, then this is returned if the queue is empty, otherwise nil is returned.")
   (type macro)
+  (topic (data concurrency))
   (arity -2)
   (see (make-queue queue? enqueue! glance queue-empty? queue-len)))
 
@@ -1291,6 +1373,7 @@
     (use "(queue-empty? q) => bool")
   (info "Return true if the queue #q is empty, nil otherwise.")
   (type proc)
+  (topic (data concurrency))
   (arity 1)
   (see (make-queue queue? enqueue! dequeue! glance queue-len)))
 
@@ -1304,6 +1387,7 @@
     (use "(queue-len q) => int")
   (info "Return the length of the queue #q.")
   (type proc)
+  (topic (data concurrency))
   (arity 1)
   (see (make-queue queue? enqueue! dequeue! glance queue-len))
   (warn "Be advised that this is of limited use in some concurrent contexts, since the length of the queue might have changed already once you've obtained it!"))
@@ -1318,6 +1402,7 @@
     (use "(glance s [def]) => any")
   (info "Peek the next element in a stack or queue without changing the data structure. If default #def is provided, this is returned in case the stack or queue is empty; otherwise nil is returned.")
   (type proc)
+  (topic (data concurrency))
   (arity 1)
   (see (make-queue make-stack queue? enqueue? dequeue? queue-len stack-len pop! push!)))
 
@@ -1329,6 +1414,7 @@
     (use "(make-stack) => array")
   (info "Make a synchronized stack.")
   (type proc)
+  (topic (data concurrency))
   (arity 0)
   (see (stack? push! pop! stack-empty? stack-len glance))
   (warn "Never change the array of a synchronized data structure directly, or your warranty is void!"))
@@ -1344,6 +1430,7 @@
     (use "(stack? q) => bool")
   (info "Return true if #q is a stack, nil otherwise.")
   (type proc)
+  (topic (data concurrency))
   (arity 1)
   (see (make-stack push! pop! stack-empty? stack-len glance)))
 
@@ -1357,6 +1444,7 @@
     (use "(push! sym elem)")
   (info "Put #elem in stack #sym, where #sym is the unquoted name of a variable.")
   (type macro)
+  (topic (data concurrency))
   (arity 2)
   (see (make-stack stack? pop! stack-len stack-empty? glance)))
 
@@ -1376,6 +1464,7 @@
     (use "(pop! sym [def]) => any")
   (info "Get the next element from stack #sym, which must be the unquoted name of a variable, and return it. If a default #def is given, then this is returned if the queue is empty, otherwise nil is returned.")
   (type macro)
+  (topic (data concurrency))
   (arity -2)
   (see (make-stack stack? push! stack-len stack-empty? glance)))
 
@@ -1389,6 +1478,7 @@
     (use "(queue-empty? s) => bool")
   (info "Return true if the stack #s is empty, nil otherwise.")
   (type proc)
+  (topic (data concurrency))
   (arity 1)
   (see (make-stack stack? push! pop! stack-len glance)))
 
@@ -1402,6 +1492,7 @@
     (use "(stack-len s) => int")
   (info "Return the length of the stack #s.")
   (type proc)
+  (topic (data concurrency))
   (arity 1)
   (see (make-queue queue? enqueue! dequeue! glance queue-len))
   (warn "Be advised that this is of limited use in some concurrent contexts, since the length of the queue might have changed already once you've obtained it!"))
@@ -1424,6 +1515,7 @@
     (use "(wait-for* dict key timeout)")
   (info "Blocks execution until the value for #key in #dict is not-nil or #timeout nanoseconds have passed, and returns that value or nil if waiting timed out. If #timeout is negative, then the function waits potentially indefinitely without any timeout. If a non-nil key is not found, the function sleeps at least *sync-wait-lower-bound* nanoseconds and up to *sync-wait-upper-bound* nanoseconds until it looks for the key again.")
   (type proc)
+  (topic (concurrency dict))
   (arity 3)
   (see (future force wait-for wait-until wait-until*))
   (warn  "This cannot be used for synchronization of multiple tasks due to potential race-conditions."))
@@ -1435,6 +1527,7 @@
     (use "(wait-for dict key)")
   (info "Block execution until the value for #key in #dict is not-nil. This function may wait indefinitely if no other thread sets the value for #key to not-nil.")
   (type proc)
+  (topic (concurrency dict))
   (arity 2)
   (see (wait-for* future force wait-until wait-until*))
   (warn  "This cannot be used for synchronization of multiple tasks due to potential race-conditions."))
@@ -1451,6 +1544,7 @@
     (use "(wait-for-empty* dict key timeout)")
   (info "Blocks execution until the #key is no longer present in #dict or #timeout nanoseconds have passed. If #timeout is negative, then the function waits potentially indefinitely without any timeout.")
   (type proc)
+  (topic (concurrency dict))
   (arity 3)
   (see (future force wait-for wait-until wait-until*))
   (warn  "This cannot be used for synchronization of multiple tasks due to potential race-conditions."))
@@ -1469,6 +1563,7 @@
     (use "(wait-until* dict key pred timeout)")
   (info "Blocks execution until the unary predicate #pred returns true for the value at #key in #dict, or #timeout nanoseconds have passed, and returns the value or nil if waiting timed out. If #timeout is negative, then the function waits potentially indefinitely without any timeout. If a non-nil key is not found, the function sleeps at least *sync-wait-lower-bound* nanoseconds and up to *sync-wait-upper-bound* nanoseconds until it looks for the key again.")
   (type proc)
+  (topic (concurrency dict))
   (arity 4)
   (see (future force wait-for wait-until* wait-until))
   (warn  "This cannot be used for synchronization of multiple tasks due to potential race-conditions."))
@@ -1480,6 +1575,7 @@
     (use "(wait-until dict key pred)")
   (info "Blocks execution until the unary predicate #pred returns true for the value at #key in #dict. This function may wait indefinitely if no other thread sets the value in such a way that #pred returns true when applied to it.")
   (type proc)
+  (topic (concurrency dict))
   (arity 2)
   (see (wait-for future force wait-until*))
   (warn  "This cannot be used for synchronization of multiple tasks due to potential race-conditions."))
@@ -1532,6 +1628,7 @@
     (use "(task sel proc) => int")
   (info "Create a new task for concurrently running #proc, a procedure that takes its own ID as argument. The #sel argument must be a symbol in '(auto manual remove). If #sel is 'remove, then the task is always removed from the task table after it has finished, even if an error has occurred. If sel is 'auto, then the task is removed from the task table if it ends without producing an error. If #sel is 'manual then the task is not removed from the task table, its state is either 'canceled, 'finished, or 'error, and it and must be removed manually with #task-remove or #prune-task-table. Broadcast messages are never removed. Tasks are more heavy-weight than futures and allow for message-passing.")
   (type proc)
+  (topic (concurrency))
   (arity 1)
   (see (task? task-run task-state task-broadcast task-send task-recv task-remove prune-task-table)))
 
@@ -1542,6 +1639,7 @@
     (use "(task? id) => bool")
   (info "Check whether the given #id is for a valid task, return true if it is valid, nil otherwise.")
   (type proc)
+  (topic (concurrency))
   (arity 1)
   (see (task task-run task-state task-broadcast  task-send task-recv)))
 
@@ -1559,6 +1657,7 @@
     (use "(task-run id)")
   (info "Run task #id, which must have been previously created with task. Attempting to run a task that is already running results in an error unless #silent? is true. If silent? is true, the function does never produce an error.")
   (type proc)
+  (topic (concurrency))
   (arity 1)
   (see (task task? task-state  task-send task-recv task-broadcast-)))
 
@@ -1571,6 +1670,7 @@
     (use "(task-remove id)")
   (info "Remove task #id from the task table. The task can no longer be interacted with.")
   (type proc)
+  (topic (concurrency))
   (arity 1)
   (see (task task? task-state)))
 
@@ -1587,6 +1687,7 @@
     (use "(prune-task-table)")
   (info "Remove tasks that are finished from the task table. This includes tasks for which an error has occurred.")
   (type proc)
+  (topic (concurrency))
   (arity 0)
   (see (task-remove task task? task-run)))
 
@@ -1599,6 +1700,7 @@
   (use "(task-state id) => sym")
   (info "Return the state of the task, which is a symbol in '(finished error stopped new waiting running).")
   (type proc)
+  (topic (concurrency))
   (arity 1)
   (see (task task? task-run task-broadcast  task-recv task-send)))
 
@@ -1611,6 +1713,7 @@
     (use "(task-broadcast id msg)")
   (info "Send a message from task #id to the blackboard. Tasks automatically send the message 'finished to the blackboard when they are finished.")
   (type proc)
+  (topic (concurrency))
   (arity 2)
   (see (task task? task-run task-state  task-send task-recv)))
 
@@ -1623,6 +1726,7 @@
     (use "(task-send id msg)")
   (info "Send a message #msg to task #id. The task needs to cooperatively use task-recv to reply to the message. It is up to the receiving task what to do with the message once it has been received, or how often to check for new messages.")
   (type proc)
+  (topic (concurrency))
   (arity 2)
   (see (task-broadcast task-recv task task? task-run task-state )))
 
@@ -1641,6 +1745,7 @@
     (use "(task-recv id) => any")
   (info "Receive a message for task #id, or nil if there is no message. This is typically used by the task with #id itself to periodically check for new messages while doing other work. By convention, if a task receives the message 'end it ought to terminate at the next convenient occasion, whereas upon receiving 'cancel it ought to terminate in an expedited manner.")
   (type proc)
+  (topic (concurrency))
   (arity 1)
   (see (task-send task task? task-run task-state task-broadcast))
   (warn "Busy polling for new messages in a tight loop is inefficient and ought to be avoided."))
@@ -1681,6 +1786,7 @@
     (use "(task-schedule sel id)")
   (info "Schedule task #id for running, starting it as soon as other tasks have finished. The scheduler attempts to avoid running more than (cpunum) tasks at once.")
   (type proc)
+  (topic (concurrency))
   (arity 1)
   (see (task task-run)))
 
@@ -1691,6 +1797,7 @@
     (use "(cpunum)")
   (info "Return the number of cpu cores of this machine.")
   (type proc)
+  (topic (concurrency system))
   (arity 0)
   (see (sys))
   (warn "This function also counts virtual cores on the emulator. The original Z3S5 machine did not have virtual cpu cores."))
@@ -1761,6 +1868,7 @@
     (use "(run-at date repeater proc) => int")
   (info "Run procedure #proc with no arguments as task periodically according to the specification in #spec and return the task ID for the periodic task. Herbey, #date is either a datetime specification or one of '(now skip next-minute next-quarter next-halfhour next-hour in-2-hours in-3-hours tomorrow next-week next-month next-year), and #repeater is nil or a procedure that takes a task ID and unix-epoch-nanoseconds and yields a new unix-epoch-nanoseconds value for the next time the procedure shall be run. While the other names are self-explanatory, the 'skip specification means that the task is not run immediately but rather that it is first run at (repeater -1 (now)). Timing resolution for the scheduler is about 1 minute. Consider using interrupts for periodic events with smaller time resolutions. The scheduler uses relative intervals and has 'drift'.")
   (type proc)
+  (topic (concurrency))
   (arity 2)
   (see (task task-send))
   (warn "Tasks scheduled by run-at are not persistent! They are only run until the system is shutdown."))
@@ -1781,6 +1889,7 @@
     (use "(with-colors textcolor backcolor proc)")
   (info "Execute #proc for display side effects, where the default colors are set to #textcolor and #backcolor. These are color specifications like in the-color. After #proc has finished or if an error occurs, the default colors are restored to their original state.")
   (type proc)
+  (topic (system))
   (arity 3)
   (see ( the-color color set-color with-final)))
 
@@ -1801,6 +1910,7 @@
     (use "(*error-printer* err)")
   (info "The global printer procedure which takes an error and prints it.")
   (type proc)
+  (topic (system))
   (arity 1)
   (see (error)))
 
@@ -1810,6 +1920,7 @@
     (use "*last-error* => str")
   (info "Contains the last error that has occurred.")
   (type sym)
+  (topic (system))
   (arity 0)
   (see (*error-printer* *error-handler*))
   (warn "This may only be used for debugging! Do *not* use this for error handling, it will surely fail!"))
@@ -1827,6 +1938,7 @@
     (use "(*error-handler* err)")
   (info "The global error handler dict that contains procedures which take an error and handle it. If an entry is nil, the default handler is used, which outputs the error using *error-printer*. The dict contains handlers based on concurrent thread IDs and ought not be manipulated directly.")
   (type dict)
+  (topic (system))
   (arity 0)
   (see (*error-printer*)))
 
@@ -1845,6 +1957,7 @@
     (use "(warn msg [args...])")
   (info "Output the warning message #msg in error colors. The optional #args are applied to the message as in fmt. The message should not end with a newline.")
   (type proc)
+  (topic (system))
   (arity -2)
   (see (error)))
 
@@ -1856,6 +1969,7 @@
     (use "(pushstacked dict key datum)")
   (info "Push #datum onto the stack maintained under #key in the #dict.")
   (type proc)
+  (topic (dict))
   (arity 3)
   (see (getstacked popstacked)))
 
@@ -1870,6 +1984,7 @@
     (use "(getstacked dict key default)")
   (info "Get the topmost element from the stack stored at #key in #dict. If the stack is empty or no stack is stored at key, then #default is returned.")
   (type proc)
+  (topic (dict))
   (arity 3)
   (see (pushstacked popstacked)))
 
@@ -1888,6 +2003,7 @@
     (use "(popstacked dict key default)")
   (info "Get the topmost element from the stack stored at #key in #dict and remove it from the stack. If the stack is empty or no stack is stored at key, then #default is returned.")
   (type proc)
+  (topic (dict))
   (arity 3)
   (see (pushstacked getstacked)))
 
@@ -1898,6 +2014,7 @@
     (use "(push-error-handler proc)")
   (info "Push an error handler #proc on the error handler stack. For internal use only.")
   (type proc)
+  (topic (system))
   (arity 1)
   (see (with-error-handler)))
 
@@ -1908,6 +2025,7 @@
     (use "(pop-error-handler) => proc")
   (info "Remove the topmost error handler from the error handler stack and return it. For internal use only.")
   (type proc)
+  (topic (system))
   (arity 0)
   (see (with-error-handler)))
 
@@ -1921,6 +2039,7 @@
     (use "(current-error-handler) => proc")
   (info "Return the current error handler, a default if there is none.")
   (type proc)
+  (topic (system))
   (arity 0)
   (see (default-error-handler push-error-handler pop-error-handler *current-error-handler* *current-error-continuation*)))
 
@@ -1931,6 +2050,7 @@
     (use "(default-error-handler) => proc")
   (info "Return the default error handler, irrespectively of the current-error-handler.")
   (type proc)
+  (topic (system))
   (arity 0)
   (see (current-error-handler push-error-handler pop-error-handler *current-error-handler* *current-error-continuation*)))
 
@@ -1941,6 +2061,7 @@
     (use "(push-finalizer proc)")
   (info "Push a finalizer procedure #proc on the finalizer stack. For internal use only.")
   (type proc)
+  (topic (system))
   (arity 1)
   (see (with-final pop-finalizer)))
 
@@ -1955,6 +2076,7 @@
     (use "(pop-finalizer) => proc")
   (info "Remove a finalizer from the finalizer stack and return it. For internal use only.")
   (type proc)
+  (topic (system))
   (arity 0)
   (see (push-finalizer with-final)))
 
@@ -1970,6 +2092,7 @@
     (use "(with-error-handler handler body ...)")
   (info "Evaluate the forms of the #body with error handler #handler in place. The handler is a procedure that takes the error as argument and handles it. If an error occurs in #handler, a default error handler is used. Handlers are only active within the same thread.")
   (type macro)
+  (topic (system))
   (arity -3)
   (see (with-final)))
 
@@ -1992,6 +2115,7 @@
   (info "Evaluate the forms of the #body with the given finalizer as error handler. If an error occurs, then #finalizer is called with that error and nil. If no error occurs, #finalizer is called with nil as first argument and the result of evaluating all forms of #body as second argument.")
   (type macro)
   (arity -3)
+  (topic (system))
   (see (with-error-handler)))
 
 (defmacro try (final-stms &rest body)
@@ -2008,6 +2132,7 @@
     (use "(try (finals ...) body ...)")
   (info "Evaluate the forms of the #body and afterwards the forms in #finals. If during the execution of #body an error occurs, first all #finals are executed and then the error is printed by the default error printer.")
   (type macro)
+  (topic (system))
   (arity -3)
   (see (with-final with-error-handler)))
 
@@ -2037,6 +2162,7 @@
     (use "(hook symbol)")
   (info "Lookup the internal hook number from a symbolic name.")
   (type proc)
+  (topic (system))
   (arity 1)
   (see (*hooks* add-hook remove-hook remove-hooks)))
 
@@ -2051,6 +2177,7 @@
     (use "(add-hook hook proc) => id")
   (info "Add hook procedure #proc which takes a list of arguments as argument under symbolic or numeric #hook and return an integer hook #id for this hook. If #hook is not known, nil is returned.")
   (type proc)
+  (topic (system))
   (arity 2)
   (see (remove-hook remove-hooks replace-hook)))
 
@@ -2069,6 +2196,7 @@
   (info "Add a hook procedure #proc which takes a list of arguments under symbolic or numeric #hook and return an integer hook #id. If #hook is not known, nil is returned.")
   (type proc)
   (arity 2)
+  (topic (system))
   (see (add-hook remove-hook replace-hook)))
 
 (defun def-custom-hook (h)
@@ -2079,6 +2207,7 @@
     (use "(def-custom-hook sym proc)")
   (info "Define a custom hook point, to be called manually from Lisp. These have IDs starting from 65636.")
   (type proc)
+  (topic (system))
   (arity 2)
   (see (add-hook)))
 
@@ -2092,6 +2221,7 @@
     (use "(run-hook hook)")
   (info "Manually run the hook, executing all procedures for the hook.")
   (type proc)
+  (topic (system))
   (arity 1)
   (see (add-hook remove-hook)))
 
@@ -2106,6 +2236,7 @@
     (use "(remove-hook hook id) => bool")
   (info "Remove the symbolic or numberic #hook with #id and return true if the hook was removed, nil otherwise.")
   (type proc)
+  (topic (system))
   (arity 2)
   (see (add-hook remove-hooks replace-hook)))
 
@@ -2120,6 +2251,7 @@
     (use "(remove-hooks hook) => bool")
   (info "Remove all hooks for symbolic or numeric #hook, return true if the hook exists and the associated procedures were removed, nil otherwise.")
   (type proc)
+  (topic (system))
   (arity 1)
   (see (add-hook remove-hook replace-hook)))
 
@@ -2132,6 +2264,7 @@
     (use "(replace-hook hook proc)")
   (info "Remove all hooks for symbolic or numeric #hook and install the given #proc as the only hook procedure.")
   (type proc)
+  (topic (system))
   (arity 2)
   (see (add-hook remove-hook remove-hooks)))
 
@@ -2160,6 +2293,7 @@
     (use "(even? n) => bool")
   (info "Returns true if the integer #n is even, nil if it is not even.")
   (type proc)
+  (topic (numeric))
   (arity 1)
   (see (odd?)))
 
@@ -2170,6 +2304,7 @@
     (use "(odd? n) => bool")
   (info "Returns true if the integer #n is odd, nil otherwise.")
   (type proc)
+  (topic (numeric))
   (arity 1)
   (see (even?)))
 
@@ -2187,6 +2322,7 @@
     (use "(shorten s n) => str")
   (info "Shorten string #s to length #n in a smart way if possible, leave it untouched if the length of #s is smaller than #n.")
   (type proc)
+  (topic (str))
   (arity 2)
   (see (substr)))
 
@@ -2197,6 +2333,7 @@
     (use "(str->list s) => list")
   (info "Return the sequence of numeric chars that make up string #s.")
   (type proc)
+  (topic (conversion str lisp))
   (arity 1)
   (see (str->array list->str array->str chars)))
 
@@ -2210,6 +2347,7 @@
     (use "(str-remove-number s [del]) => str")
   (info "Remove the suffix number in #s, provided there is one and it is separated from the rest of the string by #del, where the default is a space character. For instance, \"Test 29\" will be converted to \"Test\", \"User-Name1-23-99\" with delimiter \"-\" will be converted to \"User-Name1-23\". This function will remove intermediate delimiters in the middle of the string, since it disassembles and reassembles the string, so be aware that this is not preserving inputs in that respect.")
   (type proc)
+  (topic (str))
   (arity 1)
   (see (strsplit)))
 
@@ -2225,6 +2363,7 @@
     (use "(str-remove-prefix s prefix) => str")
   (info "Remove the prefix #prefix from string #s, return the string without the prefix. If the prefix does not match, #s is returned. If #prefix is longer than #s and matches, the empty string is returned.")
   (type proc)
+  (topic (str))
   (arity 1)
   (see (str-remove-suffix)))
 
@@ -2240,6 +2379,7 @@
     (use "(str-remove-suffix s suffix) => str")
   (info "remove the suffix #suffix from string #s, return the string without the suffix. If the suffix does not match, #s is returned. If #suffix is longer than #s and matches, the empty string is returned.")
   (type proc)
+  (topic (str))
   (arity 1)
   (see (str-remove-prefix)))
 
@@ -2255,6 +2395,7 @@
     (use "(str-join li del) => str")
   (info "Join a list of strings #li where each of the strings is separated by string #del, and return the result string.")
   (type proc)
+  (topic (str))
   (arity 2)
   (see (strlen strsplit str-slice)))
 
@@ -2265,6 +2406,7 @@
     (use "(list->str li) => string")
   (info "Return the string that is composed out of the chars in list #li.")
   (type proc)
+  (topic (conversion lisp str))
   (arity 1)
   (see (array->str str->list chars)))
 
@@ -2279,6 +2421,7 @@
     (use "(alist? li) => bool")
   (info "Return true if #li is an association list, nil otherwise. This also works for a-lists where each element is a pair rather than a full list.")
   (type proc)
+  (topic (lisp))
   (arity 1)
   (see (assoc)))
 
@@ -2289,6 +2432,7 @@
     (use "(assoc1 sym li) => any")
   (info "Get the second element in the first sublist in #li that starts with #sym. This is equivalent to (cadr (assoc sym li)).")
   (type proc)
+  (topic (lisp))
   (arity 2)
   (see (assoc alist?)))
 
@@ -2299,6 +2443,7 @@
     (use "(make-set [arg1] ... [argn]) => dict")
   (info "Create a dictionary out of arguments #arg1 to #argn that stores true for very argument.")
   (type proc)
+  (topic (data))
   (arity -1)
   (see (list->set set->list set-element? set-union set-intersection set-complement set-difference set? set-empty?)))
 
@@ -2309,6 +2454,7 @@
     (use "(list->set li) => dict")
   (info "Create a dict containing true for each element of list #li.")
   (type proc)
+  (topic (conversion lisp data))
   (arity 1)
   (see (make-set set-element? set-union set-intersection set-complement set-difference set? set-empty)))
 
@@ -2319,6 +2465,7 @@
     (use "(set->list s) => li")
   (info "Convert set #s to a list of set elements.")
   (type proc)
+  (topic (conversion lisp data))
   (arity 1)
   (see (list->set make-set set-element? set-union set-intersection set-complement set-difference set? set-empty)))
 
@@ -2329,6 +2476,7 @@
     (use "(set? x) => bool")
   (info "Return true if #x can be used as a set, nil otherwise.")
   (type proc)
+  (topic (data))
   (arity 1)
   (see (list->set make-set set->list set-element? set-union set-intersection set-complement set-difference set-empty?)))
 
@@ -2339,6 +2487,7 @@
     (use "(set-element? s elem) => bool")
   (info "Return true if set #s has element #elem, nil otherwise.")
   (type proc)
+  (topic (data))
   (arity 2)
   (see (make-set list->set set->list set-union set-intersection set-complement set-difference set? set-empty?)))
 
@@ -2349,6 +2498,7 @@
     (use "(set-empty? s) => bool")
   (info "Return true if set #s is empty, nil otherwise.")
   (type proc)
+  (topic (data))
   (arity 1)
   (see (make-set list->set set->list set-union set-intersection set-complement set-difference set?)))
 
@@ -2361,6 +2511,7 @@
     (use "(dict-merge a b) => dict")
   (info "Create a new dict that contains all key-value pairs from dicts #a and #b. Note that this function is not symmetric. If a key is in both #a and #b, then the key value pair in #a is retained for this key.")
   (type proc)
+  (topic (dict))
   (arity 2)
   (see (dict dict-map dict-map! dict-foreach)))
 
@@ -2371,6 +2522,7 @@
     (use "(set-union a b) => set")
   (info "Return the union of sets #a and #b containing all elements that are in #a or in #b (or both).")
   (type proc)
+  (topic (data))
   (arity 2)
   (see (list->set set->list make-set set-element? set-intersection set-complement set-difference set? set-empty?)))
 
@@ -2383,6 +2535,7 @@
     (use "(set-intersection a b) => set")
   (info "Return the intersection of sets #a and #b, i.e., the set of elements that are both in #a and in #b.")
   (type proc)
+  (topic (data))
   (arity 2)
   (see (list->set set->list make-set set-element? set-union set-complement set-difference set? set-empty? set-subset? set-equal?)))
 
@@ -2395,6 +2548,7 @@
     (use "(set-difference a b) => set")
   (info "Return the set-theoretic difference of set #a minus set #b, i.e., all elements in #a that are not in #b.")
   (type proc)
+  (topic (data))
   (arity 2)
   (see (list->set set->list make-set set-element? set-union set-intersection set-complement set? set-empty? set-subset? set-equal?)))
 
@@ -2407,6 +2561,7 @@
     (use "(set-complement a domain) => set")
   (info "Return all elements in #domain that are not elements of #a.")
   (type proc)
+  (topic (data))
   (arity 2)
   (see (list->set set->list make-set set-element? set-union set-difference set-intersection set? set-empty? set-subset? set-equal?)))
 
@@ -2417,6 +2572,7 @@
     (use "(set-subset? a b) => bool")
   (info "Return true if #a is a subset of #b, nil otherwise.")
   (type proc)
+  (topic (data))
   (arity 2)
   (see (set-equal? list->set set->list make-set set-element? set-union set-difference set-intersection set-complement set? set-empty?)))
 
@@ -2427,6 +2583,7 @@
     (use "(set-equal? a b) => bool")
   (info "Return true if #a and #b contain the same elements.")
   (type proc)
+  (topic (data))
   (arity 2)
   (see (set-subset? list->set set-element? set->list set-union set-difference set-intersection set-complement set? set-empty?)))
 
@@ -2437,6 +2594,7 @@
     (use "(chars str) => dict")
   (info "Return a charset based on #str, i.e., dict with the chars of #str as keys and true as value.")
   (type proc)
+  (topic (data))
   (arity 1)
   (see (dict get set contains)))
 
@@ -2447,6 +2605,7 @@
     (use "(inchars char chars) => bool")
   (info "Return true if char is in the charset chars, nil otherwise.")
   (type proc)
+  (topic (data))
   (arity 2)
   (see (chars dict get set has)))
 
@@ -2464,6 +2623,7 @@
     (use "(str-index s chars [pos]) => int")
   (info "Find the first char in #s that is in the charset #chars, starting from the optional #pos in #s, and return its index in the string. If no macthing char is found, nil is returned.")
   (type proc)
+  (topic (str))
   (arity -3)
   (see (strsplit chars inchars)))
 
@@ -2492,6 +2652,7 @@
     (use "(str-segment str start end) => list")
   (info "Parse a string #str into words that start with one of the characters in string #start and end in one of the characters in string #end and return a list consisting of lists of the form (bool s) where bool is true if the string starts with a character in #start, nil otherwise, and #s is the extracted string including start and end characters.")
   (type proc)
+  (topic (str))
   (arity 3)
   (see (str+ strsplit fmt strbuild)))
 
@@ -2514,6 +2675,7 @@
     (use "(darken color [amount]) => (r g b a)")
   (info "Return a darker version of #color. The optional positive #amount specifies the amount of darkening (0-255).")
   (type proc)
+  (topic (ui))
   (arity 1)
   (see (the-color *colors* lighten)))
 
@@ -2534,6 +2696,7 @@
     (use "(lighten color [amount]) => (r g b a)")
   (info "Return a lighter version of #color. The optional positive #amount specifies the amount of lightening (0-255).")
   (type proc)
+  (topic (ui))
   (arity 1)
   (see (the-color *colors* darken)))
 
@@ -2544,6 +2707,7 @@
     (use "(random-color [alpha])")
   (info "Return a random color with optional #alpha value. If #alpha is not specified, it is 255.")
   (type proc)
+  (topic (ui))
   (arity -1)
   (see (the-color *colors* darken lighten)))
 
@@ -2557,6 +2721,7 @@
     (use "(minmax pred li acc) => any")
   (info "Go through #li and test whether for each #elem the comparison (pred elem acc) is true. If so, #elem becomes #acc. Once all elements of the list have been compared, #acc is returned. This procedure can be used to implement generalized minimum or maximum procedures.")
   (type proc)
+  (topic (numeric))
   (arity 3)
   (see (min max)))
 
@@ -2567,6 +2732,7 @@
     (use "(min x1 x2 ...) => num")
   (info "Return the minimum of the given numbers.")
   (type proc)
+  (topic (numeric))
   (arity -2)
   (see (max minmax)))
 
@@ -2577,6 +2743,7 @@
     (use "(max x1 x2 ...) => num")
   (info "Return the maximum of the given numbers.")
   (type proc)
+  (topic (numeric))
   (arity -2)
   (see (min minmax)))
 
@@ -2587,6 +2754,7 @@
     (use "(now-ms) => num")
   (info "Return the relative system time as a call to (now-ns) but in milliseconds.")
   (type proc)
+  (topic (time))
   (arity 0)
   (see (now-ns now)))
 
@@ -2606,6 +2774,7 @@
     (use "(datelist->epoch-ns dateli) => int")
   (info "Convert a datelist to Unix epoch nanoseconds. This function uses the Unix nanoseconds from the 5th value of the second list in the datelist, as it is provided by functions like (now). However, if the Unix nanoseconds value is not specified in the list, it uses #date->epoch-ns to convert to Unix epoch nanoseconds. Datelists can be incomplete. If the month is not specified, January is assumed. If the day is not specified, the 1st is assumed. If the hour is not specified, 12 is assumed, and corresponding defaults for minutes, seconds, and nanoseconds are 0.")
   (type proc)
+  (topic (time))
   (arity 1)
   (see (date->epoch-ns datestr datestr* datestr->datelist epoch-ns->datelist now)))
   
@@ -2616,6 +2785,7 @@
     (use "(sec+ dateli n) => dateli")
   (info "Adds #n seconds to the given date #dateli in datelist format and returns the new datelist.")
   (type proc)
+  (topic (time))
   (arity 2)
   (see (minute+ hour+ day+ week+ month+ year+ now)))
 
@@ -2626,6 +2796,7 @@
     (use "(minute+ dateli n) => dateli")
   (info "Adds #n minutes to the given date #dateli in datelist format and returns the new datelist.")
   (type proc)
+  (topic (time))
   (arity 2)
   (see (sec+ hour+ day+ week+ month+ year+ now)))
 
@@ -2636,6 +2807,7 @@
     (use "(hour+ dateli n) => dateli")
   (info "Adds #n hours to the given date #dateli in datelist format and returns the new datelist.")
   (type proc)
+  (topic (time))
   (arity 2)
   (see (sec+ minute+ day+ week+ month+ year+ now)))
 
@@ -2646,6 +2818,7 @@
     (use "(day+ dateli n) => dateli")
   (info "Adds #n days to the given date #dateli in datelist format and returns the new datelist.")
   (type proc)
+  (topic (time))
   (arity 2)
   (see (sec+ minute+ hour+ week+ month+ year+ now)))
 
@@ -2656,6 +2829,7 @@
     (use "(week+ dateli n) => dateli")
   (info "Adds #n weeks to the given date #dateli in datelist format and returns the new datelist.")
   (type proc)
+  (topic (time))
   (arity 2)
   (see (sec+ minute+ hour+ day+ month+ year+ now)))
 
@@ -2673,6 +2847,7 @@
     (use "(month+ dateli n) => dateli")
   (info "Adds #n months to the given date #dateli in datelist format and returns the new datelist.")
   (type proc)
+  (topic (time))
   (arity 2)
   (see (sec+ minute+ hour+ day+ week+ year+ now)))
 
@@ -2690,6 +2865,7 @@
     (use "(month+ dateli n) => dateli")
   (info "Adds #n years to the given date #dateli in datelist format and returns the new datelist.")
   (type proc)
+  (topic (time))
   (arity 2)
   (see (sec+ minute+ hour+ day+ week+ month+ now)))
 
@@ -2700,6 +2876,7 @@
     (use "(add1 n) => num")
   (info "Add 1 to number #n.")
   (type proc)
+  (topic (numeric))
   (arity 1)
   (see (sub1 + -)))
 
@@ -2710,6 +2887,7 @@
     (use "(sub1 n) => num")
   (info "Subtract 1 from #n.")
   (type proc)
+  (topic (numeric))
   (arity 1)
   (see (add1 + -)))
 
@@ -2720,6 +2898,7 @@
     (use "(lcons datum li) => list")
   (info "Insert #datum at the end of the list #li. There may be a more efficient implementation of this in the future. Or, maybe not. Who knows?")
   (type proc)
+  (topic (lisp))
   (arity 2)
   (see (cons list append nreverse)))
 
@@ -2735,6 +2914,7 @@
     (use "(build-list n proc) => list")
   (info "Build a list with #n elements by applying #proc to the counter #n each time.")
   (type proc)
+  (topic (lisp))
   (arity 2)
   (see (list list? map foreach)))
 
@@ -2750,6 +2930,7 @@
     (use "(get-partitions x n) => proc/1*")
   (info "Return an iterator procedure that returns lists of the form (start-offset end-offset bytes) with 0-index offsets for a given index #k, or nil if there is no corresponding part, such that the sizes of the partitions returned in #bytes summed up are #x and and each partition is #n or lower in size. The last partition will be the smallest partition with a #bytes value smaller than #n if #x is not dividable without rest by #n. If no argument is provided for the returned iterator, then it returns the number of partitions.")
   (type proc)
+  (topic (lisp))
   (arity 2)
   (see (nth-partition count-partitions get-file-partitions iterate)))
 
@@ -2763,6 +2944,7 @@
     (use "(count-partitions m k) => int")
   (info "Return the number of partitions for divding #m items into parts of size #k or less, where the size of the last partition may be less than #k but the remaining ones have size #k.")
   (type proc)
+  (topic (lisp))
   (arity 2)
   (see (nth-partition get-partitions)))
 
@@ -2775,6 +2957,7 @@
     (use "(nth-partition m k idx) => li")
   (info "Return a list of the form (start-offset end-offset bytes) for the partition with index #idx of #m into parts of size #k. The index #idx as well as the start- and end-offsets are 0-based.")
   (type proc)
+  (topic (lisp))
   (arity 3)
   (see (count-partitions get-partitions)))
 
@@ -2786,85 +2969,9 @@
     (use "(iterate it proc)")
   (info "Apply #proc to each argument returned by iterator #it in sequence, similar to the way foreach works. An iterator is a procedure that takes one integer as argument or no argument at all. If no argument is provided, the iterator returns the number of iterations. If an integer is provided, the iterator returns a non-nil value for the given index.")
   (type proc)
+  (topic (lisp))
   (arity 2)
   (see (foreach get-partitions)))
-
-(defun pathli-absolute? (p)
-  (if (null? p)
-      nil
-      (equal? "/" (car p))))
-
-(defhelp pathli-absolute?
-    (use "(pathli-absolute? path) => bool")
-  (info "Return true if #path is a path list for an absolute path. These start with a \"/\" as first component.")
-  (type proc)
-  (arity 1)
-  (see (parse-path path-absolute?)))
-
-(defun path-absolute? (fi)
-  (pathli-absolute? (cadr (parse-path fi))))
-
-(defhelp path-absolute?
-    (use "(path-absolute? fi) => bool")
-  (info "Return true if the path component of file or directory #fi is absolute. Special access restrictions apply to absolute paths.")
-  (type proc)
-  (arity 1)
-  (see (pathli-absolute? parse-path)))
-
-(defun interpreter-path (ip)
-  (cadr (compose-path nil (_interpreter-path ip))))
-
-(defun _compose-path (proc li acc)
-  (cond
-    ((null? li) acc)
-    (t (_compose-path proc (cdr li) (proc acc (car li))))))
-
-(defun compose-path (fspec &rest pspec)
-  (let ((selector
-	 (cond
-	   ((null? pspec) 'user)
-	   ((pathli-absolute? (car pspec)) 'absolute)
-	   ((and (list? (car pspec)) (sym? (caar pspec)))
-	    (caar pspec))
-	   (t 'user))))
-    (list
-     selector
-     (str+
-      (cond
-	((null? pspec) '(user ""))
-	((pathli-absolute? (car pspec))
-	 (str+ "/"
-	       (_compose-path (lambda (s x) (str+ s x "/"))
-			      (cdar pspec) "")))
-	((and (list? (car pspec)) (sym? (caar pspec)))
-	 (_compose-path (lambda (s x) (str+ s x "/"))
-			(cdar pspec) ""))
-	(t (_compose-path (lambda (s x) (str+ s x "/"))
-			  (car pspec) "")))
-      (cond
-	((null? fspec) "")
-	((null? (cdr fspec)) (car fspec))
-	(t (str+ (car fspec) "." (cadr fspec))))))))
-
-(defhelp compose-path
-    (use "(compose-path [fspec] [pspec]) => str")
-  (info "Compose a filepath of the form '(selector string-path) out of the file list #fspec and the path list #pspec. At least one of [fspec] and [pspec] must be specified.")
-  (type proc)
-  (arity -2)
-  (see (parse-path path-absolute? pathli-absolute?)))
-
-(defun del-pathsep (p)
-  (cond
-    ((equal? p "") "")
-    ((equal? (last p) 47) (slice p 0 (sub1 (len p))))
-    (t p)))
-
-(defhelp del-pathsep
-    (use "(del-pathsep p) => str")
-  (info "Remove the trailing path separator from the string path #p if there is one, and return the shortened path. If the path is empty or it doesn't and in a path separator, #p is returned.")
-  (type proc)
-  (arity 1)
-  (see (dexists?)))
 
 ;; check whether a sys key is present
 (defun sys-key? (k)
@@ -2875,6 +2982,7 @@
     (use "(sys-key? key) => bool")
   (info "Return true if the given sys key #key exists, nil otherwise.")
   (type proc)
+  (topic (system))
   (arity 1)
   (see (sys setsys)))
 
@@ -2887,6 +2995,7 @@
     (use "(strcenter s n) => str")
   (info "Center string #s by wrapping space characters around it, such that the total length the result string is #n.")
   (type proc)
+  (topic (str ui))
   (arity 2)
   (see (strleft strright strlimit)))
 
@@ -2898,6 +3007,7 @@
   (use "(strleft s n) => str")
   (info "Align string #s left by adding space characters to the right of it, such that the total length the result string is #n.")
   (type proc)
+  (topic (str ui))
   (arity 2)
   (see (strcenter strright strlimit)))
 
@@ -2909,6 +3019,7 @@
   (use "(strright s n) => str")
   (info "Align string #s right by adding space characters in front of it, such that the total length the result string is #n.")
   (type proc)
+  (topic (str ui))
   (arity 2)
   (see (strcenter strleft strlimit)))
 
@@ -2920,6 +3031,7 @@
     (use "(spaces n) => str")
   (info "Create a string consisting of #n spaces.")
   (type proc)
+  (topic (str ui))
   (arity 1)
   (see (strbuild strleft strright)))
 
@@ -2933,6 +3045,7 @@
     (use "(strlimit s n) => str")
   (info "Return a string based on #s cropped to a maximal length of #n (or less if #s is shorter).")
   (type proc)
+  (topic (str ui))
   (arity 2)
   (see (strcenter strleft strright)))
 
@@ -2947,6 +3060,7 @@
     (use "(datestr datelist) => str")
   (info "Return datelist, as it is e.g. returned by (now), as a string in format YYYY-MM-DD HH:mm.")
   (type proc)
+  (topic (time))
   (arity 1)
   (see (now datestr* datestr->datelist)))
 
@@ -2960,6 +3074,7 @@
     (use "(datestr* datelist) => str")
   (info "Return the datelist, as it is e.g. returned by (now), as a string in format YYYY-MM-DD HH:mm:ss.nanoseconds.")
   (type proc)
+  (topic (time))
   (arity 1)
   (see (now datestr datestr->datelist)))
 
@@ -2984,6 +3099,7 @@
     (use "(datestr->datelist s) => li")
   (info "Convert a date string in the format of datestr and datestr* into a date list as it is e.g. returned by (now).")
   (type proc)
+  (topic (time))
   (arity 1)
   (see (datestr* datestr now)))
 
@@ -2994,6 +3110,7 @@
     (use "(nl)")
   (info "Display a newline, advancing the cursor to the next line.")
   (type proc)
+  (topic (console ui))
   (arity 0)
   (see (out outy output-at)))
 
@@ -3006,6 +3123,7 @@
     (use "(abs x) => num")
   (info "Returns the absolute value of number #x.")
   (type proc)
+  (topic (numeric))
   (arity 1)
   (see (* - + /)))
 
@@ -3200,6 +3318,7 @@
     (use "*colors*")
   (info "A global dict that maps default color names to color lists (r g b), (r g b a) or selectors for (color selector). This can be used with procedure the-color to translate symbolic names to colors.")
   (type dict)
+  (topic (ui))
   (arity 0)
   (see (the-color)))
 
@@ -3227,6 +3346,7 @@
     (use "(the-color colors-spec) => (r g b a)")
   (info "Return the color list (r g b a) based on a color specification, which may be a color list (r g b), a color selector for (color selector) or a color name such as 'dark-blue.")
   (type proc)
+  (topic (ui))
   (arity 1)
   (see (*colors* color set-color outy)))
 
@@ -3237,6 +3357,7 @@
     (use "(the-color-names) => li")
   (info "Return the list of color names in *colors*.")
   (type proc)
+  (topic (ui))
   (arity 0)
   (see (*colors* the-color)))
 
@@ -3273,6 +3394,7 @@
     (use "(outy spec)")
   (info "Output styled text specified in #spec. A specification is a list of lists starting with 'fg for foreground, 'bg for background, or 'text for unstyled text. If the list starts with 'fg or 'bg then the next element must be a color suitable for (the-color spec). Following may be a string to print or another color specification. If a list starts with 'text then one or more strings may follow.")
   (type proc)
+  (topic (ui))
   (arity 1)
   (see (*colors* the-color set-color color gfx.color output-at out)))
 
@@ -3286,6 +3408,7 @@
     (use "(synout arg)")
   (info "Like out, but enforcing a new input line afterwards. This needs to be used when outputing concurrently in a future or task.")
   (type proc)
+  (topic (ui system concurrency))
   (arity 1)
   (see (out outy synouty))
   (warn "Concurrent display output can lead to unexpected visual results and ought to be avoided."))
@@ -3319,6 +3442,7 @@
     (use "(sysmsg msg)")
   (info "Asynchronously display a system message string #msg if in console or page mode, otherwise the message is logged.")
   (type proc)
+  (topic (system ui concurrency))
   (arity 1)
   (see (sysmsg* synout synouty out outy)))
 
@@ -3336,6 +3460,7 @@
     (use "(sysmsg* msg)")
   (info "Display a system message string #msg if in console or page mode, otherwise the message is logged.")
   (type proc)
+  (topic (system ui concurrency))
   (arity 1)
   (see (sysmsg synout synouty out outy)))
 
@@ -3348,6 +3473,7 @@
 (defhelp sort-symbols
     (use "(sort-symbols li) => list")
   (info "Sort the list of symbols #li alphabetically.")
+  (topic (lisp))
   (arity 1)
   (see (out dp du dump)))
 
@@ -3377,17 +3503,34 @@
     (use "(dump [sym] [all?]) => li")
   (info "Return a list of symbols starting with the characters of #sym or starting with any characters if #sym is omitted, sorted alphabetically. When #all? is true, then all symbols are listed, otherwise only symbols that do not contain \"_\" are listed. By convention, the underscore is used for auxiliary functions.")
   (type proc)
+  (topic (system))
   (arity -1)
   (see (dump-bindings save-zimage load-zimage)))
 
 (defun find-missing-help-entries ()
   (filter (dump) (lambda (sym) (get *help* sym nil))))
 
+(defhelp find-missing-help-entries
+    (use "(find-missing-help-entries) => li")
+  (info "Return a list of global symbols for which help entries are missing.")
+  (type proc)
+  (topic (system))
+  (arity 0)
+  (see (dump dump-bindings find-unneeded-help-entries)))
+
 (defun find-unneeded-help-entries ()
   (let ((d (dump))
 	(r nil))
     (dict-foreach *help* (lambda (k v) (unless (memq k d) (setq r (cons k r)))))
     r))
+
+(defhelp find-unneeded-help-entries
+    (use "(find-unneeded-help-entries) => li")
+  (info "Return a list of help entries for which no symbols are defined.")
+  (type proc)
+  (topic (system))
+  (arity 0)
+  (see (dump dump-bindings find-missing-help-entries)))
     
 (defun protect-toplevel-symbols ()
   (apply protect (filter (dump-bindings)
@@ -3399,8 +3542,94 @@
     (use "(protect-toplevel-symbols)")
   (info "Protect all toplevel symbols that are not yet protected and aren't in the *mutable-toplevel-symbols* dict.")
   (type proc)
+  (topic (system))
   (arity 0)
   (see (protected? protect unprotect declare-unprotected when-permission? dict-protect dict-protected? dict-unprotect)))
+
+(defun _include (in last)
+  (let ((datum (read in)))
+    (cond
+      ((eof? datum) last)
+      (t (eval datum)
+	 (_include in datum)))))
+
+(defun include (&rest fi)
+  (let ((io nil))
+    (try ((when io (close io)))
+	 (setq io (apply open fi))
+	 (_include io (void)))))
+
+(defhelp include
+    (use "(include fi) => any")
+  (info "Evaluate the lisp file #fi one expression after the other in the current environment.")
+  (type proc)
+  (topic (system fileio io))
+  (arity 1)
+  (see (read write open close)))
+
+(defun flatten (lst)
+    (letrec ((loop (lambda (lst acc)
+		     (cond
+		       ((null? lst) acc)
+		       ((and (list? lst) (not (null? lst)))
+			(loop (car lst) (loop (cdr lst) acc)))
+		       (t (cons lst acc))))))
+      (loop lst nil)))
+
+(defhelp flatten
+    (use "(flatten lst) => list")
+  (info "Flatten #lst, making all elements of sublists elements of the flattened list.")
+  (type proc)
+  (arity 1)
+  (topic (lisp))
+  (see (car cdr remove-duplicates)))
+
+(defun help-topics ()
+  (let ((d (dict)))
+    (dict-foreach *help*
+		  (lambda (k v)
+		    (let ((li (cdr (assoc 'topic v))))
+		      (unless (null? li)
+			(foreach (car li)
+				 (lambda (topic)
+				   (set d topic t)))))))
+    (sort-symbols (dict->keys d))))
+
+(defhelp help-topics
+    (use "(help-topics) => li")
+  (info "Obtain a list of help topics for commands.")
+  (type proc)
+  (arity 0)
+  (topic (help))
+  (see (help help-topic apropos)))
+
+(defun help-about (topic &rest opt)
+  (let ((topics (help-topics)))
+    (unless (member topic topics)
+      (warn (fmt "topic '%v is unknown" topic)))
+    (when (and (not (null? opt))
+	       (not (or (equal? 'any (car opt))
+			(equal? 'first (car opt)))))
+      (error (fmt "help-about: the optional argument must be one of '(any first), given '%v" (car opt))))
+    (let ((d (dict)))
+      (dict-foreach *help*
+		    (lambda (k v)
+		      (let ((li (cdr (assoc 'topic v))))
+			(unless (null? li)
+			  (when (if (or (null? opt)
+					(equal? 'any (car opt)))
+				    (member topic (car li))
+				    (equal? topic (caar li)))
+			    (set d k t))))))
+      (sort-symbols (dict->keys d)))))
+
+(defhelp help-about
+    (use "(help-about topic [sel]) => li")
+  (info "Obtain a list of symbols for which help about #topic is available. If optional #sel argument is left out or #any, then any symbols with which the topic is associated are listed. If the optional #sel argument is #first, then a symbol is only listed if it has #topic as first topic entry. This restricts the number of entries returned to a more essential selection.")
+  (type proc)
+  (arity -2)
+  (topic (help))
+  (see (help-topics help apropos)))
 
 ;; PREAMBLE END
 

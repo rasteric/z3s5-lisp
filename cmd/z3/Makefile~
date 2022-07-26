@@ -1,0 +1,2 @@
+all: z3.go
+	go build -tags "fileio" z3.go

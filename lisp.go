@@ -725,6 +725,7 @@ func NewInterp(pc any) (*Interp, error) {
 	interp.Define_Ling()       // linguistic helpers such as Levenshtein distance
 	interp.Define_Decimal()    // decimal arithmetics
 	interp.Define_StyledText() // colors in terminal
+	interp.Define_FileIO()     // file i/o with build tag "fileio"
 
 	if supportsSound {
 		reflect, ok := interp.GetGlobalVar(ReflectSym)
