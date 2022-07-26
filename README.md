@@ -1,4 +1,4 @@
-![Z3S5](docs/Z3S5.png)# Z3S5 Lisp
+![Z3S5](docs/Z3S5.png) # Z3S5 Lisp
 an arcane Lisp dialect containing alien technology
 
 [![GoDoc](https://godoc.org/github.com/rasteric/z3s5-lisp/go?status.svg)](https://godoc.org/github.com/rasteric/z3s5-lisp)
