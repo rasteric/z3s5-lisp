@@ -205,9 +205,9 @@ Not only are error messages fairly rudimentary, they also use the expanded macro
 
 Dicts use Go's `sync.Map` under the hood and are therefore concurrency-safe. The global symbol table is also cuncurrency-safe. This means that dicts can be accessed safely from futures and tasks and can even be used for synchronization purposes, as the (admittedly horrible) current implementation of tasks in `embed/init.lisp` illustrates. Generally, futures should be used and can be spawned in large quantities without much of a performance penalty. Tasks need some work to become efficient and there are plans to include a more direct interface to Go's goroutines with cancelable contexts in the future.
 
-## File and Network Access
+## File Access
 
-These are coming soon. The reason they haven't been included yet in this release is that Z3S5 Lisp has been extracted from a much larger project called *Z3S5 Machine*, a currently proprietary virtual retro Lisp machine with thousands of graphics and sound commands, and in this machine network and file access is heavily abstracted from and guarded. So the existing file and network functions could not be used for a more general-purpose Lisp and need to be re-written. You can implement your own, of course. Simply define functions like `open`, `close`, `port?`, `file-port?`, `network-port?`, `read`, `write`, `read-bbinary`, `write-binary`, etc. It's not that much work, just a bit tedious. Or, wait until these are available officially. You can expect a fairly standard system of streams and ports.
+For obvious reasons, not all embedded interpreters should provide full file access. Therefore, this option needs to be enabled with build tag `fileio`, or otherwise none of the filesystem-related functions will be available. The `z3` Makefile in `cmd/z3` enables this option by default for the standalone executable.
 
 ## Language Stability
 
@@ -245,6 +245,6 @@ Custom data structures: Since there is currently no way to modify the printer fo
 
 # License and Contact
 
-Z3S5 Lisp was written by Erich H. Rast and based on Nukata Lisp by SUZUKI Hisao. It is licensed under the MIT License that allows free use and modification as long as the LICENSE and copyright notices remain. Please read the accompanying LICENSE file for more information.
+Z3S5 Lisp was written by Erich H. Rast and is based on Nukata Lisp by SUZUKI Hisao. It is licensed under the MIT License that allows free use and modification as long as the LICENSE and copyright notices remain. Please read the accompanying LICENSE file for more information.
 
 Please send inquiries and bug reports to <erich@snafu.de> or open an issue on Github. Happy hacking!
