@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2022.7.14)  26 JUL 2022 18:16
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2022.7.14)  26 JUL 2022 20:23
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -542,34 +542,27 @@ File: lstlang1.sty 2020/03/24 1.8d listings language file
 (/usr/share/texlive/texmf-dist/tex/latex/listings/lstlang2.sty
 File: lstlang2.sty 2020/03/24 1.8d listings language file
 ) [5] [6]
-[7] [8]
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 656.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 656.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 656.
- [9] (./manual.aux) ) 
+[7] [8] [9] (./manual.aux) ) 
 Here is how much of TeX's memory you used:
- 14937 strings out of 478287
- 228274 string characters out of 5849289
- 854728 words of memory out of 5000000
- 32643 multiletter control sequences out of 15000+600000
- 529103 words of font info for 139 fonts, out of 8000000 for 9000
+ 14873 strings out of 478287
+ 227368 string characters out of 5849289
+ 854716 words of memory out of 5000000
+ 32601 multiletter control sequences out of 15000+600000
+ 516575 words of font info for 118 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  74i,6n,77p,1003b,1897s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texmf/fonts/enc/dvips/lm/lm-ec.enc}{/usr/share
-/texmf/fonts/enc/dvips/lm/lm-ts1.enc}</usr/share/texmf/fonts/type1/public/lm/lm
-bx10.pfb></usr/share/texmf/fonts/type1/public/lm/lmbx12.pfb></usr/share/texmf/f
-onts/type1/public/lm/lmr10.pfb></usr/share/texmf/fonts/type1/public/lm/lmr12.pf
-b></usr/share/texmf/fonts/type1/public/lm/lmr17.pfb></usr/share/texmf/fonts/typ
-e1/public/lm/lmri10.pfb></usr/share/texmf/fonts/type1/public/lm/lmtk10.pfb></us
-r/share/texmf/fonts/type1/public/lm/lmtt8.pfb></usr/share/texmf/fonts/type1/pub
-lic/lm/lmtti10.pfb>
-Output written on manual.pdf (9 pages, 265409 bytes).
+{/usr/share/texmf/fonts/enc/dvips/lm/lm-ec.enc}{/us
+r/share/texmf/fonts/enc/dvips/lm/lm-ts1.enc}</usr/share/texmf/fonts/type1/publi
+c/lm/lmbx10.pfb></usr/share/texmf/fonts/type1/public/lm/lmbx12.pfb></usr/share/
+texmf/fonts/type1/public/lm/lmr10.pfb></usr/share/texmf/fonts/type1/public/lm/l
+mr12.pfb></usr/share/texmf/fonts/type1/public/lm/lmr17.pfb></usr/share/texmf/fo
+nts/type1/public/lm/lmri10.pfb></usr/share/texmf/fonts/type1/public/lm/lmtk10.p
+fb></usr/share/texmf/fonts/type1/public/lm/lmtt8.pfb></usr/share/texmf/fonts/ty
+pe1/public/lm/lmtti10.pfb>
+Output written on manual.pdf (9 pages, 263073 bytes).
 PDF statistics:
- 310 PDF objects out of 1000 (max. 8388607)
- 276 compressed objects within 3 object streams
+ 309 PDF objects out of 1000 (max. 8388607)
+ 275 compressed objects within 3 object streams
  134 named destinations out of 1000 (max. 500000)
- 32913 words of extra memory for PDF output out of 35830 (max. 10000000)
+ 26769 words of extra memory for PDF output out of 29859 (max. 10000000)
 

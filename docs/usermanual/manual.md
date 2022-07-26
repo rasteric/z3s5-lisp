@@ -245,6 +245,6 @@ Custom data structures: Since there is currently no way to modify the printer fo
 
 # License and Contact
 
-Z3S5 Lisp was written by Erich H. Rast and is based on Nukata Lisp by SUZUKI Hisao. It is licensed under the MIT License that allows free use and modification as long as the LICENSE and copyright notices remain. Please read the accompanying LICENSE file for more information.
+Z3S5 Lisp was written by Erich Rast and is based on Nukata Lisp by SUZUKI Hisao. It is licensed under the MIT License that allows free use and modification as long as the copyright notices remain. Please read the accompanying LICENSE file for more information.
 
-Please send inquiries and bug reports to <erich@snafu.de> or open an issue on Github. Happy hacking!
+Please open an issue on Github if you find a bug. Happy hacking!

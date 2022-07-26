@@ -530,24 +530,16 @@ much of a performance penalty. Tasks need some work to become efficient
 and there are plans to include a more direct interface to Go's
 goroutines with cancelable contexts in the future.
 
-\hypertarget{file-and-network-access}{%
-\subsection{File and Network Access}\label{file-and-network-access}}
+\hypertarget{file-access}{%
+\subsection{File Access}\label{file-access}}
 
-These are coming soon. The reason they haven't been included yet in this
-release is that Z3S5 Lisp has been extracted from a much larger project
-called \emph{Z3S5 Machine}, a currently proprietary virtual retro Lisp
-machine with thousands of graphics and sound commands, and in this
-machine network and file access is heavily abstracted from and guarded.
-So the existing file and network functions could not be used for a more
-general-purpose Lisp and need to be re-written. You can implement your
-own, of course. Simply define functions like
-\passthrough{\lstinline!open!}, \passthrough{\lstinline!close!},
-\passthrough{\lstinline!port?!}, \passthrough{\lstinline!file-port?!},
-\passthrough{\lstinline!network-port?!}, \passthrough{\lstinline!read!},
-\passthrough{\lstinline!write!}, \passthrough{\lstinline!read-bbinary!},
-\passthrough{\lstinline!write-binary!}, etc. It's not that much work,
-just a bit tedious. Or, wait until these are available officially. You
-can expect a fairly standard system of streams and ports.
+For obvious reasons, not all embedded interpreters should provide full
+file access. Therefore, this option needs to be enabled with build tag
+\passthrough{\lstinline!fileio!}, or otherwise none of the
+filesystem-related functions will be available. The
+\passthrough{\lstinline!z3!} Makefile in
+\passthrough{\lstinline!cmd/z3!} enables this option by default for the
+standalone executable.
 
 \hypertarget{language-stability}{%
 \subsection{Language Stability}\label{language-stability}}
@@ -647,13 +639,11 @@ of how to use boxed values.
 \hypertarget{license-and-contact}{%
 \section{License and Contact}\label{license-and-contact}}
 
-Z3S5 Lisp was written by Erich H. Rast and based on Nukata Lisp by
+Z3S5 Lisp was written by Erich Rast and is based on Nukata Lisp by
 SUZUKI Hisao. It is licensed under the MIT License that allows free use
-and modification as long as the LICENSE and copyright notices remain.
-Please read the accompanying LICENSE file for more information.
+and modification as long as the copyright notices remain. Please read
+the accompanying LICENSE file for more information.
 
-Please send inquiries and bug reports to
-\href{mailto:erich@snafu.de}{\nolinkurl{erich@snafu.de}} or open an
-issue on Github. Happy hacking!
+Please open an issue on Github if you find a bug. Happy hacking!
 
 \end{document}
