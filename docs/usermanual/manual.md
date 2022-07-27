@@ -1,6 +1,9 @@
 ---
 title: Z3S5 Lisp User Manual
-author: by Erich H. Rast, Ph.D.
+titlepage: true
+titlepage-background: ../Z3S5.png
+footer-left: "2.3.2+5fb70dc"
+author: by Erich Rast
 date: 2022-7-22 16:00
 header-includes: |
   \lstset{% for listings
@@ -10,7 +13,7 @@ header-includes: |
   \usepackage{xcolor}
 ---
 
-*for Z3S5 Lisp Version 2.3+*
+for Z3S5 Lisp Version "2.3.2+5fb70dc"
 
 # Introduction
 
@@ -243,8 +246,8 @@ Notice that lists are structures composed by `&Cell{Car: a, Cdr: b}`, where `Cdr
 
 Custom data structures: Since there is currently no way to modify the printer for custom structures directly in the Lisp system, it is best to put them into a box using `interp.DefBoxed`, which takes a symbol for a boxed value and creates a number of auxiliary functions. See `lisp_decimal.go` for an example of how to use boxed values.
 
-# License and Contact
+# License
 
-Z3S5 Lisp was written by Erich Rast and is based on Nukata Lisp by SUZUKI Hisao. It is licensed under the MIT License that allows free use and modification as long as the copyright notices remain. Please read the accompanying LICENSE file for more information.
+Z3S5 Lisp was written by RAST Erich and is based on Nukata Lisp by SUZUKI Hisao. It is licensed under the MIT License that allows free use and modification as long as the copyright notices remain. Please read the accompanying LICENSE file for more information.
 
-Please open an issue on Github if you find a bug. Happy hacking!
+This document is Copyright (c) 2022 by Erich Rast.

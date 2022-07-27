@@ -18,4 +18,4 @@
      (out "The session started on ")(out (datestr (now)))(out " UTC.\n")
      (out "Enter (exit) to close the session. Happy hacking!\n")))
 
-(print-start-banner)
+(when *interactive-session* (print-start-banner))

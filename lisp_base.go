@@ -2000,8 +2000,14 @@ func (interp *Interp) Define_Base() {
 			}
 			return arr
 		case "version":
+			var v any
+			var ok bool
+			v, ok = interp.GetGlobalVar(NewSym("*z3s5-version*"))
+			if !ok {
+				v = "<unknown-version>"
+			}
 			return &Cell{
-				VERSION,
+				v,
 				&Cell{
 					goarith.AsNumber(runtime.NumCPU()),
 					&Cell{

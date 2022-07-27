@@ -1,7 +1,10 @@
 ---
 title: Z3S5 Lisp Reference Manual
-author: by Erich H. Rast, Ph.D., and all other Help system contributors
-date: 2022-7-26 19:22
+titlepage: true
+titlepage-background: ../Z3S5.png
+footer-left: Version 2.3.2+5fb70dc
+author: by Erich Rast and all Help system contributors
+date: 2022-7-27 10:53
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -10,9 +13,11 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
+for Z3S5 Lisp Version 2.3.2+5fb70dc
+
 # Introduction
 
-This is the reference manual for the programming language Z3S5 Lisp, version v2.3. This manual has been automatically generated from the entries of the online help system. The reference manual is divided into two large sections. Section *By Topics* lists functions and symbols organized by topics. Within each topic, entries are sorted alphabetically. Section *Complete Reference* lists all functions and symbols alphabetically.
+This is the reference manual for Z3S5 Lisp. This manual has been automatically generated from the entries of the online help system. The reference manual is divided into two large sections. Section *By Topics* lists functions and symbols organized by topics. Within each topic, entries are sorted alphabetically. Section *Complete Reference* lists all functions and symbols alphabetically.
 Please consult the *User Manual* and the *Readme* document for more general information about Z3S5 Lisp, an introduction to its use, and how to embedd it into Go programs.
 
 Incorrect documentation strings are bugs. Please report bugs using the corresponding [Github issue tracker nfor Z3S5 Lisp](https://github.com/rasteric/z3s5-lisp/issues) and make sure to be as precise as possible. Unneeded or missing documentation entries are misfeatures and may also be reported.
@@ -1308,6 +1313,14 @@ Usage: `(read-binary p buff n) => int`
 Read `n` or less bytes from input port `p` into binary blob `buff`. If `buff` is smaller than `n`, then an error is raised. If less than `n` bytes are available before the end of file is reached, then the amount k of bytes is read into `buff` and k is returned. If the end of file is reached and no byte has been read, then 0 is returned. So to loop through this, read into the buffer and do something with it while the amount of bytes returned is larger than 0.
 
 See also: `write-binary, read, close, open`.
+
+### `read-string` : procedure/2
+
+Usage: `(read-string p delstr) => str`
+
+Reads a string from port `p` until the single-byte delimiter character in `delstr` is encountered, and returns the string including the delimiter. If the input ends before the delimiter is encountered, it returns the string up until EOF. Notice that if the empty string is returned then the end of file must have been encountered, since otherwise the string would contain the delimiter.
+
+See also: `read, read-binary, write-string, write, read, close, open`.
 
 ### `str-port?` : procedure/1
 
@@ -4303,8 +4316,6 @@ See also: `*colors*, the-color`.
 
 
 
-
-
 # Complete Reference
 
 ## `%` : procedure/2
@@ -7246,6 +7257,14 @@ Usage: `(read-binary p buff n) => int`
 Read `n` or less bytes from input port `p` into binary blob `buff`. If `buff` is smaller than `n`, then an error is raised. If less than `n` bytes are available before the end of file is reached, then the amount k of bytes is read into `buff` and k is returned. If the end of file is reached and no byte has been read, then 0 is returned. So to loop through this, read into the buffer and do something with it while the amount of bytes returned is larger than 0.
 
 See also: `write-binary, read, close, open`.
+
+## `read-string` : procedure/2
+
+Usage: `(read-string p delstr) => str`
+
+Reads a string from port `p` until the single-byte delimiter character in `delstr` is encountered, and returns the string including the delimiter. If the input ends before the delimiter is encountered, it returns the string up until EOF. Notice that if the empty string is returned then the end of file must have been encountered, since otherwise the string would contain the delimiter.
+
+See also: `read, read-binary, write-string, write, read, close, open`.
 
 ## `remove-duplicates` : procedure/1
 

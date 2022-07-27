@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="author" content="by Erich H. Rast, Ph.D." />
+  <meta name="author" content="by Erich Rast" />
   <title>Z3S5 Lisp User Manual</title>
   <style>
     code{white-space: pre-wrap;}
@@ -81,10 +81,10 @@
 <body>
 <header id="title-block-header">
 <h1 class="title">Z3S5 Lisp User Manual</h1>
-<p class="author">by Erich H. Rast, Ph.D.</p>
+<p class="author">by Erich Rast</p>
 <p class="date">2022-7-22 16:00</p>
 </header>
-<p><em>for Z3S5 Lisp Version 2.3+</em></p>
+<p>for Z3S5 Lisp Version “2.3.2+5fb70dc”</p>
 <h1 data-number="1" id="introduction"><span class="header-section-number">1</span> Introduction</h1>
 <p>Z3S5 Lisp can be used as a standalone interpreter or as an extension language embedded into Go programs. It is a traditional Lisp-1 dialect, where the suffix 1 means that symbols hold one value and this value might either represent functions and closures or data. This is in contrast to Lisp-2 language like CommonLisp in which symbols may hold functions in a separate slot. Scheme dialects are also Lisp-1 and Z3S5 Lisp shares many similarities with Scheme while also having features of traditional Lisp systems.</p>
 <h2 data-number="1.1" id="invoking-lisp"><span class="header-section-number">1.1</span> Invoking Lisp</h2>
@@ -236,8 +236,8 @@ t</code></pre>
 <p>There are a few helper functions such as <code>ExpectInts</code> that can be used for checking arguments. Other useful conversion functions are <code>AsBool</code>, <code>ToLispBool</code>, <code>ArrayToList</code>, <code>ListToArray</code>, etc.</p>
 <p>Notice that lists are structures composed by <code>&amp;Cell{Car: a, Cdr: b}</code>, where <code>Cdr</code> might be another Cell and the final Cdr is Nil, just like in any Lisp. If you construct these without the member names <code>Car</code> and <code>Cdr</code> Go will complain about this and refuse to compile, even though in this case it is perfectly fine to use anonymous access. If you want to create a lot of lists by hand in your function definitions without creating runtime performance penalties by using functions like <code>ArrayToList</code>, then it might make sense to switch off this behavior of the <code>go vet</code> command by running <code>go vet -composites=false</code> instead. Of course, this will also disable such checks for other parts of your application where they might be useful. The only other way is to make the list construction fully explicit, as in: <code>&amp;z3.Cell{z3.NewSym("hello"), &amp;z3.Cell{z3.NewSym("world"), z3.Nil}}</code> which yields the list <code>(hello world)</code>.</p>
 <p>Custom data structures: Since there is currently no way to modify the printer for custom structures directly in the Lisp system, it is best to put them into a box using <code>interp.DefBoxed</code>, which takes a symbol for a boxed value and creates a number of auxiliary functions. See <code>lisp_decimal.go</code> for an example of how to use boxed values.</p>
-<h1 data-number="5" id="license-and-contact"><span class="header-section-number">5</span> License and Contact</h1>
-<p>Z3S5 Lisp was written by Erich Rast and is based on Nukata Lisp by SUZUKI Hisao. It is licensed under the MIT License that allows free use and modification as long as the copyright notices remain. Please read the accompanying LICENSE file for more information.</p>
-<p>Please open an issue on Github if you find a bug. Happy hacking!</p>
+<h1 data-number="5" id="license"><span class="header-section-number">5</span> License</h1>
+<p>Z3S5 Lisp was written by RAST Erich and is based on Nukata Lisp by SUZUKI Hisao. It is licensed under the MIT License that allows free use and modification as long as the copyright notices remain. Please read the accompanying LICENSE file for more information.</p>
+<p>This document is Copyright (c) 2022 by Erich Rast.</p>
 </body>
 </html>

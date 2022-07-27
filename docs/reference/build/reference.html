@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="author" content="by Erich H. Rast, Ph.D., and all other Help system contributors" />
+  <meta name="author" content="by Erich Rast and all Help system contributors" />
   <title>Z3S5 Lisp Reference Manual</title>
   <style>
     code{white-space: pre-wrap;}
@@ -19,11 +19,12 @@
 <body>
 <header id="title-block-header">
 <h1 class="title">Z3S5 Lisp Reference Manual</h1>
-<p class="author">by Erich H. Rast, Ph.D., and all other Help system contributors</p>
-<p class="date">2022-7-26 19:22</p>
+<p class="author">by Erich Rast and all Help system contributors</p>
+<p class="date">2022-7-27 10:53</p>
 </header>
+<p>for Z3S5 Lisp Version 2.3.2+5fb70dc</p>
 <h1 data-number="1" id="introduction"><span class="header-section-number">1</span> Introduction</h1>
-<p>This is the reference manual for the programming language Z3S5 Lisp, version v2.3. This manual has been automatically generated from the entries of the online help system. The reference manual is divided into two large sections. Section <em>By Topics</em> lists functions and symbols organized by topics. Within each topic, entries are sorted alphabetically. Section <em>Complete Reference</em> lists all functions and symbols alphabetically. Please consult the <em>User Manual</em> and the <em>Readme</em> document for more general information about Z3S5 Lisp, an introduction to its use, and how to embedd it into Go programs.</p>
+<p>This is the reference manual for Z3S5 Lisp. This manual has been automatically generated from the entries of the online help system. The reference manual is divided into two large sections. Section <em>By Topics</em> lists functions and symbols organized by topics. Within each topic, entries are sorted alphabetically. Section <em>Complete Reference</em> lists all functions and symbols alphabetically. Please consult the <em>User Manual</em> and the <em>Readme</em> document for more general information about Z3S5 Lisp, an introduction to its use, and how to embedd it into Go programs.</p>
 <p>Incorrect documentation strings are bugs. Please report bugs using the corresponding <a href="https://github.com/rasteric/z3s5-lisp/issues">Github issue tracker nfor Z3S5 Lisp</a> and make sure to be as precise as possible. Unneeded or missing documentation entries are misfeatures and may also be reported.</p>
 <h1 data-number="2" id="by-topics"><span class="header-section-number">2</span> By Topics</h1>
 <h2 data-number="2.1" id="arrays"><span class="header-section-number">2.1</span> Arrays</h2>
@@ -661,23 +662,27 @@
 <p>Usage: <code>(read-binary p buff n) =&gt; int</code></p>
 <p>Read <code>n</code> or less bytes from input port <code>p</code> into binary blob <code>buff</code>. If <code>buff</code> is smaller than <code>n</code>, then an error is raised. If less than <code>n</code> bytes are available before the end of file is reached, then the amount k of bytes is read into <code>buff</code> and k is returned. If the end of file is reached and no byte has been read, then 0 is returned. So to loop through this, read into the buffer and do something with it while the amount of bytes returned is larger than 0.</p>
 <p>See also: <code>write-binary, read, close, open</code>.</p>
-<h3 data-number="2.10.9" id="str-port-procedure1"><span class="header-section-number">2.10.9</span> <code>str-port?</code> : procedure/1</h3>
+<h3 data-number="2.10.9" id="read-string-procedure2"><span class="header-section-number">2.10.9</span> <code>read-string</code> : procedure/2</h3>
+<p>Usage: <code>(read-string p delstr) =&gt; str</code></p>
+<p>Reads a string from port <code>p</code> until the single-byte delimiter character in <code>delstr</code> is encountered, and returns the string including the delimiter. If the input ends before the delimiter is encountered, it returns the string up until EOF. Notice that if the empty string is returned then the end of file must have been encountered, since otherwise the string would contain the delimiter.</p>
+<p>See also: <code>read, read-binary, write-string, write, read, close, open</code>.</p>
+<h3 data-number="2.10.10" id="str-port-procedure1"><span class="header-section-number">2.10.10</span> <code>str-port?</code> : procedure/1</h3>
 <p>Usage: <code>(str-port? p) =&gt; bool</code></p>
 <p>Return true if <code>p</code> is a string port, nil otherwise.</p>
 <p>See also: <code>port?, file-port?, stropen, open</code>.</p>
-<h3 data-number="2.10.10" id="write-procedure2"><span class="header-section-number">2.10.10</span> <code>write</code> : procedure/2</h3>
+<h3 data-number="2.10.11" id="write-procedure2"><span class="header-section-number">2.10.11</span> <code>write</code> : procedure/2</h3>
 <p>Usage: <code>(write p datum) =&gt; int</code></p>
 <p>Write <code>datum</code> to output port <code>p</code> and return the number of bytes written.</p>
 <p>See also: <code>write-binary, write-binary-at, read, close, open</code>.</p>
-<h3 data-number="2.10.11" id="write-binary-procedure4"><span class="header-section-number">2.10.11</span> <code>write-binary</code> : procedure/4</h3>
+<h3 data-number="2.10.12" id="write-binary-procedure4"><span class="header-section-number">2.10.12</span> <code>write-binary</code> : procedure/4</h3>
 <p>Usage: <code>(write-binary p buff n offset) =&gt; int</code></p>
 <p>Write <code>n</code> bytes starting at <code>offset</code> in binary blob <code>buff</code> to the stream port <code>p</code>. This function returns the number of bytes actually written.</p>
 <p>See also: <code>write-binary-at, read-binary, write, close, open</code>.</p>
-<h3 data-number="2.10.12" id="write-binary-at-procedure5"><span class="header-section-number">2.10.12</span> <code>write-binary-at</code> : procedure/5</h3>
+<h3 data-number="2.10.13" id="write-binary-at-procedure5"><span class="header-section-number">2.10.13</span> <code>write-binary-at</code> : procedure/5</h3>
 <p>Usage: <code>(write-binary-at p buff n offset fpos) =&gt; int</code></p>
 <p>Write <code>n</code> bytes starting at <code>offset</code> in binary blob <code>buff</code> to the seekable stream port <code>p</code> at the stream position <code>fpos</code>. If there is not enough data in <code>p</code> to overwrite at position <code>fpos</code>, then an error is caused and only part of the data might be written. The function returns the number of bytes actually written.</p>
 <p>See also: <code>read-binary, write-binary, write, close, open</code>.</p>
-<h3 data-number="2.10.13" id="write-string-procedure2"><span class="header-section-number">2.10.13</span> <code>write-string</code> : procedure/2</h3>
+<h3 data-number="2.10.14" id="write-string-procedure2"><span class="header-section-number">2.10.14</span> <code>write-string</code> : procedure/2</h3>
 <p>Usage: <code>(write-string p s) =&gt; int</code></p>
 <p>Write string <code>s</code> to output port <code>p</code> and return the number of bytes written. LF are <em>not</em> automatically converted to CR LF sequences on windows.</p>
 <p>See also: <code>write, write-binary, write-binary-at, read, close, open</code>.</p>
@@ -3615,576 +3620,580 @@
 <p>Usage: <code>(read-binary p buff n) =&gt; int</code></p>
 <p>Read <code>n</code> or less bytes from input port <code>p</code> into binary blob <code>buff</code>. If <code>buff</code> is smaller than <code>n</code>, then an error is raised. If less than <code>n</code> bytes are available before the end of file is reached, then the amount k of bytes is read into <code>buff</code> and k is returned. If the end of file is reached and no byte has been read, then 0 is returned. So to loop through this, read into the buffer and do something with it while the amount of bytes returned is larger than 0.</p>
 <p>See also: <code>write-binary, read, close, open</code>.</p>
-<h2 data-number="3.365" id="remove-duplicates-procedure1-1"><span class="header-section-number">3.365</span> <code>remove-duplicates</code> : procedure/1</h2>
+<h2 data-number="3.365" id="read-string-procedure2-1"><span class="header-section-number">3.365</span> <code>read-string</code> : procedure/2</h2>
+<p>Usage: <code>(read-string p delstr) =&gt; str</code></p>
+<p>Reads a string from port <code>p</code> until the single-byte delimiter character in <code>delstr</code> is encountered, and returns the string including the delimiter. If the input ends before the delimiter is encountered, it returns the string up until EOF. Notice that if the empty string is returned then the end of file must have been encountered, since otherwise the string would contain the delimiter.</p>
+<p>See also: <code>read, read-binary, write-string, write, read, close, open</code>.</p>
+<h2 data-number="3.366" id="remove-duplicates-procedure1-1"><span class="header-section-number">3.366</span> <code>remove-duplicates</code> : procedure/1</h2>
 <p>Usage: <code>(remove-duplicates seq) =&gt; seq</code></p>
 <p>Remove all duplicates in sequence <code>seq</code>, return a new sequence with the duplicates removed.</p>
 <p>See also: <code>seq?, map, foreach, nth</code>.</p>
-<h2 data-number="3.366" id="remove-hook-procedure2-1"><span class="header-section-number">3.366</span> <code>remove-hook</code> : procedure/2</h2>
+<h2 data-number="3.367" id="remove-hook-procedure2-1"><span class="header-section-number">3.367</span> <code>remove-hook</code> : procedure/2</h2>
 <p>Usage: <code>(remove-hook hook id) =&gt; bool</code></p>
 <p>Remove the symbolic or numberic <code>hook</code> with <code>id</code> and return true if the hook was removed, nil otherwise.</p>
 <p>See also: <code>add-hook, remove-hooks, replace-hook</code>.</p>
-<h2 data-number="3.367" id="remove-hook-internal-procedure2-1"><span class="header-section-number">3.367</span> <code>remove-hook-internal</code> : procedure/2</h2>
+<h2 data-number="3.368" id="remove-hook-internal-procedure2-1"><span class="header-section-number">3.368</span> <code>remove-hook-internal</code> : procedure/2</h2>
 <p>Usage: <code>(remove-hook-internal hook id)</code></p>
 <p>Remove the hook with ID <code>id</code> from numeric <code>hook.</code></p>
 <p>See also: <code>remove-hook</code>.</p>
 <p><strong>Warning: Internal use only.</strong></p>
-<h2 data-number="3.368" id="remove-hooks-procedure1-1"><span class="header-section-number">3.368</span> <code>remove-hooks</code> : procedure/1</h2>
+<h2 data-number="3.369" id="remove-hooks-procedure1-1"><span class="header-section-number">3.369</span> <code>remove-hooks</code> : procedure/1</h2>
 <p>Usage: <code>(remove-hooks hook) =&gt; bool</code></p>
 <p>Remove all hooks for symbolic or numeric <code>hook</code>, return true if the hook exists and the associated procedures were removed, nil otherwise.</p>
 <p>See also: <code>add-hook, remove-hook, replace-hook</code>.</p>
-<h2 data-number="3.369" id="replace-hook-procedure2-1"><span class="header-section-number">3.369</span> <code>replace-hook</code> : procedure/2</h2>
+<h2 data-number="3.370" id="replace-hook-procedure2-1"><span class="header-section-number">3.370</span> <code>replace-hook</code> : procedure/2</h2>
 <p>Usage: <code>(replace-hook hook proc)</code></p>
 <p>Remove all hooks for symbolic or numeric <code>hook</code> and install the given <code>proc</code> as the only hook procedure.</p>
 <p>See also: <code>add-hook, remove-hook, remove-hooks</code>.</p>
-<h2 data-number="3.370" id="reverse-procedure1-1"><span class="header-section-number">3.370</span> <code>reverse</code> : procedure/1</h2>
+<h2 data-number="3.371" id="reverse-procedure1-1"><span class="header-section-number">3.371</span> <code>reverse</code> : procedure/1</h2>
 <p>Usage: <code>(reverse seq) =&gt; sequence</code></p>
 <p>Reverse a sequence non-destructively, i.e., return a copy of the reversed sequence.</p>
 <p>See also: <code>nth, seq?, 1st, 2nd, 3rd, 4th, 6th, 7th, 8th, 9th, 10th, last</code>.</p>
-<h2 data-number="3.371" id="rnd-procedure0-1"><span class="header-section-number">3.371</span> <code>rnd</code> : procedure/0</h2>
+<h2 data-number="3.372" id="rnd-procedure0-1"><span class="header-section-number">3.372</span> <code>rnd</code> : procedure/0</h2>
 <p>Usage: <code>(rnd prng) =&gt; num</code></p>
 <p>Return a random value in the interval [0, 1] from pseudo-random number generator <code>prng</code>. The <code>prng</code> argument must be an integer from 0 to 9 (inclusive).</p>
 <p>See also: <code>rand, rndseed</code>.</p>
-<h2 data-number="3.372" id="rndseed-procedure1-1"><span class="header-section-number">3.372</span> <code>rndseed</code> : procedure/1</h2>
+<h2 data-number="3.373" id="rndseed-procedure1-1"><span class="header-section-number">3.373</span> <code>rndseed</code> : procedure/1</h2>
 <p>Usage: <code>(rndseed prng n)</code></p>
 <p>Seed the pseudo-random number generator <code>prng</code> (0 to 9) with 64 bit integer value <code>n</code>. Larger values will be truncated. Seeding affects both the rnd and the rand function for the given <code>prng.</code></p>
 <p>See also: <code>rnd, rand</code>.</p>
-<h2 data-number="3.373" id="rplaca-procedure2-1"><span class="header-section-number">3.373</span> <code>rplaca</code> : procedure/2</h2>
+<h2 data-number="3.374" id="rplaca-procedure2-1"><span class="header-section-number">3.374</span> <code>rplaca</code> : procedure/2</h2>
 <p>Usage: <code>(rplaca li a) =&gt; li</code></p>
 <p>Destructively mutate <code>li</code> such that its car is <code>a</code>, return the list afterwards.</p>
 <p>See also: <code>rplacd</code>.</p>
-<h2 data-number="3.374" id="run-at-procedure2-1"><span class="header-section-number">3.374</span> <code>run-at</code> : procedure/2</h2>
+<h2 data-number="3.375" id="run-at-procedure2-1"><span class="header-section-number">3.375</span> <code>run-at</code> : procedure/2</h2>
 <p>Usage: <code>(run-at date repeater proc) =&gt; int</code></p>
 <p>Run procedure <code>proc</code> with no arguments as task periodically according to the specification in <code>spec</code> and return the task ID for the periodic task. Herbey, <code>date</code> is either a datetime specification or one of ‘(now skip next-minute next-quarter next-halfhour next-hour in-2-hours in-3-hours tomorrow next-week next-month next-year), and <code>repeater</code> is nil or a procedure that takes a task ID and unix-epoch-nanoseconds and yields a new unix-epoch-nanoseconds value for the next time the procedure shall be run. While the other names are self-explanatory, the ’skip specification means that the task is not run immediately but rather that it is first run at (repeater -1 (now)). Timing resolution for the scheduler is about 1 minute. Consider using interrupts for periodic events with smaller time resolutions. The scheduler uses relative intervals and has ’drift’.</p>
 <p>See also: <code>task, task-send</code>.</p>
 <p><strong>Warning: Tasks scheduled by run-at are not persistent! They are only run until the system is shutdown.</strong></p>
-<h2 data-number="3.375" id="run-hook-procedure1-1"><span class="header-section-number">3.375</span> <code>run-hook</code> : procedure/1</h2>
+<h2 data-number="3.376" id="run-hook-procedure1-1"><span class="header-section-number">3.376</span> <code>run-hook</code> : procedure/1</h2>
 <p>Usage: <code>(run-hook hook)</code></p>
 <p>Manually run the hook, executing all procedures for the hook.</p>
 <p>See also: <code>add-hook, remove-hook</code>.</p>
-<h2 data-number="3.376" id="run-hook-internal-procedure1-or-more-1"><span class="header-section-number">3.376</span> <code>run-hook-internal</code> : procedure/1 or more</h2>
+<h2 data-number="3.377" id="run-hook-internal-procedure1-or-more-1"><span class="header-section-number">3.377</span> <code>run-hook-internal</code> : procedure/1 or more</h2>
 <p>Usage: <code>(run-hook-internal hook [args] ...)</code></p>
 <p>Run all hooks for numeric hook ID <code>hook</code> with <code>args</code>… as arguments.</p>
 <p>See also: <code>run-hook</code>.</p>
 <p><strong>Warning: Internal use only.</strong></p>
-<h2 data-number="3.377" id="run-selftest-procedure1-or-more-1"><span class="header-section-number">3.377</span> <code>run-selftest</code> : procedure/1 or more</h2>
+<h2 data-number="3.378" id="run-selftest-procedure1-or-more-1"><span class="header-section-number">3.378</span> <code>run-selftest</code> : procedure/1 or more</h2>
 <p>Usage: <code>(run-selftest [silent?]) =&gt; any</code></p>
 <p>Run a diagnostic self-test of the Z3S5 Machine. If <code>silent?</code> is true, then the self-test returns a list containing a boolean for success, the number of tests performed, the number of successes, the number of errors, and the number of failures. If <code>silent?</code> is not provided or nil, then the test progress and results are displayed. An error indicates a problem with the testing, whereas a failure means that an expected value was not returned.</p>
 <p>See also: <code>expect, testing</code>.</p>
-<h2 data-number="3.378" id="sec-procedure2-1"><span class="header-section-number">3.378</span> <code>sec+</code> : procedure/2</h2>
+<h2 data-number="3.379" id="sec-procedure2-1"><span class="header-section-number">3.379</span> <code>sec+</code> : procedure/2</h2>
 <p>Usage: <code>(sec+ dateli n) =&gt; dateli</code></p>
 <p>Adds <code>n</code> seconds to the given date <code>dateli</code> in datelist format and returns the new datelist.</p>
 <p>See also: <code>minute+, hour+, day+, week+, month+, year+, now</code>.</p>
-<h2 data-number="3.379" id="semver.build-procedure1-1"><span class="header-section-number">3.379</span> <code>semver.build</code> : procedure/1</h2>
+<h2 data-number="3.380" id="semver.build-procedure1-1"><span class="header-section-number">3.380</span> <code>semver.build</code> : procedure/1</h2>
 <p>Usage: <code>(semver.build s) =&gt; str</code></p>
 <p>Return the build part of a semantic versioning string.</p>
 <p>See also: <code>semver.canonical, semver.major, semver.major-minor</code>.</p>
-<h2 data-number="3.380" id="semver.canonical-procedure1-1"><span class="header-section-number">3.380</span> <code>semver.canonical</code> : procedure/1</h2>
+<h2 data-number="3.381" id="semver.canonical-procedure1-1"><span class="header-section-number">3.381</span> <code>semver.canonical</code> : procedure/1</h2>
 <p>Usage: <code>(semver.canonical s) =&gt; str</code></p>
 <p>Return a canonical semver string based on a valid, yet possibly not canonical version string <code>s.</code></p>
 <p>See also: <code>semver.major</code>.</p>
-<h2 data-number="3.381" id="semver.compare-procedure2-1"><span class="header-section-number">3.381</span> <code>semver.compare</code> : procedure/2</h2>
+<h2 data-number="3.382" id="semver.compare-procedure2-1"><span class="header-section-number">3.382</span> <code>semver.compare</code> : procedure/2</h2>
 <p>Usage: <code>(semver.compare s1 s2) =&gt; int</code></p>
 <p>Compare two semantic version strings <code>s1</code> and <code>s2</code>. The result is 0 if <code>s1</code> and <code>s2</code> are the same version, -1 if <code>s1</code> &lt; <code>s2</code> and 1 if <code>s1</code> &gt; <code>s2.</code></p>
 <p>See also: <code>semver.major, semver.major-minor</code>.</p>
-<h2 data-number="3.382" id="semver.is-valid-procedure1-1"><span class="header-section-number">3.382</span> <code>semver.is-valid?</code> : procedure/1</h2>
+<h2 data-number="3.383" id="semver.is-valid-procedure1-1"><span class="header-section-number">3.383</span> <code>semver.is-valid?</code> : procedure/1</h2>
 <p>Usage: <code>(semver.is-valid? s) =&gt; bool</code></p>
 <p>Return true if <code>s</code> is a valid semantic versioning string, nil otherwise.</p>
 <p>See also: <code>semver.major, semver.major-minor, semver.compare</code>.</p>
-<h2 data-number="3.383" id="semver.major-procedure1-1"><span class="header-section-number">3.383</span> <code>semver.major</code> : procedure/1</h2>
+<h2 data-number="3.384" id="semver.major-procedure1-1"><span class="header-section-number">3.384</span> <code>semver.major</code> : procedure/1</h2>
 <p>Usage: <code>(semver.major s) =&gt; str</code></p>
 <p>Return the major part of the semantic versioning string.</p>
 <p>See also: <code>semver.major-minor, semver.build</code>.</p>
-<h2 data-number="3.384" id="semver.major-minor-procedure1-1"><span class="header-section-number">3.384</span> <code>semver.major-minor</code> : procedure/1</h2>
+<h2 data-number="3.385" id="semver.major-minor-procedure1-1"><span class="header-section-number">3.385</span> <code>semver.major-minor</code> : procedure/1</h2>
 <p>Usage: <code>(semver.major-minor s) =&gt; str</code></p>
 <p>Return the major.minor prefix of a semantic versioning string. For example, (semver.major-minor “v2.1.4”) returns “v2.1”.</p>
 <p>See also: <code>semver.major, semver.build</code>.</p>
-<h2 data-number="3.385" id="semver.max-procedure2-1"><span class="header-section-number">3.385</span> <code>semver.max</code> : procedure/2</h2>
+<h2 data-number="3.386" id="semver.max-procedure2-1"><span class="header-section-number">3.386</span> <code>semver.max</code> : procedure/2</h2>
 <p>Usage: <code>(semver.max s1 s2) =&gt; str</code></p>
 <p>Canonicalize <code>s1</code> and <code>s2</code> and return the larger version of them.</p>
 <p>See also: <code>semver.compare</code>.</p>
-<h2 data-number="3.386" id="semver.prerelease-procedure1-1"><span class="header-section-number">3.386</span> <code>semver.prerelease</code> : procedure/1</h2>
+<h2 data-number="3.387" id="semver.prerelease-procedure1-1"><span class="header-section-number">3.387</span> <code>semver.prerelease</code> : procedure/1</h2>
 <p>Usage: <code>(semver.prerelease s) =&gt; str</code></p>
 <p>Return the prerelease part of a version string, or the empty string if there is none. For example, (semver.prerelease “v2.1.0-pre+build”) returns “-pre”.</p>
 <p>See also: <code>semver.build, semver.major, semver.major-minor</code>.</p>
-<h2 data-number="3.387" id="seq-procedure1-1"><span class="header-section-number">3.387</span> <code>seq?</code> : procedure/1</h2>
+<h2 data-number="3.388" id="seq-procedure1-1"><span class="header-section-number">3.388</span> <code>seq?</code> : procedure/1</h2>
 <p>Usage: <code>(seq? seq) =&gt; bool</code></p>
 <p>Return true if <code>seq</code> is a sequence, nil otherwise.</p>
 <p>See also: <code>list, array, string, slice, nth</code>.</p>
-<h2 data-number="3.388" id="set-procedure3-1"><span class="header-section-number">3.388</span> <code>set</code> : procedure/3</h2>
+<h2 data-number="3.389" id="set-procedure3-1"><span class="header-section-number">3.389</span> <code>set</code> : procedure/3</h2>
 <p>Usage: <code>(set d key value)</code></p>
 <p>Set <code>value</code> for <code>key</code> in dict <code>d.</code></p>
 <p>See also: <code>dict, get, get-or-set</code>.</p>
-<h2 data-number="3.389" id="set-procedure2-1"><span class="header-section-number">3.389</span> <code>set*</code> : procedure/2</h2>
+<h2 data-number="3.390" id="set-procedure2-1"><span class="header-section-number">3.390</span> <code>set*</code> : procedure/2</h2>
 <p>Usage: <code>(set* d li)</code></p>
 <p>Set in dict <code>d</code> the keys and values in list <code>li</code>. The list <code>li</code> must be of the form (key-1 value-1 key-2 value-2 … key-n value-n). This function may be slightly faster than using individual <code>set</code> operations.</p>
 <p>See also: <code>dict, set</code>.</p>
-<h2 data-number="3.390" id="set-list-procedure1-1"><span class="header-section-number">3.390</span> <code>set-&gt;list</code> : procedure/1</h2>
+<h2 data-number="3.391" id="set-list-procedure1-1"><span class="header-section-number">3.391</span> <code>set-&gt;list</code> : procedure/1</h2>
 <p>Usage: <code>(set-&gt;list s) =&gt; li</code></p>
 <p>Convert set <code>s</code> to a list of set elements.</p>
 <p>See also: <code>list-&gt;set, make-set, set-element?, set-union, set-intersection, set-complement, set-difference, set?, set-empty</code>.</p>
-<h2 data-number="3.391" id="set-color-procedure1-1"><span class="header-section-number">3.391</span> <code>set-color</code> : procedure/1</h2>
+<h2 data-number="3.392" id="set-color-procedure1-1"><span class="header-section-number">3.392</span> <code>set-color</code> : procedure/1</h2>
 <p>Usage: <code>(set-color sel colorlist)</code></p>
 <p>Set the color according to <code>sel</code> to the color <code>colorlist</code> of the form ’(r g b a). See <code>color</code> for information about <code>sel.</code></p>
 <p>See also: <code>color, the-color, with-colors</code>.</p>
-<h2 data-number="3.392" id="set-complement-procedure2-1"><span class="header-section-number">3.392</span> <code>set-complement</code> : procedure/2</h2>
+<h2 data-number="3.393" id="set-complement-procedure2-1"><span class="header-section-number">3.393</span> <code>set-complement</code> : procedure/2</h2>
 <p>Usage: <code>(set-complement a domain) =&gt; set</code></p>
 <p>Return all elements in <code>domain</code> that are not elements of <code>a.</code></p>
 <p>See also: <code>list-&gt;set, set-&gt;list, make-set, set-element?, set-union, set-difference, set-intersection, set?, set-empty?, set-subset?, set-equal?</code>.</p>
-<h2 data-number="3.393" id="set-difference-procedure2-1"><span class="header-section-number">3.393</span> <code>set-difference</code> : procedure/2</h2>
+<h2 data-number="3.394" id="set-difference-procedure2-1"><span class="header-section-number">3.394</span> <code>set-difference</code> : procedure/2</h2>
 <p>Usage: <code>(set-difference a b) =&gt; set</code></p>
 <p>Return the set-theoretic difference of set <code>a</code> minus set <code>b</code>, i.e., all elements in <code>a</code> that are not in <code>b.</code></p>
 <p>See also: <code>list-&gt;set, set-&gt;list, make-set, set-element?, set-union, set-intersection, set-complement, set?, set-empty?, set-subset?, set-equal?</code>.</p>
-<h2 data-number="3.394" id="set-element-procedure2-1"><span class="header-section-number">3.394</span> <code>set-element?</code> : procedure/2</h2>
+<h2 data-number="3.395" id="set-element-procedure2-1"><span class="header-section-number">3.395</span> <code>set-element?</code> : procedure/2</h2>
 <p>Usage: <code>(set-element? s elem) =&gt; bool</code></p>
 <p>Return true if set <code>s</code> has element <code>elem</code>, nil otherwise.</p>
 <p>See also: <code>make-set, list-&gt;set, set-&gt;list, set-union, set-intersection, set-complement, set-difference, set?, set-empty?</code>.</p>
-<h2 data-number="3.395" id="set-empty-procedure1-1"><span class="header-section-number">3.395</span> <code>set-empty?</code> : procedure/1</h2>
+<h2 data-number="3.396" id="set-empty-procedure1-1"><span class="header-section-number">3.396</span> <code>set-empty?</code> : procedure/1</h2>
 <p>Usage: <code>(set-empty? s) =&gt; bool</code></p>
 <p>Return true if set <code>s</code> is empty, nil otherwise.</p>
 <p>See also: <code>make-set, list-&gt;set, set-&gt;list, set-union, set-intersection, set-complement, set-difference, set?</code>.</p>
-<h2 data-number="3.396" id="set-equal-procedure2-1"><span class="header-section-number">3.396</span> <code>set-equal?</code> : procedure/2</h2>
+<h2 data-number="3.397" id="set-equal-procedure2-1"><span class="header-section-number">3.397</span> <code>set-equal?</code> : procedure/2</h2>
 <p>Usage: <code>(set-equal? a b) =&gt; bool</code></p>
 <p>Return true if <code>a</code> and <code>b</code> contain the same elements.</p>
 <p>See also: <code>set-subset?, list-&gt;set, set-element?, set-&gt;list, set-union, set-difference, set-intersection, set-complement, set?, set-empty?</code>.</p>
-<h2 data-number="3.397" id="set-help-topic-info-procedure3-1"><span class="header-section-number">3.397</span> <code>set-help-topic-info</code> : procedure/3</h2>
+<h2 data-number="3.398" id="set-help-topic-info-procedure3-1"><span class="header-section-number">3.398</span> <code>set-help-topic-info</code> : procedure/3</h2>
 <p>Usage: <code>(set-help-topic-info topic header info)</code></p>
 <p>Set a human-readable information entry for help <code>topic</code> with human-readable <code>header</code> and <code>info</code> strings.</p>
 <p>See also: <code>defhelp, help-topic-info</code>.</p>
-<h2 data-number="3.398" id="set-intersection-procedure2-1"><span class="header-section-number">3.398</span> <code>set-intersection</code> : procedure/2</h2>
+<h2 data-number="3.399" id="set-intersection-procedure2-1"><span class="header-section-number">3.399</span> <code>set-intersection</code> : procedure/2</h2>
 <p>Usage: <code>(set-intersection a b) =&gt; set</code></p>
 <p>Return the intersection of sets <code>a</code> and <code>b</code>, i.e., the set of elements that are both in <code>a</code> and in <code>b.</code></p>
 <p>See also: <code>list-&gt;set, set-&gt;list, make-set, set-element?, set-union, set-complement, set-difference, set?, set-empty?, set-subset?, set-equal?</code>.</p>
-<h2 data-number="3.399" id="set-permissions-nil-1"><span class="header-section-number">3.399</span> set-permissions : nil</h2>
+<h2 data-number="3.400" id="set-permissions-nil-1"><span class="header-section-number">3.400</span> set-permissions : nil</h2>
 <p>Usage: <code>(set-permissions li)</code></p>
 <p>Set the permissions for the current interpreter. This will trigger an error when the permission cannot be set due to a security violation. Generally, permissions can only be downgraded (made more stringent) and never relaxed. See the information for <code>permissions</code> for an overview of symbolic flags.</p>
 <p>See also: <code>permissions, permission?, when-permission, sys</code>.</p>
-<h2 data-number="3.400" id="set-subset-procedure2-1"><span class="header-section-number">3.400</span> <code>set-subset?</code> : procedure/2</h2>
+<h2 data-number="3.401" id="set-subset-procedure2-1"><span class="header-section-number">3.401</span> <code>set-subset?</code> : procedure/2</h2>
 <p>Usage: <code>(set-subset? a b) =&gt; bool</code></p>
 <p>Return true if <code>a</code> is a subset of <code>b</code>, nil otherwise.</p>
 <p>See also: <code>set-equal?, list-&gt;set, set-&gt;list, make-set, set-element?, set-union, set-difference, set-intersection, set-complement, set?, set-empty?</code>.</p>
-<h2 data-number="3.401" id="set-union-procedure2-1"><span class="header-section-number">3.401</span> <code>set-union</code> : procedure/2</h2>
+<h2 data-number="3.402" id="set-union-procedure2-1"><span class="header-section-number">3.402</span> <code>set-union</code> : procedure/2</h2>
 <p>Usage: <code>(set-union a b) =&gt; set</code></p>
 <p>Return the union of sets <code>a</code> and <code>b</code> containing all elements that are in <code>a</code> or in <code>b</code> (or both).</p>
 <p>See also: <code>list-&gt;set, set-&gt;list, make-set, set-element?, set-intersection, set-complement, set-difference, set?, set-empty?</code>.</p>
-<h2 data-number="3.402" id="set-volume-procedure1-1"><span class="header-section-number">3.402</span> <code>set-volume</code> : procedure/1</h2>
+<h2 data-number="3.403" id="set-volume-procedure1-1"><span class="header-section-number">3.403</span> <code>set-volume</code> : procedure/1</h2>
 <p>Usage: <code>(set-volume fl)</code></p>
 <p>Set the master volume for all sound to <code>fl</code>, a value between 0.0 and 1.0.</p>
 <p>See also: <code>play-sound, play-music</code>.</p>
-<h2 data-number="3.403" id="set-procedure1-1"><span class="header-section-number">3.403</span> <code>set?</code> : procedure/1</h2>
+<h2 data-number="3.404" id="set-procedure1-1"><span class="header-section-number">3.404</span> <code>set?</code> : procedure/1</h2>
 <p>Usage: <code>(set? x) =&gt; bool</code></p>
 <p>Return true if <code>x</code> can be used as a set, nil otherwise.</p>
 <p>See also: <code>list-&gt;set, make-set, set-&gt;list, set-element?, set-union, set-intersection, set-complement, set-difference, set-empty?</code>.</p>
-<h2 data-number="3.404" id="setcar-procedure1-1"><span class="header-section-number">3.404</span> <code>setcar</code> : procedure/1</h2>
+<h2 data-number="3.405" id="setcar-procedure1-1"><span class="header-section-number">3.405</span> <code>setcar</code> : procedure/1</h2>
 <p>Usage: <code>(setcar li elem) =&gt; li</code></p>
 <p>Mutate <code>li</code> such that its car is <code>elem</code>. Same as rplaca.</p>
 <p>See also: <code>rplaca, rplacd, setcdr</code>.</p>
-<h2 data-number="3.405" id="setcdr-procedure1-1"><span class="header-section-number">3.405</span> <code>setcdr</code> : procedure/1</h2>
+<h2 data-number="3.406" id="setcdr-procedure1-1"><span class="header-section-number">3.406</span> <code>setcdr</code> : procedure/1</h2>
 <p>Usage: <code>(setcdr li1 li2) =&gt; li</code></p>
 <p>Mutate <code>li1</code> such that its cdr is <code>li2</code>. Same as rplacd.</p>
 <p>See also: <code>rplacd, rplaca, setcar</code>.</p>
-<h2 data-number="3.406" id="shorten-procedure2-1"><span class="header-section-number">3.406</span> <code>shorten</code> : procedure/2</h2>
+<h2 data-number="3.407" id="shorten-procedure2-1"><span class="header-section-number">3.407</span> <code>shorten</code> : procedure/2</h2>
 <p>Usage: <code>(shorten s n) =&gt; str</code></p>
 <p>Shorten string <code>s</code> to length <code>n</code> in a smart way if possible, leave it untouched if the length of <code>s</code> is smaller than <code>n.</code></p>
 <p>See also: <code>substr</code>.</p>
-<h2 data-number="3.407" id="sleep-procedure1-1"><span class="header-section-number">3.407</span> <code>sleep</code> : procedure/1</h2>
+<h2 data-number="3.408" id="sleep-procedure1-1"><span class="header-section-number">3.408</span> <code>sleep</code> : procedure/1</h2>
 <p>Usage: <code>(sleep ms)</code></p>
 <p>Halt the current task execution for <code>ms</code> milliseconds.</p>
 <p>See also: <code>sleep-ns, time, now, now-ns</code>.</p>
-<h2 data-number="3.408" id="sleep-ns-procedure1-1"><span class="header-section-number">3.408</span> <code>sleep-ns</code> : procedure/1</h2>
+<h2 data-number="3.409" id="sleep-ns-procedure1-1"><span class="header-section-number">3.409</span> <code>sleep-ns</code> : procedure/1</h2>
 <p>Usage: <code>(sleep-ns n</code></p>
 <p>Halt the current task execution for <code>n</code> nanoseconds.</p>
 <p>See also: <code>sleep, time, now, now-ns</code>.</p>
-<h2 data-number="3.409" id="slice-procedure3-1"><span class="header-section-number">3.409</span> <code>slice</code> : procedure/3</h2>
+<h2 data-number="3.410" id="slice-procedure3-1"><span class="header-section-number">3.410</span> <code>slice</code> : procedure/3</h2>
 <p>Usage: <code>(slice seq low high) =&gt; seq</code></p>
 <p>Return the subsequence of <code>seq</code> starting from <code>low</code> inclusive and ending at <code>high</code> exclusive. Sequences are 0-indexed.</p>
 <p>See also: <code>list, array, string, nth, seq?</code>.</p>
-<h2 data-number="3.410" id="sort-procedure2-1"><span class="header-section-number">3.410</span> <code>sort</code> : procedure/2</h2>
+<h2 data-number="3.411" id="sort-procedure2-1"><span class="header-section-number">3.411</span> <code>sort</code> : procedure/2</h2>
 <p>Usage: <code>(sort li proc) =&gt; li</code></p>
 <p>Sort the list <code>li</code> by the given less-than procedure <code>proc</code>, which takes two arguments and returns true if the first one is less than the second, nil otheriwse.</p>
 <p>See also: <code>array-sort</code>.</p>
-<h2 data-number="3.411" id="sort-symbols-nil-1"><span class="header-section-number">3.411</span> sort-symbols : nil</h2>
+<h2 data-number="3.412" id="sort-symbols-nil-1"><span class="header-section-number">3.412</span> sort-symbols : nil</h2>
 <p>Usage: <code>(sort-symbols li) =&gt; list</code></p>
 <p>Sort the list of symbols <code>li</code> alphabetically.</p>
 <p>See also: <code>out, dp, du, dump</code>.</p>
-<h2 data-number="3.412" id="spaces-procedure1-1"><span class="header-section-number">3.412</span> <code>spaces</code> : procedure/1</h2>
+<h2 data-number="3.413" id="spaces-procedure1-1"><span class="header-section-number">3.413</span> <code>spaces</code> : procedure/1</h2>
 <p>Usage: <code>(spaces n) =&gt; str</code></p>
 <p>Create a string consisting of <code>n</code> spaces.</p>
 <p>See also: <code>strbuild, strleft, strright</code>.</p>
-<h2 data-number="3.413" id="stack-empty-procedure1-1"><span class="header-section-number">3.413</span> <code>stack-empty?</code> : procedure/1</h2>
+<h2 data-number="3.414" id="stack-empty-procedure1-1"><span class="header-section-number">3.414</span> <code>stack-empty?</code> : procedure/1</h2>
 <p>Usage: <code>(queue-empty? s) =&gt; bool</code></p>
 <p>Return true if the stack <code>s</code> is empty, nil otherwise.</p>
 <p>See also: <code>make-stack, stack?, push!, pop!, stack-len, glance</code>.</p>
-<h2 data-number="3.414" id="stack-len-procedure1-1"><span class="header-section-number">3.414</span> <code>stack-len</code> : procedure/1</h2>
+<h2 data-number="3.415" id="stack-len-procedure1-1"><span class="header-section-number">3.415</span> <code>stack-len</code> : procedure/1</h2>
 <p>Usage: <code>(stack-len s) =&gt; int</code></p>
 <p>Return the length of the stack <code>s.</code></p>
 <p>See also: <code>make-queue, queue?, enqueue!, dequeue!, glance, queue-len</code>.</p>
 <p><strong>Warning: Be advised that this is of limited use in some concurrent contexts, since the length of the queue might have changed already once you’ve obtained it!</strong></p>
-<h2 data-number="3.415" id="stack-procedure1-1"><span class="header-section-number">3.415</span> <code>stack?</code> : procedure/1</h2>
+<h2 data-number="3.416" id="stack-procedure1-1"><span class="header-section-number">3.416</span> <code>stack?</code> : procedure/1</h2>
 <p>Usage: <code>(stack? q) =&gt; bool</code></p>
 <p>Return true if <code>q</code> is a stack, nil otherwise.</p>
 <p>See also: <code>make-stack, push!, pop!, stack-empty?, stack-len, glance</code>.</p>
-<h2 data-number="3.416" id="str-procedure0-or-more-1"><span class="header-section-number">3.416</span> <code>str+</code> : procedure/0 or more</h2>
+<h2 data-number="3.417" id="str-procedure0-or-more-1"><span class="header-section-number">3.417</span> <code>str+</code> : procedure/0 or more</h2>
 <p>Usage: <code>(str+ [s] ...) =&gt; str</code></p>
 <p>Append all strings given to the function.</p>
 <p>See also: <code>str?</code>.</p>
-<h2 data-number="3.417" id="str-array-procedure1-1"><span class="header-section-number">3.417</span> <code>str-&gt;array</code> : procedure/1</h2>
+<h2 data-number="3.418" id="str-array-procedure1-1"><span class="header-section-number">3.418</span> <code>str-&gt;array</code> : procedure/1</h2>
 <p>Usage: <code>(str-&gt;array s) =&gt; array</code></p>
 <p>Return the string <code>s</code> as an array of unicode glyph integer values.</p>
 <p>See also: <code>array-&gt;str</code>.</p>
-<h2 data-number="3.418" id="str-blob-procedure1-1"><span class="header-section-number">3.418</span> <code>str-&gt;blob</code> : procedure/1</h2>
+<h2 data-number="3.419" id="str-blob-procedure1-1"><span class="header-section-number">3.419</span> <code>str-&gt;blob</code> : procedure/1</h2>
 <p>Usage: <code>(str-&gt;blob s) =&gt; blob</code></p>
 <p>Convert string <code>s</code> into a blob.</p>
 <p>See also: <code>blob-&gt;str</code>.</p>
-<h2 data-number="3.419" id="str-char-procedure1-1"><span class="header-section-number">3.419</span> <code>str-&gt;char</code> : procedure/1</h2>
+<h2 data-number="3.420" id="str-char-procedure1-1"><span class="header-section-number">3.420</span> <code>str-&gt;char</code> : procedure/1</h2>
 <p>Usage: <code>(str-&gt;char s)</code></p>
 <p>Return the first character of <code>s</code> as unicode integer.</p>
 <p>See also: <code>char-&gt;str</code>.</p>
-<h2 data-number="3.420" id="str-chars-procedure1-1"><span class="header-section-number">3.420</span> <code>str-&gt;chars</code> : procedure/1</h2>
+<h2 data-number="3.421" id="str-chars-procedure1-1"><span class="header-section-number">3.421</span> <code>str-&gt;chars</code> : procedure/1</h2>
 <p>Usage: <code>(str-&gt;chars s) =&gt; array</code></p>
 <p>Convert the UTF-8 string <code>s</code> into an array of UTF-8 rune integers. An error may occur if the string is not a valid UTF-8 string.</p>
 <p>See also: <code>runes-&gt;str, str-&gt;char, char-&gt;str</code>.</p>
-<h2 data-number="3.421" id="str-expr-procedure0-or-more-2"><span class="header-section-number">3.421</span> <code>str-&gt;expr</code> : procedure/0 or more</h2>
+<h2 data-number="3.422" id="str-expr-procedure0-or-more-2"><span class="header-section-number">3.422</span> <code>str-&gt;expr</code> : procedure/0 or more</h2>
 <p>Usage: <code>(str-&gt;expr s [default]) =&gt; any</code></p>
 <p>Convert a string <code>s</code> into a Lisp expression. If <code>default</code> is provided, it is returned if an error occurs, otherwise an error is raised.</p>
 <p>See also: <code>expr-&gt;str, str-&gt;expr*, openstr, externalize, internalize</code>.</p>
-<h2 data-number="3.422" id="str-expr-procedure0-or-more-3"><span class="header-section-number">3.422</span> <code>str-&gt;expr*</code> : procedure/0 or more</h2>
+<h2 data-number="3.423" id="str-expr-procedure0-or-more-3"><span class="header-section-number">3.423</span> <code>str-&gt;expr*</code> : procedure/0 or more</h2>
 <p>Usage: <code>(str-&gt;expr* s [default]) =&gt; li</code></p>
 <p>Convert a string <code>s</code> into a list consisting of the Lisp expressions in <code>s</code>. If <code>default</code> is provided, then this value is put in the result list whenever an error occurs. Otherwise an error is raised. Notice that it might not always be obvious what expression in <code>s</code> triggers an error, since this hinges on the way the internal expession parser works.</p>
 <p>See also: <code>str-&gt;expr, expr-&gt;str, openstr, internalize, externalize</code>.</p>
-<h2 data-number="3.423" id="str-list-procedure1-1"><span class="header-section-number">3.423</span> <code>str-&gt;list</code> : procedure/1</h2>
+<h2 data-number="3.424" id="str-list-procedure1-1"><span class="header-section-number">3.424</span> <code>str-&gt;list</code> : procedure/1</h2>
 <p>Usage: <code>(str-&gt;list s) =&gt; list</code></p>
 <p>Return the sequence of numeric chars that make up string <code>s.</code></p>
 <p>See also: <code>str-&gt;array, list-&gt;str, array-&gt;str, chars</code>.</p>
-<h2 data-number="3.424" id="str-sym-procedure1-1"><span class="header-section-number">3.424</span> <code>str-&gt;sym</code> : procedure/1</h2>
+<h2 data-number="3.425" id="str-sym-procedure1-1"><span class="header-section-number">3.425</span> <code>str-&gt;sym</code> : procedure/1</h2>
 <p>Usage: <code>(str-&gt;sym s) =&gt; sym</code></p>
 <p>Convert a string into a symbol.</p>
 <p>See also: <code>sym-&gt;str, intern, make-symbol</code>.</p>
-<h2 data-number="3.425" id="str-count-substr-procedure2-1"><span class="header-section-number">3.425</span> <code>str-count-substr</code> : procedure/2</h2>
+<h2 data-number="3.426" id="str-count-substr-procedure2-1"><span class="header-section-number">3.426</span> <code>str-count-substr</code> : procedure/2</h2>
 <p>Usage: <code>(str-count-substr s1 s2) =&gt; int</code></p>
 <p>Count the number of non-overlapping occurrences of substring <code>s2</code> in string <code>s1.</code></p>
 <p>See also: <code>str-replace, str-replace*, instr</code>.</p>
-<h2 data-number="3.426" id="str-empty-procedure1-1"><span class="header-section-number">3.426</span> <code>str-empty?</code> : procedure/1</h2>
+<h2 data-number="3.427" id="str-empty-procedure1-1"><span class="header-section-number">3.427</span> <code>str-empty?</code> : procedure/1</h2>
 <p>Usage: <code>(str-empty? s) =&gt; bool</code></p>
 <p>Return true if the string <code>s</code> is empty, nil otherwise.</p>
 <p>See also: <code>strlen</code>.</p>
-<h2 data-number="3.427" id="str-exists-procedure2-1"><span class="header-section-number">3.427</span> <code>str-exists?</code> : procedure/2</h2>
+<h2 data-number="3.428" id="str-exists-procedure2-1"><span class="header-section-number">3.428</span> <code>str-exists?</code> : procedure/2</h2>
 <p>Usage: <code>(str-exists? s pred) =&gt; bool</code></p>
 <p>Return true if <code>pred</code> returns true for at least one character in string <code>s</code>, nil otherwise.</p>
 <p>See also: <code>exists?, forall?, list-exists?, array-exists?, seq?</code>.</p>
-<h2 data-number="3.428" id="str-forall-procedure2-1"><span class="header-section-number">3.428</span> <code>str-forall?</code> : procedure/2</h2>
+<h2 data-number="3.429" id="str-forall-procedure2-1"><span class="header-section-number">3.429</span> <code>str-forall?</code> : procedure/2</h2>
 <p>Usage: <code>(str-forall? s pred) =&gt; bool</code></p>
 <p>Return true if predicate <code>pred</code> returns true for all characters in string <code>s</code>, nil otherwise.</p>
 <p>See also: <code>foreach, map, forall?, array-forall?, list-forall, exists?</code>.</p>
-<h2 data-number="3.429" id="str-foreach-procedure2-1"><span class="header-section-number">3.429</span> <code>str-foreach</code> : procedure/2</h2>
+<h2 data-number="3.430" id="str-foreach-procedure2-1"><span class="header-section-number">3.430</span> <code>str-foreach</code> : procedure/2</h2>
 <p>Usage: <code>(str-foreach s proc)</code></p>
 <p>Apply <code>proc</code> to each element of string <code>s</code> in order, for the side effects.</p>
 <p>See also: <code>foreach, list-foreach, array-foreach, map</code>.</p>
-<h2 data-number="3.430" id="str-index-procedure2-or-more-1"><span class="header-section-number">3.430</span> <code>str-index</code> : procedure/2 or more</h2>
+<h2 data-number="3.431" id="str-index-procedure2-or-more-1"><span class="header-section-number">3.431</span> <code>str-index</code> : procedure/2 or more</h2>
 <p>Usage: <code>(str-index s chars [pos]) =&gt; int</code></p>
 <p>Find the first char in <code>s</code> that is in the charset <code>chars</code>, starting from the optional <code>pos</code> in <code>s</code>, and return its index in the string. If no macthing char is found, nil is returned.</p>
 <p>See also: <code>strsplit, chars, inchars</code>.</p>
-<h2 data-number="3.431" id="str-join-procedure2-1"><span class="header-section-number">3.431</span> <code>str-join</code> : procedure/2</h2>
+<h2 data-number="3.432" id="str-join-procedure2-1"><span class="header-section-number">3.432</span> <code>str-join</code> : procedure/2</h2>
 <p>Usage: <code>(str-join li del) =&gt; str</code></p>
 <p>Join a list of strings <code>li</code> where each of the strings is separated by string <code>del</code>, and return the result string.</p>
 <p>See also: <code>strlen, strsplit, str-slice</code>.</p>
-<h2 data-number="3.432" id="str-port-procedure1-1"><span class="header-section-number">3.432</span> <code>str-port?</code> : procedure/1</h2>
+<h2 data-number="3.433" id="str-port-procedure1-1"><span class="header-section-number">3.433</span> <code>str-port?</code> : procedure/1</h2>
 <p>Usage: <code>(str-port? p) =&gt; bool</code></p>
 <p>Return true if <code>p</code> is a string port, nil otherwise.</p>
 <p>See also: <code>port?, file-port?, stropen, open</code>.</p>
-<h2 data-number="3.433" id="str-ref-procedure2-1"><span class="header-section-number">3.433</span> <code>str-ref</code> : procedure/2</h2>
+<h2 data-number="3.434" id="str-ref-procedure2-1"><span class="header-section-number">3.434</span> <code>str-ref</code> : procedure/2</h2>
 <p>Usage: <code>(str-ref s n) =&gt; n</code></p>
 <p>Return the unicode char as integer at position <code>n</code> in <code>s</code>. Strings are 0-indexed.</p>
 <p>See also: <code>nth</code>.</p>
-<h2 data-number="3.434" id="str-remove-number-procedure1-1"><span class="header-section-number">3.434</span> <code>str-remove-number</code> : procedure/1</h2>
+<h2 data-number="3.435" id="str-remove-number-procedure1-1"><span class="header-section-number">3.435</span> <code>str-remove-number</code> : procedure/1</h2>
 <p>Usage: <code>(str-remove-number s [del]) =&gt; str</code></p>
 <p>Remove the suffix number in <code>s</code>, provided there is one and it is separated from the rest of the string by <code>del</code>, where the default is a space character. For instance, “Test 29” will be converted to “Test”, “User-Name1-23-99” with delimiter “-” will be converted to “User-Name1-23”. This function will remove intermediate delimiters in the middle of the string, since it disassembles and reassembles the string, so be aware that this is not preserving inputs in that respect.</p>
 <p>See also: <code>strsplit</code>.</p>
-<h2 data-number="3.435" id="str-remove-prefix-procedure1-1"><span class="header-section-number">3.435</span> <code>str-remove-prefix</code> : procedure/1</h2>
+<h2 data-number="3.436" id="str-remove-prefix-procedure1-1"><span class="header-section-number">3.436</span> <code>str-remove-prefix</code> : procedure/1</h2>
 <p>Usage: <code>(str-remove-prefix s prefix) =&gt; str</code></p>
 <p>Remove the prefix <code>prefix</code> from string <code>s</code>, return the string without the prefix. If the prefix does not match, <code>s</code> is returned. If <code>prefix</code> is longer than <code>s</code> and matches, the empty string is returned.</p>
 <p>See also: <code>str-remove-suffix</code>.</p>
-<h2 data-number="3.436" id="str-remove-suffix-procedure1-1"><span class="header-section-number">3.436</span> <code>str-remove-suffix</code> : procedure/1</h2>
+<h2 data-number="3.437" id="str-remove-suffix-procedure1-1"><span class="header-section-number">3.437</span> <code>str-remove-suffix</code> : procedure/1</h2>
 <p>Usage: <code>(str-remove-suffix s suffix) =&gt; str</code></p>
 <p>remove the suffix <code>suffix</code> from string <code>s</code>, return the string without the suffix. If the suffix does not match, <code>s</code> is returned. If <code>suffix</code> is longer than <code>s</code> and matches, the empty string is returned.</p>
 <p>See also: <code>str-remove-prefix</code>.</p>
-<h2 data-number="3.437" id="str-replace-procedure4-1"><span class="header-section-number">3.437</span> <code>str-replace</code> : procedure/4</h2>
+<h2 data-number="3.438" id="str-replace-procedure4-1"><span class="header-section-number">3.438</span> <code>str-replace</code> : procedure/4</h2>
 <p>Usage: <code>(str-replace s t1 t2 n) =&gt; str</code></p>
 <p>Replace the first <code>n</code> instances of substring <code>t1</code> in <code>s</code> by <code>t2.</code></p>
 <p>See also: <code>str-replace*, str-count-substr</code>.</p>
-<h2 data-number="3.438" id="str-replace-procedure3-1"><span class="header-section-number">3.438</span> <code>str-replace*</code> : procedure/3</h2>
+<h2 data-number="3.439" id="str-replace-procedure3-1"><span class="header-section-number">3.439</span> <code>str-replace*</code> : procedure/3</h2>
 <p>Usage: <code>(str-replace* s t1 t2) =&gt; str</code></p>
 <p>Replace all non-overlapping substrings <code>t1</code> in <code>s</code> by <code>t2.</code></p>
 <p>See also: <code>str-replace, str-count-substr</code>.</p>
-<h2 data-number="3.439" id="str-reverse-procedure1-1"><span class="header-section-number">3.439</span> <code>str-reverse</code> : procedure/1</h2>
+<h2 data-number="3.440" id="str-reverse-procedure1-1"><span class="header-section-number">3.440</span> <code>str-reverse</code> : procedure/1</h2>
 <p>Usage: <code>(str-reverse s) =&gt; str</code></p>
 <p>Reverse string <code>s.</code></p>
 <p>See also: <code>reverse, array-reverse, list-reverse</code>.</p>
-<h2 data-number="3.440" id="str-segment-procedure3-1"><span class="header-section-number">3.440</span> <code>str-segment</code> : procedure/3</h2>
+<h2 data-number="3.441" id="str-segment-procedure3-1"><span class="header-section-number">3.441</span> <code>str-segment</code> : procedure/3</h2>
 <p>Usage: <code>(str-segment str start end) =&gt; list</code></p>
 <p>Parse a string <code>str</code> into words that start with one of the characters in string <code>start</code> and end in one of the characters in string <code>end</code> and return a list consisting of lists of the form (bool s) where bool is true if the string starts with a character in <code>start</code>, nil otherwise, and <code>s</code> is the extracted string including start and end characters.</p>
 <p>See also: <code>str+, strsplit, fmt, strbuild</code>.</p>
-<h2 data-number="3.441" id="str-slice-procedure3-1"><span class="header-section-number">3.441</span> <code>str-slice</code> : procedure/3</h2>
+<h2 data-number="3.442" id="str-slice-procedure3-1"><span class="header-section-number">3.442</span> <code>str-slice</code> : procedure/3</h2>
 <p>Usage: <code>(str-slice s low high) =&gt; s</code></p>
 <p>Return a slice of string <code>s</code> starting at character with index <code>low</code> (inclusive) and ending at character with index <code>high</code> (exclusive).</p>
 <p>See also: <code>slice</code>.</p>
-<h2 data-number="3.442" id="str-procedure1"><span class="header-section-number">3.442</span> <code>str?</code> : procedure/1</h2>
+<h2 data-number="3.443" id="str-procedure1"><span class="header-section-number">3.443</span> <code>str?</code> : procedure/1</h2>
 <p>Usage: <code>(str? s) =&gt; bool</code></p>
 <p>Return true if <code>s</code> is a string, nil otherwise.</p>
 <p>See also: <code>num?, atom?, sym?, closure?, intrinsic?, macro?</code>.</p>
-<h2 data-number="3.443" id="strbuild-procedure2-1"><span class="header-section-number">3.443</span> <code>strbuild</code> : procedure/2</h2>
+<h2 data-number="3.444" id="strbuild-procedure2-1"><span class="header-section-number">3.444</span> <code>strbuild</code> : procedure/2</h2>
 <p>Usage: <code>(strbuild s n) =&gt; str</code></p>
 <p>Build a string by repeating string <code>s`` n</code> times.</p>
 <p>See also: <code>str+</code>.</p>
-<h2 data-number="3.444" id="strcase-procedure2-1"><span class="header-section-number">3.444</span> <code>strcase</code> : procedure/2</h2>
+<h2 data-number="3.445" id="strcase-procedure2-1"><span class="header-section-number">3.445</span> <code>strcase</code> : procedure/2</h2>
 <p>Usage: <code>(strcase s sel) =&gt; str</code></p>
 <p>Change the case of the string <code>s</code> according to selector <code>sel</code> and return a copy. Valid values for <code>sel</code> are ’lower for conversion to lower-case, ’upper for uppercase, ’title for title case and ’utf-8 for utf-8 normalization (which replaces unprintable characters with “?”).</p>
 <p>See also: <code>strmap</code>.</p>
-<h2 data-number="3.445" id="strcenter-procedure2-1"><span class="header-section-number">3.445</span> <code>strcenter</code> : procedure/2</h2>
+<h2 data-number="3.446" id="strcenter-procedure2-1"><span class="header-section-number">3.446</span> <code>strcenter</code> : procedure/2</h2>
 <p>Usage: <code>(strcenter s n) =&gt; str</code></p>
 <p>Center string <code>s</code> by wrapping space characters around it, such that the total length the result string is <code>n.</code></p>
 <p>See also: <code>strleft, strright, strlimit</code>.</p>
-<h2 data-number="3.446" id="strcnt-procedure2-1"><span class="header-section-number">3.446</span> <code>strcnt</code> : procedure/2</h2>
+<h2 data-number="3.447" id="strcnt-procedure2-1"><span class="header-section-number">3.447</span> <code>strcnt</code> : procedure/2</h2>
 <p>Usage: <code>(strcnt s del) =&gt; int</code></p>
 <p>Returnt the number of non-overlapping substrings <code>del</code> in <code>s.</code></p>
 <p>See also: <code>strsplit, str-index</code>.</p>
-<h2 data-number="3.447" id="strleft-procedure2-1"><span class="header-section-number">3.447</span> <code>strleft</code> : procedure/2</h2>
+<h2 data-number="3.448" id="strleft-procedure2-1"><span class="header-section-number">3.448</span> <code>strleft</code> : procedure/2</h2>
 <p>Usage: <code>(strleft s n) =&gt; str</code></p>
 <p>Align string <code>s</code> left by adding space characters to the right of it, such that the total length the result string is <code>n.</code></p>
 <p>See also: <code>strcenter, strright, strlimit</code>.</p>
-<h2 data-number="3.448" id="strlen-procedure1-1"><span class="header-section-number">3.448</span> <code>strlen</code> : procedure/1</h2>
+<h2 data-number="3.449" id="strlen-procedure1-1"><span class="header-section-number">3.449</span> <code>strlen</code> : procedure/1</h2>
 <p>Usage: <code>(strlen s) =&gt; int</code></p>
 <p>Return the length of <code>s.</code></p>
 <p>See also: <code>len, seq?, str?</code>.</p>
-<h2 data-number="3.449" id="strless-procedure2-1"><span class="header-section-number">3.449</span> <code>strless</code> : procedure/2</h2>
+<h2 data-number="3.450" id="strless-procedure2-1"><span class="header-section-number">3.450</span> <code>strless</code> : procedure/2</h2>
 <p>Usage: <code>(strless s1 s2) =&gt; bool</code></p>
 <p>Return true if string <code>s1</code> &lt; <code>s2</code> in lexicographic comparison, nil otherwise.</p>
 <p>See also: <code>sort, array-sort, strcase</code>.</p>
-<h2 data-number="3.450" id="strlimit-procedure2-1"><span class="header-section-number">3.450</span> <code>strlimit</code> : procedure/2</h2>
+<h2 data-number="3.451" id="strlimit-procedure2-1"><span class="header-section-number">3.451</span> <code>strlimit</code> : procedure/2</h2>
 <p>Usage: <code>(strlimit s n) =&gt; str</code></p>
 <p>Return a string based on <code>s</code> cropped to a maximal length of <code>n</code> (or less if <code>s</code> is shorter).</p>
 <p>See also: <code>strcenter, strleft, strright</code>.</p>
-<h2 data-number="3.451" id="strmap-procedure2-1"><span class="header-section-number">3.451</span> <code>strmap</code> : procedure/2</h2>
+<h2 data-number="3.452" id="strmap-procedure2-1"><span class="header-section-number">3.452</span> <code>strmap</code> : procedure/2</h2>
 <p>Usage: <code>(strmap s proc) =&gt; str</code></p>
 <p>Map function <code>proc</code>, which takes a number and returns a number, over all unicode characters in <code>s</code> and return the result as new string.</p>
 <p>See also: <code>map</code>.</p>
-<h2 data-number="3.452" id="stropen-procedure1-1"><span class="header-section-number">3.452</span> <code>stropen</code> : procedure/1</h2>
+<h2 data-number="3.453" id="stropen-procedure1-1"><span class="header-section-number">3.453</span> <code>stropen</code> : procedure/1</h2>
 <p>Usage: <code>(stropen s) =&gt; streamport</code></p>
 <p>Open the string <code>s</code> as input stream.</p>
 <p>See also: <code>open, close</code>.</p>
-<h2 data-number="3.453" id="strright-procedure2-1"><span class="header-section-number">3.453</span> <code>strright</code> : procedure/2</h2>
+<h2 data-number="3.454" id="strright-procedure2-1"><span class="header-section-number">3.454</span> <code>strright</code> : procedure/2</h2>
 <p>Usage: <code>(strright s n) =&gt; str</code></p>
 <p>Align string <code>s</code> right by adding space characters in front of it, such that the total length the result string is <code>n.</code></p>
 <p>See also: <code>strcenter, strleft, strlimit</code>.</p>
-<h2 data-number="3.454" id="strsplit-procedure2-1"><span class="header-section-number">3.454</span> <code>strsplit</code> : procedure/2</h2>
+<h2 data-number="3.455" id="strsplit-procedure2-1"><span class="header-section-number">3.455</span> <code>strsplit</code> : procedure/2</h2>
 <p>Usage: <code>(strsplit s del) =&gt; array</code></p>
 <p>Return an array of strings obtained from <code>s</code> by splitting <code>s</code> at each occurrence of string <code>del.</code></p>
 <p>See also: <code>str?</code>.</p>
-<h2 data-number="3.455" id="sub1-procedure1-1"><span class="header-section-number">3.455</span> <code>sub1</code> : procedure/1</h2>
+<h2 data-number="3.456" id="sub1-procedure1-1"><span class="header-section-number">3.456</span> <code>sub1</code> : procedure/1</h2>
 <p>Usage: <code>(sub1 n) =&gt; num</code></p>
 <p>Subtract 1 from <code>n.</code></p>
 <p>See also: <code>add1, +, -</code>.</p>
-<h2 data-number="3.456" id="sym-str-procedure1-1"><span class="header-section-number">3.456</span> <code>sym-&gt;str</code> : procedure/1</h2>
+<h2 data-number="3.457" id="sym-str-procedure1-1"><span class="header-section-number">3.457</span> <code>sym-&gt;str</code> : procedure/1</h2>
 <p>Usage: <code>(sym-&gt;str sym) =&gt; str</code></p>
 <p>Convert a symbol into a string.</p>
 <p>See also: <code>str-&gt;sym, intern, make-symbol</code>.</p>
-<h2 data-number="3.457" id="sym-procedure1-1"><span class="header-section-number">3.457</span> <code>sym?</code> : procedure/1</h2>
+<h2 data-number="3.458" id="sym-procedure1-1"><span class="header-section-number">3.458</span> <code>sym?</code> : procedure/1</h2>
 <p>Usage: <code>(sym? sym) =&gt; bool</code></p>
 <p>Return true if <code>sym</code> is a symbol, nil otherwise.</p>
 <p>See also: <code>str?, atom?</code>.</p>
-<h2 data-number="3.458" id="synout-procedure1-1"><span class="header-section-number">3.458</span> <code>synout</code> : procedure/1</h2>
+<h2 data-number="3.459" id="synout-procedure1-1"><span class="header-section-number">3.459</span> <code>synout</code> : procedure/1</h2>
 <p>Usage: <code>(synout arg)</code></p>
 <p>Like out, but enforcing a new input line afterwards. This needs to be used when outputing concurrently in a future or task.</p>
 <p>See also: <code>out, outy, synouty</code>.</p>
 <p><strong>Warning: Concurrent display output can lead to unexpected visual results and ought to be avoided.</strong></p>
-<h2 data-number="3.459" id="synouty-procedure1"><span class="header-section-number">3.459</span> <code>synouty</code> : procedure/1</h2>
+<h2 data-number="3.460" id="synouty-procedure1"><span class="header-section-number">3.460</span> <code>synouty</code> : procedure/1</h2>
 <p>Usage: <code>(synouty li)</code></p>
 <p>Like outy, but enforcing a new input line afterwards. This needs to be used when outputing concurrently in a future or task.</p>
 <p>See also: <code>synout, out, outy</code>.</p>
 <p><strong>Warning: Concurrent display output can lead to unexpected visual results and ought to be avoided.</strong></p>
-<h2 data-number="3.460" id="sys-key-procedure1-1"><span class="header-section-number">3.460</span> <code>sys-key?</code> : procedure/1</h2>
+<h2 data-number="3.461" id="sys-key-procedure1-1"><span class="header-section-number">3.461</span> <code>sys-key?</code> : procedure/1</h2>
 <p>Usage: <code>(sys-key? key) =&gt; bool</code></p>
 <p>Return true if the given sys key <code>key</code> exists, nil otherwise.</p>
 <p>See also: <code>sys, setsys</code>.</p>
-<h2 data-number="3.461" id="sysmsg-procedure1-2"><span class="header-section-number">3.461</span> <code>sysmsg</code> : procedure/1</h2>
+<h2 data-number="3.462" id="sysmsg-procedure1-2"><span class="header-section-number">3.462</span> <code>sysmsg</code> : procedure/1</h2>
 <p>Usage: <code>(sysmsg msg)</code></p>
 <p>Asynchronously display a system message string <code>msg</code> if in console or page mode, otherwise the message is logged.</p>
 <p>See also: <code>sysmsg*, synout, synouty, out, outy</code>.</p>
-<h2 data-number="3.462" id="sysmsg-procedure1-3"><span class="header-section-number">3.462</span> <code>sysmsg*</code> : procedure/1</h2>
+<h2 data-number="3.463" id="sysmsg-procedure1-3"><span class="header-section-number">3.463</span> <code>sysmsg*</code> : procedure/1</h2>
 <p>Usage: <code>(sysmsg* msg)</code></p>
 <p>Display a system message string <code>msg</code> if in console or page mode, otherwise the message is logged.</p>
 <p>See also: <code>sysmsg, synout, synouty, out, outy</code>.</p>
-<h2 data-number="3.463" id="take-procedure3-1"><span class="header-section-number">3.463</span> <code>take</code> : procedure/3</h2>
+<h2 data-number="3.464" id="take-procedure3-1"><span class="header-section-number">3.464</span> <code>take</code> : procedure/3</h2>
 <p>Usage: <code>(take seq n) =&gt; seq</code></p>
 <p>Return the sequence consisting of the <code>n</code> first elements of <code>seq.</code></p>
 <p>See also: <code>list, array, string, nth, seq?</code>.</p>
-<h2 data-number="3.464" id="task-procedure1-2"><span class="header-section-number">3.464</span> <code>task</code> : procedure/1</h2>
+<h2 data-number="3.465" id="task-procedure1-2"><span class="header-section-number">3.465</span> <code>task</code> : procedure/1</h2>
 <p>Usage: <code>(task sel proc) =&gt; int</code></p>
 <p>Create a new task for concurrently running <code>proc</code>, a procedure that takes its own ID as argument. The <code>sel</code> argument must be a symbol in ’(auto manual remove). If <code>sel</code> is ’remove, then the task is always removed from the task table after it has finished, even if an error has occurred. If sel is ’auto, then the task is removed from the task table if it ends without producing an error. If <code>sel</code> is ’manual then the task is not removed from the task table, its state is either ’canceled, ’finished, or ’error, and it and must be removed manually with <code>task-remove</code> or <code>prune-task-table</code>. Broadcast messages are never removed. Tasks are more heavy-weight than futures and allow for message-passing.</p>
 <p>See also: <code>task?, task-run, task-state, task-broadcast, task-send, task-recv, task-remove, prune-task-table</code>.</p>
-<h2 data-number="3.465" id="task-broadcast-procedure2-1"><span class="header-section-number">3.465</span> <code>task-broadcast</code> : procedure/2</h2>
+<h2 data-number="3.466" id="task-broadcast-procedure2-1"><span class="header-section-number">3.466</span> <code>task-broadcast</code> : procedure/2</h2>
 <p>Usage: <code>(task-broadcast id msg)</code></p>
 <p>Send a message from task <code>id</code> to the blackboard. Tasks automatically send the message ’finished to the blackboard when they are finished.</p>
 <p>See also: <code>task, task?, task-run, task-state, task-send, task-recv</code>.</p>
-<h2 data-number="3.466" id="task-recv-procedure1-1"><span class="header-section-number">3.466</span> <code>task-recv</code> : procedure/1</h2>
+<h2 data-number="3.467" id="task-recv-procedure1-1"><span class="header-section-number">3.467</span> <code>task-recv</code> : procedure/1</h2>
 <p>Usage: <code>(task-recv id) =&gt; any</code></p>
 <p>Receive a message for task <code>id</code>, or nil if there is no message. This is typically used by the task with <code>id</code> itself to periodically check for new messages while doing other work. By convention, if a task receives the message ’end it ought to terminate at the next convenient occasion, whereas upon receiving ’cancel it ought to terminate in an expedited manner.</p>
 <p>See also: <code>task-send, task, task?, task-run, task-state, task-broadcast</code>.</p>
 <p><strong>Warning: Busy polling for new messages in a tight loop is inefficient and ought to be avoided.</strong></p>
-<h2 data-number="3.467" id="task-remove-procedure1-1"><span class="header-section-number">3.467</span> <code>task-remove</code> : procedure/1</h2>
+<h2 data-number="3.468" id="task-remove-procedure1-1"><span class="header-section-number">3.468</span> <code>task-remove</code> : procedure/1</h2>
 <p>Usage: <code>(task-remove id)</code></p>
 <p>Remove task <code>id</code> from the task table. The task can no longer be interacted with.</p>
 <p>See also: <code>task, task?, task-state</code>.</p>
-<h2 data-number="3.468" id="task-run-procedure1-1"><span class="header-section-number">3.468</span> <code>task-run</code> : procedure/1</h2>
+<h2 data-number="3.469" id="task-run-procedure1-1"><span class="header-section-number">3.469</span> <code>task-run</code> : procedure/1</h2>
 <p>Usage: <code>(task-run id)</code></p>
 <p>Run task <code>id</code>, which must have been previously created with task. Attempting to run a task that is already running results in an error unless <code>silent?</code> is true. If silent? is true, the function does never produce an error.</p>
 <p>See also: <code>task, task?, task-state, task-send, task-recv, task-broadcast-</code>.</p>
-<h2 data-number="3.469" id="task-schedule-procedure1-1"><span class="header-section-number">3.469</span> <code>task-schedule</code> : procedure/1</h2>
+<h2 data-number="3.470" id="task-schedule-procedure1-1"><span class="header-section-number">3.470</span> <code>task-schedule</code> : procedure/1</h2>
 <p>Usage: <code>(task-schedule sel id)</code></p>
 <p>Schedule task <code>id</code> for running, starting it as soon as other tasks have finished. The scheduler attempts to avoid running more than (cpunum) tasks at once.</p>
 <p>See also: <code>task, task-run</code>.</p>
-<h2 data-number="3.470" id="task-send-procedure2-1"><span class="header-section-number">3.470</span> <code>task-send</code> : procedure/2</h2>
+<h2 data-number="3.471" id="task-send-procedure2-1"><span class="header-section-number">3.471</span> <code>task-send</code> : procedure/2</h2>
 <p>Usage: <code>(task-send id msg)</code></p>
 <p>Send a message <code>msg</code> to task <code>id</code>. The task needs to cooperatively use task-recv to reply to the message. It is up to the receiving task what to do with the message once it has been received, or how often to check for new messages.</p>
 <p>See also: <code>task-broadcast, task-recv, task, task?, task-run, task-state</code>.</p>
-<h2 data-number="3.471" id="task-state-procedure1-1"><span class="header-section-number">3.471</span> <code>task-state</code> : procedure/1</h2>
+<h2 data-number="3.472" id="task-state-procedure1-1"><span class="header-section-number">3.472</span> <code>task-state</code> : procedure/1</h2>
 <p>Usage: <code>(task-state id) =&gt; sym</code></p>
 <p>Return the state of the task, which is a symbol in ’(finished error stopped new waiting running).</p>
 <p>See also: <code>task, task?, task-run, task-broadcast, task-recv, task-send</code>.</p>
-<h2 data-number="3.472" id="task-procedure1-3"><span class="header-section-number">3.472</span> <code>task?</code> : procedure/1</h2>
+<h2 data-number="3.473" id="task-procedure1-3"><span class="header-section-number">3.473</span> <code>task?</code> : procedure/1</h2>
 <p>Usage: <code>(task? id) =&gt; bool</code></p>
 <p>Check whether the given <code>id</code> is for a valid task, return true if it is valid, nil otherwise.</p>
 <p>See also: <code>task, task-run, task-state, task-broadcast, task-send, task-recv</code>.</p>
-<h2 data-number="3.473" id="terpri-procedure0-1"><span class="header-section-number">3.473</span> <code>terpri</code> : procedure/0</h2>
+<h2 data-number="3.474" id="terpri-procedure0-1"><span class="header-section-number">3.474</span> <code>terpri</code> : procedure/0</h2>
 <p>Usage: <code>(terpri)</code></p>
 <p>Advance the host OS terminal to the next line.</p>
 <p>See also: <code>princ, out, outy</code>.</p>
-<h2 data-number="3.474" id="testing-macro1-1"><span class="header-section-number">3.474</span> <code>testing</code> : macro/1</h2>
+<h2 data-number="3.475" id="testing-macro1-1"><span class="header-section-number">3.475</span> <code>testing</code> : macro/1</h2>
 <p>Usage: <code>(testing name)</code></p>
 <p>Registers the string <code>name</code> as the name of the tests that are next registered with expect.</p>
 <p>See also: <code>expect, expect-err, expect-ok, run-selftest</code>.</p>
-<h2 data-number="3.475" id="the-color-procedure1-1"><span class="header-section-number">3.475</span> <code>the-color</code> : procedure/1</h2>
+<h2 data-number="3.476" id="the-color-procedure1-1"><span class="header-section-number">3.476</span> <code>the-color</code> : procedure/1</h2>
 <p>Usage: <code>(the-color colors-spec) =&gt; (r g b a)</code></p>
 <p>Return the color list (r g b a) based on a color specification, which may be a color list (r g b), a color selector for (color selector) or a color name such as ’dark-blue.</p>
 <p>See also: <code>*colors*, color, set-color, outy</code>.</p>
-<h2 data-number="3.476" id="the-color-names-procedure0-1"><span class="header-section-number">3.476</span> <code>the-color-names</code> : procedure/0</h2>
+<h2 data-number="3.477" id="the-color-names-procedure0-1"><span class="header-section-number">3.477</span> <code>the-color-names</code> : procedure/0</h2>
 <p>Usage: <code>(the-color-names) =&gt; li</code></p>
 <p>Return the list of color names in <em>colors</em>.</p>
 <p>See also: <code>*colors*, the-color</code>.</p>
-<h2 data-number="3.477" id="time-procedure1-1"><span class="header-section-number">3.477</span> <code>time</code> : procedure/1</h2>
+<h2 data-number="3.478" id="time-procedure1-1"><span class="header-section-number">3.478</span> <code>time</code> : procedure/1</h2>
 <p>Usage: <code>(time proc) =&gt; int</code></p>
 <p>Return the time in nanoseconds that it takes to execute the procedure with no arguments <code>proc.</code></p>
 <p>See also: <code>now-ns, now</code>.</p>
-<h2 data-number="3.478" id="truncate-procedure1-or-more-1"><span class="header-section-number">3.478</span> <code>truncate</code> : procedure/1 or more</h2>
+<h2 data-number="3.479" id="truncate-procedure1-or-more-1"><span class="header-section-number">3.479</span> <code>truncate</code> : procedure/1 or more</h2>
 <p>Usage: <code>(truncate x [y]) =&gt; int</code></p>
 <p>Round down to nearest integer of <code>x</code>. If <code>y</code> is present, divide <code>x</code> by <code>y</code> and round down to the nearest integer.</p>
 <p>See also: <code>div, /, int</code>.</p>
-<h2 data-number="3.479" id="try-macro2-or-more-1"><span class="header-section-number">3.479</span> <code>try</code> : macro/2 or more</h2>
+<h2 data-number="3.480" id="try-macro2-or-more-1"><span class="header-section-number">3.480</span> <code>try</code> : macro/2 or more</h2>
 <p>Usage: <code>(try (finals ...) body ...)</code></p>
 <p>Evaluate the forms of the <code>body</code> and afterwards the forms in <code>finals</code>. If during the execution of <code>body</code> an error occurs, first all <code>finals</code> are executed and then the error is printed by the default error printer.</p>
 <p>See also: <code>with-final, with-error-handler</code>.</p>
-<h2 data-number="3.480" id="unless-macro1-or-more-1"><span class="header-section-number">3.480</span> <code>unless</code> : macro/1 or more</h2>
+<h2 data-number="3.481" id="unless-macro1-or-more-1"><span class="header-section-number">3.481</span> <code>unless</code> : macro/1 or more</h2>
 <p>Usage: <code>(unless cond expr ...) =&gt; any</code></p>
 <p>Evaluate expressions <code>expr</code> if <code>cond</code> is not true, returns void otherwise.</p>
 <p>See also: <code>if, when, cond</code>.</p>
-<h2 data-number="3.481" id="unprotect-procedure0-or-more-1"><span class="header-section-number">3.481</span> <code>unprotect</code> : procedure/0 or more</h2>
+<h2 data-number="3.482" id="unprotect-procedure0-or-more-1"><span class="header-section-number">3.482</span> <code>unprotect</code> : procedure/0 or more</h2>
 <p>Usage: <code>(unprotect [sym] ...)</code></p>
 <p>Unprotect symbols <code>sym</code> …, allowing mutation or rebinding them. The symbols need to be quoted. This operation requires the permission ’allow-unprotect to be set, or else an error is caused.</p>
 <p>See also: <code>protect, protected?, dict-unprotect, dict-protected?, permissions, permission?, setq, bind, interpret</code>.</p>
-<h2 data-number="3.482" id="valid-procedure1-1"><span class="header-section-number">3.482</span> <code>valid?</code> : procedure/1</h2>
+<h2 data-number="3.483" id="valid-procedure1-1"><span class="header-section-number">3.483</span> <code>valid?</code> : procedure/1</h2>
 <p>Usage: <code>(valid? obj) =&gt; bool</code></p>
 <p>Return true if <code>obj</code> is a valid object, nil otherwise. What exactly object validity means is undefined, but certain kind of objects such as graphics objects may be marked invalid when they can no longer be used because they have been disposed off by a subsystem and cannot be automatically garbage collected. Generally, invalid objects ought no longer be used and need to be discarded.</p>
 <p>See also: <code>gfx.reset</code>.</p>
-<h2 data-number="3.483" id="void-procedure0-or-more-1"><span class="header-section-number">3.483</span> <code>void</code> : procedure/0 or more</h2>
+<h2 data-number="3.484" id="void-procedure0-or-more-1"><span class="header-section-number">3.484</span> <code>void</code> : procedure/0 or more</h2>
 <p>Usage: <code>(void [any] ...)</code></p>
 <p>Always returns void, no matter what values are given to it. Void is a special value that is not printed in the console.</p>
 <p>See also: <code>void?</code>.</p>
-<h2 data-number="3.484" id="wait-for-procedure2-1"><span class="header-section-number">3.484</span> <code>wait-for</code> : procedure/2</h2>
+<h2 data-number="3.485" id="wait-for-procedure2-1"><span class="header-section-number">3.485</span> <code>wait-for</code> : procedure/2</h2>
 <p>Usage: <code>(wait-for dict key)</code></p>
 <p>Block execution until the value for <code>key</code> in <code>dict</code> is not-nil. This function may wait indefinitely if no other thread sets the value for <code>key</code> to not-nil.</p>
 <p>See also: <code>wait-for*, future, force, wait-until, wait-until*</code>.</p>
 <p><strong>Warning: This cannot be used for synchronization of multiple tasks due to potential race-conditions.</strong></p>
-<h2 data-number="3.485" id="wait-for-procedure3-1"><span class="header-section-number">3.485</span> <code>wait-for*</code> : procedure/3</h2>
+<h2 data-number="3.486" id="wait-for-procedure3-1"><span class="header-section-number">3.486</span> <code>wait-for*</code> : procedure/3</h2>
 <p>Usage: <code>(wait-for* dict key timeout)</code></p>
 <p>Blocks execution until the value for <code>key</code> in <code>dict</code> is not-nil or <code>timeout</code> nanoseconds have passed, and returns that value or nil if waiting timed out. If <code>timeout</code> is negative, then the function waits potentially indefinitely without any timeout. If a non-nil key is not found, the function sleeps at least <em>sync-wait-lower-bound</em> nanoseconds and up to <em>sync-wait-upper-bound</em> nanoseconds until it looks for the key again.</p>
 <p>See also: <code>future, force, wait-for, wait-until, wait-until*</code>.</p>
 <p><strong>Warning: This cannot be used for synchronization of multiple tasks due to potential race-conditions.</strong></p>
-<h2 data-number="3.486" id="wait-for-empty-procedure3-1"><span class="header-section-number">3.486</span> <code>wait-for-empty*</code> : procedure/3</h2>
+<h2 data-number="3.487" id="wait-for-empty-procedure3-1"><span class="header-section-number">3.487</span> <code>wait-for-empty*</code> : procedure/3</h2>
 <p>Usage: <code>(wait-for-empty* dict key timeout)</code></p>
 <p>Blocks execution until the <code>key</code> is no longer present in <code>dict</code> or <code>timeout</code> nanoseconds have passed. If <code>timeout</code> is negative, then the function waits potentially indefinitely without any timeout.</p>
 <p>See also: <code>future, force, wait-for, wait-until, wait-until*</code>.</p>
 <p><strong>Warning: This cannot be used for synchronization of multiple tasks due to potential race-conditions.</strong></p>
-<h2 data-number="3.487" id="wait-until-procedure2-1"><span class="header-section-number">3.487</span> <code>wait-until</code> : procedure/2</h2>
+<h2 data-number="3.488" id="wait-until-procedure2-1"><span class="header-section-number">3.488</span> <code>wait-until</code> : procedure/2</h2>
 <p>Usage: <code>(wait-until dict key pred)</code></p>
 <p>Blocks execution until the unary predicate <code>pred</code> returns true for the value at <code>key</code> in <code>dict</code>. This function may wait indefinitely if no other thread sets the value in such a way that <code>pred</code> returns true when applied to it.</p>
 <p>See also: <code>wait-for, future, force, wait-until*</code>.</p>
 <p><strong>Warning: This cannot be used for synchronization of multiple tasks due to potential race-conditions.</strong></p>
-<h2 data-number="3.488" id="wait-until-procedure4-1"><span class="header-section-number">3.488</span> <code>wait-until*</code> : procedure/4</h2>
+<h2 data-number="3.489" id="wait-until-procedure4-1"><span class="header-section-number">3.489</span> <code>wait-until*</code> : procedure/4</h2>
 <p>Usage: <code>(wait-until* dict key pred timeout)</code></p>
 <p>Blocks execution until the unary predicate <code>pred</code> returns true for the value at <code>key</code> in <code>dict</code>, or <code>timeout</code> nanoseconds have passed, and returns the value or nil if waiting timed out. If <code>timeout</code> is negative, then the function waits potentially indefinitely without any timeout. If a non-nil key is not found, the function sleeps at least <em>sync-wait-lower-bound</em> nanoseconds and up to <em>sync-wait-upper-bound</em> nanoseconds until it looks for the key again.</p>
 <p>See also: <code>future, force, wait-for, wait-until*, wait-until</code>.</p>
 <p><strong>Warning: This cannot be used for synchronization of multiple tasks due to potential race-conditions.</strong></p>
-<h2 data-number="3.489" id="warn-procedure1-or-more-1"><span class="header-section-number">3.489</span> <code>warn</code> : procedure/1 or more</h2>
+<h2 data-number="3.490" id="warn-procedure1-or-more-1"><span class="header-section-number">3.490</span> <code>warn</code> : procedure/1 or more</h2>
 <p>Usage: <code>(warn msg [args...])</code></p>
 <p>Output the warning message <code>msg</code> in error colors. The optional <code>args</code> are applied to the message as in fmt. The message should not end with a newline.</p>
 <p>See also: <code>error</code>.</p>
-<h2 data-number="3.490" id="week-procedure2-1"><span class="header-section-number">3.490</span> <code>week+</code> : procedure/2</h2>
+<h2 data-number="3.491" id="week-procedure2-1"><span class="header-section-number">3.491</span> <code>week+</code> : procedure/2</h2>
 <p>Usage: <code>(week+ dateli n) =&gt; dateli</code></p>
 <p>Adds <code>n</code> weeks to the given date <code>dateli</code> in datelist format and returns the new datelist.</p>
 <p>See also: <code>sec+, minute+, hour+, day+, month+, year+, now</code>.</p>
-<h2 data-number="3.491" id="week-of-date-procedure3-1"><span class="header-section-number">3.491</span> <code>week-of-date</code> : procedure/3</h2>
+<h2 data-number="3.492" id="week-of-date-procedure3-1"><span class="header-section-number">3.492</span> <code>week-of-date</code> : procedure/3</h2>
 <p>Usage: <code>(week-of-date Y M D) =&gt; int</code></p>
 <p>Return the week of the date in the year given by year <code>Y</code>, month <code>M</code>, and day <code>D.</code></p>
 <p>See also: <code>day-of-week, datestr-&gt;datelist, date-&gt;epoch-ns, epoch-ns-&gt;datelist, datestr, datestr*, now</code>.</p>
-<h2 data-number="3.492" id="when-macro1-or-more-1"><span class="header-section-number">3.492</span> <code>when</code> : macro/1 or more</h2>
+<h2 data-number="3.493" id="when-macro1-or-more-1"><span class="header-section-number">3.493</span> <code>when</code> : macro/1 or more</h2>
 <p>Usage: <code>(when cond expr ...) =&gt; any</code></p>
 <p>Evaluate the expressions <code>expr</code> if <code>cond</code> is true, returns void otherwise.</p>
 <p>See also: <code>if, cond, unless</code>.</p>
-<h2 data-number="3.493" id="when-permission-macro1-or-more-1"><span class="header-section-number">3.493</span> <code>when-permission</code> : macro/1 or more</h2>
+<h2 data-number="3.494" id="when-permission-macro1-or-more-1"><span class="header-section-number">3.494</span> <code>when-permission</code> : macro/1 or more</h2>
 <p>Usage: <code>(when-permission perm body ...) =&gt; any</code></p>
 <p>Execute the expressions in <code>body</code> if and only if the symbolic permission <code>perm</code> is available.</p>
 <p>See also: <code>permission?</code>.</p>
-<h2 data-number="3.494" id="while-macro1-or-more-1"><span class="header-section-number">3.494</span> <code>while</code> : macro/1 or more</h2>
+<h2 data-number="3.495" id="while-macro1-or-more-1"><span class="header-section-number">3.495</span> <code>while</code> : macro/1 or more</h2>
 <p>Usage: <code>(while test body ...) =&gt; any</code></p>
 <p>Evaluate the expressions in <code>body</code> while <code>test</code> is not nil.</p>
 <p>See also: <code>letrec, dotimes, dolist</code>.</p>
-<h2 data-number="3.495" id="with-colors-procedure3-1"><span class="header-section-number">3.495</span> <code>with-colors</code> : procedure/3</h2>
+<h2 data-number="3.496" id="with-colors-procedure3-1"><span class="header-section-number">3.496</span> <code>with-colors</code> : procedure/3</h2>
 <p>Usage: <code>(with-colors textcolor backcolor proc)</code></p>
 <p>Execute <code>proc</code> for display side effects, where the default colors are set to <code>textcolor</code> and <code>backcolor</code>. These are color specifications like in the-color. After <code>proc</code> has finished or if an error occurs, the default colors are restored to their original state.</p>
 <p>See also: <code>the-color, color, set-color, with-final</code>.</p>
-<h2 data-number="3.496" id="with-error-handler-macro2-or-more-1"><span class="header-section-number">3.496</span> <code>with-error-handler</code> : macro/2 or more</h2>
+<h2 data-number="3.497" id="with-error-handler-macro2-or-more-1"><span class="header-section-number">3.497</span> <code>with-error-handler</code> : macro/2 or more</h2>
 <p>Usage: <code>(with-error-handler handler body ...)</code></p>
 <p>Evaluate the forms of the <code>body</code> with error handler <code>handler</code> in place. The handler is a procedure that takes the error as argument and handles it. If an error occurs in <code>handler</code>, a default error handler is used. Handlers are only active within the same thread.</p>
 <p>See also: <code>with-final</code>.</p>
-<h2 data-number="3.497" id="with-final-macro2-or-more-1"><span class="header-section-number">3.497</span> <code>with-final</code> : macro/2 or more</h2>
+<h2 data-number="3.498" id="with-final-macro2-or-more-1"><span class="header-section-number">3.498</span> <code>with-final</code> : macro/2 or more</h2>
 <p>Usage: <code>(with-final finalizer body ...)</code></p>
 <p>Evaluate the forms of the <code>body</code> with the given finalizer as error handler. If an error occurs, then <code>finalizer</code> is called with that error and nil. If no error occurs, <code>finalizer</code> is called with nil as first argument and the result of evaluating all forms of <code>body</code> as second argument.</p>
 <p>See also: <code>with-error-handler</code>.</p>
-<h2 data-number="3.498" id="with-mutex-lock-macro1-or-more"><span class="header-section-number">3.498</span> <code>with-mutex-lock</code> : macro/1 or more</h2>
+<h2 data-number="3.499" id="with-mutex-lock-macro1-or-more"><span class="header-section-number">3.499</span> <code>with-mutex-lock</code> : macro/1 or more</h2>
 <p>Usage: <code>(with-mutex-lock m ...) =&gt; any</code></p>
 <p>Execute the body with mutex <code>m</code> locked for writing and unlock the mutex afterwards.</p>
 <p>See also: <code>with-mutex-rlock, make-mutex, mutex-lock, mutex-rlock, mutex-unlock, mutex-runlock</code>.</p>
 <p><strong>Warning: Make sure to never lock the same mutex twice from the same task, otherwise a deadlock will occur!</strong></p>
-<h2 data-number="3.499" id="with-mutex-rlock-macro1-or-more-1"><span class="header-section-number">3.499</span> <code>with-mutex-rlock</code> : macro/1 or more</h2>
+<h2 data-number="3.500" id="with-mutex-rlock-macro1-or-more-1"><span class="header-section-number">3.500</span> <code>with-mutex-rlock</code> : macro/1 or more</h2>
 <p>Usage: <code>(with-mutex-rlock m ...) =&gt; any</code></p>
 <p>Execute the body with mutex <code>m</code> locked for reading and unlock the mutex afterwards.</p>
 <p>See also: <code>with-mutex-lock, make-mutex, mutex-lock, mutex-rlock, mutex-unlock, mutex-runlock</code>.</p>
-<h2 data-number="3.500" id="write-procedure2-1"><span class="header-section-number">3.500</span> <code>write</code> : procedure/2</h2>
+<h2 data-number="3.501" id="write-procedure2-1"><span class="header-section-number">3.501</span> <code>write</code> : procedure/2</h2>
 <p>Usage: <code>(write p datum) =&gt; int</code></p>
 <p>Write <code>datum</code> to output port <code>p</code> and return the number of bytes written.</p>
 <p>See also: <code>write-binary, write-binary-at, read, close, open</code>.</p>
-<h2 data-number="3.501" id="write-binary-procedure4-1"><span class="header-section-number">3.501</span> <code>write-binary</code> : procedure/4</h2>
+<h2 data-number="3.502" id="write-binary-procedure4-1"><span class="header-section-number">3.502</span> <code>write-binary</code> : procedure/4</h2>
 <p>Usage: <code>(write-binary p buff n offset) =&gt; int</code></p>
 <p>Write <code>n</code> bytes starting at <code>offset</code> in binary blob <code>buff</code> to the stream port <code>p</code>. This function returns the number of bytes actually written.</p>
 <p>See also: <code>write-binary-at, read-binary, write, close, open</code>.</p>
-<h2 data-number="3.502" id="write-binary-at-procedure5-1"><span class="header-section-number">3.502</span> <code>write-binary-at</code> : procedure/5</h2>
+<h2 data-number="3.503" id="write-binary-at-procedure5-1"><span class="header-section-number">3.503</span> <code>write-binary-at</code> : procedure/5</h2>
 <p>Usage: <code>(write-binary-at p buff n offset fpos) =&gt; int</code></p>
 <p>Write <code>n</code> bytes starting at <code>offset</code> in binary blob <code>buff</code> to the seekable stream port <code>p</code> at the stream position <code>fpos</code>. If there is not enough data in <code>p</code> to overwrite at position <code>fpos</code>, then an error is caused and only part of the data might be written. The function returns the number of bytes actually written.</p>
 <p>See also: <code>read-binary, write-binary, write, close, open</code>.</p>
-<h2 data-number="3.503" id="write-string-procedure2-1"><span class="header-section-number">3.503</span> <code>write-string</code> : procedure/2</h2>
+<h2 data-number="3.504" id="write-string-procedure2-1"><span class="header-section-number">3.504</span> <code>write-string</code> : procedure/2</h2>
 <p>Usage: <code>(write-string p s) =&gt; int</code></p>
 <p>Write string <code>s</code> to output port <code>p</code> and return the number of bytes written. LF are <em>not</em> automatically converted to CR LF sequences on windows.</p>
 <p>See also: <code>write, write-binary, write-binary-at, read, close, open</code>.</p>
-<h2 data-number="3.504" id="year-procedure2-1"><span class="header-section-number">3.504</span> <code>year+</code> : procedure/2</h2>
+<h2 data-number="3.505" id="year-procedure2-1"><span class="header-section-number">3.505</span> <code>year+</code> : procedure/2</h2>
 <p>Usage: <code>(month+ dateli n) =&gt; dateli</code></p>
 <p>Adds <code>n</code> years to the given date <code>dateli</code> in datelist format and returns the new datelist.</p>
 <p>See also: <code>sec+, minute+, hour+, day+, week+, month+, now</code>.</p>

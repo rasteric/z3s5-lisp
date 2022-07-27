@@ -2559,6 +2559,14 @@
   (arity 2)
   (see (write write-binary write-binary-at read close open)))
 
+(defhelp read-string
+    (use "(read-string p delstr) => str")
+  (info "Reads a string from port #p until the single-byte delimiter character in #delstr is encountered, and returns the string including the delimiter. If the input ends before the delimiter is encountered, it returns the string up until EOF. Notice that if the empty string is returned then the end of file must have been encountered, since otherwise the string would contain the delimiter.")
+  (type proc)
+  (topic (fileio io))
+  (arity 2)
+  (see (read read-binary write-string write read close open)))
+
 (defhelp read-binary
     (use "(read-binary p buff n) => int")
   (info "Read #n or less bytes from input port #p into binary blob #buff. If #buff is smaller than #n, then an error is raised. If less than #n bytes are available before the end of file is reached, then the amount k of bytes is read into #buff and k is returned. If the end of file is reached and no byte has been read, then 0 is returned. So to loop through this, read into the buffer and do something with it while the amount of bytes returned is larger than 0.")

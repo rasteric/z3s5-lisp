@@ -57,7 +57,7 @@
 
 \title{Z3S5 Lisp Reference Manual}
 \author{by Erich H. Rast, Ph.D., and all other Help system contributors}
-\date{2022-7-26 19:22}
+\date{2022-7-27 10:11}
 
 \begin{document}
 \maketitle
@@ -66,10 +66,10 @@
 \section{Introduction}\label{introduction}}
 
 This is the reference manual for the programming language Z3S5 Lisp,
-version v2.3. This manual has been automatically generated from the
-entries of the online help system. The reference manual is divided into
-two large sections. Section \emph{By Topics} lists functions and symbols
-organized by topics. Within each topic, entries are sorted
+version 2.3.2+5fb70dc. This manual has been automatically generated from
+the entries of the online help system. The reference manual is divided
+into two large sections. Section \emph{By Topics} lists functions and
+symbols organized by topics. Within each topic, entries are sorted
 alphabetically. Section \emph{Complete Reference} lists all functions
 and symbols alphabetically. Please consult the \emph{User Manual} and
 the \emph{Readme} document for more general information about Z3S5 Lisp,
@@ -2093,6 +2093,23 @@ through this, read into the buffer and do something with it while the
 amount of bytes returned is larger than 0.
 
 See also: \passthrough{\lstinline!write-binary, read, close, open!}.
+
+\hypertarget{read-string-procedure2}{%
+\subsubsection{\texorpdfstring{\texttt{read-string} :
+procedure/2}{read-string : procedure/2}}\label{read-string-procedure2}}
+
+Usage: \passthrough{\lstinline!(read-string p delstr) => str!}
+
+Reads a string from port \passthrough{\lstinline!p!} until the
+single-byte delimiter character in \passthrough{\lstinline!delstr!} is
+encountered, and returns the string including the delimiter. If the
+input ends before the delimiter is encountered, it returns the string up
+until EOF. Notice that if the empty string is returned then the end of
+file must have been encountered, since otherwise the string would
+contain the delimiter.
+
+See also:
+\passthrough{\lstinline!read, read-binary, write-string, write, read, close, open!}.
 
 \hypertarget{str-port-procedure1}{%
 \subsubsection{\texorpdfstring{\texttt{str-port?} :
@@ -10920,6 +10937,23 @@ through this, read into the buffer and do something with it while the
 amount of bytes returned is larger than 0.
 
 See also: \passthrough{\lstinline!write-binary, read, close, open!}.
+
+\hypertarget{read-string-procedure2-1}{%
+\subsection{\texorpdfstring{\texttt{read-string} :
+procedure/2}{read-string : procedure/2}}\label{read-string-procedure2-1}}
+
+Usage: \passthrough{\lstinline!(read-string p delstr) => str!}
+
+Reads a string from port \passthrough{\lstinline!p!} until the
+single-byte delimiter character in \passthrough{\lstinline!delstr!} is
+encountered, and returns the string including the delimiter. If the
+input ends before the delimiter is encountered, it returns the string up
+until EOF. Notice that if the empty string is returned then the end of
+file must have been encountered, since otherwise the string would
+contain the delimiter.
+
+See also:
+\passthrough{\lstinline!read, read-binary, write-string, write, read, close, open!}.
 
 \hypertarget{remove-duplicates-procedure1-1}{%
 \subsection{\texorpdfstring{\texttt{remove-duplicates} :

@@ -289,6 +289,34 @@ func (interp *Interp) Define_FileIO() {
 		return goarith.AsNumber(k)
 	})
 
+	// (read-string p del)
+	interp.Def("read-string", 2, func(a []any) any {
+		obj, ok := a[0].(*Boxed)
+		if !ok {
+			panic(fmt.Sprintf("read-string: expected valid port, given %v", Str(a[0])))
+		}
+		s, ok := interp.Streams().Load(obj)
+		if !ok {
+			panic("read-string: stream not valid")
+		}
+		stream, ok := s.(*Stream)
+		if !ok {
+			panic("read-string: stream not valid (internal error)")
+		}
+		del := []byte(a[1].(string))
+		if len(del) == 0 {
+			panic("read-string: empty delimiter string, the string must contain one single-byte delimiter character")
+		}
+		if len(del) > 1 {
+			panic("read-string: delimiter string too long, read-string currenly only supports single-byte characters")
+		}
+		b, err := stream.BuffReader.BuffIOReader().ReadString(del[0])
+		if err != nil && err != io.EOF {
+			panic(fmt.Errorf("read-string: %w", err))
+		}
+		return string(b)
+	})
+
 	// (seek id pos sel) => offset seek to pos in stream id, depending on selector sel. Return the new offset.
 	interp.Def("seek", 3, func(a []any) any {
 		obj, ok := a[0].(*Boxed)

@@ -16,6 +16,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Z3S5 Lisp failed to start: %v\n", err)
 		os.Exit(1)
 	}
+	interp.SetInteractive(*exec == "") // needs to be set before boot to prevent printing start banner
 	err = interp.Boot()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Z3S5 Lisp failed to boot the standard prelude: %v\n", err)

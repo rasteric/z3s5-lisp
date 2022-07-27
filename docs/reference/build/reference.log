@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2022.7.14)  26 JUL 2022 20:23
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2022.7.14)  27 JUL 2022 11:11
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -564,402 +564,402 @@ Underfull \hbox (badness 10000) in paragraph at lines 1679--1681
 
 [23] [24] [25] [26] [27] [28] [29] [30] [31] [32] [33]
 LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 2
-410.
+427.
 
 (/usr/share/texmf/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 ) [34] [35] [36] [37] [38] [39]
-[40]
-Underfull \hbox (badness 2005) in paragraph at lines 2937--2939
+[40] [41]
+Underfull \hbox (badness 2005) in paragraph at lines 2954--2956
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2937--2939
+Underfull \hbox (badness 10000) in paragraph at lines 2954--2956
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][][][][][][][]
  []
 
-[41]
-Underfull \hbox (badness 10000) in paragraph at lines 2949--2951
+
+Underfull \hbox (badness 10000) in paragraph at lines 2966--2968
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 2005) in paragraph at lines 2961--2963
+Underfull \hbox (badness 2005) in paragraph at lines 2978--2980
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2961--2963
+Underfull \hbox (badness 10000) in paragraph at lines 2978--2980
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2973--2975
+Underfull \hbox (badness 10000) in paragraph at lines 2990--2992
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2985--2987
+Underfull \hbox (badness 10000) in paragraph at lines 3002--3004
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][]
  []
 
-
-Underfull \hbox (badness 2005) in paragraph at lines 2996--2998
+[42]
+Underfull \hbox (badness 2005) in paragraph at lines 3013--3015
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2996--2998
+Underfull \hbox (badness 10000) in paragraph at lines 3013--3015
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][][][]
  []
 
-[42]
-Underfull \hbox (badness 2005) in paragraph at lines 3010--3012
+
+Underfull \hbox (badness 2005) in paragraph at lines 3027--3029
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3010--3012
+Underfull \hbox (badness 10000) in paragraph at lines 3027--3029
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 2005) in paragraph at lines 3022--3024
+Underfull \hbox (badness 2005) in paragraph at lines 3039--3041
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3022--3024
+Underfull \hbox (badness 10000) in paragraph at lines 3039--3041
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 2005) in paragraph at lines 3033--3035
+Underfull \hbox (badness 2005) in paragraph at lines 3050--3052
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3033--3035
+Underfull \hbox (badness 10000) in paragraph at lines 3050--3052
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 2005) in paragraph at lines 3045--3047
+Underfull \hbox (badness 2005) in paragraph at lines 3062--3064
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3045--3047
+Underfull \hbox (badness 10000) in paragraph at lines 3062--3064
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][]
  []
 
-
-Underfull \hbox (badness 2005) in paragraph at lines 3057--3059
+[43]
+Underfull \hbox (badness 2005) in paragraph at lines 3074--3076
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3057--3059
+Underfull \hbox (badness 10000) in paragraph at lines 3074--3076
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][]
  []
 
-[43] [44] [45] [46] [47] [48] [49] [50] [51] [52] [53] [54] [55] [56] [57]
-[58] [59]
+[44] [45] [46] [47] [48] [49] [50] [51] [52] [53] [54] [55] [56] [57] [58]
+[59]
 LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 
-4233.
+4250.
  (/usr/share/texmf/tex/latex/lm/ts1lmtt.fd
 File: ts1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
-) [60] [61] [62] [63]
-[64] [65] [66] [67] [68] [69] [70] [71] [72] [73] [74] [75]
-Underfull \hbox (badness 10000) in paragraph at lines 5344--5346
+) [60] [61] [62] [63] [64]
+[65] [66] [67] [68] [69] [70] [71] [72] [73] [74] [75]
+Underfull \hbox (badness 10000) in paragraph at lines 5361--5363
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 5360--5362
+Underfull \hbox (badness 10000) in paragraph at lines 5377--5379
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][]
  []
 
 [76]
-Underfull \hbox (badness 10000) in paragraph at lines 5372--5374
+Underfull \hbox (badness 10000) in paragraph at lines 5389--5391
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][]
  []
 
 [77] [78] [79] [80]
-Underfull \hbox (badness 2005) in paragraph at lines 5664--5666
+Underfull \hbox (badness 2005) in paragraph at lines 5681--5683
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][]
  []
 
 [81] [82]
-Underfull \hbox (badness 10000) in paragraph at lines 5816--5818
+Underfull \hbox (badness 10000) in paragraph at lines 5833--5835
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][]
  []
 
 [83] [84] [85]
-Underfull \hbox (badness 4543) in paragraph at lines 6052--6054
+Underfull \hbox (badness 4543) in paragraph at lines 6069--6071
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][]
  []
 
 [86] [87]
-Underfull \hbox (badness 10000) in paragraph at lines 6162--6164
+Underfull \hbox (badness 10000) in paragraph at lines 6179--6181
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][]
  []
 
 [88] [89] [90]
-Underfull \hbox (badness 2005) in paragraph at lines 6358--6360
+Underfull \hbox (badness 2005) in paragraph at lines 6375--6377
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][]
  []
 
 [91] [92]
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 6523.
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 6540.
  [93] [94] [95] [96] [97] [98] [99] [100] [101] [102] [103] [104]
 [105] [106] [107] [108] [109] [110] [111] [112]
-Underfull \hbox (badness 10000) in paragraph at lines 7928--7930
+Underfull \hbox (badness 10000) in paragraph at lines 7945--7947
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][]
  []
 
 [113] [114] [115] [116] [117]
-Underfull \hbox (badness 10000) in paragraph at lines 8210--8212
+Underfull \hbox (badness 10000) in paragraph at lines 8227--8229
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 8226--8228
+Underfull \hbox (badness 10000) in paragraph at lines 8243--8245
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 8238--8240
+Underfull \hbox (badness 10000) in paragraph at lines 8255--8257
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][]
  []
 
 [118] [119] [120] [121] [122] [123] [124] [125] [126] [127] [128] [129]
 [130] [131] [132] [133] [134] [135] [136] [137] [138] [139] [140]
-Underfull \hbox (badness 2005) in paragraph at lines 9811--9813
+Underfull \hbox (badness 2005) in paragraph at lines 9828--9830
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 9811--9813
+Underfull \hbox (badness 10000) in paragraph at lines 9828--9830
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 9823--9825
+Underfull \hbox (badness 10000) in paragraph at lines 9840--9842
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 2005) in paragraph at lines 9835--9837
+Underfull \hbox (badness 2005) in paragraph at lines 9852--9854
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 9835--9837
+Underfull \hbox (badness 10000) in paragraph at lines 9852--9854
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 9847--9849
+Underfull \hbox (badness 10000) in paragraph at lines 9864--9866
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][]
  []
 
 [141]
-Underfull \hbox (badness 10000) in paragraph at lines 9859--9861
+Underfull \hbox (badness 10000) in paragraph at lines 9876--9878
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 2005) in paragraph at lines 9870--9872
+Underfull \hbox (badness 2005) in paragraph at lines 9887--9889
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 9870--9872
+Underfull \hbox (badness 10000) in paragraph at lines 9887--9889
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 2005) in paragraph at lines 9884--9886
+Underfull \hbox (badness 2005) in paragraph at lines 9901--9903
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 9884--9886
+Underfull \hbox (badness 10000) in paragraph at lines 9901--9903
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 2005) in paragraph at lines 9896--9898
+Underfull \hbox (badness 2005) in paragraph at lines 9913--9915
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 9896--9898
+Underfull \hbox (badness 10000) in paragraph at lines 9913--9915
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 2005) in paragraph at lines 9907--9909
+Underfull \hbox (badness 2005) in paragraph at lines 9924--9926
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 9907--9909
+Underfull \hbox (badness 10000) in paragraph at lines 9924--9926
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][]
  []
 
 [142]
-Underfull \hbox (badness 2005) in paragraph at lines 9919--9921
+Underfull \hbox (badness 2005) in paragraph at lines 9936--9938
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 9919--9921
+Underfull \hbox (badness 10000) in paragraph at lines 9936--9938
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 2005) in paragraph at lines 9931--9933
+Underfull \hbox (badness 2005) in paragraph at lines 9948--9950
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 9931--9933
+Underfull \hbox (badness 10000) in paragraph at lines 9948--9950
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][]
  []
 
 [143] [144]
-Underfull \hbox (badness 2005) in paragraph at lines 10074--10076
+Underfull \hbox (badness 2005) in paragraph at lines 10091--10093
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][]
  []
 
 [145] [146] [147] [148] [149] [150] [151] [152] [153] [154]
-Underfull \hbox (badness 10000) in paragraph at lines 10771--10773
+Underfull \hbox (badness 10000) in paragraph at lines 10788--10790
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][]
  []
 
 [155] [156] [157] [158] [159] [160] [161]
-Underfull \hbox (badness 2005) in paragraph at lines 11252--11254
+Underfull \hbox (badness 2005) in paragraph at lines 11286--11288
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 11290--11292
-[]\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
-[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 11302--11304
-[]\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
-[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 11313--11315
+Underfull \hbox (badness 10000) in paragraph at lines 11324--11326
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
  []
 
 [162]
-Underfull \hbox (badness 10000) in paragraph at lines 11325--11327
+Underfull \hbox (badness 10000) in paragraph at lines 11336--11338
+[]\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 11347--11349
+[]\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 11359--11361
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
  []
 
 [163]
-Underfull \hbox (badness 2005) in paragraph at lines 11390--11392
+Underfull \hbox (badness 2005) in paragraph at lines 11424--11426
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 11413--11415
+Underfull \hbox (badness 10000) in paragraph at lines 11447--11449
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
  []
 
 [164] [165] [166] [167] [168] [169] [170] [171] [172] [173] [174] [175]
 [176] [177]
-Underfull \hbox (badness 4543) in paragraph at lines 12367--12369
+Underfull \hbox (badness 4543) in paragraph at lines 12401--12403
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][]
  []
 
 [178] [179]
-Underfull \hbox (badness 2005) in paragraph at lines 12530--12532
+Underfull \hbox (badness 2005) in paragraph at lines 12564--12566
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][]
  []
 
-[180]
-Underfull \hbox (badness 2005) in paragraph at lines 12634--12636
+[180] [181]
+Underfull \hbox (badness 2005) in paragraph at lines 12668--12670
 []\T1/lmr/m/n/10 (+20) See also: [][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
  []
 
-[181] [182] (./reference.aux) ) 
+[182] [183] (./reference.aux) ) 
 Here is how much of TeX's memory you used:
- 18476 strings out of 478287
- 291081 string characters out of 5849289
- 801328 words of memory out of 5000000
- 34049 multiletter control sequences out of 15000+600000
+ 18485 strings out of 478287
+ 291238 string characters out of 5849289
+ 808387 words of memory out of 5000000
+ 34053 multiletter control sequences out of 15000+600000
  527286 words of font info for 139 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  74i,6n,77p,1006b,1333s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -971,10 +971,10 @@ re/texmf/fonts/type1/public/lm/lmbxi10.pfb></usr/share/texmf/fonts/type1/public
 mf/fonts/type1/public/lm/lmr17.pfb></usr/share/texmf/fonts/type1/public/lm/lmri
 10.pfb></usr/share/texmf/fonts/type1/public/lm/lmtk10.pfb></usr/share/texmf/fon
 ts/type1/public/lm/lmtt8.pfb>
-Output written on reference.pdf (182 pages, 638386 bytes).
+Output written on reference.pdf (183 pages, 639077 bytes).
 PDF statistics:
- 6550 PDF objects out of 7423 (max. 8388607)
- 6283 compressed objects within 63 object streams
- 2265 named destinations out of 2487 (max. 500000)
- 39049 words of extra memory for PDF output out of 42996 (max. 10000000)
+ 6566 PDF objects out of 7423 (max. 8388607)
+ 6298 compressed objects within 63 object streams
+ 2270 named destinations out of 2487 (max. 500000)
+ 39065 words of extra memory for PDF output out of 42996 (max. 10000000)
 

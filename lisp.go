@@ -30,7 +30,9 @@ var initFile []byte
 //go:embed embed/help.lisp
 var helpFile []byte
 
-const VERSION = "v2.3"
+//go:embed embed/version.lisp
+var versionFile []byte
+
 const DEFAULT_BUFFSIZE = 32768  // default buffer size for reader
 const DEFAULT_BUFFMAX = 1048576 // default max buffer size
 
@@ -1888,6 +1890,21 @@ func (w *WriterAt) IOWriterAt() io.WriterAt {
 	return w.iowriterat
 }
 
+// BufferedReader is a buffered reader.
+type BufferedReader struct {
+	buffioreader *bufio.Reader
+}
+
+// NewBufferedReader returns a buffered reader based on an io.Reader.
+func NewBufferedReader(reader io.Reader) *BufferedReader {
+	return &BufferedReader{buffioreader: bufio.NewReader(reader)}
+}
+
+// BuffIOReader returns the bufio.Reader encapsulated in the BufferedReader.
+func (r *BufferedReader) BuffIOReader() *bufio.Reader {
+	return r.buffioreader
+}
+
 // Stream is a Lisp wrapper for a lisp stream, reader and writer.
 // It is used in combination with the FileManager to manage i/o streams.
 type Stream struct {
@@ -1895,11 +1912,12 @@ type Stream struct {
 	LispWriter   *Writer
 	LispSeeker   *Seeker
 	LispWriterAt *WriterAt
+	BuffReader   *BufferedReader
 }
 
 func NewStream(ioreader io.Reader, iowriter io.Writer, ioseeker io.Seeker, iowriterat io.WriterAt) *Stream {
 	return &Stream{LispReader: NewReader(ioreader), LispWriter: NewWriter(iowriter),
-		LispSeeker: NewSeeker(ioseeker), LispWriterAt: NewWriterAt(iowriterat)}
+		LispSeeker: NewSeeker(ioseeker), LispWriterAt: NewWriterAt(iowriterat), BuffReader: NewBufferedReader(ioreader)}
 }
 
 // Boot loads the standard prelude and any other init files and ensures
@@ -1919,6 +1937,10 @@ func (interp *Interp) Boot() error {
 		if !interp.Run(help) {
 			return errors.New(`Z3S5 Lisp help definitions failed`)
 		}
+		version := bytes.NewReader(versionFile)
+		if !interp.Run(version) {
+			return errors.New(`Z3S5 Lisp could not read the version information`)
+		}
 	}
 	if p.LoadUserInit {
 		file, err := os.Open(`init.lisp`)
@@ -1934,6 +1956,11 @@ func (interp *Interp) Boot() error {
 		}
 	}
 	return nil
+}
+
+// SetInteractive sets the Lisp *interactive-session* global variable to indicate a session is interactive or not.
+func (interp *Interp) SetInteractive(on bool) {
+	interp.SetGlobalVar(NewSym("*interactive-session*"), AsLispBool(on))
 }
 
 // StartREPL marks the start of the line input in the current editor. The line can then be
