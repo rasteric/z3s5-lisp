@@ -1,7 +1,7 @@
 /*
-  Z3S5 Lisp by Erich H. Rast <erich@snafu.de>.
-  Based on Nukata Lisp 2.0 by SUZUKI Hisao.
-
+  Z3S5 Lisp by Erich Rast.
+  A Lisp-1 for Go based on Nukata Lisp 2.0 by SUZUKI Hisao.
+  MIT License, see the accompanying LICENSE file.
 */
 package z3s5
 
@@ -2341,7 +2341,7 @@ var Prelude = strings.Replace(`
 /*
   Copyright (c) 2015, 2016 OKI Software Co., Ltd.
   Copyright (c) 2019 SUZUKI Hisao
-  Copyright (c) 2019-2022 Erich H. Rast
+  Copyright (c) 2019-2022 Erich Rast
 
   The above copyright notice and this permission notice shall be included in
   all copies or substantial portions of the Software.
