@@ -8,7 +8,7 @@ func (interp *Interp) Define_FileIO() {
 }
 
 /*
-  Copyright (c) 2019-2022 Erich H. Rast
+  Copyright (c) 2019-2022 Erich Rast
 
   The above copyright notice and this permission notice shall be included in
   all copies or substantial portions of the Software.
