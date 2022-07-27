@@ -10,13 +10,17 @@ import (
 
 func main() {
 	exec := flag.String("l", "", "load the specified file and execute it in a non-interactive session")
+	interactive := flag.Bool("i", false, "run the interpreter interactively even if a file is loaded with -l")
+	silent := flag.Bool("s", false, "set *interactive-session* false even if -i is specified to prevent printing a start banner")
 	flag.Parse()
 	interp, err := z3.NewInterp(z3.NewBasicRuntime(z3.FullPermissions))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Z3S5 Lisp failed to start: %v\n", err)
 		os.Exit(1)
 	}
-	interp.SetInteractive(*exec == "") // needs to be set before boot to prevent printing start banner
+	// the following needs to be set before boot to prevent printing start banner
+	// it sets the global variable *interactive-session*
+	interp.SetInteractive((*exec == "" || *interactive) && !(*silent))
 	err = interp.Boot()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Z3S5 Lisp failed to boot the standard prelude: %v\n", err)
@@ -32,7 +36,9 @@ func main() {
 		if !interp.Run(file) {
 			os.Exit(1)
 		}
-		os.Exit(0)
+		if !(*interactive) {
+			os.Exit(0)
+		}
 	}
 	interp.Run(nil)
 }
