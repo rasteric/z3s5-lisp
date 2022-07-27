@@ -36,15 +36,18 @@
 	     "    \\usepackage{xcolor}\n"
 	     "---\n"
 	     "\n"
-	     "for Z3S5 Lisp Version %v\n\n"
+	     "For Z3S5 Lisp Version %v "
+	     "with installed modules %v.\n\n"
 	     "# Introduction\n"
 	     "\n"
 	     "This is the reference manual for Z3S5 Lisp. This manual has been automatically generated from the entries of the online help system. The reference manual is divided into two large sections. Section *By Topics* lists functions and symbols organized by topics. Within each topic, entries are sorted alphabetically. Section *Complete Reference* lists all functions and symbols alphabetically."
 	     "\n"
 	     "Please consult the *User Manual* and the *Readme* document for more general information about Z3S5 Lisp, an introduction to its use, and how to embedd it into Go programs.\n"
 	     "\n"
-	     "Incorrect documentation strings are bugs. Please report bugs using the corresponding [Github issue tracker nfor Z3S5 Lisp](https://github.com/rasteric/z3s5-lisp/issues) and make sure to be as precise as possible. Unneeded or missing documentation entries are misfeatures and may also be reported.\n"
-	     "\n")  (1st (sys 'version) "<unknown>") (datestr (now)) (1st (sys 'version) "<unknown>")))
+	     "Incorrect documentation strings are bugs. Please report bugs using the corresponding [Github issue tracker for Z3S5 Lisp](https://github.com/rasteric/z3s5-lisp/issues) and be as precise as possible. Superfluous and missing documentation entries are misfeatures and may also be reported.\n"
+	     "\n")  (1st (sys 'version) "<unknown>") (datestr (now))
+	     (1st (sys 'version) "<unknown>")
+	     *reflect*))
 
 (defun _help->manual-by-topics ()
   (let ((topics (help-topics))

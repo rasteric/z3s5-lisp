@@ -7,6 +7,13 @@ import (
 
 func (interp *Interp) Define_Ling() {
 
+	// register this module
+	reflect, ok := interp.GetGlobalVar(ReflectSym)
+	if !ok {
+		reflect = Nil
+	}
+	interp.SetGlobalVar(ReflectSym, &Cell{NewSym("ling"), reflect})
+
 	// (ling.soundex s) => str compute the soundex representation of s
 	interp.Def("ling.soundex", 1, func(a []any) any {
 		return ling.Soundex(a[0].(string))

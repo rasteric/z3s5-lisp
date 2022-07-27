@@ -2,9 +2,9 @@
 title: Z3S5 Lisp Reference Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: Version 2.3.2+5fb70dc
+footer-left: Version 2.3.2+3f2a3c7
 author: by Erich Rast and all Help system contributors
-date: 2022-7-27 10:53
+date: 2022-7-27 11:08
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -13,14 +13,14 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
-for Z3S5 Lisp Version 2.3.2+5fb70dc
+For Z3S5 Lisp Version 2.3.2+3f2a3c7 with installed modules (tasks help beep fileio decimal ling float console base).
 
 # Introduction
 
 This is the reference manual for Z3S5 Lisp. This manual has been automatically generated from the entries of the online help system. The reference manual is divided into two large sections. Section *By Topics* lists functions and symbols organized by topics. Within each topic, entries are sorted alphabetically. Section *Complete Reference* lists all functions and symbols alphabetically.
 Please consult the *User Manual* and the *Readme* document for more general information about Z3S5 Lisp, an introduction to its use, and how to embedd it into Go programs.
 
-Incorrect documentation strings are bugs. Please report bugs using the corresponding [Github issue tracker nfor Z3S5 Lisp](https://github.com/rasteric/z3s5-lisp/issues) and make sure to be as precise as possible. Unneeded or missing documentation entries are misfeatures and may also be reported.
+Incorrect documentation strings are bugs. Please report bugs using the corresponding [Github issue tracker for Z3S5 Lisp](https://github.com/rasteric/z3s5-lisp/issues) and be as precise as possible. Superfluous and missing documentation entries are misfeatures and may also be reported.
 
 # By Topics
 
