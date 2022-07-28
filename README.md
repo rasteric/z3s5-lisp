@@ -13,11 +13,13 @@ There is a build tag `nosound` you may use to leave out sound support. If this o
 
 ## Building
 
-Linux: To build it, you need Go 1.18+. Alsa sound support development library `libasound2` needs to be installed with `apt get install libasound2` on Debian-based distributions. For the manuals both `pandoc` and the  [Eisvogel Pandoc Template](https://github.com/Wandmalfarbe/pandoc-latex-template) are required. Notice that normal `make` will attempt to compile these manuals. You may use `make lisp` in directory `cmd/z3` to only compile the `z3` sample executable if you want to test it without generating manuals.
+Go 1.18+ is required. 
+
+Linux: Alsa sound support development library `libasound2` needs to be installed with `apt get install libasound2` on Debian-based distributions. For the manuals both `pandoc` and the  [Eisvogel Pandoc Template](https://github.com/Wandmalfarbe/pandoc-latex-template) are required. Notice that normal `make` will attempt to compile these manuals. You may use `make lisp` in directory `cmd/z3` to only compile the `z3` sample executable if you want to test it without generating manuals.
 
 Windows: This has not been tested on Windows so far but should work as long as your machine satisfies the compilation requirements for the [Beep](https://github.com/faiface/beep) sound library or if you use build tag `nosound`.
 
-MacOS: I currently don't have a Mac; as usual, building should be similar to Linux.
+MacOS: Not tested so far; building should be similar to Linux.
 
 ## Z3S5 Lisp Reference
 
