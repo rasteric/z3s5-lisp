@@ -2,9 +2,9 @@
 title: Z3S5 Lisp Reference Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: Version 2.3.2+1ac9cb6
+footer-left: Version 2.3.2+4201ebd
 author: by Erich Rast and all Help system contributors
-date: 2022-7-28 13:13
+date: 2022-7-28 13:29
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -13,7 +13,7 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
-For Z3S5 Lisp Version 2.3.2+1ac9cb6 with installed modules (tasks help beep fileio decimal ling float console base).
+For Z3S5 Lisp Version 2.3.2+4201ebd with installed modules (tasks help beep fileio decimal ling float console base).
 
 # Introduction
 
@@ -234,6 +234,14 @@ Frees the binary data stored in blob `b` and makes the blob invalid.
 
 See also: `make-blob, valid?, str->blob, blob->str, blob-equal?`.
 
+### `blob?` : procedure/1
+
+Usage: `(blob? obj) => bool`
+
+Return true if `obj` is a binary blob, nil otherwise.
+
+See also: `blob->ascii85, blob->base64, blob->hex, blob->str, blob-free, blob-chksum, blob-equal?, valid?`.
+
 ### `make-blob` : procedure/1
 
 Usage: `(make-blob n) => blob`
@@ -270,7 +278,7 @@ Usage: `(valid? obj) => bool`
 
 Return true if `obj` is a valid object, nil otherwise. What exactly object validity means is undefined, but certain kind of objects such as graphics objects may be marked invalid when they can no longer be used because they have been disposed off by a subsystem and cannot be automatically garbage collected. Generally, invalid objects ought no longer be used and need to be discarded.
 
-See also: `gfx.reset`.
+See also: `blob?`.
 
 
 
@@ -4938,6 +4946,14 @@ Frees the binary data stored in blob `b` and makes the blob invalid.
 
 See also: `make-blob, valid?, str->blob, blob->str, blob-equal?`.
 
+## `blob?` : procedure/1
+
+Usage: `(blob? obj) => bool`
+
+Return true if `obj` is a binary blob, nil otherwise.
+
+See also: `blob->ascii85, blob->base64, blob->hex, blob->str, blob-free, blob-chksum, blob-equal?, valid?`.
+
 ## `bound?` : macro/1
 
 Usage: `(bound? sym) => bool`
@@ -8222,7 +8238,7 @@ Usage: `(valid? obj) => bool`
 
 Return true if `obj` is a valid object, nil otherwise. What exactly object validity means is undefined, but certain kind of objects such as graphics objects may be marked invalid when they can no longer be used because they have been disposed off by a subsystem and cannot be automatically garbage collected. Generally, invalid objects ought no longer be used and need to be discarded.
 
-See also: `gfx.reset`.
+See also: `blob?`.
 
 ## `void` : procedure/0 or more
 

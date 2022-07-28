@@ -1609,6 +1609,18 @@ func (interp *Interp) Define_Base() {
 
 	// BLOBs - boxed binary data for I/O
 
+	// (blob? datum) => bool return true if datum is a blob, nil otherwise
+	interp.Def("blob?", 1, func(a []any) any {
+		obj, ok := a[0].(*Boxed)
+		if !ok {
+			return Nil
+		}
+		if obj.Sort != BoxedBlob {
+			return Nil
+		}
+		return true
+	})
+
 	// (blob->str blob [start] [end]) => str
 	interp.Def("blob->str", -1, func(a []any) any {
 		b, n, m := interp.MustParseBlobArgs("blob->str", a)

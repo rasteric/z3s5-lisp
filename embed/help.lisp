@@ -1159,7 +1159,15 @@
   (type proc)
   (topic (boxed))
   (arity 1)
-  (see (gfx.reset)))
+  (see (blob?)))
+
+(defhelp blob?
+    (use "(blob? obj) => bool")
+  (info "Return true if #obj is a binary blob, nil otherwise.")
+  (type proc)
+  (topic (binary boxed))
+  (arity 1)
+  (see (blob->ascii85 blob->base64 blob->hex blob->str blob-free blob-chksum blob-equal? valid?)))
 
 (defhelp enq
     (use "(enq proc)")
