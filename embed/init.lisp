@@ -287,7 +287,7 @@
 	       (topic (help))
 	       (arity 1)
 	       (result list)
-	       (see (defhelp help apropos *help*))))))
+	       (see (defhelp help apropos *help* help-topics help-about set-help-topic-info help-topic-info))))))
 
 (setq *help-topics*
       (dict))
@@ -379,7 +379,7 @@
   (arity 1)
   (topic (help))
   (result nil)
-  (see (defhelp help-entry *help* apropos)))
+  (see (defhelp help-topics help-about help-topic-info set-help-topic-info help-entry *help* apropos)))
 
 (defhelp *help*
     (use "*help*")
