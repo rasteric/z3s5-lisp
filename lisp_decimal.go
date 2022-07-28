@@ -9,7 +9,9 @@ import (
 
 var BoxedDecimal = NewSym("dec.num")
 
-// Define_Graphics defines the graphics package with prefix gfx.
+// Define_Decimal defines decimal arithmetics primitives with prefix 'dec.
+// These can be used for finance and banking applications that require
+// fixed precision and correct rounding.
 func (interp *Interp) Define_Decimal() {
 
 	// register this module
