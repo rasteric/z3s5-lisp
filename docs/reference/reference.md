@@ -2,9 +2,9 @@
 title: Z3S5 Lisp Reference Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: Version 2.3.2+3b7a8bf
+footer-left: Version 2.3.2+1ac9cb6
 author: by Erich Rast and all Help system contributors
-date: 2022-7-27 16:45
+date: 2022-7-28 13:13
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -13,7 +13,7 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
-For Z3S5 Lisp Version 2.3.2+3b7a8bf with installed modules (tasks help beep fileio decimal ling float console base).
+For Z3S5 Lisp Version 2.3.2+1ac9cb6 with installed modules (tasks help beep fileio decimal ling float console base).
 
 # Introduction
 
@@ -1860,7 +1860,7 @@ Usage: `(help sym)`
 
 Display help information about `sym` (unquoted).
 
-See also: `defhelp, help-entry, *help*, apropos`.
+See also: `defhelp, help-topics, help-about, help-topic-info, set-help-topic-info, help-entry, *help*, apropos`.
 
 ### help->manual-entry : nil
 
@@ -1884,7 +1884,7 @@ Usage: `(help-entry sym) => list`
 
 Get usage and help information for `sym.`
 
-See also: `defhelp, help, apropos, *help*`.
+See also: `defhelp, help, apropos, *help*, help-topics, help-about, set-help-topic-info, help-topic-info`.
 
 ### `help-topic-info` : procedure/1
 
@@ -6308,7 +6308,7 @@ Usage: `(help sym)`
 
 Display help information about `sym` (unquoted).
 
-See also: `defhelp, help-entry, *help*, apropos`.
+See also: `defhelp, help-topics, help-about, help-topic-info, set-help-topic-info, help-entry, *help*, apropos`.
 
 ## help->manual-entry : nil
 
@@ -6332,7 +6332,7 @@ Usage: `(help-entry sym) => list`
 
 Get usage and help information for `sym.`
 
-See also: `defhelp, help, apropos, *help*`.
+See also: `defhelp, help, apropos, *help*, help-topics, help-about, set-help-topic-info, help-topic-info`.
 
 ## `help-topic-info` : procedure/1
 

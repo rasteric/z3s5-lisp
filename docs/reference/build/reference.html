@@ -20,9 +20,9 @@
 <header id="title-block-header">
 <h1 class="title">Z3S5 Lisp Reference Manual</h1>
 <p class="author">by Erich Rast and all Help system contributors</p>
-<p class="date">2022-7-27 16:45</p>
+<p class="date">2022-7-28 13:13</p>
 </header>
-<p>For Z3S5 Lisp Version 2.3.2+3b7a8bf with installed modules (tasks help beep fileio decimal ling float console base).</p>
+<p>For Z3S5 Lisp Version 2.3.2+1ac9cb6 with installed modules (tasks help beep fileio decimal ling float console base).</p>
 <h1 data-number="1" id="introduction"><span class="header-section-number">1</span> Introduction</h1>
 <p>This is the reference manual for Z3S5 Lisp. This manual has been automatically generated from the entries of the online help system. The reference manual is divided into two large sections. Section <em>By Topics</em> lists functions and symbols organized by topics. Within each topic, entries are sorted alphabetically. Section <em>Complete Reference</em> lists all functions and symbols alphabetically. Please consult the <em>User Manual</em> and the <em>Readme</em> document for more general information about Z3S5 Lisp, an introduction to its use, and how to embedd it into Go programs.</p>
 <p>Incorrect documentation strings are bugs. Please report bugs using the corresponding <a href="https://github.com/rasteric/z3s5-lisp/issues">Github issue tracker for Z3S5 Lisp</a> and be as precise as possible. Superfluous and missing documentation entries are misfeatures and may also be reported.</p>
@@ -933,7 +933,7 @@
 <h3 data-number="2.12.3" id="help-macro1"><span class="header-section-number">2.12.3</span> <code>help</code> : macro/1</h3>
 <p>Usage: <code>(help sym)</code></p>
 <p>Display help information about <code>sym</code> (unquoted).</p>
-<p>See also: <code>defhelp, help-entry, *help*, apropos</code>.</p>
+<p>See also: <code>defhelp, help-topics, help-about, help-topic-info, set-help-topic-info, help-entry, *help*, apropos</code>.</p>
 <h3 data-number="2.12.4" id="help-manual-entry-nil"><span class="header-section-number">2.12.4</span> help-&gt;manual-entry : nil</h3>
 <p>Usage: <code>(help-&gt;manual-entry key [level]) =&gt; str</code></p>
 <p>Looks up help for <code>key</code> and converts it to a manual section as markdown string. If there is no entry for <code>key</code>, then nil is returned. The optional <code>level</code> integer indicates the heading nesting.</p>
@@ -945,7 +945,7 @@
 <h3 data-number="2.12.6" id="help-entry-procedure1"><span class="header-section-number">2.12.6</span> <code>help-entry</code> : procedure/1</h3>
 <p>Usage: <code>(help-entry sym) =&gt; list</code></p>
 <p>Get usage and help information for <code>sym.</code></p>
-<p>See also: <code>defhelp, help, apropos, *help*</code>.</p>
+<p>See also: <code>defhelp, help, apropos, *help*, help-topics, help-about, set-help-topic-info, help-topic-info</code>.</p>
 <h3 data-number="2.12.7" id="help-topic-info-procedure1"><span class="header-section-number">2.12.7</span> <code>help-topic-info</code> : procedure/1</h3>
 <p>Usage: <code>(help-topic-info topic) =&gt; li</code></p>
 <p>Return a list containing a heading and an info string for help <code>topic</code>, or nil if no info is available.</p>
@@ -3145,7 +3145,7 @@
 <h2 data-number="3.247" id="help-macro1-1"><span class="header-section-number">3.247</span> <code>help</code> : macro/1</h2>
 <p>Usage: <code>(help sym)</code></p>
 <p>Display help information about <code>sym</code> (unquoted).</p>
-<p>See also: <code>defhelp, help-entry, *help*, apropos</code>.</p>
+<p>See also: <code>defhelp, help-topics, help-about, help-topic-info, set-help-topic-info, help-entry, *help*, apropos</code>.</p>
 <h2 data-number="3.248" id="help-manual-entry-nil-1"><span class="header-section-number">3.248</span> help-&gt;manual-entry : nil</h2>
 <p>Usage: <code>(help-&gt;manual-entry key [level]) =&gt; str</code></p>
 <p>Looks up help for <code>key</code> and converts it to a manual section as markdown string. If there is no entry for <code>key</code>, then nil is returned. The optional <code>level</code> integer indicates the heading nesting.</p>
@@ -3157,7 +3157,7 @@
 <h2 data-number="3.250" id="help-entry-procedure1-1"><span class="header-section-number">3.250</span> <code>help-entry</code> : procedure/1</h2>
 <p>Usage: <code>(help-entry sym) =&gt; list</code></p>
 <p>Get usage and help information for <code>sym.</code></p>
-<p>See also: <code>defhelp, help, apropos, *help*</code>.</p>
+<p>See also: <code>defhelp, help, apropos, *help*, help-topics, help-about, set-help-topic-info, help-topic-info</code>.</p>
 <h2 data-number="3.251" id="help-topic-info-procedure1-1"><span class="header-section-number">3.251</span> <code>help-topic-info</code> : procedure/1</h2>
 <p>Usage: <code>(help-topic-info topic) =&gt; li</code></p>
 <p>Return a list containing a heading and an info string for help <code>topic</code>, or nil if no info is available.</p>
