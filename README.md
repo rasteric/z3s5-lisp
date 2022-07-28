@@ -17,7 +17,7 @@ Linux: To build it, you need Go 1.18+. Alsa sound support development library `l
 
 Windows: This has not been tested on Windows so far but should work as long as your machine satisfies the compilation requirements for the [Beep](https://github.com/faiface/beep) sound library or if you use build tag `nosound`.
 
-MacOS: I currently don't have a Mac but; as usual, building should be similar to Linux.
+MacOS: I currently don't have a Mac; as usual, building should be similar to Linux.
 
 ## Z3S5 Lisp Reference
 
