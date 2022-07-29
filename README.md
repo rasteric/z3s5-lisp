@@ -27,7 +27,7 @@ A rudimentary [user manual](https://github.com/rasteric/z3s5-lisp/blob/main/docs
 
 Online help: You may use `(dump [prefix])` in the Lisp system to get a list of toplevel bindings, `(help symbol)` without quote to get information about a function, global symbol, or macro. To get a list of help topics use `(help-topics)` and `(help-about topic)` provides a list of symbols for a help topic.
 
-Z3S5 Lisp is an old-fashioned Lisp-1 dialect originally based on Nukata Lisp by SUZUKI Hisao. It uses real cons cells and is reasonably fast for an interpreter. (Depending on your mileage, it's definitely not optimized for speed.) There are some notable differences to other Lisps:
+Z3S5 Lisp is an old-fashioned Lisp-1 dialect originally based on [Nukata Lisp](https://github.com/nukata/lisp-in-go) by SUZUKI Hisao. It uses real cons cells and is reasonably fast for an interpreter. (Depending on your mileage, it's definitely not optimized for speed.) There are some notable differences to other Lisps:
 
 - Iterators over sequences use the order `(iterator sequence function)`, not sometimes one and sometimes the other. Exception: `memq` and `member` ask whether an element is a member of a list and have order `(member element list)`.
 
