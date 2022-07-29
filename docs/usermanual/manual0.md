@@ -27,7 +27,9 @@ In the directory `cmd/z3` there is an example standalone version `z3.go` that yo
 
 The `z3` interpreter is fairly limited. It starts a read-eval-reply loop until it is quit with the command `(exit [n])` where the optional number `n` is an integer for the Unix return code of the program. It reads one line of input from the command line and returns the result of evaluating it. Better editing capabilities and parenthesis matching are planned for the future; for now, the interpreter is more of a testing tool and a proof of concept and can be used as an example of how to implement your own Z3S5 standalone executable.
 
-When an interpreter starts either in a standalone executable or when the `interp.Boot()` function is called in a Go program, then it first loads the standard prelude and help files in directory `embed`. These are embedded into the executable and so the directory is not needed to run the interpreter. After this start sequence, the interpreter checks whether there is a file named `init.lisp` in the executable directory -- that is, the `z3` directory for standalone or the directory of the program that includes Z3S5 Lisp as a package. If there is such a file, then it is loaded and executed.
+When an interpreter starts either in a standalone executable or when the `interp.Boot()` function is called in a Go program, then it first loads the standard prelude and help files in directory `embed`. These are embedded into the executable and so the directory is not needed to run the interpreter. After this start sequence, the interpreter checks whether there is a file named `init.lisp` in the executable directory -- that is, the `z3` directory for standalone or the directory of the program that includes Z3S5 Lisp as a package. If there is such a file, then it is loaded and executed. If option `-l <filename>` is provided, then Z3S5 Lisp sets `*interactive-session*` to `nil` (which usually suppresses the start banner), loads and executes the specified file, and returns to the shell afterwards. If in addition the `-i` option is provided, then `*interactive-session*` is set to true right from the start, the file is loaded and executed, and then an interactive session is started as if the interpreter had been started without any command-line options.
+
+See `./z3 -h` for a list of all command-line options. 
 
 ### Using the Interpreter in Go
 
@@ -84,7 +86,7 @@ Numbers are generally one bignum type for which `num?` is true and they will ext
 
 # Writing Programs
 
-Currently, the only way to load programs into the `z3` interpreter instead of typing them by hand is to edit the `init.lisp` file in the same directory as the executable. This file is loaded and executed at startup.
+The `z3` interpreter loads and executes any file `init.lisp` in the same directory as the executable at startup. It is also possible to use the command-line option `-l <filename>` to load and execute it. This sets `*interactive-session*` to `nil`, executes the contents of the file and returns to the shell. This behavior can be overridden by specifying the `-i` flag on the command-line, which sets `*interactive-session* to true and ensures that an interactive session is started after the initial files are loaded. 
 
 ## Finding Functions and Online Help
 
