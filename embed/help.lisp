@@ -2730,6 +2730,14 @@
   (see (ling.match-rating-compare ling.levenshtein ling.jaro-winkler ling.jaro ling.hamming ling.damerau-levenshtein
 				  ling.match-rating-codex ling.porter ling.nysiis ling.metaphone ling.soundex)))
 
+(defhelp run-selftest
+    (use "(run-selftest)")
+  (info "Run a self test of the Z3S5 Lisp system and report errors to standard output.")
+  (type proc)
+  (arity 0)
+  (topic (system))
+  (see (help testing)))
+
 ;;; Help end
 
 ;;;  Copyright (c) 2019-2022 Erich Rast

@@ -2,9 +2,9 @@
 title: Z3S5 Lisp Reference Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: Version 2.3.3+dad3931
+footer-left: Version 2.3.3+db84c81
 author: by Erich Rast and all Help system contributors
-date: 2022-7-29 14:05
+date: 2022-7-30 18:16
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -13,7 +13,7 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
-For Z3S5 Lisp Version 2.3.3+dad3931 with installed modules (tasks help beep fileio decimal ling float console base).
+For Z3S5 Lisp Version 2.3.3+db84c81 with installed modules (tasks help beep fileio decimal ling float console base).
 
 # Introduction
 
@@ -3952,13 +3952,13 @@ See also: [`run-hook`](#link72756e2d686f6f6b).	 [→index](#idx)
 
 **Warning: Internal use only.**
 
-### `run-selftest` : procedure/1 or more
+### `run-selftest` : procedure/0
 
-Usage: `(run-selftest [silent?]) => any`
+Usage: `(run-selftest)`
 
-Run a diagnostic self-test of the Z3S5 Machine. If `silent?` is true, then the self-test returns a list containing a boolean for success, the number of tests performed, the number of successes, the number of errors, and the number of failures. If `silent?` is not provided or nil, then the test progress and results are displayed. An error indicates a problem with the testing, whereas a failure means that an expected value was not returned.
+Run a self test of the Z3S5 Lisp system and report errors to standard output.
 
-See also: [`expect`](#link657870656374), [`testing`](#link74657374696e67).	 [→index](#idx)
+See also: [`help`](#link68656c70), [`testing`](#link74657374696e67).	 [→index](#idx)
 
 ### set-permissions : nil
 
@@ -7388,13 +7388,13 @@ See also: [`run-hook`](#link72756e2d686f6f6b).	 [→index](#idx)
 
 **Warning: Internal use only.** [→topic](#system)
 
-## `run-selftest` : procedure/1 or more {#link72756e2d73656c6674657374}
+## `run-selftest` : procedure/0 {#link72756e2d73656c6674657374}
 
-Usage: `(run-selftest [silent?]) => any`
+Usage: `(run-selftest)`
 
-Run a diagnostic self-test of the Z3S5 Machine. If `silent?` is true, then the self-test returns a list containing a boolean for success, the number of tests performed, the number of successes, the number of errors, and the number of failures. If `silent?` is not provided or nil, then the test progress and results are displayed. An error indicates a problem with the testing, whereas a failure means that an expected value was not returned.
+Run a self test of the Z3S5 Lisp system and report errors to standard output.
 
-See also: [`expect`](#link657870656374), [`testing`](#link74657374696e67).	 [→index](#idx) [→topic](#system)
+See also: [`help`](#link68656c70), [`testing`](#link74657374696e67).	 [→index](#idx) [→topic](#system)
 
 ## `sec+` : procedure/2 {#link7365632b}
 

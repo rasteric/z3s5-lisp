@@ -9,7 +9,7 @@
      ((permission? ,perm) ,@body)))
 
 (defun out (s)
- (princ s))
+ (void (princ s)))
 
 (defun protect (&rest symbols)
   (cond
@@ -203,10 +203,9 @@
 ;; error. It would be nice to have a general macro for this, something like dynamic-wind.
 (defun run-selftest (&rest opt)
   (set *testinfo* 'silent? (1st opt nil))
-  (unless (get *testinfo* 'silent?) (cls))
   (_testouty `((fg z3s5-blue
 		   (bg z3s5-orange
-		       (text ,(strcenter "<<< RUNNING Z3S5 MACHINE SERIES A SELFTEST >>>" (sys 'cols 80)))))))
+		       (text "<<< RUNNING Z3S5 LISP SELFTEST >>>\n")))))
   (unless (get *testinfo* 'silent? nil) (beep 'info))
   (set *testinfo* 'count 0)
   (set *testinfo* 'failure 0)

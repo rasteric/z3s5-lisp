@@ -20,9 +20,9 @@
 <header id="title-block-header">
 <h1 class="title">Z3S5 Lisp Reference Manual</h1>
 <p class="author">by Erich Rast and all Help system contributors</p>
-<p class="date">2022-7-29 14:05</p>
+<p class="date">2022-7-30 18:16</p>
 </header>
-<p>For Z3S5 Lisp Version 2.3.3+dad3931 with installed modules (tasks help beep fileio decimal ling float console base).</p>
+<p>For Z3S5 Lisp Version 2.3.3+db84c81 with installed modules (tasks help beep fileio decimal ling float console base).</p>
 <h1 data-number="1" id="introduction"><span class="header-section-number">1</span> Introduction</h1>
 <p>This is the reference manual for Z3S5 Lisp. This manual has been automatically generated from the entries of the online help system. The reference manual is divided into two large sections. Section <a href="#topics">By Topics</a> lists functions and symbols organized by topics. Within each topic, entries are sorted alphabetically. Section <a href="#reference">Complete Reference</a> lists all functions and symbols alphabetically. Please consult the <em>User Manual</em> and the <em>Readme</em> document for more general information about Z3S5 Lisp, an introduction to its use, and how to embedd it into Go programs.</p>
 <p>Incorrect documentation strings are bugs. Please report bugs using the corresponding <a href="https://github.com/rasteric/z3s5-lisp/issues">Github issue tracker for Z3S5 Lisp</a> and be as precise as possible. Superfluous and missing documentation entries are misfeatures and may also be reported.</p>
@@ -1970,10 +1970,10 @@
 <p>Run all hooks for numeric hook ID <code>hook</code> with <code>args</code>… as arguments.</p>
 <p>See also: <a href="#link72756e2d686f6f6b"><code>run-hook</code></a>. <a href="#idx">→index</a></p>
 <p><strong>Warning: Internal use only.</strong></p>
-<h3 data-number="3.20.63" id="run-selftest-procedure1-or-more"><span class="header-section-number">3.20.63</span> <code>run-selftest</code> : procedure/1 or more</h3>
-<p>Usage: <code>(run-selftest [silent?]) =&gt; any</code></p>
-<p>Run a diagnostic self-test of the Z3S5 Machine. If <code>silent?</code> is true, then the self-test returns a list containing a boolean for success, the number of tests performed, the number of successes, the number of errors, and the number of failures. If <code>silent?</code> is not provided or nil, then the test progress and results are displayed. An error indicates a problem with the testing, whereas a failure means that an expected value was not returned.</p>
-<p>See also: <a href="#link657870656374"><code>expect</code></a>, <a href="#link74657374696e67"><code>testing</code></a>. <a href="#idx">→index</a></p>
+<h3 data-number="3.20.63" id="run-selftest-procedure0"><span class="header-section-number">3.20.63</span> <code>run-selftest</code> : procedure/0</h3>
+<p>Usage: <code>(run-selftest)</code></p>
+<p>Run a self test of the Z3S5 Lisp system and report errors to standard output.</p>
+<p>See also: <a href="#link68656c70"><code>help</code></a>, <a href="#link74657374696e67"><code>testing</code></a>. <a href="#idx">→index</a></p>
 <h3 data-number="3.20.64" id="set-permissions-nil"><span class="header-section-number">3.20.64</span> set-permissions : nil</h3>
 <p>Usage: <code>(set-permissions li)</code></p>
 <p>Set the permissions for the current interpreter. This will trigger an error when the permission cannot be set due to a security violation. Generally, permissions can only be downgraded (made more stringent) and never relaxed. See the information for <code>permissions</code> for an overview of symbolic flags.</p>
@@ -3685,10 +3685,10 @@
 <p>Run all hooks for numeric hook ID <code>hook</code> with <code>args</code>… as arguments.</p>
 <p>See also: <a href="#link72756e2d686f6f6b"><code>run-hook</code></a>. <a href="#idx">→index</a></p>
 <p><strong>Warning: Internal use only.</strong> <a href="#system">→topic</a></p>
-<h2 data-number="4.379" id="link72756e2d73656c6674657374"><span class="header-section-number">4.379</span> <code>run-selftest</code> : procedure/1 or more</h2>
-<p>Usage: <code>(run-selftest [silent?]) =&gt; any</code></p>
-<p>Run a diagnostic self-test of the Z3S5 Machine. If <code>silent?</code> is true, then the self-test returns a list containing a boolean for success, the number of tests performed, the number of successes, the number of errors, and the number of failures. If <code>silent?</code> is not provided or nil, then the test progress and results are displayed. An error indicates a problem with the testing, whereas a failure means that an expected value was not returned.</p>
-<p>See also: <a href="#link657870656374"><code>expect</code></a>, <a href="#link74657374696e67"><code>testing</code></a>. <a href="#idx">→index</a> <a href="#system">→topic</a></p>
+<h2 data-number="4.379" id="link72756e2d73656c6674657374"><span class="header-section-number">4.379</span> <code>run-selftest</code> : procedure/0</h2>
+<p>Usage: <code>(run-selftest)</code></p>
+<p>Run a self test of the Z3S5 Lisp system and report errors to standard output.</p>
+<p>See also: <a href="#link68656c70"><code>help</code></a>, <a href="#link74657374696e67"><code>testing</code></a>. <a href="#idx">→index</a> <a href="#system">→topic</a></p>
 <h2 data-number="4.380" id="link7365632b"><span class="header-section-number">4.380</span> <code>sec+</code> : procedure/2</h2>
 <p>Usage: <code>(sec+ dateli n) =&gt; dateli</code></p>
 <p>Adds <code>n</code> seconds to the given date <code>dateli</code> in datelist format and returns the new datelist.</p>
