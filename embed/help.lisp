@@ -74,6 +74,9 @@
 (set-help-topic-info 'uncategorized
 		     "Other / Not Categorized"
 		     "This section lists functions and symbols that have no associated help topic.")
+(set-help-topic-info 'db
+		     "Databases"
+		     "These functions concern Sqlite3 database access. The module needs to be enabled with the \"db\" build tag.")
 
 ;;; help for builtin functions (intrinsics)
 
@@ -2737,6 +2740,121 @@
   (arity 0)
   (topic (system))
   (see (help testing)))
+
+(when (member 'db *reflect*)
+  (defhelp db.open
+      (use "(db.open fi) => db")
+    (info "Opens an sqlite3 DB or creates a new, empty database at file path #fi.")
+    (type proc)
+    (arity 1)
+    (topic (db io))
+    (see (db.close db.exec db.query)))
+
+  (defhelp db.close
+      (use "(db.close db)")
+    (info "Close the database #db.")
+    (type proc)
+    (arity 1)
+    (topic (db io))
+    (see (db.open db.open* db.exec db.query)))
+
+  (defhelp db.open*
+      (use "(db.open* sel) => db")
+    (info "Open a temporary database if #sel is 'temp or an in-memory database if #sel is 'mem.")
+    (type proc)
+    (topic (db io))
+    (arity 1)
+    (see (db.open db.close db.exec db.query)))
+
+  (defhelp db.exec
+      (use "(db.exec db stmt [args] ...)")
+    (info "Execute the SQL statement #stmt in database #db, binding any optional #args to the open variable slots in it. This function does not return anything, use db.query to execute a query that returns rows as result.")
+    (type proc)
+    (topic (db io))
+    (arity -3)
+    (see (db.query db.open db.close db.open*)))
+
+  (defhelp db.query
+      (use "(db.query db stmt [args] ...) => db-result")
+    (info "Query #db with SQL statement #stmt, binding any optional #args to the open variable slots in it. This function returns a #db-result that can be used to loop through rows with db.step and obtain columns in them using the various accessor methods.")
+    (type proc)
+    (topic (db io))
+    (arity -3)
+    (see (db.exec db.step db.int db.cname db.float db.str db.expr db.blob)))
+
+  (defhelp db.step
+      (use "(db.step db-result) => bool")
+    (info "Obtain the next result row in #db-result and return true, or return nil of there is no more row in the result.")
+    (type proc)
+    (topic (db io))
+    (arity 1)
+    (see (db.query db.row db.rows)))
+
+  (defhelp db.close-result
+      (use "(db.close-result db-result)")
+    (info "Close the #db-result. It is invalid afterwards. This should be done to avoid memory leaks after the result has been used.")
+    (type proc)
+    (topic (db io))
+    (arity 1)
+    (see (db.reset db.step db.close)))
+
+  (defhelp db.int
+      (use "(db.int db-result n) => int")
+    (info "Get the content of column #n in #db-result as integer.")
+    (type proc)
+    (topic (db))
+    (arity 2)
+    (see (db.float db.str db.blob)))
+
+  (defhelp db.str
+      (use "(db.str db-result n) => str")
+    (info "Get the content of column #n in #db-result as string.")
+    (type proc)
+    (topic (db))
+    (arity 2)
+    (see (db.blob db.int db.float)))
+
+  (defhelp db.float
+      (use "(db.float db-result n) => fl")
+    (info "Get the content of column #n in #db-result as float.")
+    (type proc)
+    (topic (db))
+    (arity 2)
+    (see (db.int db.str)))
+
+  (defhelp db.blob
+      (use "(db.blob db-result n) => fl")
+    (info "Get the content of column #n in #db-result as blob. A blob is a boxed memory area holding binary data.")
+    (type proc)
+    (topic (db binary))
+    (arity 2)
+    (see (db.str)))
+
+  (defhelp db.result-column-count
+      (use "(db.result-column-count db-result) => int")
+    (info "Get the number of columns in the rows of #db-result.")
+    (type proc)
+    (topic (db))
+    (arity 1)
+    (see (db.result-columns)))
+
+  (defhelp db.result-columns
+      (use "(db.result-columns db-result) => li")
+    (info "Get a list of column specifications for #db-result, each consisting of a list with the column name and the column type as string, as these were provided to the query. Since queries support automatic type conversions, this need not reflect the column types in the database schema.")
+    (type proc)
+    (topic (db))
+    (arity 1)
+    (see (db.result-column-count)))
+
+  (defhelp db.row
+      (use "(db.row db-result) => li")
+    (info "Return all columns of the current row in #db-result as list. They have the respective base types INT, FLOAT, BLOB, and TEXT.")
+    (type proc)
+    (topic (db))
+    (arity 1)
+    (see (db.rows)))
+  )
+
 
 ;;; Help end
 

@@ -2,9 +2,15 @@
 
 ## Version 2.3.3
 
-Various small improvements and bug fixes.
+Modules: `(db tasks help beep fileio decimal ling float console base)`
 
-- Improved *Reference Manual* with auto-generated index.
+Build tags: `db` Sqlite3 database support, `fileio` file access
+
+- Various small improvements and bug fixes.
+
+- Vastly improved *Reference Manual* with auto-generated index.
+
+- Sqlite3 support with the `db` build tag.
 
 ## Version 2.3.2
 

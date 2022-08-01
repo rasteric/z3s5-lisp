@@ -134,7 +134,7 @@ func ToInt64(caller string, a any) int64 {
 // ConvertNumbersToInts converts any goarith.Int32 and goarith.Int64 values in a slice
 // of interface{} values to Int64, modifying the array. The array can no longer be used
 // for representing Lisp numbers afterwards.
-func TonvertNumbersToInts(a []any) {
+func ConvertNumbersToInts(a []any) {
 	for i := range a {
 		switch a[i].(type) {
 		case goarith.Int32:

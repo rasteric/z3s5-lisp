@@ -728,6 +728,7 @@ func NewInterp(pc any) (*Interp, error) {
 	interp.Define_Decimal()    // decimal arithmetics
 	interp.Define_StyledText() // colors in terminal
 	interp.Define_FileIO()     // file i/o with build tag "fileio"
+	interp.Define_DB()         // sqlite interface with build tag "db"
 
 	if supportsSound {
 		reflect, ok := interp.GetGlobalVar(ReflectSym)

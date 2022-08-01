@@ -3529,7 +3529,8 @@
   (type proc)
   (topic (system))
   (arity 0)
-  (see (dump dump-bindings find-missing-help-entries)))
+  (see (dump dump-bindings find-missing-help-entries))
+  (warn "This function returns false positives! Special forms like setq and macro are listed even though they clearly are useful and should have a help entry."))
     
 (defun protect-toplevel-symbols ()
   (apply protect (filter (dump-bindings)
@@ -3629,6 +3630,18 @@
   (arity -2)
   (topic (help))
   (see (help-topics help apropos)))
+
+(defun prune-unneeded-help-entries ()
+  (foreach (find-unneeded-help-entries)
+	   (lambda (sym) (delete *help* sym))))
+
+(defhelp prune-unneeded-help-entries
+    (use "(prune-unneeded-help-entries)")
+  (info "Remove help entries for which no toplevel symbol is defined. This function may need to be called when a module is not being used (e.g. because of a missing build tag) and it is desirable that only help for existing symbols is available.")
+  (arity 0)
+  (topic (help system))
+  (type proc)
+  (see (find-unneeded-help-entries find-missing-help-entries help *help*)))
 
 ;; PREAMBLE END
 
