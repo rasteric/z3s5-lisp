@@ -10,3 +10,6 @@ lisp: z3.go
 
 manuals: z3 distribution.lisp
 	./z3 -l distribution.lisp && cd ../../docs/reference && echo -n 'CREATING REFERENCE MANUAL...' && make -s && echo 'DONE.' &&  cd ../../docs/usermanual && echo -n 'CREATING USER MANUAL...' && make -s && echo 'DONE.'
+
+test: z3 test-distribution.lisp
+	./z3 -l test-distribution.lisp
