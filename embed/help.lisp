@@ -26,9 +26,6 @@
 (set-help-topic-info 'dict
 		     "Dictionaries"
 		     "Dictionaries are thread-safe key-value repositories held in memory. They are internally based on hash tables and have fast access.")
-(set-help-topic-info 'equality
-		     "Equality Predicates"
-		     "Equality predicates are used to test whether two values are equal in some sense.")
 (set-help-topic-info 'fileio
 		     "File Input & Output"
 		     "These functions allow direct access for reading and writing to files. This module requires the `fileio` build tag.")
@@ -76,7 +73,10 @@
 		     "This section lists functions and symbols that have no associated help topic.")
 (set-help-topic-info 'db
 		     "Databases"
-		     "These functions concern Sqlite3 database access. The module needs to be enabled with the \"db\" build tag.")
+		     "These functions allow for Sqlite3 database access. The module needs to be enabled with the \"db\" build tag.")
+(set-help-topic-info 'zimage
+		     "Runtime System Images (defunct)"
+		     "The following functions provide functionality for saving, loading, and running of runtime system images to and from disk. This module is currently broken and under maintenance.")
 
 ;;; help for builtin functions (intrinsics)
 
@@ -125,7 +125,7 @@
   (info "Return true if #x and #y are equal, nil otherwise. In contrast to other LISPs, eq? checks for deep equality of arrays and dicts. However, lists are compared by checking whether they are the same cell in memory. Use #equal? to check for deep equality of lists and other objects.")
   (type proc)
   (arity 2)
-  (topic (equality))
+  (topic (lisp))
   (see (equal?)))
 
 (defhelp list
@@ -229,7 +229,7 @@
   (info "Returns true if #x is equal to #y, nil otherwise. This is currently the same as equal? but the behavior might change.")
   (type proc)
   (arity 2)
-  (topic (equality))
+  (topic (lisp))
   (see (equal?))
   (warn "Deprecated."))
 
@@ -2855,6 +2855,21 @@
     (see (db.rows)))
   )
 
+(defhelp error?
+    (use "(error? datum) => bool")
+  (info "Return true if #datum is a special error value, nil otherwise.")
+  (type proc)
+  (topic (system))
+  (arity 1)
+  (see (*last-error* error->str error eof? valid?)))
+
+(defhelp error->str
+    (use "(error->str datum) => str")
+  (info "Convert a special error value to a string.")
+  (type proc)
+  (topic (system))
+  (arity 1)
+  (see (*last-error* error error?)))
 
 ;;; Help end
 

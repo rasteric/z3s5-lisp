@@ -3546,6 +3546,44 @@
   (arity 0)
   (see (protected? protect unprotect declare-unprotected when-permission? dict-protect dict-protected? dict-unprotect)))
 
+;;; additional i/o
+
+;; readall contents of a lisp stream
+(defun _readall (n acc)
+  (let ((datum (read n)))
+    (if (eof? datum)
+	acc
+	(_readall n (cons datum acc)))))
+
+(defun readall (n)
+  (nreverse (_readall n nil)))
+
+(defhelp readall
+    (use "(readall stream) => sexpr")
+  (info "Read all data from stream with numeric ID #stream and return it as an sexpr.")
+  (type proc)
+  (arity 1)
+  (see (read write open close)))
+
+(defun readall-str (p &rest opt)
+  (letrec ((m (1st opt 2048))
+	   (buff (make-blob m))
+	   (reader (lambda (s)
+		     (let ((n (read-binary p buff m)))
+		       (cond
+			 ((> n 0)
+			  (reader (str+ s (blob->str buff 0 n))))
+			 (t (blob-free buff)
+			    s))))))
+    (reader "")))
+
+(defhelp readall-str
+    (use "(readall-str p [buffsize]) => str")
+  (info "Read all content from port #p as string. This method may trigger an error if the content in the stream is not a valid UTF-8 string. The optional #buffzie argument determines the size of the internal buffer.")
+  (type proc)
+  (arity -2)
+  (see (readall read-binary read)))
+
 (defun _include (in last)
   (let ((datum (read in)))
     (cond
@@ -3642,6 +3680,247 @@
   (topic (help system))
   (type proc)
   (see (find-unneeded-help-entries find-missing-help-entries help *help*)))
+
+;; ZIMAGES
+
+(defun externalize0 (arg)
+  (cond
+    ((sym? arg) arg)
+    ((list? arg) (mapcar arg (lambda (x) (externalize0 x))))
+    ((array? arg) (map arg (lambda (x) (externalize0 x))))
+    ((dict? arg) `(dict ',(externalize0 (dict->list arg))))
+    ((num? arg) arg)
+    ((str? arg) arg)
+    ((port? arg) arg)
+    (t (_external-str arg))))
+
+(defhelp externalize0
+    (use "(externalize0 arg) => any")
+  (info "Attempts to externalize #arg but falls back to the internal expression if #arg cannot be externalized. This procedure never fails but #can-externalize? may be false for the result. This function is only used in miscellaneous printing. Use #externalize to externalize expressions for writing to disk.")
+  (type proc)
+  (topic (system))
+  (arity 1)
+  (see (externalize can-externalize?)))
+
+(defun _external-str (arg)
+  (cond
+    ((can-externalize? arg)
+     (letrec ((s (stropen (_external arg)))
+	      (e (car (readall s))))
+       (close s)
+       e))
+    (t arg)))
+
+(defun externalize (arg &rest rest)
+  (let ((nonce (1st rest nil)))
+    (externalize* arg nonce)))
+
+(defun externalize* (arg nonce)
+  (cond
+    ((sym? arg) arg)
+    ((list? arg) (mapcar arg (lambda (x) (externalize* x nonce))))
+    ((array? arg) (map arg (lambda (x) (externalize* x nonce))))
+    ((dict? arg) (list nonce `(dict ',(dict->list (dict-map arg (lambda (k v) (externalize* v nonce)))))))
+    ((blob? arg) (list nonce `(ascii85->blob ',(blob->ascii85 arg))))
+    ((num? arg) arg)
+    ((str? arg) arg)
+    ((eof? arg) (list nonce end-of-file))
+    ((error? arg) nil) ; special case
+    (t (_externalize-nonce arg nonce))))
+
+(defun _externalize-nonce (arg nonce)
+  (let ((s (stropen (_external arg))))
+    (with-final (lambda (err x)
+		  (when err (*error-handler* err))
+		  (let ((result (car (readall s))))
+		    (close s)
+		    (if nonce
+			(list nonce result)
+			result))))))
+
+(defhelp externalize
+    (use "(externalize sym [nonce]) => sexpr")
+  (info "Obtain an external representation of top-level symbol #sym. The optional #nonce must be a value unique in each system zimage, in order to distinguish data from procedures.")
+  (type proc)
+  (topic (system))
+  (arity 1)
+  (see (can-externalize? externalize0 current-zimage save-zimage load-zimage)))
+
+(defun can-externalize? (datum)
+  (cond
+    ((seq? datum) (forall? datum can-externalize?))
+    ((dict? datum) (forall? (dict->alist datum)
+			    (lambda (x) (and (can-externalize? (car x))
+					     (can-externalize? (cdr x))))))
+    ((blob? datum) t)
+    ((or (num? datum) (eof? datum)(functional? datum)) t)
+    ((error? datum) nil)
+    (t (_external? datum))))
+
+(defhelp can-externalize?
+    (use "(can-externalize? datum) => bool")
+  (info "Recursively determines if #datum can be externalized and returns true in this case, nil otherwise.")
+  (type proc)
+  (topic (system))
+  (arity 1)
+  (see (externalize externalize0)))
+
+(defun current-zimage (&rest r)
+  (let ((d (dict '()))
+	(nonce (1st r nil)))
+    (foreach
+     (dump-bindings)
+     (lambda (sym)
+       (out sym)(out " ") ; TODO: Use this to fix externalize, then remove.
+       (cond
+	 ((can-externalize? sym)
+	  (set d sym (externalize (eval sym) nonce)))
+	 (t
+	  (set d sym nil)
+	  (warn "cannot externalize '%v, set to nil" sym)))))
+    d))
+
+(defhelp current-zimage
+    (use "(current-zimage [nonce]) => dict")
+  (info "Obtain a dict of all toplevel bindings. If the #nonce is provided, procedures are externalized as (nonce proc) to distinguish them from data. This function may use a lot of memory. Consider saving or loading zimages directly from disk instead. Notice that the dict is not the same format as the one used by load-zimage and save-zimage.")
+  (type proc)
+  (topic (zimage))
+  (arity 0)
+  (see (load-zimage save-zimage externalize)))
+
+(defun save-zimage (min-version info entry-point &rest fi)
+  (let ((out (apply open fi)))
+    (write-zimage out min-version info entry-point)
+    (close out)))
+
+(defhelp save-zimage
+    (use "(save-zimage min-version info entry-point fi) => int")
+  (info "Write the current state of the system as a zimage to file #fi. If the file already exists, it is overwritten. The #min-version argument designates the minimum system version required to load the zimage. The #info argument should be a list whose first argument is a human-readable string explaining the purpose of the zimage and remainder is user data. The #entry-point is either nil or an expression that can be evaluated to start the zimage after it has been loaded with run-zimage.")
+  (type proc)
+  (topic (zimage))
+  (arity -2)
+  (see (load-zimage current-zimage dump run-zimage zimage-loadable? zimage-runable? externalize)))
+
+(defun write-zimage (out min-version info entry-point)
+  (let ((n (nonce)))
+    (write out (list 'z3s5-image
+		     (list 'version (sys 'version))
+		     (list 'info info)
+		     (list 'nonce n)
+		     (list 'min-version min-version)
+		     (list 'time (now))
+		     (list 'entry (externalize entry-point))))
+    (dict-foreach (current-zimage n)
+		  (lambda (k v)
+		    (write out (list k v))))))
+
+(defhelp write-zimage
+    (use "(write-zimage out min-version info entry-point) => list")
+  (info "Write the current state of the system as an zimage to stream #out. The #min-version argument designates the minimum system version required to load the zimage. The #info argument should be a list whose first argument is a human-readable string explaining the purpose of the zimage and remainder is user data. The #entry-point is either nil or an expression that can be evaluated to start the zimage after it has been loaded with run-zimage. The procedure returns a header with information of the zimage.")
+  (type proc)
+  (topic (zimage))
+  (arity 4)
+  (see (save-zimage read-zimage load-zimage current-zimage externalize)))
+
+(defun zimage-loadable? (&rest fi)
+  (letrec ((in (apply open fi))
+	   (header (read in)))
+    (close in)
+    (and (equal? (1st header nil) 'z3s5-image)
+	 (>= (semver.compare (1st (sys 'version "v0.0")) (2nd (assoc 'min-version header) "v0.1")) 0))))
+
+(defhelp zimage-loadable?
+    (use "(zimage-loadable? fi)")
+  (info "Checks whether the file #fi is loadable. This does not check whether the file actually is an zimage file, so you can only use this on readable lisp files.")
+  (type proc)
+  (topic (zimage))
+  (arity -2)
+  (see (zimage-runable? load-zimage save-zimage current-zimage)))
+
+(defun zimage-runable? (&rest fi)
+  (letrec ((in (apply open fi))
+	   (header (read in)))
+    (close in)
+    (and (equal? (1st header nil) 'z3s5-image)
+	 (>= (semver.compare (1st (sys 'version "v0.0")) (2nd (assoc 'min-version header) "v0.1")) 0)
+	 (2nd (assoc 'entry header) nil))))
+
+(defhelp zimage-runable?
+    (use "(zimage-runable? [sel] fi")
+  (info "Returns the non-nil entry-point of the zimage if the the zimage in file #fi with optional path selector #sel can be run, nil otherwise.")
+  (type proc)
+  (topic (zimage))
+  (arity -2)
+  (see (load-zimage zimage-loadable? save-zimage current-zimage)))
+
+(defun read-zimage (in fi)
+  (letrec ((header (read in))
+	   (nonce (2nd (assoc 'nonce header) nil)))
+    (unless nonce (error "read-zimage: zimage corrupted, empty nonce"))
+    (if (>= (semver.compare (1st (sys 'version)) (2nd (assoc 'min-version header) "v0.0")) 0)
+	(_read-zimage in header fi 1 nonce)
+	(error "read-zimage: zimage requires Lisp version %v, but this is only version %v"
+	       (semver.canonical (2nd (assoc 'min-version header) "v0.0"))
+	       (semver.canonical (1st (sys 'version)))))))
+
+(defun zimage-header-info (header file c)
+  (cons file (cons c header)))
+
+(defun _read-zimage (in header file c nonce)
+  (let ((li (read in)))
+    (cond
+      ((eof? li) (zimage-header-info header file c))
+      ((not (list? li)) (error "zimage corrupted: %v" li))
+      (t (bind (car li) (eval (internalize (cadr li) nonce)))
+	 (_read-zimage in header file (add1 c) nonce)))))
+
+(defun internalize (arg nonce)
+  (cond
+    ((list? arg)
+     (if (equal? (1st arg nil) nonce)
+	 (eval (internalize (2nd arg nil) nonce))
+	 (mapcar arg (lambda (x) (internalize x nonce)))))
+    ((str? arg) arg)
+    ((array? arg) (map arg (lambda (x) (internalize x nonce))))
+    ((dict? arg) (dict-map arg (lambda (k v) (internalize v nonce))))
+    (t arg)))
+
+(defhelp internalize
+    (use "(internalize arg nonce)")
+  (info "Internalize an external representation of #arg, using #nonce for distinguishing between data and code that needs to be evaluated.")
+  (type proc)
+  (topic (system))
+  (arity 2)
+  (see (externalize)))
+
+(defun load-zimage  (fi)
+  (let ((in (open fi)))
+    (try ((close in))
+	 (read-zimage in fi))))
+
+(defhelp load-zimage
+    (use "(load-zimage fi) => li")
+  (info "Load the zimage file #fi at optional path selector #sel, if possible, and return a list containing information about the zimage after it has been loaded. If the zimage fails the semantic version check, then an error is raised.")
+  (type proc)
+  (topic (zimage))
+  (arity -2)
+  (see (save-zimage run-zimage zimage-loadable?)))
+
+(defun run-zimage (&rest fi)
+  (if (apply zimage-runable? fi)
+      (_run-zimage fi)
+      (error "zimage not runable, no entry point: %v" fi)))
+
+(defun _run-zimage (fi)
+  ((eval (2nd (assoc 'entry (apply load-zimage fi)) (lambda () (void))))))
+
+(defhelp run-zimage
+    (use "(run-zimage fi)")
+  (info "Load the zimage file #fi and start it at the designated entry point. Raises an error if the zimage version is not compatible or the zimage cannot be run.")
+  (type proc)
+  (topic (zimage))
+  (arity -2)
+  (see (load-zimage save-zimage zimage-runable? zimage-loadable?)))
 
 ;; PREAMBLE END
 

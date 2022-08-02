@@ -875,6 +875,20 @@ func (interp *Interp) Define_Base() {
 		return interp.Externalize(nil, a[0])
 	})
 
+	// (error? datum) => bool return true if the datum is an error, nil otherwise
+	interp.Def("error?", 1, func(a []any) any {
+		_, ok := a[0].(error)
+		if ok {
+			return true
+		}
+		return Nil
+	})
+
+	// (error->str datum) => str convert a special error value to a string
+	interp.Def("error->str", 1, func(a []any) any {
+		return Str(a[0])
+	})
+
 	// (_external? datum) => bool return true if an external representation of datum is possible
 	interp.Def("_external?", 1, func(a []any) any {
 		return AsLispBool(interp.CanExternalize(a[0]))
