@@ -200,7 +200,7 @@ The reason this doesn't work with `let` is that `is-even?` is not bound in the d
 
 ## Error Handling
 
-Error handling is very rudimentary in Z3S5 Lisp. There are no continuations and there is no fancy stuff like dynamic wind. Instead, there are primitives like `push-error-handler` and `pop-error-handler` and macros such as `with-final` and `with-error-handler`.
+There are no continuations and there is no fancy stuff like dynamic wind. Instead, there are primitives like `push-error-handler` and `pop-error-handler` and macros such as `with-final` and `with-error-handler`.
 
 ## Debugging
 
@@ -214,13 +214,29 @@ Dicts use Go's `sync.Map` under the hood and are therefore concurrency-safe. The
 
 For obvious reasons, not all embedded interpreters should provide full file access. Therefore, this option needs to be enabled with build tag `fileio`, or otherwise none of the filesystem-related functions will be available. The `z3` Makefile in `cmd/z3` enables this option by default for the standalone executable.
 
+## Images
+
+Z3S5 Lisp supports the writing and reading of Lisp images called "zimages". To save a zimage, use `(save-zimage <version> <info> <entry-point> <file>)`, where the `<version>` must be a semver string and `<info>` a list. The entry point is a procedure that is executed after the image has been loaded and can be `nil` for not executing anything. The filename `<file>` by convention ends in `.zimage`. To load such an image, overwriting the current lisp system, use `(load-zimage <file>)`.
+
+Important limitations need to be kept in mind when working with zimages. Symbols will get unprotected when loading a zimage and therefore the interpreter must have the permission to unprotect symbols. See `declare-unprotected`, `protect`, `unprotect`, and `protected?` for more information. Symbols may also be declared volatile with `declare-volatile` and some of the predefined global variables such as `*tasks*` are already declared volatile. A volatile toplevel symbol is neither written to a zimage nor is a symbol marked volatile in the running system overwritten when it is present in a zimage and the image is loaded. This can be a rare source of incompatibility; there is currently no way to force the loading of a symbol in the image when it is declared volatile in the running system and providing such a mechanism would introduce new problems. You should declare as volatile any symbol that cannot be overwritten because it contains data essential to the running system, and at the same time be aware of the possibility that a global symbol might be declared volatile in the future and therefore not be loaded. Use prefixes and sanity checks where necessary to avoid problems.
+
+Finally, not all values can be externalized. For example, ports, tasks, futures, and mutexes cannot be externalized. If a symbol bound to such a value is declared volatile, then it is neither written nor loaded. If it is *not* volatile, however, then the value `nil` is written and loaded for it. For most applications this is desirable. The procedure in your entry point can check for nil and make sure to re-introduce the desired state of such values after loading an image if this is necessary for the proper functioning of the system. In general, it is desirable to use initialization functions and not rely on global variables when dealing with images.
+
+## Database Access
+
+The build tag `db` enables a database module with Sqlite3 support. See `(dump 'db.)` for available functions and consult the reference and help system for more information on them.
+
 ## Language Stability
 
 At this stage, built-in commands may still change. The good news is that any change introduced in Z3S5 Lisp needs to be tracked and checked in Z3S5 Machine, and so no larger changes are planned. However, no guarantees can be made and you should vendor the repository or even fork it if you want to make sure no breaking changes occur. Once the language is stable, it will be marked on the home page.
 
+## Known Bugs
+
+Since this language has been ported from a larger system, there may be known bugs not in the issue tracker at Github. A known issue of this version is a problem with the recursive externalization of Dict containing Dict.
+
 ## Roadmap
 
-File and network access will be added soon. An interface to sqlite3 will also be ported from Z3S5 Machine, although it might involve some abstraction and only indirect access. A simple persistence layer might also be ported from Z3S5 Machine.
+A library system, a robust key-value database with fulltext search, some basic OOP, and a simple persistence layer will likely be ported from Z3S5 Machine to this embedded Lisp in the future.
 
 # Extending Z3S5 Lisp 
 

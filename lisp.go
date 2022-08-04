@@ -1627,7 +1627,7 @@ func str4(a any, quoteString bool, count int,
 		}
 		if s, ok := x.Car.(*Sym); ok {
 			if q, ok := quotes[s]; ok {
-				if d, ok := x.Cdr.(*Cell); ok {
+				if d, ok := x.Cdr.(*Cell); ok && d != nil {
 					if d.Cdr == Nil {
 						return q + str4(d.Car, true, count, printed)
 					}
@@ -2333,6 +2333,13 @@ var Prelude = strings.Replace(`
 (defun declare-unprotected (sym)
   (set *mutable-toplevel-symbols* sym t))
 
+(setq *volatile-toplevel-symbols* (dict))
+
+(defun declare-volatile (sym)
+  (set *volatile-toplevel-symbols* sym t))
+
+(declare-volatile '*volatile-toplevel-symbols*)
+(declare-volatile '*mutable-toplevel-symbols*)
 (declare-unprotected 'vars) ; fixes unclean macro definitions using defun 
 (declare-unprotected 'vals) ; so these do not get protected later
 (declare-unprotected 'sets) ; unbind does not do the job since init sequence uses the macros later

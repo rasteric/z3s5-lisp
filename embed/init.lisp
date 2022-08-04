@@ -288,8 +288,12 @@
 	       (result list)
 	       (see (defhelp help apropos *help* help-topics help-about set-help-topic-info help-topic-info))))))
 
+(declare-volatile '*help*)
+
 (setq *help-topics*
       (dict))
+
+(declare-volatile '*help-topics*)
 
 (defun help-entry (sym)
   (get *help* sym nil))
@@ -1584,13 +1588,13 @@
 (when (bound? *reflect*)
   (setq *reflect* (cons 'tasks *reflect*)))
 
-(setq *task-counter* 0)(declare-unprotected '*task-counter*)
-(setq *tasks* (dict))
-(setq *tasks-state* (dict))
-(setq *tasks-to-msg* (dict))
-(setq *blackboard* nil)(declare-unprotected '*blackboard*)
-(setq *blackboard-mutex* (make-mutex))
-(setq *running-tasks* 0)(declare-unprotected '*running-tasks*)
+(setq *task-counter* 0)(declare-unprotected '*task-counter*)(declare-volatile '*task-counter*)
+(setq *tasks* (dict))(declare-volatile '*tasks*)
+(setq *tasks-state* (dict))(declare-volatile '*tasks-state*)
+(setq *tasks-to-msg* (dict))(declare-volatile '*tasks-to-msg*)
+(setq *blackboard* nil)(declare-unprotected '*blackboard*)(declare-volatile '*blackboard*)
+(setq *blackboard-mutex* (make-mutex))(declare-volatile '*blackboard-mutex*)
+(setq *running-tasks* 0)(declare-unprotected '*running-tasks*)(declare-volatile '*running-tasks*)
 
 (defun _new-task-id ()
   (cinc! '*task-counter*))
@@ -1749,9 +1753,9 @@
   (see (task-send task task? task-run task-state task-broadcast))
   (warn "Busy polling for new messages in a tight loop is inefficient and ought to be avoided."))
 
-(setq *scheduled-tasks* (make-queue))(declare-unprotected '*scheduled-tasks*)
+(setq *scheduled-tasks* (make-queue))(declare-unprotected '*scheduled-tasks*)(declare-volatile '*scheduled-tasks*)
 (setq *scheduler-sleep-interval* 800)(declare-unprotected '*scheduler-sleep-interval*)
-(setq *scheduler* nil)(declare-unprotected '*scheduler*)
+(setq *scheduler* nil)(declare-unprotected '*scheduler*)(declare-volatile '*scheduler*)
 
 (defun _schedule-task-future ()
   (task
@@ -1913,7 +1917,7 @@
   (arity 1)
   (see (error)))
 
-(setq *last-error* nil)(declare-unprotected '*last-error*)
+(setq *last-error* nil)(declare-unprotected '*last-error*)(declare-volatile '*last-error*)
 
 (defhelp *last-error*
     (use "*last-error* => str")
@@ -3544,7 +3548,18 @@
   (type proc)
   (topic (system))
   (arity 0)
-  (see (protected? protect unprotect declare-unprotected when-permission? dict-protect dict-protected? dict-unprotect)))
+  (see (protected? protect unprotect declare-unprotected declare-volatile when-permission? dict-protect dict-protected? dict-unprotect)))
+
+(defun unprotect-toplevel-symbols ()
+  (apply unprotect (dump-bindings)))
+
+(defhelp unprotect-toplevel-symbols
+    (use "(unprotect-toplevel-symbols)")
+  (info "Attempts to unprotect all toplevel symbols.")
+  (type proc)
+  (topic (system))
+  (arity 0)
+  (see (protect-toplevel-symbols protect unprotect declare-unprotected)))
 
 ;;; additional i/o
 
@@ -3724,8 +3739,7 @@
     ((blob? arg) (list nonce `(ascii85->blob ',(blob->ascii85 arg))))
     ((num? arg) arg)
     ((str? arg) arg)
-    ((eof? arg) (list nonce end-of-file))
-    ((error? arg) nil) ; special case
+    ((eof? arg) (list nonce '(end-of-file)))
     (t (_externalize-nonce arg nonce))))
 
 (defun _externalize-nonce (arg nonce)
@@ -3754,7 +3768,6 @@
 					     (can-externalize? (cdr x))))))
     ((blob? datum) t)
     ((or (num? datum) (eof? datum)(functional? datum)) t)
-    ((error? datum) nil)
     (t (_external? datum))))
 
 (defhelp can-externalize?
@@ -3771,13 +3784,13 @@
     (foreach
      (dump-bindings)
      (lambda (sym)
-       (out sym)(out " ") ; TODO: Use this to fix externalize, then remove.
-       (cond
-	 ((can-externalize? sym)
-	  (set d sym (externalize (eval sym) nonce)))
-	 (t
-	  (set d sym nil)
-	  (warn "cannot externalize '%v, set to nil" sym)))))
+       (unless (get *volatile-toplevel-symbols* sym nil)
+	 (cond
+	   ((can-externalize? sym)
+	    (set d sym (externalize (eval sym) nonce)))
+	   (t
+	    (set d sym nil)
+	    (warn "cannot externalize '%v, set to nil" sym))))))
     d))
 
 (defhelp current-zimage
@@ -3802,6 +3815,10 @@
   (see (load-zimage current-zimage dump run-zimage zimage-loadable? zimage-runable? externalize)))
 
 (defun write-zimage (out min-version info entry-point)
+  (unless (str? min-version)
+    (error "write-zimage: min-version must be a version string, given %v" min-version))
+  (unless (list? info)
+    (error "write-zimage: info must be a list, given %v" info))
   (let ((n (nonce)))
     (write out (list 'z3s5-image
 		     (list 'version (sys 'version))
@@ -3810,9 +3827,15 @@
 		     (list 'min-version min-version)
 		     (list 'time (now))
 		     (list 'entry (externalize entry-point))))
-    (dict-foreach (current-zimage n)
-		  (lambda (k v)
-		    (write out (list k v))))))
+    (foreach
+     (dump-bindings)
+     (lambda (sym)
+       (unless (get *volatile-toplevel-symbols* sym nil)
+	 (cond
+	   ((can-externalize? sym)
+	    (write out (list sym (protected? sym) (externalize (eval sym) n))))
+	   (t (write out (list sym (protected? sym) nil))
+	      (warn "cannot externalize '%v, set to nil" sym))))))))
 
 (defhelp write-zimage
     (use "(write-zimage out min-version info entry-point) => list")
@@ -3847,7 +3870,7 @@
 
 (defhelp zimage-runable?
     (use "(zimage-runable? [sel] fi")
-  (info "Returns the non-nil entry-point of the zimage if the the zimage in file #fi with optional path selector #sel can be run, nil otherwise.")
+  (info "Returns the non-nil entry-point of the zimage if the the zimage in file #fi can be run, nil otherwise.")
   (type proc)
   (topic (zimage))
   (arity -2)
@@ -3871,8 +3894,17 @@
     (cond
       ((eof? li) (zimage-header-info header file c))
       ((not (list? li)) (error "zimage corrupted: %v" li))
-      (t (bind (car li) (eval (internalize (cadr li) nonce)))
+      (t (if (get *volatile-toplevel-symbols* (car li) nil)
+	     (warn "read-zimage: cannot set volatile toplevel symbol '%v" (car li))
+	     (_read-zimage-bind li nonce))
 	 (_read-zimage in header file (add1 c) nonce)))))
+
+(defun _read-zimage-bind (li nonce)
+  (when (protected? (1st li))
+    (unprotect (1st li)))
+  (bind (1st li) (if (3rd li) (internalize (3rd li) nonce) nil))
+  (when (2nd li)
+    (protect (1st li))))
 
 (defun internalize (arg nonce)
   (cond
@@ -3900,7 +3932,7 @@
 
 (defhelp load-zimage
     (use "(load-zimage fi) => li")
-  (info "Load the zimage file #fi at optional path selector #sel, if possible, and return a list containing information about the zimage after it has been loaded. If the zimage fails the semantic version check, then an error is raised.")
+  (info "Load the zimage file #fi, if possible, and return a list containing information about the zimage after it has been loaded. If the zimage fails the semantic version check, then an error is raised.")
   (type proc)
   (topic (zimage))
   (arity -2)

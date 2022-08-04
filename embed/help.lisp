@@ -2871,6 +2871,14 @@
   (arity 1)
   (see (*last-error* error error?)))
 
+(defhelp declare-volatile
+    (use "(declare-volatile sym)")
+  (info "Declares #sym, which has to be quoted, as a volatile toplevel symbol. Volatile toplevel symbols are neither saved to nor loaded from zimages.")
+  (type proc)
+  (arity 1)
+  (topic (zimage system))
+  (see (save-zimage load-zimage declare-unprotected)))
+
 ;;; Help end
 
 ;;;  Copyright (c) 2019-2022 Erich Rast
