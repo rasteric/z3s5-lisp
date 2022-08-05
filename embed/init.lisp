@@ -3845,8 +3845,8 @@
   (arity 4)
   (see (save-zimage read-zimage load-zimage current-zimage externalize)))
 
-(defun zimage-loadable? (&rest fi)
-  (letrec ((in (apply open fi))
+(defun zimage-loadable? (fi)
+  (letrec ((in (open fi))
 	   (header (read in)))
     (close in)
     (and (equal? (1st header nil) 'z3s5-image)
@@ -3860,8 +3860,8 @@
   (arity -2)
   (see (zimage-runable? load-zimage save-zimage current-zimage)))
 
-(defun zimage-runable? (&rest fi)
-  (letrec ((in (apply open fi))
+(defun zimage-runable? (fi)
+  (letrec ((in (open fi))
 	   (header (read in)))
     (close in)
     (and (equal? (1st header nil) 'z3s5-image)
@@ -3886,8 +3886,30 @@
 	       (semver.canonical (2nd (assoc 'min-version header) "v0.0"))
 	       (semver.canonical (1st (sys 'version)))))))
 
+(defhelp read-zimage
+    (use "(read-zimage in fi)")
+  (info "Reads and evaluates the zimage in stream #in from file #fi. The file #fi argument is used in error messages. This procedure raises errors when the zimage is malformed or the version check fails.")
+  (type proc)
+  (topic (zimage))
+  (arity 2)
+  (see (load-zimage run-zimage zimage-header)))
+
+(defun zimage-header (fi)
+  (letrec ((in (open fi '(read)))
+	   (header (read in)))
+    (close in)
+    header))
+
 (defun zimage-header-info (header file c)
   (cons file (cons c header)))
+
+(defhelp zimage-header
+    (use "(zimage-header fi) => li")
+  (info "Return the zimage header from file #fi.")
+  (type proc)
+  (arity 1)
+  (topic (zimage))
+  (see (load-zimage run-zimage)))
 
 (defun _read-zimage (in header file c nonce)
   (let ((li (read in)))
@@ -3926,7 +3948,7 @@
   (see (externalize)))
 
 (defun load-zimage  (fi)
-  (let ((in (open fi)))
+  (let ((in (open fi '(read))))
     (try ((close in))
 	 (read-zimage in fi))))
 
@@ -3938,13 +3960,15 @@
   (arity -2)
   (see (save-zimage run-zimage zimage-loadable?)))
 
-(defun run-zimage (&rest fi)
-  (if (apply zimage-runable? fi)
+(defun run-zimage (fi)
+  (if (zimage-runable? fi)
       (_run-zimage fi)
       (error "zimage not runable, no entry point: %v" fi)))
 
 (defun _run-zimage (fi)
-  ((eval (2nd (assoc 'entry (apply load-zimage fi)) (lambda () (void))))))
+  (let ((header (zimage-header fi)))
+    (load-zimage fi)
+    ((eval (2nd (assoc 'entry header) (lambda () (void)))))))
 
 (defhelp run-zimage
     (use "(run-zimage fi)")
