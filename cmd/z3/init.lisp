@@ -2,7 +2,7 @@
 ;;; This file is loaded when it is in the same directory as the z3 executable.
 ;;; Feel free to hack this file as you like!
 
-(init-remember) ;; initializes the remember system, slows down start-up, socomment out if not needed
+(init-remember) ;; initializes the remember system, slows down start-up, remove if not needed
 
 (defun print-start-banner ()
    (let ((tc (color 'text))
