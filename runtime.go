@@ -7,6 +7,7 @@ import (
 	"syscall"
 
 	seq "github.com/jirenius/taskqueue"
+	"github.com/rasteric/hooks"
 )
 
 // BasicRuntime is a minimal runtime system that only uses the console and basic sounds.
@@ -52,6 +53,7 @@ func (rt *BasicRuntime) SetPerm(p Permissions) error {
 }
 
 func (rt *BasicRuntime) RequestShutdown(errcode int) {
+	hooks.Exec(ShutdownHook, nil)
 	os.Exit(errcode)
 }
 

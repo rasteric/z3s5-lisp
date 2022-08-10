@@ -20,9 +20,9 @@
 <header id="title-block-header">
 <h1 class="title">Z3S5 Lisp Reference Manual</h1>
 <p class="author">by Erich Rast and all Help system contributors</p>
-<p class="date">2022-8-10 11:42</p>
+<p class="date">2022-8-10 14:16</p>
 </header>
-<p>For Z3S5 Lisp Version 2.3.4+772693c with installed modules (kvdb zimage tasks help beep db fileio decimal ling float console base).</p>
+<p>For Z3S5 Lisp Version 2.3.4+e6d4665 with installed modules (kvdb zimage tasks help beep db fileio decimal ling float console base).</p>
 <h1 data-number="1" id="introduction"><span class="header-section-number">1</span> Introduction</h1>
 <p>This is the reference manual for Z3S5 Lisp. This manual has been automatically generated from the entries of the online help system. The reference manual is divided into two large sections. Section <a href="#topics">By Topics</a> lists functions and symbols organized by topics. Within each topic, entries are sorted alphabetically. Section <a href="#reference">Complete Reference</a> lists all functions and symbols alphabetically. Please consult the <em>User Manual</em> and the <em>Readme</em> document for more general information about Z3S5 Lisp, an introduction to its use, and how to embedd it into Go programs.</p>
 <p>Incorrect documentation strings are bugs. Please report bugs using the corresponding <a href="https://github.com/rasteric/z3s5-lisp/issues">Github issue tracker for Z3S5 Lisp</a> and be as precise as possible. Superfluous and missing documentation entries are misfeatures and may also be reported.</p>
@@ -612,7 +612,7 @@
 <p>See also: <a href="#link72656d656d626572"><code>remember</code></a>, <a href="#link726563616c6c"><code>recall</code></a>, <a href="#link7265636f6c6c656374"><code>recollect</code></a>, <a href="#link726563616c6c2d7768656e"><code>recall-when</code></a>, <a href="#link726563616c6c2d696e666f"><code>recall-info</code></a>. <a href="#idx">→index</a></p>
 <h3 data-number="3.8.16" id="init-remember-procedure0"><span class="header-section-number">3.8.16</span> <code>init-remember</code> : procedure/0</h3>
 <p>Usage: <code>(init-remember)</code></p>
-<p>Initialize the remember database. This requires the modules ’kvdb and ’db enabled.</p>
+<p>Initialize the remember database. This requires the modules ’kvdb and ’db enabled. The database is located at (str+ (sysdir ’z3s5-data) “/remembered.z3kv”).</p>
 <p>See also: <a href="#link72656d656d626572"><code>remember</code></a>, <a href="#link726563616c6c2d7768656e"><code>recall-when</code></a>, <a href="#link726563616c6c"><code>recall</code></a>, <a href="#link666f72676574"><code>forget</code></a>. <a href="#idx">→index</a></p>
 <h3 data-number="3.8.17" id="kvdb.begin-procedure1"><span class="header-section-number">3.8.17</span> <code>kvdb.begin</code> : procedure/1</h3>
 <p>Usage: <code>(kvdb.begin db)</code></p>
@@ -3512,7 +3512,7 @@
 <p>See also: <a href="#link6e7468"><code>nth</code></a>, <a href="#link7365713f"><code>seq?</code></a>. <a href="#idx">→index</a> <a href="#seq">→topic</a></p>
 <h2 data-number="4.284" id="link696e69742d72656d656d626572"><span class="header-section-number">4.284</span> <code>init-remember</code> : procedure/0</h2>
 <p>Usage: <code>(init-remember)</code></p>
-<p>Initialize the remember database. This requires the modules ’kvdb and ’db enabled.</p>
+<p>Initialize the remember database. This requires the modules ’kvdb and ’db enabled. The database is located at (str+ (sysdir ’z3s5-data) “/remembered.z3kv”).</p>
 <p>See also: <a href="#link72656d656d626572"><code>remember</code></a>, <a href="#link726563616c6c2d7768656e"><code>recall-when</code></a>, <a href="#link726563616c6c"><code>recall</code></a>, <a href="#link666f72676574"><code>forget</code></a>. <a href="#idx">→index</a> <a href="#db">→topic</a></p>
 <h2 data-number="4.285" id="link696e737472"><span class="header-section-number">4.285</span> <code>instr</code> : procedure/2</h2>
 <p>Usage: <code>(instr s1 s2) =&gt; int</code></p>

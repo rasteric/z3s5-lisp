@@ -2146,7 +2146,22 @@
 (dfc! '*custom-hook-counter*)
 
 (setq *hooks*
-      (dict))
+      (dict
+       '(set-cursor 1
+	 draw-text 2
+	 print 3
+	 load 4
+	 load-text 5
+	 save 6
+	 save-text 7
+	 slow-irq 8
+	 shutdown 9
+	 superslow-irq 10
+	 scroll-up-pre 11
+	 scroll-up-post 12
+	 scroll-down-pre 13
+	 scroll-down-post 14
+	 startup 15)))
 
 (defhelp *hooks*
     (use "*hooks*")
@@ -3404,8 +3419,7 @@
 (defun synout (arg)
   (enq
    (lambda ()
-     (out arg)
-     (when (permission? 'interactive (read-eval-reply))))))
+     (out arg))))
 
 (defhelp synout
     (use "(synout arg)")
@@ -3419,8 +3433,7 @@
 (defun synouty (li)
   (enq
    (lambda ()
-     (outy li)
-     (when (permission? 'interactive) (read-eval-reply)))))
+     (outy li))))
 
 (defhelp synouty
     (use "(synouty li)")
@@ -3984,10 +3997,14 @@
 ;;; a key-value database using the 'db module (Sqlite3)
 
 (when (member 'db *reflect*)
+  (declare-unprotected '*remember-db*)(declare-volatile '*remember-db*)
   (setq *remember-db* nil)
+  (declare-unprotected 'kvdb.*default-search-limit*)
   (setq kvdb.*default-search-limit* 10000)
+  (declare-unprotected 'kvdb.*vacuum-modulo*)
   (setq kvdb.*vacuum-modulo* 997)
-  (setq kvdb.*report-maintenance* (lambda (x) (log (fmt "kvdb automated maintenance for %v" x))))
+  (declare-unprotected 'kvdb.*report-maintenance*)
+  (setq kvdb.*report-maintenance* (lambda (x) (sysmsg (fmt "kvdb automated maintenance for %v" x))))
 
   (defun kvdb.open (&rest fi)
     (let ((db (apply db.open fi)))
@@ -4355,13 +4372,12 @@
 	  (kvdb.open (str+ (sysdir 'z3s5-data) "/remembered.z3kv")))
     (add-hook 'shutdown
 	      (lambda (args)
-		(sysmsg "Closing remember db...")
 		(when *remember-db*
 		  (kvdb.close *remember-db*)))))
 
   (defhelp init-remember
       (use "(init-remember)")
-    (info "Initialize the remember database. This requires the modules 'kvdb and 'db enabled.")
+    (info "Initialize the remember database. This requires the modules 'kvdb and 'db enabled. The database is located at (str+ (sysdir 'z3s5-data) \"/remembered.z3kv\").")
     (type proc)
     (topic (db))
     (arity 0)

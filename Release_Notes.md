@@ -1,10 +1,22 @@
 # Version History
 
+## Version 2.3.5
+
+Build Tags: `db fts5` Sqlite3 database support, `fileio` file access
+
+- Added kvdb module (Lisp code) and support for `remember`. These require the `db` module, hence both build tags `db` and `fts5` must be used.
+
+- Added shutdown hook in z3 executable. Other built-in hooks are defined but not yet called. (Most of them are reserved for the Z3S5 Machine.)
+
+**Warning: If you're running the embedded interpreter you have to call the shutdown hook manually or create your own runtime that does that!**
+
+Bugs: Known regression bug in zimages. We need to check for global DB values and gracefully handle their initialization by calling a start hook once an image is loaded.
+
 ## Version 2.3.4
 
 Modules: `(zimage tasks help beep db fileio decimal ling float console base)`
 
-Build Tags: `db` Sqlite3 database support, `fileio` file access
+Build Tags: `db fts5` Sqlite3 database support, `fileio` file access
 
 - Further improvements to the documentation.
 

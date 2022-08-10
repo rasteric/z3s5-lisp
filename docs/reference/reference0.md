@@ -2,9 +2,9 @@
 title: Z3S5 Lisp Reference Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: Version 2.3.4+772693c
+footer-left: Version 2.3.4+e6d4665
 author: by Erich Rast and all Help system contributors
-date: 2022-8-10 11:42
+date: 2022-8-10 14:16
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -13,7 +13,7 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
-For Z3S5 Lisp Version 2.3.4+772693c with installed modules (kvdb zimage tasks help beep db fileio decimal ling float console base).
+For Z3S5 Lisp Version 2.3.4+e6d4665 with installed modules (kvdb zimage tasks help beep db fileio decimal ling float console base).
 
 # Introduction
 
@@ -1210,7 +1210,7 @@ See also: [`remember`](#link72656d656d626572), [`recall`](#link726563616c6c), [`
 
 Usage: `(init-remember)`
 
-Initialize the remember database. This requires the modules 'kvdb and 'db enabled.
+Initialize the remember database. This requires the modules 'kvdb and 'db enabled. The database is located at (str+ (sysdir 'z3s5-data) "/remembered.z3kv").
 
 See also: [`remember`](#link72656d656d626572), [`recall-when`](#link726563616c6c2d7768656e), [`recall`](#link726563616c6c), [`forget`](#link666f72676574).	 [→index](#idx)
 
@@ -7044,7 +7044,7 @@ See also: [`nth`](#link6e7468), [`seq?`](#link7365713f).	 [→index](#idx) [→t
 
 Usage: `(init-remember)`
 
-Initialize the remember database. This requires the modules 'kvdb and 'db enabled.
+Initialize the remember database. This requires the modules 'kvdb and 'db enabled. The database is located at (str+ (sysdir 'z3s5-data) "/remembered.z3kv").
 
 See also: [`remember`](#link72656d656d626572), [`recall-when`](#link726563616c6c2d7768656e), [`recall`](#link726563616c6c), [`forget`](#link666f72676574).	 [→index](#idx) [→topic](#db)
 
