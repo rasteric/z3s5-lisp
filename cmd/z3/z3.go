@@ -4,12 +4,14 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	z3 "github.com/rasteric/z3s5-lisp"
 )
 
 func main() {
-	exec := flag.String("l", "", "load the specified file and execute it in a non-interactive session")
+	load := flag.String("l", "", "load the specified file and execute it in a non-interactive session")
+	exec := flag.String("e", "", "execute the expression(s) given as argument at startup")
 	interactive := flag.Bool("i", false, "run the interpreter interactively even if a file is loaded with -l")
 	silent := flag.Bool("s", false, "set *interactive-session* false even if -i is specified to prevent printing a start banner")
 	flag.Parse()
@@ -20,20 +22,31 @@ func main() {
 	}
 	// the following needs to be set before boot to prevent printing start banner
 	// it sets the global variable *interactive-session*
-	interp.SetInteractive((*exec == "" || *interactive) && !(*silent))
+	interp.SetInteractive(((*load == "" && *exec == "") || *interactive) && !(*silent))
 	err = interp.Boot()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Z3S5 Lisp failed to boot the standard prelude: %v\n", err)
 		os.Exit(2)
 	}
 	interp.SafeEval(&z3.Cell{Car: z3.NewSym("protect-toplevel-symbols"), Cdr: z3.Nil}, z3.Nil)
-	if *exec != "" {
-		file, err := os.Open(*exec)
+	if *load != "" {
+		file, err := os.Open(*load)
 		if err != nil {
 			panic(err)
 		}
 		defer file.Close()
 		if !interp.Run(file) {
+			fmt.Fprintf(os.Stderr, "Z3S5 Lisp error in input file \"%v\" given with -l flag.\n", *load)
+			os.Exit(1)
+		}
+		if !(*interactive) && *exec == "" {
+			os.Exit(0)
+		}
+	}
+	if *exec != "" {
+		ss := strings.NewReader(*exec)
+		if !interp.Run(ss) {
+			fmt.Fprintf(os.Stderr, "Z3S5 Lisp error in input expression given with -e flag.\n")
 			os.Exit(1)
 		}
 		if !(*interactive) {

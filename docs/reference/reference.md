@@ -2,9 +2,9 @@
 title: Z3S5 Lisp Reference Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: Version 2.3.3+d0736f6
+footer-left: Version 2.3.4+772693c
 author: by Erich Rast and all Help system contributors
-date: 2022-8-5 10:18
+date: 2022-8-10 11:42
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -13,7 +13,7 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
-For Z3S5 Lisp Version 2.3.3+d0736f6 with installed modules (tasks help beep db fileio decimal ling float console base).
+For Z3S5 Lisp Version 2.3.4+772693c with installed modules (kvdb zimage tasks help beep db fileio decimal ling float console base).
 
 # Introduction
 
@@ -24,7 +24,7 @@ Incorrect documentation strings are bugs. Please report bugs using the correspon
 
 # Index {#idx}
 
-[`%`](#link25) [`*`](#link2a) [`*colors*`](#link2a636f6c6f72732a) [`*error-handler*`](#link2a6572726f722d68616e646c65722a) [`*error-printer*`](#link2a6572726f722d7072696e7465722a) [`*help*`](#link2a68656c702a) [`*hooks*`](#link2a686f6f6b732a) [`*last-error*`](#link2a6c6173742d6572726f722a) [`*reflect*`](#link2a7265666c6563742a) [`+`](#link2b) [`-`](#link2d) [`/`](#link2f) [`/=`](#link2f3d) [`10th`](#link31307468) [`1st`](#link317374) [`2nd`](#link326e64) [`3rd`](#link337264) [`4th`](#link347468) [`5th`](#link357468) [`6th`](#link367468) [`7th`](#link377468) [`8th`](#link387468) [`9th`](#link397468) [`<`](#link3c) [`<=`](#link3c3d) [`=`](#link3d) [`>`](#link3e) [`>=`](#link3e3d) [`abs`](#link616273) [`add-hook`](#link6164642d686f6f6b) [`add-hook-internal`](#link6164642d686f6f6b2d696e7465726e616c) [`add-hook-once`](#link6164642d686f6f6b2d6f6e6365) [`add1`](#link61646431) [`alist->dict`](#link616c6973742d3e64696374) [`alist?`](#link616c6973743f) [`and`](#link616e64) [`append`](#link617070656e64) [`apply`](#link6170706c79) [`apropos`](#link6170726f706f73) [`array`](#link6172726179) [`array->list`](#link61727261792d3e6c697374) [`array->str`](#link61727261792d3e737472) [`array-copy`](#link61727261792d636f7079) [`array-exists?`](#link61727261792d6578697374733f) [`array-forall?`](#link61727261792d666f72616c6c3f) [`array-foreach`](#link61727261792d666f7265616368) [`array-len`](#link61727261792d6c656e) [`array-map!`](#link61727261792d6d617021) [`array-pmap!`](#link61727261792d706d617021) [`array-ref`](#link61727261792d726566) [`array-reverse`](#link61727261792d72657665727365) [`array-set`](#link61727261792d736574) [`array-slice`](#link61727261792d736c696365) [`array-sort`](#link61727261792d736f7274) [`array-walk`](#link61727261792d77616c6b) [`array?`](#link61727261793f) [`ascii85->blob`](#link617363696938352d3e626c6f62) [`assoc`](#link6173736f63) [`assoc1`](#link6173736f6331) [`assq`](#link61737371) [`atom?`](#link61746f6d3f) [`base64->blob`](#link6261736536342d3e626c6f62) [`beep`](#link62656570) [`bind`](#link62696e64) [`bitand`](#link626974616e64) [`bitclear`](#link626974636c656172) [`bitor`](#link6269746f72) [`bitshl`](#link62697473686c) [`bitshr`](#link626974736872) [`bitxor`](#link626974786f72) [`blob->ascii85`](#link626c6f622d3e61736369693835) [`blob->base64`](#link626c6f622d3e626173653634) [`blob->hex`](#link626c6f622d3e686578) [`blob->str`](#link626c6f622d3e737472) [`blob-chksum`](#link626c6f622d63686b73756d) [`blob-equal?`](#link626c6f622d657175616c3f) [`blob-free`](#link626c6f622d66726565) [`blob?`](#link626c6f623f) [`bound?`](#link626f756e643f) [`build-array`](#link6275696c642d6172726179) [`build-list`](#link6275696c642d6c697374) [`caaar`](#link6361616172) [`caadr`](#link6361616472) [`caar`](#link63616172) [`cadar`](#link6361646172) [`caddr`](#link6361646472) [`cadr`](#link63616472) [`can-externalize?`](#link63616e2d65787465726e616c697a653f) [`car`](#link636172) [`case`](#link63617365) [`ccmp`](#link63636d70) [`cdaar`](#link6364616172) [`cdadr`](#link6364616472) [`cdar`](#link63646172) [`cddar`](#link6364646172) [`cdddr`](#link6364646472) [`cddr`](#link63646472) [`cdec!`](#link6364656321) [`cdr`](#link636472) [`char->str`](#link636861722d3e737472) [`chars`](#link6368617273) [`chars->str`](#link63686172732d3e737472) [`cinc!`](#link63696e6321) [`close`](#link636c6f7365) [`closure?`](#link636c6f737572653f) [`collect-garbage`](#link636f6c6c6563742d67617262616765) [`color`](#link636f6c6f72) [`cons`](#link636f6e73) [`cons?`](#link636f6e733f) [`count-partitions`](#link636f756e742d706172746974696f6e73) [`cpunum`](#link6370756e756d) [`cst!`](#link63737421) [`current-error-handler`](#link63757272656e742d6572726f722d68616e646c6572) [`current-zimage`](#link63757272656e742d7a696d616765) [`cwait`](#link6377616974) [`darken`](#link6461726b656e) [`date->epoch-ns`](#link646174652d3e65706f63682d6e73) [`datelist->epoch-ns`](#link646174656c6973742d3e65706f63682d6e73) [`datestr`](#link64617465737472) [`datestr*`](#link646174657374722a) [`datestr->datelist`](#link646174657374722d3e646174656c697374) [`day+`](#link6461792b) [`day-of-week`](#link6461792d6f662d7765656b) [`db.blob`](#link64622e626c6f62) [`db.close`](#link64622e636c6f7365) [`db.close-result`](#link64622e636c6f73652d726573756c74) [`db.exec`](#link64622e65786563) [`db.float`](#link64622e666c6f6174) [`db.int`](#link64622e696e74) [`db.open`](#link64622e6f70656e) [`db.open*`](#link64622e6f70656e2a) [`db.query`](#link64622e7175657279) [`db.result-column-count`](#link64622e726573756c742d636f6c756d6e2d636f756e74) [`db.result-columns`](#link64622e726573756c742d636f6c756d6e73) [`db.row`](#link64622e726f77) [`db.step`](#link64622e73746570) [`db.str`](#link64622e737472) [`declare-volatile`](#link6465636c6172652d766f6c6174696c65) [`def-custom-hook`](#link6465662d637573746f6d2d686f6f6b) [`default-error-handler`](#link64656661756c742d6572726f722d68616e646c6572) [`defmacro`](#link6465666d6163726f) [`delete`](#link64656c657465) [`dequeue!`](#link6465717565756521) [`dict`](#link64696374) [`dict->alist`](#link646963742d3e616c697374) [`dict->array`](#link646963742d3e6172726179) [`dict->keys`](#link646963742d3e6b657973) [`dict->list`](#link646963742d3e6c697374) [`dict->values`](#link646963742d3e76616c756573) [`dict-copy`](#link646963742d636f7079) [`dict-empty?`](#link646963742d656d7074793f) [`dict-foreach`](#link646963742d666f7265616368) [`dict-map`](#link646963742d6d6170) [`dict-map!`](#link646963742d6d617021) [`dict-merge`](#link646963742d6d65726765) [`dict-protect`](#link646963742d70726f74656374) [`dict-protected?`](#link646963742d70726f7465637465643f) [`dict-unprotect`](#link646963742d756e70726f74656374) [`dict?`](#link646963743f) [`dir`](#link646972) [`dir?`](#link6469723f) [`div`](#link646976) [`dolist`](#link646f6c697374) [`dotimes`](#link646f74696d6573) [`dump`](#link64756d70) [`dump-bindings`](#link64756d702d62696e64696e6773) [`enq`](#link656e71) [`enqueue!`](#link656e717565756521) [`epoch-ns->datelist`](#link65706f63682d6e732d3e646174656c697374) [`eq?`](#link65713f) [`eql?`](#link65716c3f) [`equal?`](#link657175616c3f) [`error`](#link6572726f72) [`error->str`](#link6572726f722d3e737472) [`error?`](#link6572726f723f) [`eval`](#link6576616c) [`even?`](#link6576656e3f) [`exists?`](#link6578697374733f) [`exit`](#link65786974) [`expect`](#link657870656374) [`expect-err`](#link6578706563742d657272) [`expect-false`](#link6578706563742d66616c7365) [`expect-ok`](#link6578706563742d6f6b) [`expect-true`](#link6578706563742d74727565) [`expr->str`](#link657870722d3e737472) [`externalize`](#link65787465726e616c697a65) [`externalize0`](#link65787465726e616c697a6530) [`fdelete`](#link6664656c657465) [`feature?`](#link666561747572653f) [`file-port?`](#link66696c652d706f72743f) [`filter`](#link66696c746572) [`find-missing-help-entries`](#link66696e642d6d697373696e672d68656c702d656e7472696573) [`find-unneeded-help-entries`](#link66696e642d756e6e65656465642d68656c702d656e7472696573) [`fl.abs`](#link666c2e616273) [`fl.acos`](#link666c2e61636f73) [`fl.asin`](#link666c2e6173696e) [`fl.asinh`](#link666c2e6173696e68) [`fl.atan`](#link666c2e6174616e) [`fl.atan2`](#link666c2e6174616e32) [`fl.atanh`](#link666c2e6174616e68) [`fl.cbrt`](#link666c2e63627274) [`fl.ceil`](#link666c2e6365696c) [`fl.cos`](#link666c2e636f73) [`fl.cosh`](#link666c2e636f7368) [`fl.dim`](#link666c2e64696d) [`fl.erf`](#link666c2e657266) [`fl.erfc`](#link666c2e65726663) [`fl.erfcinv`](#link666c2e65726663696e76) [`fl.erfinv`](#link666c2e657266696e76) [`fl.exp`](#link666c2e657870) [`fl.exp2`](#link666c2e65787032) [`fl.expm1`](#link666c2e6578706d31) [`fl.floor`](#link666c2e666c6f6f72) [`fl.fma`](#link666c2e666d61) [`fl.frexp`](#link666c2e6672657870) [`fl.gamma`](#link666c2e67616d6d61) [`fl.hypot`](#link666c2e6879706f74) [`fl.ilogb`](#link666c2e696c6f6762) [`fl.inf`](#link666c2e696e66) [`fl.is-nan?`](#link666c2e69732d6e616e3f) [`fl.j0`](#link666c2e6a30) [`fl.j1`](#link666c2e6a31) [`fl.jn`](#link666c2e6a6e) [`fl.ldexp`](#link666c2e6c64657870) [`fl.lgamma`](#link666c2e6c67616d6d61) [`fl.log`](#link666c2e6c6f67) [`fl.log10`](#link666c2e6c6f673130) [`fl.log1p`](#link666c2e6c6f673170) [`fl.log2`](#link666c2e6c6f6732) [`fl.logb`](#link666c2e6c6f6762) [`fl.max`](#link666c2e6d6178) [`fl.min`](#link666c2e6d696e) [`fl.mod`](#link666c2e6d6f64) [`fl.modf`](#link666c2e6d6f6466) [`fl.nan`](#link666c2e6e616e) [`fl.next-after`](#link666c2e6e6578742d6166746572) [`fl.pow`](#link666c2e706f77) [`fl.pow10`](#link666c2e706f773130) [`fl.remainder`](#link666c2e72656d61696e646572) [`fl.round`](#link666c2e726f756e64) [`fl.round-to-even`](#link666c2e726f756e642d746f2d6576656e) [`fl.signbit`](#link666c2e7369676e626974) [`fl.sin`](#link666c2e73696e) [`fl.sinh`](#link666c2e73696e68) [`fl.sqrt`](#link666c2e73717274) [`fl.tan`](#link666c2e74616e) [`fl.tanh`](#link666c2e74616e68) [`fl.trunc`](#link666c2e7472756e63) [`fl.y0`](#link666c2e7930) [`fl.y1`](#link666c2e7931) [`fl.yn`](#link666c2e796e) [`flatten`](#link666c617474656e) [`float`](#link666c6f6174) [`fmt`](#link666d74) [`forall?`](#link666f72616c6c3f) [`force`](#link666f726365) [`foreach`](#link666f7265616368) [`functional-arity`](#link66756e6374696f6e616c2d6172697479) [`functional-has-rest?`](#link66756e6374696f6e616c2d6861732d726573743f) [`functional?`](#link66756e6374696f6e616c3f) [`gensym`](#link67656e73796d) [`get`](#link676574) [`get-or-set`](#link6765742d6f722d736574) [`get-partitions`](#link6765742d706172746974696f6e73) [`getstacked`](#link676574737461636b6564) [`glance`](#link676c616e6365) [`has`](#link686173) [`has-key?`](#link6861732d6b65793f) [`help`](#link68656c70) [`help->manual-entry`](#link68656c702d3e6d616e75616c2d656e747279) [`help-about`](#link68656c702d61626f7574) [`help-entry`](#link68656c702d656e747279) [`help-topic-info`](#link68656c702d746f7069632d696e666f) [`help-topics`](#link68656c702d746f70696373) [`hex->blob`](#link6865782d3e626c6f62) [`hook`](#link686f6f6b) [`hour+`](#link686f75722b) [`identity`](#link6964656e74697479) [`if`](#link6966) [`inchars`](#link696e6368617273) [`include`](#link696e636c756465) [`index`](#link696e646578) [`instr`](#link696e737472) [`int`](#link696e74) [`intern`](#link696e7465726e) [`internalize`](#link696e7465726e616c697a65) [`intrinsic`](#link696e7472696e736963) [`intrinsic?`](#link696e7472696e7369633f) [`iterate`](#link69746572617465) [`last`](#link6c617374) [`lcons`](#link6c636f6e73) [`len`](#link6c656e) [`let`](#link6c6574) [`letrec`](#link6c6574726563) [`lighten`](#link6c69676874656e) [`ling.damerau-levenshtein`](#link6c696e672e64616d657261752d6c6576656e73687465696e) [`ling.hamming`](#link6c696e672e68616d6d696e67) [`ling.jaro`](#link6c696e672e6a61726f) [`ling.jaro-winkler`](#link6c696e672e6a61726f2d77696e6b6c6572) [`ling.levenshtein`](#link6c696e672e6c6576656e73687465696e) [`ling.match-rating-codex`](#link6c696e672e6d617463682d726174696e672d636f646578) [`ling.match-rating-compare`](#link6c696e672e6d617463682d726174696e672d636f6d70617265) [`ling.metaphone`](#link6c696e672e6d65746170686f6e65) [`ling.nysiis`](#link6c696e672e6e7973696973) [`ling.porter`](#link6c696e672e706f72746572) [`ling.soundex`](#link6c696e672e736f756e646578) [`list`](#link6c697374) [`list->array`](#link6c6973742d3e6172726179) [`list->set`](#link6c6973742d3e736574) [`list->str`](#link6c6973742d3e737472) [`list-exists?`](#link6c6973742d6578697374733f) [`list-forall?`](#link6c6973742d666f72616c6c3f) [`list-foreach`](#link6c6973742d666f7265616368) [`list-last`](#link6c6973742d6c617374) [`list-ref`](#link6c6973742d726566) [`list-reverse`](#link6c6973742d72657665727365) [`list-slice`](#link6c6973742d736c696365) [`list?`](#link6c6973743f) [`load-zimage`](#link6c6f61642d7a696d616765) [`macro?`](#link6d6163726f3f) [`make-blob`](#link6d616b652d626c6f62) [`make-mutex`](#link6d616b652d6d75746578) [`make-queue`](#link6d616b652d7175657565) [`make-set`](#link6d616b652d736574) [`make-stack`](#link6d616b652d737461636b) [`make-symbol`](#link6d616b652d73796d626f6c) [`map`](#link6d6170) [`map-pairwise`](#link6d61702d7061697277697365) [`mapcar`](#link6d6170636172) [`max`](#link6d6178) [`member`](#link6d656d626572) [`memq`](#link6d656d71) [`memstats`](#link6d656d7374617473) [`min`](#link6d696e) [`minmax`](#link6d696e6d6178) [`minute+`](#link6d696e7574652b) [`mod`](#link6d6f64) [`month+`](#link6d6f6e74682b) [`mutex-lock`](#link6d757465782d6c6f636b) [`mutex-rlock`](#link6d757465782d726c6f636b) [`mutex-runlock`](#link6d757465782d72756e6c6f636b) [`mutex-unlock`](#link6d757465782d756e6c6f636b) [`nconc`](#link6e636f6e63) [`nl`](#link6e6c) [`nonce`](#link6e6f6e6365) [`not`](#link6e6f74) [`now`](#link6e6f77) [`now-ms`](#link6e6f772d6d73) [`now-ns`](#link6e6f772d6e73) [`nreverse`](#link6e72657665727365) [`nth`](#link6e7468) [`nth-partition`](#link6e74682d706172746974696f6e) [`nthdef`](#link6e7468646566) [`null?`](#link6e756c6c3f) [`num?`](#link6e756d3f) [`odd?`](#link6f64643f) [`on-feature`](#link6f6e2d66656174757265) [`open`](#link6f70656e) [`or`](#link6f72) [`out`](#link6f7574) [`outy`](#link6f757479) [`peek`](#link7065656b) [`permission?`](#link7065726d697373696f6e3f) [`permissions`](#link7065726d697373696f6e73) [`poke`](#link706f6b65) [`pop!`](#link706f7021) [`pop-error-handler`](#link706f702d6572726f722d68616e646c6572) [`pop-finalizer`](#link706f702d66696e616c697a6572) [`popstacked`](#link706f70737461636b6564) [`prin1`](#link7072696e31) [`princ`](#link7072696e63) [`print`](#link7072696e74) [`proc?`](#link70726f633f) [`protect`](#link70726f74656374) [`protect-toplevel-symbols`](#link70726f746563742d746f706c6576656c2d73796d626f6c73) [`protected?`](#link70726f7465637465643f) [`prune-task-table`](#link7072756e652d7461736b2d7461626c65) [`prune-unneeded-help-entries`](#link7072756e652d756e6e65656465642d68656c702d656e7472696573) [`push!`](#link7075736821) [`push-error-handler`](#link707573682d6572726f722d68616e646c6572) [`push-finalizer`](#link707573682d66696e616c697a6572) [`pushstacked`](#link70757368737461636b6564) [`queue-empty?`](#link71756575652d656d7074793f) [`queue-len`](#link71756575652d6c656e) [`queue?`](#link71756575653f) [`rand`](#link72616e64) [`random-color`](#link72616e646f6d2d636f6c6f72) [`read`](#link72656164) [`read-binary`](#link726561642d62696e617279) [`read-string`](#link726561642d737472696e67) [`read-zimage`](#link726561642d7a696d616765) [`readall`](#link72656164616c6c) [`readall-str`](#link72656164616c6c2d737472) [`remove-duplicates`](#link72656d6f76652d6475706c696361746573) [`remove-hook`](#link72656d6f76652d686f6f6b) [`remove-hook-internal`](#link72656d6f76652d686f6f6b2d696e7465726e616c) [`remove-hooks`](#link72656d6f76652d686f6f6b73) [`replace-hook`](#link7265706c6163652d686f6f6b) [`reverse`](#link72657665727365) [`rnd`](#link726e64) [`rndseed`](#link726e6473656564) [`rplaca`](#link72706c616361) [`run-at`](#link72756e2d6174) [`run-hook`](#link72756e2d686f6f6b) [`run-hook-internal`](#link72756e2d686f6f6b2d696e7465726e616c) [`run-selftest`](#link72756e2d73656c6674657374) [`run-zimage`](#link72756e2d7a696d616765) [`save-zimage`](#link736176652d7a696d616765) [`sec+`](#link7365632b) [`semver.build`](#link73656d7665722e6275696c64) [`semver.canonical`](#link73656d7665722e63616e6f6e6963616c) [`semver.compare`](#link73656d7665722e636f6d70617265) [`semver.is-valid?`](#link73656d7665722e69732d76616c69643f) [`semver.major`](#link73656d7665722e6d616a6f72) [`semver.major-minor`](#link73656d7665722e6d616a6f722d6d696e6f72) [`semver.max`](#link73656d7665722e6d6178) [`semver.prerelease`](#link73656d7665722e70726572656c65617365) [`seq?`](#link7365713f) [`set`](#link736574) [`set*`](#link7365742a) [`set->list`](#link7365742d3e6c697374) [`set-color`](#link7365742d636f6c6f72) [`set-complement`](#link7365742d636f6d706c656d656e74) [`set-difference`](#link7365742d646966666572656e6365) [`set-element?`](#link7365742d656c656d656e743f) [`set-empty?`](#link7365742d656d7074793f) [`set-equal?`](#link7365742d657175616c3f) [`set-help-topic-info`](#link7365742d68656c702d746f7069632d696e666f) [`set-intersection`](#link7365742d696e74657273656374696f6e) [`set-permissions`](#link7365742d7065726d697373696f6e73) [`set-subset?`](#link7365742d7375627365743f) [`set-union`](#link7365742d756e696f6e) [`set-volume`](#link7365742d766f6c756d65) [`set?`](#link7365743f) [`setcar`](#link736574636172) [`setcdr`](#link736574636472) [`shorten`](#link73686f7274656e) [`sleep`](#link736c656570) [`sleep-ns`](#link736c6565702d6e73) [`slice`](#link736c696365) [`sort`](#link736f7274) [`sort-symbols`](#link736f72742d73796d626f6c73) [`spaces`](#link737061636573) [`stack-empty?`](#link737461636b2d656d7074793f) [`stack-len`](#link737461636b2d6c656e) [`stack?`](#link737461636b3f) [`str+`](#link7374722b) [`str->array`](#link7374722d3e6172726179) [`str->blob`](#link7374722d3e626c6f62) [`str->char`](#link7374722d3e63686172) [`str->chars`](#link7374722d3e6368617273) [`str->expr`](#link7374722d3e65787072) [`str->expr*`](#link7374722d3e657870722a) [`str->list`](#link7374722d3e6c697374) [`str->sym`](#link7374722d3e73796d) [`str-count-substr`](#link7374722d636f756e742d737562737472) [`str-empty?`](#link7374722d656d7074793f) [`str-exists?`](#link7374722d6578697374733f) [`str-forall?`](#link7374722d666f72616c6c3f) [`str-foreach`](#link7374722d666f7265616368) [`str-index`](#link7374722d696e646578) [`str-join`](#link7374722d6a6f696e) [`str-port?`](#link7374722d706f72743f) [`str-ref`](#link7374722d726566) [`str-remove-number`](#link7374722d72656d6f76652d6e756d626572) [`str-remove-prefix`](#link7374722d72656d6f76652d707265666978) [`str-remove-suffix`](#link7374722d72656d6f76652d737566666978) [`str-replace`](#link7374722d7265706c616365) [`str-replace*`](#link7374722d7265706c6163652a) [`str-reverse`](#link7374722d72657665727365) [`str-segment`](#link7374722d7365676d656e74) [`str-slice`](#link7374722d736c696365) [`str?`](#link7374723f) [`strbuild`](#link7374726275696c64) [`strcase`](#link73747263617365) [`strcenter`](#link73747263656e746572) [`strcnt`](#link737472636e74) [`strleft`](#link7374726c656674) [`strlen`](#link7374726c656e) [`strless`](#link7374726c657373) [`strlimit`](#link7374726c696d6974) [`strmap`](#link7374726d6170) [`stropen`](#link7374726f70656e) [`strright`](#link7374727269676874) [`strsplit`](#link73747273706c6974) [`sub1`](#link73756231) [`sym->str`](#link73796d2d3e737472) [`sym?`](#link73796d3f) [`synout`](#link73796e6f7574) [`synouty`](#link73796e6f757479) [`sys-key?`](#link7379732d6b65793f) [`sysmsg`](#link7379736d7367) [`sysmsg*`](#link7379736d73672a) [`take`](#link74616b65) [`task`](#link7461736b) [`task-broadcast`](#link7461736b2d62726f616463617374) [`task-recv`](#link7461736b2d72656376) [`task-remove`](#link7461736b2d72656d6f7665) [`task-run`](#link7461736b2d72756e) [`task-schedule`](#link7461736b2d7363686564756c65) [`task-send`](#link7461736b2d73656e64) [`task-state`](#link7461736b2d7374617465) [`task?`](#link7461736b3f) [`terpri`](#link746572707269) [`testing`](#link74657374696e67) [`the-color`](#link7468652d636f6c6f72) [`the-color-names`](#link7468652d636f6c6f722d6e616d6573) [`time`](#link74696d65) [`truncate`](#link7472756e63617465) [`try`](#link747279) [`unless`](#link756e6c657373) [`unprotect`](#link756e70726f74656374) [`unprotect-toplevel-symbols`](#link756e70726f746563742d746f706c6576656c2d73796d626f6c73) [`valid?`](#link76616c69643f) [`void`](#link766f6964) [`wait-for`](#link776169742d666f72) [`wait-for*`](#link776169742d666f722a) [`wait-for-empty*`](#link776169742d666f722d656d7074792a) [`wait-until`](#link776169742d756e74696c) [`wait-until*`](#link776169742d756e74696c2a) [`warn`](#link7761726e) [`week+`](#link7765656b2b) [`week-of-date`](#link7765656b2d6f662d64617465) [`when`](#link7768656e) [`when-permission`](#link7768656e2d7065726d697373696f6e) [`while`](#link7768696c65) [`with-colors`](#link776974682d636f6c6f7273) [`with-error-handler`](#link776974682d6572726f722d68616e646c6572) [`with-final`](#link776974682d66696e616c) [`with-mutex-lock`](#link776974682d6d757465782d6c6f636b) [`with-mutex-rlock`](#link776974682d6d757465782d726c6f636b) [`write`](#link7772697465) [`write-binary`](#link77726974652d62696e617279) [`write-binary-at`](#link77726974652d62696e6172792d6174) [`write-string`](#link77726974652d737472696e67) [`write-zimage`](#link77726974652d7a696d616765) [`year+`](#link796561722b) [`zimage-header`](#link7a696d6167652d686561646572) [`zimage-loadable?`](#link7a696d6167652d6c6f616461626c653f) [`zimage-runable?`](#link7a696d6167652d72756e61626c653f) 
+[`%`](#link25) [`*`](#link2a) [`*colors*`](#link2a636f6c6f72732a) [`*error-handler*`](#link2a6572726f722d68616e646c65722a) [`*error-printer*`](#link2a6572726f722d7072696e7465722a) [`*help*`](#link2a68656c702a) [`*hooks*`](#link2a686f6f6b732a) [`*last-error*`](#link2a6c6173742d6572726f722a) [`*reflect*`](#link2a7265666c6563742a) [`+`](#link2b) [`-`](#link2d) [`/`](#link2f) [`/=`](#link2f3d) [`10th`](#link31307468) [`1st`](#link317374) [`2nd`](#link326e64) [`3rd`](#link337264) [`4th`](#link347468) [`5th`](#link357468) [`6th`](#link367468) [`7th`](#link377468) [`8th`](#link387468) [`9th`](#link397468) [`<`](#link3c) [`<=`](#link3c3d) [`=`](#link3d) [`>`](#link3e) [`>=`](#link3e3d) [`abs`](#link616273) [`add-hook`](#link6164642d686f6f6b) [`add-hook-internal`](#link6164642d686f6f6b2d696e7465726e616c) [`add-hook-once`](#link6164642d686f6f6b2d6f6e6365) [`add1`](#link61646431) [`alist->dict`](#link616c6973742d3e64696374) [`alist?`](#link616c6973743f) [`and`](#link616e64) [`append`](#link617070656e64) [`apply`](#link6170706c79) [`apropos`](#link6170726f706f73) [`array`](#link6172726179) [`array->list`](#link61727261792d3e6c697374) [`array->str`](#link61727261792d3e737472) [`array-copy`](#link61727261792d636f7079) [`array-exists?`](#link61727261792d6578697374733f) [`array-forall?`](#link61727261792d666f72616c6c3f) [`array-foreach`](#link61727261792d666f7265616368) [`array-len`](#link61727261792d6c656e) [`array-map!`](#link61727261792d6d617021) [`array-pmap!`](#link61727261792d706d617021) [`array-ref`](#link61727261792d726566) [`array-reverse`](#link61727261792d72657665727365) [`array-set`](#link61727261792d736574) [`array-slice`](#link61727261792d736c696365) [`array-sort`](#link61727261792d736f7274) [`array-walk`](#link61727261792d77616c6b) [`array?`](#link61727261793f) [`ascii85->blob`](#link617363696938352d3e626c6f62) [`assoc`](#link6173736f63) [`assoc1`](#link6173736f6331) [`assq`](#link61737371) [`atom?`](#link61746f6d3f) [`base64->blob`](#link6261736536342d3e626c6f62) [`beep`](#link62656570) [`bind`](#link62696e64) [`bitand`](#link626974616e64) [`bitclear`](#link626974636c656172) [`bitor`](#link6269746f72) [`bitshl`](#link62697473686c) [`bitshr`](#link626974736872) [`bitxor`](#link626974786f72) [`blob->ascii85`](#link626c6f622d3e61736369693835) [`blob->base64`](#link626c6f622d3e626173653634) [`blob->hex`](#link626c6f622d3e686578) [`blob->str`](#link626c6f622d3e737472) [`blob-chksum`](#link626c6f622d63686b73756d) [`blob-equal?`](#link626c6f622d657175616c3f) [`blob-free`](#link626c6f622d66726565) [`blob?`](#link626c6f623f) [`bound?`](#link626f756e643f) [`build-array`](#link6275696c642d6172726179) [`build-list`](#link6275696c642d6c697374) [`caaar`](#link6361616172) [`caadr`](#link6361616472) [`caar`](#link63616172) [`cadar`](#link6361646172) [`caddr`](#link6361646472) [`cadr`](#link63616472) [`can-externalize?`](#link63616e2d65787465726e616c697a653f) [`car`](#link636172) [`case`](#link63617365) [`ccmp`](#link63636d70) [`cdaar`](#link6364616172) [`cdadr`](#link6364616472) [`cdar`](#link63646172) [`cddar`](#link6364646172) [`cdddr`](#link6364646472) [`cddr`](#link63646472) [`cdec!`](#link6364656321) [`cdr`](#link636472) [`char->str`](#link636861722d3e737472) [`chars`](#link6368617273) [`chars->str`](#link63686172732d3e737472) [`cinc!`](#link63696e6321) [`close`](#link636c6f7365) [`closure?`](#link636c6f737572653f) [`collect-garbage`](#link636f6c6c6563742d67617262616765) [`color`](#link636f6c6f72) [`cons`](#link636f6e73) [`cons?`](#link636f6e733f) [`count-partitions`](#link636f756e742d706172746974696f6e73) [`cpunum`](#link6370756e756d) [`cst!`](#link63737421) [`current-error-handler`](#link63757272656e742d6572726f722d68616e646c6572) [`current-zimage`](#link63757272656e742d7a696d616765) [`cwait`](#link6377616974) [`darken`](#link6461726b656e) [`date->epoch-ns`](#link646174652d3e65706f63682d6e73) [`datelist->epoch-ns`](#link646174656c6973742d3e65706f63682d6e73) [`datestr`](#link64617465737472) [`datestr*`](#link646174657374722a) [`datestr->datelist`](#link646174657374722d3e646174656c697374) [`day+`](#link6461792b) [`day-of-week`](#link6461792d6f662d7765656b) [`db.blob`](#link64622e626c6f62) [`db.close`](#link64622e636c6f7365) [`db.close-result`](#link64622e636c6f73652d726573756c74) [`db.exec`](#link64622e65786563) [`db.float`](#link64622e666c6f6174) [`db.int`](#link64622e696e74) [`db.open`](#link64622e6f70656e) [`db.open*`](#link64622e6f70656e2a) [`db.query`](#link64622e7175657279) [`db.result-column-count`](#link64622e726573756c742d636f6c756d6e2d636f756e74) [`db.result-columns`](#link64622e726573756c742d636f6c756d6e73) [`db.row`](#link64622e726f77) [`db.step`](#link64622e73746570) [`db.str`](#link64622e737472) [`declare-volatile`](#link6465636c6172652d766f6c6174696c65) [`def-custom-hook`](#link6465662d637573746f6d2d686f6f6b) [`default-error-handler`](#link64656661756c742d6572726f722d68616e646c6572) [`defmacro`](#link6465666d6163726f) [`delete`](#link64656c657465) [`dequeue!`](#link6465717565756521) [`dict`](#link64696374) [`dict->alist`](#link646963742d3e616c697374) [`dict->array`](#link646963742d3e6172726179) [`dict->keys`](#link646963742d3e6b657973) [`dict->list`](#link646963742d3e6c697374) [`dict->values`](#link646963742d3e76616c756573) [`dict-copy`](#link646963742d636f7079) [`dict-empty?`](#link646963742d656d7074793f) [`dict-foreach`](#link646963742d666f7265616368) [`dict-map`](#link646963742d6d6170) [`dict-map!`](#link646963742d6d617021) [`dict-merge`](#link646963742d6d65726765) [`dict-protect`](#link646963742d70726f74656374) [`dict-protected?`](#link646963742d70726f7465637465643f) [`dict-unprotect`](#link646963742d756e70726f74656374) [`dict?`](#link646963743f) [`dir`](#link646972) [`dir?`](#link6469723f) [`div`](#link646976) [`dolist`](#link646f6c697374) [`dotimes`](#link646f74696d6573) [`dump`](#link64756d70) [`dump-bindings`](#link64756d702d62696e64696e6773) [`enq`](#link656e71) [`enqueue!`](#link656e717565756521) [`epoch-ns->datelist`](#link65706f63682d6e732d3e646174656c697374) [`eq?`](#link65713f) [`eql?`](#link65716c3f) [`equal?`](#link657175616c3f) [`error`](#link6572726f72) [`error->str`](#link6572726f722d3e737472) [`error?`](#link6572726f723f) [`eval`](#link6576616c) [`even?`](#link6576656e3f) [`exists?`](#link6578697374733f) [`exit`](#link65786974) [`expect`](#link657870656374) [`expect-err`](#link6578706563742d657272) [`expect-false`](#link6578706563742d66616c7365) [`expect-ok`](#link6578706563742d6f6b) [`expect-true`](#link6578706563742d74727565) [`expr->str`](#link657870722d3e737472) [`externalize`](#link65787465726e616c697a65) [`externalize0`](#link65787465726e616c697a6530) [`fdelete`](#link6664656c657465) [`feature?`](#link666561747572653f) [`file-port?`](#link66696c652d706f72743f) [`filter`](#link66696c746572) [`find-missing-help-entries`](#link66696e642d6d697373696e672d68656c702d656e7472696573) [`find-unneeded-help-entries`](#link66696e642d756e6e65656465642d68656c702d656e7472696573) [`fl.abs`](#link666c2e616273) [`fl.acos`](#link666c2e61636f73) [`fl.asin`](#link666c2e6173696e) [`fl.asinh`](#link666c2e6173696e68) [`fl.atan`](#link666c2e6174616e) [`fl.atan2`](#link666c2e6174616e32) [`fl.atanh`](#link666c2e6174616e68) [`fl.cbrt`](#link666c2e63627274) [`fl.ceil`](#link666c2e6365696c) [`fl.cos`](#link666c2e636f73) [`fl.cosh`](#link666c2e636f7368) [`fl.dim`](#link666c2e64696d) [`fl.erf`](#link666c2e657266) [`fl.erfc`](#link666c2e65726663) [`fl.erfcinv`](#link666c2e65726663696e76) [`fl.erfinv`](#link666c2e657266696e76) [`fl.exp`](#link666c2e657870) [`fl.exp2`](#link666c2e65787032) [`fl.expm1`](#link666c2e6578706d31) [`fl.floor`](#link666c2e666c6f6f72) [`fl.fma`](#link666c2e666d61) [`fl.frexp`](#link666c2e6672657870) [`fl.gamma`](#link666c2e67616d6d61) [`fl.hypot`](#link666c2e6879706f74) [`fl.ilogb`](#link666c2e696c6f6762) [`fl.inf`](#link666c2e696e66) [`fl.is-nan?`](#link666c2e69732d6e616e3f) [`fl.j0`](#link666c2e6a30) [`fl.j1`](#link666c2e6a31) [`fl.jn`](#link666c2e6a6e) [`fl.ldexp`](#link666c2e6c64657870) [`fl.lgamma`](#link666c2e6c67616d6d61) [`fl.log`](#link666c2e6c6f67) [`fl.log10`](#link666c2e6c6f673130) [`fl.log1p`](#link666c2e6c6f673170) [`fl.log2`](#link666c2e6c6f6732) [`fl.logb`](#link666c2e6c6f6762) [`fl.max`](#link666c2e6d6178) [`fl.min`](#link666c2e6d696e) [`fl.mod`](#link666c2e6d6f64) [`fl.modf`](#link666c2e6d6f6466) [`fl.nan`](#link666c2e6e616e) [`fl.next-after`](#link666c2e6e6578742d6166746572) [`fl.pow`](#link666c2e706f77) [`fl.pow10`](#link666c2e706f773130) [`fl.remainder`](#link666c2e72656d61696e646572) [`fl.round`](#link666c2e726f756e64) [`fl.round-to-even`](#link666c2e726f756e642d746f2d6576656e) [`fl.signbit`](#link666c2e7369676e626974) [`fl.sin`](#link666c2e73696e) [`fl.sinh`](#link666c2e73696e68) [`fl.sqrt`](#link666c2e73717274) [`fl.tan`](#link666c2e74616e) [`fl.tanh`](#link666c2e74616e68) [`fl.trunc`](#link666c2e7472756e63) [`fl.y0`](#link666c2e7930) [`fl.y1`](#link666c2e7931) [`fl.yn`](#link666c2e796e) [`flatten`](#link666c617474656e) [`float`](#link666c6f6174) [`fmt`](#link666d74) [`forall?`](#link666f72616c6c3f) [`force`](#link666f726365) [`foreach`](#link666f7265616368) [`forget`](#link666f72676574) [`functional-arity`](#link66756e6374696f6e616c2d6172697479) [`functional-has-rest?`](#link66756e6374696f6e616c2d6861732d726573743f) [`functional?`](#link66756e6374696f6e616c3f) [`gensym`](#link67656e73796d) [`get`](#link676574) [`get-or-set`](#link6765742d6f722d736574) [`get-partitions`](#link6765742d706172746974696f6e73) [`getstacked`](#link676574737461636b6564) [`glance`](#link676c616e6365) [`has`](#link686173) [`has-key?`](#link6861732d6b65793f) [`help`](#link68656c70) [`help->manual-entry`](#link68656c702d3e6d616e75616c2d656e747279) [`help-about`](#link68656c702d61626f7574) [`help-entry`](#link68656c702d656e747279) [`help-topic-info`](#link68656c702d746f7069632d696e666f) [`help-topics`](#link68656c702d746f70696373) [`hex->blob`](#link6865782d3e626c6f62) [`hook`](#link686f6f6b) [`hour+`](#link686f75722b) [`identity`](#link6964656e74697479) [`if`](#link6966) [`inchars`](#link696e6368617273) [`include`](#link696e636c756465) [`index`](#link696e646578) [`init-remember`](#link696e69742d72656d656d626572) [`instr`](#link696e737472) [`int`](#link696e74) [`intern`](#link696e7465726e) [`internalize`](#link696e7465726e616c697a65) [`intrinsic`](#link696e7472696e736963) [`intrinsic?`](#link696e7472696e7369633f) [`iterate`](#link69746572617465) [`kvdb.begin`](#link6b7664622e626567696e) [`kvdb.close`](#link6b7664622e636c6f7365) [`kvdb.commit`](#link6b7664622e636f6d6d6974) [`kvdb.db?`](#link6b7664622e64623f) [`kvdb.forget`](#link6b7664622e666f72676574) [`kvdb.forget-everything`](#link6b7664622e666f726765742d65766572797468696e67) [`kvdb.get`](#link6b7664622e676574) [`kvdb.info`](#link6b7664622e696e666f) [`kvdb.open`](#link6b7664622e6f70656e) [`kvdb.rollback`](#link6b7664622e726f6c6c6261636b) [`kvdb.search`](#link6b7664622e736561726368) [`kvdb.set`](#link6b7664622e736574) [`kvdb.when`](#link6b7664622e7768656e) [`last`](#link6c617374) [`lcons`](#link6c636f6e73) [`len`](#link6c656e) [`let`](#link6c6574) [`letrec`](#link6c6574726563) [`lighten`](#link6c69676874656e) [`ling.damerau-levenshtein`](#link6c696e672e64616d657261752d6c6576656e73687465696e) [`ling.hamming`](#link6c696e672e68616d6d696e67) [`ling.jaro`](#link6c696e672e6a61726f) [`ling.jaro-winkler`](#link6c696e672e6a61726f2d77696e6b6c6572) [`ling.levenshtein`](#link6c696e672e6c6576656e73687465696e) [`ling.match-rating-codex`](#link6c696e672e6d617463682d726174696e672d636f646578) [`ling.match-rating-compare`](#link6c696e672e6d617463682d726174696e672d636f6d70617265) [`ling.metaphone`](#link6c696e672e6d65746170686f6e65) [`ling.nysiis`](#link6c696e672e6e7973696973) [`ling.porter`](#link6c696e672e706f72746572) [`ling.soundex`](#link6c696e672e736f756e646578) [`list`](#link6c697374) [`list->array`](#link6c6973742d3e6172726179) [`list->set`](#link6c6973742d3e736574) [`list->str`](#link6c6973742d3e737472) [`list-exists?`](#link6c6973742d6578697374733f) [`list-forall?`](#link6c6973742d666f72616c6c3f) [`list-foreach`](#link6c6973742d666f7265616368) [`list-last`](#link6c6973742d6c617374) [`list-ref`](#link6c6973742d726566) [`list-reverse`](#link6c6973742d72657665727365) [`list-slice`](#link6c6973742d736c696365) [`list?`](#link6c6973743f) [`load-zimage`](#link6c6f61642d7a696d616765) [`macro?`](#link6d6163726f3f) [`make-blob`](#link6d616b652d626c6f62) [`make-mutex`](#link6d616b652d6d75746578) [`make-queue`](#link6d616b652d7175657565) [`make-set`](#link6d616b652d736574) [`make-stack`](#link6d616b652d737461636b) [`make-symbol`](#link6d616b652d73796d626f6c) [`map`](#link6d6170) [`map-pairwise`](#link6d61702d7061697277697365) [`mapcar`](#link6d6170636172) [`max`](#link6d6178) [`member`](#link6d656d626572) [`memq`](#link6d656d71) [`memstats`](#link6d656d7374617473) [`min`](#link6d696e) [`minmax`](#link6d696e6d6178) [`minute+`](#link6d696e7574652b) [`mod`](#link6d6f64) [`month+`](#link6d6f6e74682b) [`mutex-lock`](#link6d757465782d6c6f636b) [`mutex-rlock`](#link6d757465782d726c6f636b) [`mutex-runlock`](#link6d757465782d72756e6c6f636b) [`mutex-unlock`](#link6d757465782d756e6c6f636b) [`nconc`](#link6e636f6e63) [`nl`](#link6e6c) [`nonce`](#link6e6f6e6365) [`not`](#link6e6f74) [`now`](#link6e6f77) [`now-ms`](#link6e6f772d6d73) [`now-ns`](#link6e6f772d6e73) [`nreverse`](#link6e72657665727365) [`nth`](#link6e7468) [`nth-partition`](#link6e74682d706172746974696f6e) [`nthdef`](#link6e7468646566) [`null?`](#link6e756c6c3f) [`num?`](#link6e756d3f) [`odd?`](#link6f64643f) [`on-feature`](#link6f6e2d66656174757265) [`open`](#link6f70656e) [`or`](#link6f72) [`out`](#link6f7574) [`outy`](#link6f757479) [`peek`](#link7065656b) [`permission?`](#link7065726d697373696f6e3f) [`permissions`](#link7065726d697373696f6e73) [`poke`](#link706f6b65) [`pop!`](#link706f7021) [`pop-error-handler`](#link706f702d6572726f722d68616e646c6572) [`pop-finalizer`](#link706f702d66696e616c697a6572) [`popstacked`](#link706f70737461636b6564) [`prin1`](#link7072696e31) [`princ`](#link7072696e63) [`print`](#link7072696e74) [`proc?`](#link70726f633f) [`protect`](#link70726f74656374) [`protect-toplevel-symbols`](#link70726f746563742d746f706c6576656c2d73796d626f6c73) [`protected?`](#link70726f7465637465643f) [`prune-task-table`](#link7072756e652d7461736b2d7461626c65) [`prune-unneeded-help-entries`](#link7072756e652d756e6e65656465642d68656c702d656e7472696573) [`push!`](#link7075736821) [`push-error-handler`](#link707573682d6572726f722d68616e646c6572) [`push-finalizer`](#link707573682d66696e616c697a6572) [`pushstacked`](#link70757368737461636b6564) [`queue-empty?`](#link71756575652d656d7074793f) [`queue-len`](#link71756575652d6c656e) [`queue?`](#link71756575653f) [`rand`](#link72616e64) [`random-color`](#link72616e646f6d2d636f6c6f72) [`read`](#link72656164) [`read-binary`](#link726561642d62696e617279) [`read-string`](#link726561642d737472696e67) [`read-zimage`](#link726561642d7a696d616765) [`readall`](#link72656164616c6c) [`readall-str`](#link72656164616c6c2d737472) [`recall`](#link726563616c6c) [`recall-info`](#link726563616c6c2d696e666f) [`recall-when`](#link726563616c6c2d7768656e) [`recollect`](#link7265636f6c6c656374) [`remember`](#link72656d656d626572) [`remove-duplicates`](#link72656d6f76652d6475706c696361746573) [`remove-hook`](#link72656d6f76652d686f6f6b) [`remove-hook-internal`](#link72656d6f76652d686f6f6b2d696e7465726e616c) [`remove-hooks`](#link72656d6f76652d686f6f6b73) [`replace-hook`](#link7265706c6163652d686f6f6b) [`reverse`](#link72657665727365) [`rnd`](#link726e64) [`rndseed`](#link726e6473656564) [`rplaca`](#link72706c616361) [`run-at`](#link72756e2d6174) [`run-hook`](#link72756e2d686f6f6b) [`run-hook-internal`](#link72756e2d686f6f6b2d696e7465726e616c) [`run-selftest`](#link72756e2d73656c6674657374) [`run-zimage`](#link72756e2d7a696d616765) [`save-zimage`](#link736176652d7a696d616765) [`sec+`](#link7365632b) [`semver.build`](#link73656d7665722e6275696c64) [`semver.canonical`](#link73656d7665722e63616e6f6e6963616c) [`semver.compare`](#link73656d7665722e636f6d70617265) [`semver.is-valid?`](#link73656d7665722e69732d76616c69643f) [`semver.major`](#link73656d7665722e6d616a6f72) [`semver.major-minor`](#link73656d7665722e6d616a6f722d6d696e6f72) [`semver.max`](#link73656d7665722e6d6178) [`semver.prerelease`](#link73656d7665722e70726572656c65617365) [`seq?`](#link7365713f) [`set`](#link736574) [`set*`](#link7365742a) [`set->list`](#link7365742d3e6c697374) [`set-color`](#link7365742d636f6c6f72) [`set-complement`](#link7365742d636f6d706c656d656e74) [`set-difference`](#link7365742d646966666572656e6365) [`set-element?`](#link7365742d656c656d656e743f) [`set-empty?`](#link7365742d656d7074793f) [`set-equal?`](#link7365742d657175616c3f) [`set-help-topic-info`](#link7365742d68656c702d746f7069632d696e666f) [`set-intersection`](#link7365742d696e74657273656374696f6e) [`set-permissions`](#link7365742d7065726d697373696f6e73) [`set-subset?`](#link7365742d7375627365743f) [`set-union`](#link7365742d756e696f6e) [`set-volume`](#link7365742d766f6c756d65) [`set?`](#link7365743f) [`setcar`](#link736574636172) [`setcdr`](#link736574636472) [`shorten`](#link73686f7274656e) [`sleep`](#link736c656570) [`sleep-ns`](#link736c6565702d6e73) [`slice`](#link736c696365) [`sort`](#link736f7274) [`sort-symbols`](#link736f72742d73796d626f6c73) [`spaces`](#link737061636573) [`stack-empty?`](#link737461636b2d656d7074793f) [`stack-len`](#link737461636b2d6c656e) [`stack?`](#link737461636b3f) [`str+`](#link7374722b) [`str->array`](#link7374722d3e6172726179) [`str->blob`](#link7374722d3e626c6f62) [`str->char`](#link7374722d3e63686172) [`str->chars`](#link7374722d3e6368617273) [`str->expr`](#link7374722d3e65787072) [`str->expr*`](#link7374722d3e657870722a) [`str->list`](#link7374722d3e6c697374) [`str->sym`](#link7374722d3e73796d) [`str-count-substr`](#link7374722d636f756e742d737562737472) [`str-empty?`](#link7374722d656d7074793f) [`str-exists?`](#link7374722d6578697374733f) [`str-forall?`](#link7374722d666f72616c6c3f) [`str-foreach`](#link7374722d666f7265616368) [`str-index`](#link7374722d696e646578) [`str-join`](#link7374722d6a6f696e) [`str-port?`](#link7374722d706f72743f) [`str-ref`](#link7374722d726566) [`str-remove-number`](#link7374722d72656d6f76652d6e756d626572) [`str-remove-prefix`](#link7374722d72656d6f76652d707265666978) [`str-remove-suffix`](#link7374722d72656d6f76652d737566666978) [`str-replace`](#link7374722d7265706c616365) [`str-replace*`](#link7374722d7265706c6163652a) [`str-reverse`](#link7374722d72657665727365) [`str-segment`](#link7374722d7365676d656e74) [`str-slice`](#link7374722d736c696365) [`str?`](#link7374723f) [`strbuild`](#link7374726275696c64) [`strcase`](#link73747263617365) [`strcenter`](#link73747263656e746572) [`strcnt`](#link737472636e74) [`strleft`](#link7374726c656674) [`strlen`](#link7374726c656e) [`strless`](#link7374726c657373) [`strlimit`](#link7374726c696d6974) [`strmap`](#link7374726d6170) [`stropen`](#link7374726f70656e) [`strright`](#link7374727269676874) [`strsplit`](#link73747273706c6974) [`sub1`](#link73756231) [`sym->str`](#link73796d2d3e737472) [`sym?`](#link73796d3f) [`synout`](#link73796e6f7574) [`synouty`](#link73796e6f757479) [`sys-key?`](#link7379732d6b65793f) [`sysmsg`](#link7379736d7367) [`sysmsg*`](#link7379736d73672a) [`take`](#link74616b65) [`task`](#link7461736b) [`task-broadcast`](#link7461736b2d62726f616463617374) [`task-recv`](#link7461736b2d72656376) [`task-remove`](#link7461736b2d72656d6f7665) [`task-run`](#link7461736b2d72756e) [`task-schedule`](#link7461736b2d7363686564756c65) [`task-send`](#link7461736b2d73656e64) [`task-state`](#link7461736b2d7374617465) [`task?`](#link7461736b3f) [`terpri`](#link746572707269) [`testing`](#link74657374696e67) [`the-color`](#link7468652d636f6c6f72) [`the-color-names`](#link7468652d636f6c6f722d6e616d6573) [`time`](#link74696d65) [`truncate`](#link7472756e63617465) [`try`](#link747279) [`unless`](#link756e6c657373) [`unprotect`](#link756e70726f74656374) [`unprotect-toplevel-symbols`](#link756e70726f746563742d746f706c6576656c2d73796d626f6c73) [`valid?`](#link76616c69643f) [`void`](#link766f6964) [`wait-for`](#link776169742d666f72) [`wait-for*`](#link776169742d666f722a) [`wait-for-empty*`](#link776169742d666f722d656d7074792a) [`wait-until`](#link776169742d756e74696c) [`wait-until*`](#link776169742d756e74696c2a) [`warn`](#link7761726e) [`week+`](#link7765656b2b) [`week-of-date`](#link7765656b2d6f662d64617465) [`when`](#link7768656e) [`when-permission`](#link7768656e2d7065726d697373696f6e) [`while`](#link7768696c65) [`with-colors`](#link776974682d636f6c6f7273) [`with-error-handler`](#link776974682d6572726f722d68616e646c6572) [`with-final`](#link776974682d66696e616c) [`with-mutex-lock`](#link776974682d6d757465782d6c6f636b) [`with-mutex-rlock`](#link776974682d6d757465782d726c6f636b) [`write`](#link7772697465) [`write-binary`](#link77726974652d62696e617279) [`write-binary-at`](#link77726974652d62696e6172792d6174) [`write-string`](#link77726974652d737472696e67) [`write-zimage`](#link77726974652d7a696d616765) [`year+`](#link796561722b) [`zimage-header`](#link7a696d6167652d686561646572) [`zimage-loadable?`](#link7a696d6167652d6c6f616461626c653f) [`zimage-runable?`](#link7a696d6167652d72756e61626c653f) 
 
 # By Topics {#topics}
 
@@ -1197,6 +1197,170 @@ Usage: `(db.str db-result n) => str`
 Get the content of column `n` in `db-result` as string.
 
 See also: [`db.blob`](#link64622e626c6f62), [`db.int`](#link64622e696e74), [`db.float`](#link64622e666c6f6174).	 [→index](#idx)
+
+### `forget` : procedure/1
+
+Usage: `(forget key)`
+
+Forget the value associated with `key`. This permanently deletes the value from the persistent record.
+
+See also: [`remember`](#link72656d656d626572), [`recall`](#link726563616c6c), [`recollect`](#link7265636f6c6c656374), [`recall-when`](#link726563616c6c2d7768656e), [`recall-info`](#link726563616c6c2d696e666f).	 [→index](#idx)
+
+### `init-remember` : procedure/0
+
+Usage: `(init-remember)`
+
+Initialize the remember database. This requires the modules 'kvdb and 'db enabled.
+
+See also: [`remember`](#link72656d656d626572), [`recall-when`](#link726563616c6c2d7768656e), [`recall`](#link726563616c6c), [`forget`](#link666f72676574).	 [→index](#idx)
+
+### `kvdb.begin` : procedure/1
+
+Usage: `(kvdb.begin db)`
+
+Begin a key-value database transaction. This can be committed by using kvdb.commit and rolled back by kvdb.rollback.
+
+See also: [`kvdb.comit`](#link6b7664622e636f6d6974), [`kvdb.rollback`](#link6b7664622e726f6c6c6261636b).	 [→index](#idx)
+
+**Warning: Transactions in key-value databases cannot be nested! You have to ensure that there is only one begin...commit pair.**
+
+### `kvdb.close` : procedure/1
+
+Usage: `(kvdb.close db)`
+
+Close a key-value db.
+
+See also: [`kvdb.open`](#link6b7664622e6f70656e).	 [→index](#idx)
+
+### `kvdb.commit` : procedure/1
+
+Usage: `(kvdb.commit db)`
+
+Commit the current transaction, making any changes made since the transaction started permanent.
+
+See also: [`kvdb.rollback`](#link6b7664622e726f6c6c6261636b), [`kvdb.begin`](#link6b7664622e626567696e).	 [→index](#idx)
+
+### `kvdb.db?` : procedure/1
+
+Usage: `(kvdb.db? datum) => bool`
+
+Return true if the given datum is a key-value database, nil otherwise.
+
+See also: [`kvdb.open`](#link6b7664622e6f70656e).	 [→index](#idx)
+
+### `kvdb.forget` : procedure/1
+
+Usage: `(kvdb.forget key)`
+
+Forget the value for `key` if there is one.
+
+See also: [`kvdb.set`](#link6b7664622e736574), [`kvdb.get`](#link6b7664622e676574).	 [→index](#idx)
+
+### `kvdb.forget-everything` : procedure/1
+
+Usage: `(kvdb.forget-everything db)`
+
+Erases all data from the given key-value database `db`, irrecoverably loosing ALL data in it.
+
+See also: [`kvdb.forget`](#link6b7664622e666f72676574).	 [→index](#idx)
+
+**Warning: This operation cannot be undone! Data for all types of keys is deleted. Permanent data loss is imminent!**
+
+### `kvdb.get` : procedure/2 or more
+
+Usage: `(kvdb.get db key [other]) => any`
+
+Get the value stored at `key` in the key-value database `db`. If the value is found, it is returned. If the value is not found and `other` is specified, then `other` is returned. If the value is not found and `other` is not specified, then nil is returned.
+
+See also: [`kvdb.set`](#link6b7664622e736574), [`kvdb.when`](#link6b7664622e7768656e), [`kvdb.info`](#link6b7664622e696e666f), [`kvdb.open`](#link6b7664622e6f70656e), [`kvdb.forget`](#link6b7664622e666f72676574), [`kvdb.close`](#link6b7664622e636c6f7365), [`kvdb.search`](#link6b7664622e736561726368), [`remember`](#link72656d656d626572), [`recall`](#link726563616c6c), [`forget`](#link666f72676574).	 [→index](#idx)
+
+### `kvdb.info` : procedure/2 or more
+
+Usage: `(db key [other]) => (str str)`
+
+Return a list containing the info string and its fuzzy variant stored for `key` in `db`, `other` when the value for `key` is not found. The default for `other` is nil.
+
+See also: [`kvdb.get`](#link6b7664622e676574), [`kvdb.when`](#link6b7664622e7768656e).	 [→index](#idx)
+
+### `kvdb.open` : procedure/1 or more
+
+Usage: `(kvdb.open path) => kvdb-array`
+
+Create or open a key-value database at `path.`
+
+See also: [`kvdb.close`](#link6b7664622e636c6f7365).	 [→index](#idx)
+
+### `kvdb.rollback` : procedure/1
+
+Usage: `(kvdb.rollback db)`
+
+Rollback the changes made since the last transaction has been started and return the key-value database to its previous state.
+
+See also: [`kvdb.commit`](#link6b7664622e636f6d6d6974), [`kvdb.begin`](#link6b7664622e626567696e).	 [→index](#idx)
+
+### `kvdb.search` : procedure/2 or more
+
+Usage: `(kvdb.search db s [keytype] [limit] [fuzzer]) => li`
+
+Search the key-value database `db` for search expression string `s` for optional `keytype` and return a list of matching keys. The optional `keytype` may be one of '(all str sym int expr), where the default is 'all for any kind of key. If the optional `limit` is provided, then only `limit` entries are returned. Default limit is kvdb.*default-search-limit*. If `fuzzer` is a function provided, then a fuzzy string search is performed based on applying fuzzer to the search term; default is nil. 
+
+See also: [`kvdb.get`](#link6b7664622e676574).	 [→index](#idx)
+
+### `kvdb.set` : procedure/3 or more
+
+Usage: `(kvdb.set db key value [info] [fuzzer])`
+
+Set the `value` for `key` in key-value database `db`. The optional `info` string contains searchable information about the value that may be retrieved with the search function. The optional `fuzzer` must be a function that takes a string and yields a fuzzy variant of the string that can be used for fuzzy search. If no fuzzer is specified, then the default metaphone algorithm is used. Keys for the database must be externalizable but notice that integer keys may provide faster performance.
+
+See also: [`kvdb.get`](#link6b7664622e676574), [`kvdb.forget`](#link6b7664622e666f72676574), [`kvdb.open`](#link6b7664622e6f70656e), [`kvdb.close`](#link6b7664622e636c6f7365), [`kvdb.search`](#link6b7664622e736561726368).	 [→index](#idx)
+
+### `kvdb.when` : procedure/2 or more
+
+Usage: `(kvdb.when db key [other]) => str`
+
+Get the date in `db` when the entry for `key` was last modified as a date string. If there is no entry for `key`, then `other` is returned. If `other` is not specified and there is no `key`, then nil is returned.
+
+See also: [`datestr->datelist`](#link646174657374722d3e646174656c697374), [`kvdb.get`](#link6b7664622e676574), [`kvdb.info`](#link6b7664622e696e666f).	 [→index](#idx)
+
+### `recall` : procedure/1 or more
+
+Usage: `(recall key [notfound]) => any`
+
+Obtain the value remembered for `key`, `notfound` if it doesn't exist. If `notfound` is not provided, then nil is returned in case the value for `key` doesn't exist.
+
+See also: [`recall-when`](#link726563616c6c2d7768656e), [`recall-info`](#link726563616c6c2d696e666f), [`recollect`](#link7265636f6c6c656374), [`remember`](#link72656d656d626572), [`forget`](#link666f72676574).	 [→index](#idx)
+
+### `recall-info` : procedure/1 or more
+
+Usage: `(recall-info key [notfound]) => (str str)`
+
+Return a list containing the info string and its fuzzy version for a remembered value with the given `key`, `notfound` if no value for `key` was found. The default for `notfound` is nil.
+
+See also: [`recall-when`](#link726563616c6c2d7768656e), [`recall`](#link726563616c6c), [`recall-when`](#link726563616c6c2d7768656e), [`recollect`](#link7265636f6c6c656374), [`remember`](#link72656d656d626572), [`forget`](#link666f72676574).	 [→index](#idx)
+
+### `recall-when` : procedure/1 or more
+
+Usage: `(recall-when key [notfound]) => datestr`
+
+Obtain the date string when the value for `key` was last modified by remember (set), `notfound` if it doesn't exist. If `notfound` is not provided, then nil is returned in case there is no value for `key.`
+
+See also: [`recall`](#link726563616c6c), [`datestr->datelist`](#link646174657374722d3e646174656c697374), [`recall-info`](#link726563616c6c2d696e666f), [`remember`](#link72656d656d626572), [`forget`](#link666f72676574).	 [→index](#idx)
+
+### `recollect` : procedure/1 or more
+
+Usage: `(recollect s [keytype] [limit] [fuzzer]) => li`
+
+Search for remembered items based on search query `s` and return a list of matching keys. The optional `keytype` parameter must be one of '(all str sym int expr), where the default is 'all for all kinds of keys. Up to `limit` results are returned, default is kvdb.*default-search-limit*. The optional `fuzzer` procedure takes a word string and yields a 'fuzzy' version of it. If fuzzer is specified and a procedure, then a fuzzy search is performed.
+
+See also: [`kvdb.search`](#link6b7664622e736561726368), [`recall`](#link726563616c6c), [`recall-info`](#link726563616c6c2d696e666f), [`recall-when`](#link726563616c6c2d7768656e), [`remember`](#link72656d656d626572).	 [→index](#idx)
+
+### `remember` : procedure/2
+
+Usage: `(remember key value [info] [fuzzer])`
+
+Persistently remember `value` by given `key`. See kvdb.set for the optional `info` and `fuzzer` arguments.
+
+See also: [`recall`](#link726563616c6c), [`forget`](#link666f72676574), [`kvdb.set`](#link6b7664622e736574), [`recall-when`](#link726563616c6c2d7768656e), [`recall-info`](#link726563616c6c2d696e666f), [`recollect`](#link7265636f6c6c656374).	 [→index](#idx)
 
 
 
@@ -6668,6 +6832,14 @@ Apply `proc` to each element of sequence `seq` in order, for the side effects.
 
 See also: [`seq?`](#link7365713f), [`map`](#link6d6170).	 [→index](#idx) [→topic](#seq)
 
+## `forget` : procedure/1 {#link666f72676574}
+
+Usage: `(forget key)`
+
+Forget the value associated with `key`. This permanently deletes the value from the persistent record.
+
+See also: [`remember`](#link72656d656d626572), [`recall`](#link726563616c6c), [`recollect`](#link7265636f6c6c656374), [`recall-when`](#link726563616c6c2d7768656e), [`recall-info`](#link726563616c6c2d696e666f).	 [→index](#idx) [→topic](#db)
+
 ## `functional-arity` : procedure/1 {#link66756e6374696f6e616c2d6172697479}
 
 Usage: `(functional-arity proc) => int`
@@ -6868,6 +7040,14 @@ Return the first index of `elem` in `seq` going from left to right, using equali
 
 See also: [`nth`](#link6e7468), [`seq?`](#link7365713f).	 [→index](#idx) [→topic](#seq)
 
+## `init-remember` : procedure/0 {#link696e69742d72656d656d626572}
+
+Usage: `(init-remember)`
+
+Initialize the remember database. This requires the modules 'kvdb and 'db enabled.
+
+See also: [`remember`](#link72656d656d626572), [`recall-when`](#link726563616c6c2d7768656e), [`recall`](#link726563616c6c), [`forget`](#link666f72676574).	 [→index](#idx) [→topic](#db)
+
 ## `instr` : procedure/2 {#link696e737472}
 
 Usage: `(instr s1 s2) => int`
@@ -6929,6 +7109,114 @@ Usage: `(iterate it proc)`
 Apply `proc` to each argument returned by iterator `it` in sequence, similar to the way foreach works. An iterator is a procedure that takes one integer as argument or no argument at all. If no argument is provided, the iterator returns the number of iterations. If an integer is provided, the iterator returns a non-nil value for the given index.
 
 See also: [`foreach`](#link666f7265616368), [`get-partitions`](#link6765742d706172746974696f6e73).	 [→index](#idx) [→topic](#lisp)
+
+## `kvdb.begin` : procedure/1 {#link6b7664622e626567696e}
+
+Usage: `(kvdb.begin db)`
+
+Begin a key-value database transaction. This can be committed by using kvdb.commit and rolled back by kvdb.rollback.
+
+See also: [`kvdb.comit`](#link6b7664622e636f6d6974), [`kvdb.rollback`](#link6b7664622e726f6c6c6261636b).	 [→index](#idx)
+
+**Warning: Transactions in key-value databases cannot be nested! You have to ensure that there is only one begin...commit pair.** [→topic](#db)
+
+## `kvdb.close` : procedure/1 {#link6b7664622e636c6f7365}
+
+Usage: `(kvdb.close db)`
+
+Close a key-value db.
+
+See also: [`kvdb.open`](#link6b7664622e6f70656e).	 [→index](#idx) [→topic](#db)
+
+## `kvdb.commit` : procedure/1 {#link6b7664622e636f6d6d6974}
+
+Usage: `(kvdb.commit db)`
+
+Commit the current transaction, making any changes made since the transaction started permanent.
+
+See also: [`kvdb.rollback`](#link6b7664622e726f6c6c6261636b), [`kvdb.begin`](#link6b7664622e626567696e).	 [→index](#idx) [→topic](#db)
+
+## `kvdb.db?` : procedure/1 {#link6b7664622e64623f}
+
+Usage: `(kvdb.db? datum) => bool`
+
+Return true if the given datum is a key-value database, nil otherwise.
+
+See also: [`kvdb.open`](#link6b7664622e6f70656e).	 [→index](#idx) [→topic](#db)
+
+## `kvdb.forget` : procedure/1 {#link6b7664622e666f72676574}
+
+Usage: `(kvdb.forget key)`
+
+Forget the value for `key` if there is one.
+
+See also: [`kvdb.set`](#link6b7664622e736574), [`kvdb.get`](#link6b7664622e676574).	 [→index](#idx) [→topic](#db)
+
+## `kvdb.forget-everything` : procedure/1 {#link6b7664622e666f726765742d65766572797468696e67}
+
+Usage: `(kvdb.forget-everything db)`
+
+Erases all data from the given key-value database `db`, irrecoverably loosing ALL data in it.
+
+See also: [`kvdb.forget`](#link6b7664622e666f72676574).	 [→index](#idx)
+
+**Warning: This operation cannot be undone! Data for all types of keys is deleted. Permanent data loss is imminent!** [→topic](#db)
+
+## `kvdb.get` : procedure/2 or more {#link6b7664622e676574}
+
+Usage: `(kvdb.get db key [other]) => any`
+
+Get the value stored at `key` in the key-value database `db`. If the value is found, it is returned. If the value is not found and `other` is specified, then `other` is returned. If the value is not found and `other` is not specified, then nil is returned.
+
+See also: [`kvdb.set`](#link6b7664622e736574), [`kvdb.when`](#link6b7664622e7768656e), [`kvdb.info`](#link6b7664622e696e666f), [`kvdb.open`](#link6b7664622e6f70656e), [`kvdb.forget`](#link6b7664622e666f72676574), [`kvdb.close`](#link6b7664622e636c6f7365), [`kvdb.search`](#link6b7664622e736561726368), [`remember`](#link72656d656d626572), [`recall`](#link726563616c6c), [`forget`](#link666f72676574).	 [→index](#idx) [→topic](#db)
+
+## `kvdb.info` : procedure/2 or more {#link6b7664622e696e666f}
+
+Usage: `(db key [other]) => (str str)`
+
+Return a list containing the info string and its fuzzy variant stored for `key` in `db`, `other` when the value for `key` is not found. The default for `other` is nil.
+
+See also: [`kvdb.get`](#link6b7664622e676574), [`kvdb.when`](#link6b7664622e7768656e).	 [→index](#idx) [→topic](#db)
+
+## `kvdb.open` : procedure/1 or more {#link6b7664622e6f70656e}
+
+Usage: `(kvdb.open path) => kvdb-array`
+
+Create or open a key-value database at `path.`
+
+See also: [`kvdb.close`](#link6b7664622e636c6f7365).	 [→index](#idx) [→topic](#db)
+
+## `kvdb.rollback` : procedure/1 {#link6b7664622e726f6c6c6261636b}
+
+Usage: `(kvdb.rollback db)`
+
+Rollback the changes made since the last transaction has been started and return the key-value database to its previous state.
+
+See also: [`kvdb.commit`](#link6b7664622e636f6d6d6974), [`kvdb.begin`](#link6b7664622e626567696e).	 [→index](#idx) [→topic](#db)
+
+## `kvdb.search` : procedure/2 or more {#link6b7664622e736561726368}
+
+Usage: `(kvdb.search db s [keytype] [limit] [fuzzer]) => li`
+
+Search the key-value database `db` for search expression string `s` for optional `keytype` and return a list of matching keys. The optional `keytype` may be one of '(all str sym int expr), where the default is 'all for any kind of key. If the optional `limit` is provided, then only `limit` entries are returned. Default limit is kvdb.*default-search-limit*. If `fuzzer` is a function provided, then a fuzzy string search is performed based on applying fuzzer to the search term; default is nil. 
+
+See also: [`kvdb.get`](#link6b7664622e676574).	 [→index](#idx) [→topic](#db)
+
+## `kvdb.set` : procedure/3 or more {#link6b7664622e736574}
+
+Usage: `(kvdb.set db key value [info] [fuzzer])`
+
+Set the `value` for `key` in key-value database `db`. The optional `info` string contains searchable information about the value that may be retrieved with the search function. The optional `fuzzer` must be a function that takes a string and yields a fuzzy variant of the string that can be used for fuzzy search. If no fuzzer is specified, then the default metaphone algorithm is used. Keys for the database must be externalizable but notice that integer keys may provide faster performance.
+
+See also: [`kvdb.get`](#link6b7664622e676574), [`kvdb.forget`](#link6b7664622e666f72676574), [`kvdb.open`](#link6b7664622e6f70656e), [`kvdb.close`](#link6b7664622e636c6f7365), [`kvdb.search`](#link6b7664622e736561726368).	 [→index](#idx) [→topic](#db)
+
+## `kvdb.when` : procedure/2 or more {#link6b7664622e7768656e}
+
+Usage: `(kvdb.when db key [other]) => str`
+
+Get the date in `db` when the entry for `key` was last modified as a date string. If there is no entry for `key`, then `other` is returned. If `other` is not specified and there is no `key`, then nil is returned.
+
+See also: [`datestr->datelist`](#link646174657374722d3e646174656c697374), [`kvdb.get`](#link6b7664622e676574), [`kvdb.info`](#link6b7664622e696e666f).	 [→index](#idx) [→topic](#db)
 
 ## `last` : procedure/1 or more {#link6c617374}
 
@@ -7767,6 +8055,46 @@ Usage: `(readall-str p [buffsize]) => str`
 Read all content from port `p` as string. This method may trigger an error if the content in the stream is not a valid UTF-8 string. The optional `buffzie` argument determines the size of the internal buffer.
 
 See also: [`readall`](#link72656164616c6c), [`read-binary`](#link726561642d62696e617279), [`read`](#link72656164).	 [→index](#idx)
+
+## `recall` : procedure/1 or more {#link726563616c6c}
+
+Usage: `(recall key [notfound]) => any`
+
+Obtain the value remembered for `key`, `notfound` if it doesn't exist. If `notfound` is not provided, then nil is returned in case the value for `key` doesn't exist.
+
+See also: [`recall-when`](#link726563616c6c2d7768656e), [`recall-info`](#link726563616c6c2d696e666f), [`recollect`](#link7265636f6c6c656374), [`remember`](#link72656d656d626572), [`forget`](#link666f72676574).	 [→index](#idx) [→topic](#db)
+
+## `recall-info` : procedure/1 or more {#link726563616c6c2d696e666f}
+
+Usage: `(recall-info key [notfound]) => (str str)`
+
+Return a list containing the info string and its fuzzy version for a remembered value with the given `key`, `notfound` if no value for `key` was found. The default for `notfound` is nil.
+
+See also: [`recall-when`](#link726563616c6c2d7768656e), [`recall`](#link726563616c6c), [`recall-when`](#link726563616c6c2d7768656e), [`recollect`](#link7265636f6c6c656374), [`remember`](#link72656d656d626572), [`forget`](#link666f72676574).	 [→index](#idx) [→topic](#db)
+
+## `recall-when` : procedure/1 or more {#link726563616c6c2d7768656e}
+
+Usage: `(recall-when key [notfound]) => datestr`
+
+Obtain the date string when the value for `key` was last modified by remember (set), `notfound` if it doesn't exist. If `notfound` is not provided, then nil is returned in case there is no value for `key.`
+
+See also: [`recall`](#link726563616c6c), [`datestr->datelist`](#link646174657374722d3e646174656c697374), [`recall-info`](#link726563616c6c2d696e666f), [`remember`](#link72656d656d626572), [`forget`](#link666f72676574).	 [→index](#idx) [→topic](#db)
+
+## `recollect` : procedure/1 or more {#link7265636f6c6c656374}
+
+Usage: `(recollect s [keytype] [limit] [fuzzer]) => li`
+
+Search for remembered items based on search query `s` and return a list of matching keys. The optional `keytype` parameter must be one of '(all str sym int expr), where the default is 'all for all kinds of keys. Up to `limit` results are returned, default is kvdb.*default-search-limit*. The optional `fuzzer` procedure takes a word string and yields a 'fuzzy' version of it. If fuzzer is specified and a procedure, then a fuzzy search is performed.
+
+See also: [`kvdb.search`](#link6b7664622e736561726368), [`recall`](#link726563616c6c), [`recall-info`](#link726563616c6c2d696e666f), [`recall-when`](#link726563616c6c2d7768656e), [`remember`](#link72656d656d626572).	 [→index](#idx) [→topic](#db)
+
+## `remember` : procedure/2 {#link72656d656d626572}
+
+Usage: `(remember key value [info] [fuzzer])`
+
+Persistently remember `value` by given `key`. See kvdb.set for the optional `info` and `fuzzer` arguments.
+
+See also: [`recall`](#link726563616c6c), [`forget`](#link666f72676574), [`kvdb.set`](#link6b7664622e736574), [`recall-when`](#link726563616c6c2d7768656e), [`recall-info`](#link726563616c6c2d696e666f), [`recollect`](#link7265636f6c6c656374).	 [→index](#idx) [→topic](#db)
 
 ## `remove-duplicates` : procedure/1 {#link72656d6f76652d6475706c696361746573}
 

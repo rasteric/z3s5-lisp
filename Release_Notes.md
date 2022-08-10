@@ -1,5 +1,19 @@
 # Version History
 
+## Version 2.3.4
+
+Modules: `(zimage tasks help beep db fileio decimal ling float console base)`
+
+Build Tags: `db` Sqlite3 database support, `fileio` file access
+
+- Further improvements to the documentation.
+
+- Fixed a rare bug with recursive printing of lists.
+
+- Added zimage module for saving, loading, and running Lisp images. These literally overwrite the global symbol of the live system.
+
+- Added an `-e <exprs>` option to the z3 interpreter to execute expressions `<expr>` from the command-line 
+
 ## Version 2.3.3
 
 Modules: `(db tasks help beep fileio decimal ling float console base)`

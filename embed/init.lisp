@@ -3978,6 +3978,471 @@
   (arity -2)
   (see (load-zimage save-zimage zimage-runable? zimage-loadable?)))
 
+(setq *reflect* (cons 'zimage *reflect*))
+
+;;; KVDB AND REMEMBER
+;;; a key-value database using the 'db module (Sqlite3)
+
+(when (member 'db *reflect*)
+  (setq *remember-db* nil)
+  (setq kvdb.*default-search-limit* 10000)
+  (setq kvdb.*vacuum-modulo* 997)
+  (setq kvdb.*report-maintenance* (lambda (x) (log (fmt "kvdb automated maintenance for %v" x))))
+
+  (defun kvdb.open (&rest fi)
+    (let ((db (apply db.open fi)))
+      (kvdb._init db)
+      (let ((n (kvdb._get-nonce db))
+	    (c (kvdb._get-counter db)))
+	(db.exec db "begin;")
+	(kvdb._set-nonce db n)
+	(kvdb._set-counter db (add1 c))
+	(db.exec db "commit;")
+	(array 'kvdb db n))))
+
+  (defhelp kvdb.open
+      (use "(kvdb.open path) => kvdb-array")
+    (info "Create or open a key-value database at #path.")
+    (type proc)
+    (topic (db))
+    (arity -2)
+    (see (kvdb.close)))
+
+  (defun kvdb.db? (db)
+    (and (array? db)
+	 (equal? (1st db nil) 'kvdb)
+	 (boxed? (2nd db nil))
+	 (str? (3rd db nil))))
+
+  (defhelp kvdb.db?
+      (use "(kvdb.db? datum) => bool")
+    (info "Return true if the given datum is a key-value database, nil otherwise.")
+    (type proc)
+    (arity 1)
+    (topic (db))
+    (see (kvdb.open)))
+
+  (defun kvdb.close (db)
+    (db.exec (2nd db) "pragma optimize;")
+    (db.close (2nd db)))
+
+  (defhelp kvdb.close
+      (use "(kvdb.close db)")
+    (info "Close a key-value db.")
+    (type proc)
+    (topic (db))
+    (arity 1)
+    (see (kvdb.open)))
+
+  (defun kvdb._init (db)
+    (db.exec db "pragma journal_mode = WAL;")
+    (db.exec db "pragma fullfsync = 1;")
+    (db.exec db "begin;")
+    (db.exec db "create table if not exists StrData (Slot text primary key not null, Value text not null, Info text not null,Fuzzy text not null, Modified text not null);")
+    (db.exec db "create table if not exists IntData (Id integer primary key, Value text not null, Info text not null,Fuzzy text not null, Modified text not null);")
+    (db.exec db "create table if not exists SymData (Slot text primary key not null, Value text not null, Info text not null, Fuzzy text not null,Modified text not null);")
+    (db.exec db "create table if not exists ExprData (Slot text primary key not null, Value text not null, Info text not null,Fuzzy text not null, Modified text not null);")
+    (db.exec db "create table if not exists Internal (Id integer primary key, Value text not null);")
+    (db.exec db "create virtual table if not exists StrFts using FTS5 (content='StrData',prefix='2 3 4',Slot,Value,Info,Fuzzy,Modified);")
+    (db.exec db "create virtual table if not exists IntFts using FTS5 (content='IntData',prefix='2 3 4',Id,Value,Info,Fuzzy,Modified);")
+    (db.exec db "create virtual table if not exists SymFts using FTS5 (content='SymData',prefix='2 3 4',Slot,Value,Info,Fuzzy,Modified);")
+    (db.exec db "create virtual table if not exists ExprFts using FTS5 (content='ExprData',prefix='2 3 4',Slot,Value,Info,Fuzzy,Modified);")
+    (db.exec db "commit;"))
+
+  (defun kvdb._set-nonce (db n)
+    (db.exec db "insert or replace into Internal(Id,Value) Values(?,?);" 1 n))
+
+  (defun kvdb._get-nonce (db)
+    (let ((result (db.query db "SELECT (Value) FROM Internal WHERE id=1 LIMIT 1;")))
+      (cond
+	((db.step result)
+	 (let ((datum (db.str result 0)))
+	   (db.close-result result)
+	   datum))
+	(t
+	 (db.close-result result)(nonce)))))
+
+  (defun kvdb._get-counter (db)
+    (let ((result (db.query db "SELECT (Value) FROM Internal WHERE id=2 LIMIT 1;")))
+      (cond
+	((db.step result)
+	 (let ((n (db.int result 0)))
+	   (db.close-result result)
+	   n))
+	(t
+	 (db.close-result result) 0))))
+
+  (defun kvdb._set-counter (db c)
+    (db.exec db "insert or replace into Internal(Id,Value) Values(?,?);" 2 c))
+
+  (defun kvdb.begin (db)
+    (db.exec (2nd db) "begin transaction;"))
+
+  (defhelp kvdb.begin
+      (use "(kvdb.begin db)")
+    (info "Begin a key-value database transaction. This can be committed by using kvdb.commit and rolled back by kvdb.rollback.")
+    (type proc)
+    (arity 1)
+    (topic (db))
+    (see (kvdb.comit kvdb.rollback))
+    (warn "Transactions in key-value databases cannot be nested! You have to ensure that there is only one begin...commit pair."))
+
+  (defun kvdb.commit (db)
+    (db.exec (2nd db) "commit;"))
+
+  (defhelp kvdb.commit
+      (use "(kvdb.commit db)")
+    (info "Commit the current transaction, making any changes made since the transaction started permanent.")
+    (type proc)
+    (topic (db))
+    (arity 1)
+    (see (kvdb.rollback kvdb.begin)))
+
+  (defun kvdb.rollback (db)
+    (db.exec (2nd db) "rollback;"))
+
+  (defhelp kvdb.rollback
+      (use "(kvdb.rollback db)")
+    (info "Rollback the changes made since the last transaction has been started and return the key-value database to its previous state.")
+    (type proc)
+    (topic (db))
+    (arity 1)
+    (see (kvdb.commit kvdb.begin)))
+
+  ;; default function used to create the fuzzy version of a string
+  ;; that is used in text search
+  (setq kvdb.*default-fuzzer* (lambda (s) (ling.metaphone s)))
+
+  (defun kvdb._set (db key value info fuzzer)
+    (cond
+      ((num? key)
+       (cond
+	 ((< key 1) (error "kvdb.set: key must be a positive integer, given %v" key))
+	 (t (db.exec (2nd db) "insert or replace into IntData(Id,Value, Info, Fuzzy, Modified) Values(?,?,?,?,?);"
+		     (truncate key) (expr->str (externalize value (3rd db))) info (fuzzer info)
+		     (expr->str (datestr* (now))))
+	    (db.exec (2nd db) "insert or replace into IntFts(Id,Value,Info,Fuzzy,Modified) Values(?,?,?,?,?);"
+		     (truncate key) (expr->str (externalize value (3rd db))) info (fuzzer info)
+		     (expr->str (datestr* (now)))))))
+      ((sym? key)
+       (db.exec (2nd db) "insert or replace into SymData(Slot, Value, Info, Fuzzy, Modified) Values(?,?,?,?,?);"
+		(sym->str key) (expr->str (externalize value (3rd db))) info (fuzzer info)
+		(expr->str (datestr* (now))))
+       (db.exec (2nd db) "insert or replace into SymFts(Slot, Value, Info, Fuzzy, Modified) Values(?,?,?,?,?);"
+		(sym->str key) (expr->str (externalize value (3rd db))) info (fuzzer info)
+		(expr->str (datestr* (now)))))
+      ((str? key)
+       (db.exec (2nd db)  "insert or replace into StrData(Slot, Value, Info, Fuzzy, Modified) Values(?,?,?,?,?);"
+		key (expr->str (externalize value (3rd db))) info (fuzzer info)
+		(expr->str (datestr* (now))))
+       (db.exec (2nd db)  "insert or replace into StrFts(Slot, Value, Info, Fuzzy, Modified) Values(?,?,?,?,?);"
+		key (expr->str (externalize value (3rd db))) info (fuzzer info)
+		(expr->str (datestr* (now)))))
+      (t
+       (db.exec (2nd db) "insert or replace into ExprData(Slot, Value, Info, Fuzzy, Modified) Values(?,?,?,?,?);"
+		(expr->str (externalize key (3rd db))) (expr->str (externalize value (3rd db))) info (fuzzer info)
+		(expr->str (datestr* (now))))
+       (db.exec (2nd db) "insert or replace into ExprFts(Slot, Value, Info, Fuzzy, Modified) Values(?,?,?,?,?);"
+		(expr->str (externalize key (3rd db))) (expr->str (externalize value (3rd db))) info (fuzzer info)
+		(expr->str (datestr* (now)))))))
+
+  (defun kvdb.set (db key value &rest opt)
+    (kvdb._set db key value (if (1st opt nil)(1st opt) "") (if (2nd opt nil)(2nd opt) kvdb.*default-fuzzer*)))
+
+  (defhelp kvdb.set
+      (use "(kvdb.set db key value [info] [fuzzer])")
+    (info "Set the #value for #key in key-value database #db. The optional #info string contains searchable information about the value that may be retrieved with the search function. The optional #fuzzer must be a function that takes a string and yields a fuzzy variant of the string that can be used for fuzzy search. If no fuzzer is specified, then the default metaphone algorithm is used. Keys for the database must be externalizable but notice that integer keys may provide faster performance.")
+    (type proc)
+    (topic (db))
+    (arity -4)
+    (see (kvdb.get kvdb.forget kvdb.open kvdb.close kvdb.search)))
+
+  (defun kvdb._get-value (result no other)
+    (let ((datum 
+	   (if (db.step result)
+	       (internalize (str->expr (db.str result 0)) no)
+	       other)))
+      (db.close-result result)
+      datum))
+
+  (defun kvdb._get (db key other)
+    (cond
+      ((num? key) (kvdb._get-value
+		   (db.query (2nd db) "select distinct Value from IntData where Id = ?;" key)
+		   (3rd db) other))
+      ((sym? key) (kvdb._get-value
+		   (db.query (2nd db) "select distinct Value from SymData where Slot = ?;" (sym->str key))
+		   (3rd db) other))
+      ((str? key) (kvdb._get-value
+		   (db.query (2nd db) "select distinct Value from StrData where Slot = ?;" key)
+		   (3rd db) other))
+      (t (kvdb._get-value
+	  (db.query (2nd db) "select distinct Value from ExprData where Slot = ?;" (expr->str (externalize key (3rd db))))
+	  (3rd db) other))))
+
+  (defun kvdb.get (db key &rest opt)
+    (kvdb._get db key (1st opt nil)))
+
+  (defhelp kvdb.get
+      (use "(kvdb.get db key [other]) => any")
+    (info "Get the value stored at #key in the key-value database #db. If the value is found, it is returned. If the value is not found and #other is specified, then #other is returned. If the value is not found and #other is not specified, then nil is returned.")
+    (type proc)
+    (arity -3)
+    (topic (db))
+    (see (kvdb.set kvdb.when kvdb.info kvdb.open kvdb.forget kvdb.close kvdb.search remember recall forget)))
+
+  (defun kvdb.when (db key &rest opt)
+    (kvdb._when db key (1st opt nil)))
+
+  (defun kvdb._when (db key other)
+    (cond
+      ((num? key) (kvdb._get-value
+		   (db.query (2nd db)
+			     "select distinct Modified from IntData where Id = ?;" key)
+		   (3rd db) other))
+      ((sym? key) (kvdb._get-value
+		   (db.query (2nd db)
+			     "select distinct Modified from SymData where Slot = ?;" (sym->str key))
+		   (3rd db) other))
+      ((str? key) (kvdb._get-value
+		   (db.query (2nd db)
+			     "select distinct Modified from StrData where Slot = ?;" key)
+		   (3rd db) other))
+      (t (kvdb._get-value
+	  (db.query (2nd db)
+		    "select distinct Modified from ExprData where Slot = ?;" (expr->str (externalize key (3rd db))))
+	  (3rd db) other))))
+
+  (defhelp kvdb.when
+      (use "(kvdb.when db key [other]) => str")
+    (info "Get the date in #db when the entry for #key was last modified as a date string. If there is no entry for #key, then #other is returned. If #other is not specified and there is no #key, then nil is returned.")
+    (type proc)
+    (arity -3)
+    (topic (db))
+    (see (datestr->datelist kvdb.get kvdb.info)))
+
+  (defun kvdb.info (db key &rest opt)
+    (kvdb._info db key (1st opt nil)))
+
+  (defun kvdb._info (db key other)
+    (let ((_get-strs (lambda (result other)
+		       (let ((datum (if (db.step result)
+					(list (db.str result 0) (db.str result 1))
+					other)))
+			 (db.close-result result)
+			 datum))))
+      (cond
+	((num? key) (_get-strs
+		     (db.query (2nd db)
+			       "select distinct Info, Fuzzy from IntData where Id = ?;" key)
+		     other))
+	((sym? key) (_get-strs
+		     (db.query (2nd db)
+			       "select distinct Info, Fuzzy from SymData where Slot = ?;" (sym->str key))
+		     other))
+	((str? key) (_get-strs
+		     (db.query (2nd db)
+			       "select distinct Info, Fuzzy from StrData where Slot = ?;" key)
+		     other))
+	(t (_get-strs
+	    (db.query (2nd db)
+		      "select distinct Info, Fuzzy from ExprData where Slot = ?;" (expr->str (externalize key (3rd db))))
+	    other)))))
+
+  (defhelp kvdb.info
+      (use "(db key [other]) => (str str)")
+    (info "Return a list containing the info string and its fuzzy variant stored for #key in #db, #other when the value for #key is not found. The default for #other is nil.")
+    (type proc)
+    (topic (db))
+    (arity -3)
+    (see (kvdb.get kvdb.when)))
+
+  (defun kvdb.forget (db key)
+    (cond
+      ((num? key) (db.exec (2nd db) "delete from IntData where Id = ?;" key))
+      ((sym? key) (db.exec (2nd db) "delete from SymData where Slot = ?;" (sym->str key)))
+      ((str? key) (db.exec (2nd db) "delete from StrData where Slot = ?;" key))
+      (t (db.exec (2nd db) "delete from ExprData where Slot = ?;" (expr->str (externalize key (3rd db)))))))
+
+  (defhelp kvdb.forget
+      (use "(kvdb.forget key)")
+    (info "Forget the value for #key if there is one.")
+    (type proc)
+    (topic (db))
+    (arity 1)
+    (see (kvdb.set kvdb.get)))
+
+  (defun kvdb.forget-everything (db)
+    (db.exec (2nd db) "delete from IntData;")
+    (db.exec (2nd db) "delete from IntFts;")
+    (db.exec (2nd db) "delete from StrData;")
+    (db.exec (2nd db) "delete from StrFts;")
+    (db.exec (2nd db) "delete from SymData;")
+    (db.exec (2nd db) "delete from SymFts;")
+    (db.exec (2nd db) "delete from ExprData;")
+    (db.exec (2nd db) "delete from ExprFts;"))
+
+  (defhelp kvdb.forget-everything
+      (use "(kvdb.forget-everything db)")
+    (info "Erases all data from the given key-value database #db, irrecoverably loosing ALL data in it.")
+    (type proc)
+    (topic (db))
+    (arity 1)
+    (see (kvdb.forget))
+    (warn "This operation cannot be undone! Data for all types of keys is deleted. Permanent data loss is imminent!"))
+
+  (defun kvdb.search (db s &rest opt)
+    (kvdb._search db s (1st opt 'all) (2nd opt kvdb.*default-search-limit*) (3rd opt nil)
+		  (or (equal? s "") (equal? s "*")(equal? s "%"))))
+
+  (defhelp kvdb.search
+      (use "(kvdb.search db s [keytype] [limit] [fuzzer]) => li")
+    (info "Search the key-value database #db for search expression string #s for optional #keytype and return a list of matching keys. The optional #keytype may be one of '(all str sym int expr), where the default is 'all for any kind of key. If the optional #limit is provided, then only #limit entries are returned. Default limit is kvdb.*default-search-limit*. If #fuzzer is a function provided, then a fuzzy string search is performed based on applying fuzzer to the search term; default is nil. ")
+    (type proc)
+    (topic (db))
+    (arity -3)
+    (see (kvdb.get)))
+
+  (defun kvdb._search (db s kind limit fuzzer all?)
+    (case kind
+      ((all) (append
+	      (kvdb._query db s "Slot" "SymFts" limit fuzzer str->sym db.str all?)
+	      (kvdb._query db s "Slot" "StrFts" limit fuzzer (lambda (x) x) db.str all?)
+	      (kvdb._query db s "Slot" "ExprFts" limit fuzzer
+			   (lambda (x) (internalize (str->expr x) (3rd db))) db.str all?)
+	      (kvdb._query db s "Id" "IntFts" limit fuzzer (lambda (x) x) db.int all?)))
+      ((str) (kvdb._query db s "Slot" "StrFts" limit fuzzer (lambda (x) x) db.str all?))
+      ((sym) (kvdb._query db s "Slot" "SymFts" limit fuzzer str->sym db.str all?))
+      ((int) (kvdb._query db s "Id" "IntFts" limit fuzzer (lambda (x) x) db.int all?))
+      ((expr) (kvdb._query db s "Slot" "ExprFts" limit fuzzer
+			   (lambda (x) (internalize (str->expr x) (3rd db))) db.str all?))
+      (t (error "kvdb.search: unknown kind of key: %v" kind))))
+
+  (defun kvdb._query (db s table column limit fuzzer converter getter all?)
+    (letrec ((fuzzy? (and (functional? fuzzer) (= (functional-arity fuzzer) 1)))
+	     (fuzz (if fuzzy? fuzzer (lambda (s) s))))
+      (kvdb._get-all
+       (if all?
+	   (db.query (2nd db)
+		     (fmt "select %v from %v limit ?;" table column)
+		     limit)
+	   (db.query (2nd db)
+		     (fmt "select %v from %v where %v match ? limit ?;"
+			  table column column)
+		     (fuzz s)
+		     limit))
+       converter getter
+       nil)))
+
+  (defun kvdb._fuzzify (fuzzer s)
+    (db.fuzzify s fuzzer))
+
+  (defun kvdb._get-all (result converter getter acc)
+    (cond
+      ((db.step result)
+       (let ((s (getter result 0)))
+	 (cond
+	   (s
+	    (kvdb._get-all result converter getter (cons (converter s) acc)))
+	   (t
+	    (db.close-result result)
+	    acc))))
+      (t (db.close-result result)
+	 acc)))
+
+  (defun init-remember ()
+    (setq *remember-db*
+	  (kvdb.open (str+ (sysdir 'z3s5-data) "/remembered.z3kv")))
+    (add-hook 'shutdown
+	      (lambda (args)
+		(sysmsg "Closing remember db...")
+		(when *remember-db*
+		  (kvdb.close *remember-db*)))))
+
+  (defhelp init-remember
+      (use "(init-remember)")
+    (info "Initialize the remember database. This requires the modules 'kvdb and 'db enabled.")
+    (type proc)
+    (topic (db))
+    (arity 0)
+    (see (remember recall-when recall forget)))
+
+  (defun remember (k v &rest opt)
+    (kvdb.set *remember-db* k v
+	      (if (1st opt nil) (1st opt) "")
+	      (if (2nd opt nil)(2nd opt) kvdb.*default-fuzzer*)))
+
+  (defhelp remember
+      (use "(remember key value [info] [fuzzer])")
+    (info "Persistently remember #value by given #key. See kvdb.set for the optional #info and #fuzzer arguments.")
+    (type proc)
+    (topic (db))
+    (arity 2)
+    (see (recall forget kvdb.set recall-when recall-info recollect)))
+
+  (defun recall-when (k &rest opt)
+    (kvdb.when *remember-db* k (1st opt nil)))
+
+  (defhelp recall-when
+      (use "(recall-when key [notfound]) => datestr")
+    (info "Obtain the date string when the value for #key was last modified by remember (set), #notfound if it doesn't exist. If #notfound is not provided, then nil is returned in case there is no value for #key.")
+    (type proc)
+    (arity -2)
+    (topic (db))
+    (see (recall datestr->datelist recall-info remember forget)))
+
+  (defun recall-info (k &rest opt)
+    (kvdb.info *remember-db* k (1st opt nil)))
+
+  (defhelp recall-info
+      (use "(recall-info key [notfound]) => (str str)")
+    (info "Return a list containing the info string and its fuzzy version for a remembered value with the given #key, #notfound if no value for #key was found. The default for #notfound is nil.")
+    (type proc)
+    (topic (db))
+    (arity -2)
+    (see (recall-when recall recall-when recollect remember forget)))
+
+  (defun recall (k &rest opt)
+    (kvdb.get *remember-db* k (1st opt nil)))
+
+  (defhelp recall
+      (use "(recall key [notfound]) => any")
+    (info "Obtain the value remembered for #key, #notfound if it doesn't exist. If #notfound is not provided, then nil is returned in case the value for #key doesn't exist.")
+    (type proc)
+    (topic (db))
+    (arity -2)
+    (see (recall-when recall-info recollect remember forget)))
+
+  (defun recollect (term &rest opt)
+    (kvdb.search *remember-db*
+		 term
+		 (1st opt 'all)
+		 (2nd opt kvdb.*default-search-limit*)
+		 (3rd opt nil)))
+
+  (defhelp recollect
+      (use "(recollect s [keytype] [limit] [fuzzer]) => li")
+    (info "Search for remembered items based on search query #s and return a list of matching keys. The optional #keytype parameter must be one of '(all str sym int expr), where the default is 'all for all kinds of keys. Up to #limit results are returned, default is kvdb.*default-search-limit*. The optional #fuzzer procedure takes a word string and yields a 'fuzzy' version of it. If fuzzer is specified and a procedure, then a fuzzy search is performed.")
+    (type proc)
+    (topic (db))
+    (arity -2)
+    (see (kvdb.search recall recall-info recall-when remember)))
+
+  (defun forget (k)
+    (kvdb.forget *remember-db* k))
+
+  (defhelp forget
+      (use "(forget key)")
+    (info "Forget the value associated with #key. This permanently deletes the value from the persistent record.")
+    (type proc)
+    (topic (db))
+    (arity 1)
+    (see (remember recall recollect recall-when recall-info)))
+
+  (setq *reflect* (cons 'kvdb *reflect*))
+  
+  )
+
 ;; PREAMBLE END
 
 ;;;  Copyright (c) 2019-2022 Erich Rast

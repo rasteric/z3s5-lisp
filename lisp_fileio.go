@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"sync"
 
+	"github.com/adrg/xdg"
 	"github.com/nukata/goarith"
 )
 
@@ -501,6 +502,71 @@ func (interp *Interp) Define_FileIO() {
 			arr[i] = names[i]
 		}
 		return ArrayToList(arr)
+	})
+
+	// (sysdir sel) => str obtain a special system path based on the given selector
+	interp.Def("sysdir", 1, func(a []any) any {
+		sym := a[0].(*Sym)
+		s := sym.String()
+		switch s {
+		case "data":
+			return xdg.DataHome
+		case "data-dirs":
+			return StrArrayToList(xdg.DataDirs)
+		case "config":
+			return xdg.ConfigHome
+		case "config-dirs":
+			return StrArrayToList(xdg.ConfigDirs)
+		case "state":
+			return xdg.StateHome
+		case "cache":
+			return xdg.CacheHome
+		case "runtime":
+			return xdg.RuntimeDir
+		case "home":
+			return xdg.Home
+		case "application-dirs":
+			return StrArrayToList(xdg.ApplicationDirs)
+		case "font-dirs":
+			return StrArrayToList(xdg.FontDirs)
+		case "desktop":
+			return xdg.UserDirs.Desktop
+		case "downloads":
+			return xdg.UserDirs.Download
+		case "documents":
+			return xdg.UserDirs.Documents
+		case "music":
+			return xdg.UserDirs.Music
+		case "pictures":
+			return xdg.UserDirs.Pictures
+		case "videos":
+			return xdg.UserDirs.Videos
+		case "templates":
+			return xdg.UserDirs.Templates
+		case "public", "shared":
+			return xdg.UserDirs.PublicShare
+		case "z3s5-data":
+			d := xdg.DataHome + "/z3s5"
+			os.MkdirAll(filepath.FromSlash(d), 0777)
+			return d
+		default:
+			panic(fmt.Sprintf("sysdir: unknown directory '%v, the selector must be one of '(data data-dirs config config-dirs state cache runtime home application-dirs font-dirs desktop downloads documents music pictures videos templates public shared z3s5-data)",
+				Str(sym)))
+		}
+	})
+
+	// (mkdir path [permissions]) creates all directories in path that don't exist yet
+	interp.Def("mkdir", -1, func(a []any) any {
+		c := a[0].(*Cell)
+		if c == Nil {
+			panic("mkdir: missing path argument")
+		}
+		perm := 0777
+		if c.CdrCell() != Nil {
+			perm = FilePermissionToInt("mkdir", c.CdrCell().Car)
+		}
+		os.MkdirAll(filepath.FromSlash(c.Car.(string)), os.FileMode(perm))
+		return Void
 	})
 
 	// (cd path) change the working directory to path

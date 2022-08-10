@@ -247,6 +247,15 @@ func ArrayToList(arr []any) *Cell {
 	return start
 }
 
+// StrArrayToList converts an array of strings (not a Lisp object) to a list of strings (an admissible Lisp object).
+func StrArrayToList(arr []string) *Cell {
+	a := make([]any, len(arr))
+	for i := range a {
+		a[i] = arr[i]
+	}
+	return ArrayToList(a)
+}
+
 // reverse array returns an array reversed as copy
 func ReverseArray(arr []any) []any {
 	arr2 := make([]any, len(arr))

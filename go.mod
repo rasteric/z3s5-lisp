@@ -15,6 +15,7 @@ require (
 require (
 	atomicgo.dev/cursor v0.1.1 // indirect
 	atomicgo.dev/keyboard v0.2.8 // indirect
+	github.com/adrg/xdg v0.4.0 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/charmbracelet/bubbles v0.13.0 // indirect
 	github.com/charmbracelet/bubbletea v0.22.0 // indirect

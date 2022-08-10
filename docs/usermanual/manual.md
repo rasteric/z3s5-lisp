@@ -2,7 +2,7 @@
 title: Z3S5 Lisp User Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: "2.3.3+d0736f6"
+footer-left: "2.3.4+772693c"
 author: by Erich Rast
 date: 2022-7-22 16:00
 header-includes: |
@@ -13,7 +13,7 @@ header-includes: |
   \usepackage{xcolor}
 ---
 
-for Z3S5 Lisp Version "2.3.3+d0736f6"
+for Z3S5 Lisp Version "2.3.4+772693c"
 
 # Introduction
 
@@ -23,11 +23,19 @@ Z3S5 Lisp can be used as a standalone interpreter or as an extension language em
 
 ### The Standalone Interpreter
 
-In the directory `cmd/z3` there is an example standalone version `z3.go` that you can build on your system using `go build z3.go`. The interpreter is started in a terminal using `./z3`.
+In the directory `cmd/z3` there is an example standalone version `z3.go` that you can build on your system using `go build z3.go`. The interpreter is started in a terminal using `./z3`. The `z3` interpreter is fairly limited. It starts a read-eval-reply loop until it is quit with the command `(exit [n])` where the optional number `n` is an integer for the Unix return code of the program. It reads one line of input from the command line and returns the result of evaluating it. Better editing capabilities and parenthesis matching are planned for the future.
 
-The `z3` interpreter is fairly limited. It starts a read-eval-reply loop until it is quit with the command `(exit [n])` where the optional number `n` is an integer for the Unix return code of the program. It reads one line of input from the command line and returns the result of evaluating it. Better editing capabilities and parenthesis matching are planned for the future; for now, the interpreter is more of a testing tool and a proof of concept and can be used as an example of how to implement your own Z3S5 standalone executable.
+When an interpreter starts either in a standalone executable or when the `interp.Boot()` function is called in a Go program, then it first loads the standard prelude and help files in directory `embed`. These are embedded into the executable and so the directory is not needed to run the interpreter. After this start sequence, the interpreter checks whether there is a file named `init.lisp` in the executable directory -- that is, the `z3` directory for standalone or the directory of the program that includes Z3S5 Lisp as a package. If there is such a file, then it is loaded and executed.
 
-When an interpreter starts either in a standalone executable or when the `interp.Boot()` function is called in a Go program, then it first loads the standard prelude and help files in directory `embed`. These are embedded into the executable and so the directory is not needed to run the interpreter. After this start sequence, the interpreter checks whether there is a file named `init.lisp` in the executable directory -- that is, the `z3` directory for standalone or the directory of the program that includes Z3S5 Lisp as a package. If there is such a file, then it is loaded and executed. If option `-l <filename>` is provided, then Z3S5 Lisp sets `*interactive-session*` to `nil` (which usually suppresses the start banner), loads and executes the specified file, and returns to the shell afterwards. If in addition the `-i` option is provided, then `*interactive-session*` is set to true right from the start, the file is loaded and executed, and then an interactive session is started as if the interpreter had been started without any command-line options.
+The `z3` interpreter also has a number of command-line options. If option `-l <filename>` is provided, then Z3S5 Lisp sets `*interactive-session*` to `nil` (which usually suppresses the start banner), loads and executes the specified file, and returns to the shell afterwards. The flag `-e` does the same but executes the expressions directly provided as string on the command-line. Special characters in the provided expressions have to be suitably escaped not to be interpreted by the shell, of course, and how to do this depends on the type of shell used to run the interpreter.
+
+If in addition to the `-e` or `-l` flags the `-i` option is provided, then `*interactive-session*` is set to true right from the start, the file is loaded and executed, and then an interactive session is started as if the interpreter had been started without any command-line options. By using the `-s` flag, `*interactive-session*` can be set to `nil` regardless of how the interpreter is started, and therefore printing a start banner is suppressed (and anything else that requires `*interactive-session*` to be non-nil.)
+
+Example 1: `./z3 -e "(out 'hello-world)(nl)" -i -s` starts the interpreter, does not print a start banner since `-s` is specified, prints *hello-world* and new line, and then enters an interactive session since `-i` is specified.
+
+Example 2: `./z3 -l /home/user/tests/test.lisp -s` starts the interpreter, loads and executes the file in directory `/home/tests/test.lisp` (an absolute Unix path) while suppressing the start-banner with the `-s` option, and returns to the shell.
+
+Example 3: `./z3 -i -l my_prelude.lisp` launches the interpreter and loads the file `my_prelude.lisp` in the same directory as the interpreter and then starts an interactive session
 
 See `./z3 -h` for a list of all command-line options. 
 
@@ -224,7 +232,9 @@ Finally, not all values can be externalized. For example, ports, tasks, futures,
 
 ## Database Access
 
-The build tag `db` enables a database module with Sqlite3 support. See `(dump 'db.)` for available functions and consult the reference and help system for more information on them.
+The build tags `db` and `fts5` enable a database module with Sqlite3 support. See `(dump 'db.)` for available functions and consult the reference and help system for more information on them. The tag `fts5` is required if `db` is used, since the key-value module `kvdb` makes use of the fts5 text indexing features of Sqlite. So the tags always have to be combined.
+
+Take a look at `(dump 'kvdb)` for more information about the key-value database and look up `(help remember)` for information on the remember system. Basically, you can use `(remember key value)` to remember a value, `(recall key) => value` to recall it, and `(forget key)` to forget it. However, this requires `(init-remember)` to be executed first once. In the `z3` executable this is loaded in the local `init.lisp` file that also prints the start banner, but you might want to disable it if you don't use remember because it slows down startup.
 
 ## Language Stability
 
