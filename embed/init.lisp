@@ -13,12 +13,12 @@
 
 (defun protect (&rest symbols)
   (cond
-    ((permission? 'allow-protect) (list-foreach symbols (lambda (x) (_protect x))))
+    ((permission? 'allow-protect) (list-foreach symbols _protect))
     (t (error "protect: security violation - no permission to protect symbols!"))))
 
 (defun unprotect (&rest symbols)
   (cond
-    ((permission? 'allow-unprotect) (list-foreach symbols (lambda (x) (_unprotect x))))
+    ((permission? 'allow-unprotect) (list-foreach symbols _unprotect))
     (t (error "unprotect: security violation - no permission to unprotect symbols!"))))
 
 (declare-unprotected '*gensym-counter*)
@@ -3815,6 +3815,9 @@
   (see (load-zimage save-zimage externalize)))
 
 (defun save-zimage (min-version info entry-point &rest fi)
+  (when (and (file-exists? (car fi))
+	     (not (dir? (car fi))))
+    (fdelete (car fi)))
   (let ((out (apply open fi)))
     (write-zimage out min-version info entry-point)
     (close out)))
@@ -3936,10 +3939,10 @@
 
 (defun _read-zimage-bind (li nonce)
   (when (protected? (1st li))
-    (unprotect (1st li)))
+    (_unprotect (1st li)))
   (bind (1st li) (if (3rd li) (internalize (3rd li) nonce) nil))
   (when (2nd li)
-    (protect (1st li))))
+    (_protect (1st li))))
 
 (defun internalize (arg nonce)
   (cond
@@ -3947,7 +3950,6 @@
      (if (equal? (1st arg nil) nonce)
 	 (eval (internalize (2nd arg nil) nonce))
 	 (mapcar arg (lambda (x) (internalize x nonce)))))
-    ((str? arg) arg)
     ((array? arg) (map arg (lambda (x) (internalize x nonce))))
     ((dict? arg) (dict-map arg (lambda (k v) (internalize v nonce))))
     (t arg)))
@@ -4368,12 +4370,13 @@
 	 acc)))
 
   (defun init-remember ()
-    (setq *remember-db*
-	  (kvdb.open (str+ (sysdir 'z3s5-data) "/remembered.z3kv")))
-    (add-hook 'shutdown
-	      (lambda (args)
-		(when *remember-db*
-		  (kvdb.close *remember-db*)))))
+    (unless *remember-db*
+      (setq *remember-db*
+	    (kvdb.open (str+ (sysdir 'z3s5-data) "/remembered.z3kv")))
+      (add-hook 'shutdown
+		(lambda (args)
+		  (when *remember-db*
+		    (kvdb.close *remember-db*))))))
 
   (defhelp init-remember
       (use "(init-remember)")
