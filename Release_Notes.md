@@ -1,5 +1,12 @@
 # Version History
 
+## Version 2.3.8
+
+Build tags: `db fts` for Sqlite3 support, `fileio` for file access.
+
+- Library system ported from Z3S5 Machine, providing the (load prefix) command. See (help load).
+
+
 ## Version 2.3.7
 
 Build tags: `db fts` for Sqlite3 support, `fileio` for file access.

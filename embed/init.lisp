@@ -57,7 +57,7 @@
      ((permission? ,perm) ,@body)))
 
 
-;; ESSENTIAL MACROS AND FUNCTIONS
+;;; ESSENTIAL MACROS AND FUNCTIONS
 
 (defun dfc! (sym)
   (progn (bind sym 0) sym))
@@ -67,7 +67,7 @@
      ,@body))
 
 
-;; TESTING
+;;; TESTING
 
 (defun init-testing ()
   (setq *tests* nil)(declare-unprotected '*tests*)
@@ -263,7 +263,7 @@
 (expect-ok (void))
 (expect-err (error "intentional error for testing"))
 
-;; HELP SYSTEM
+;;; HELP SYSTEM
 (testing "help")
 
 (setq *_current-lib* nil)
@@ -571,7 +571,7 @@
 (expect-true (functional? expect))
 (expect-true (functional? car))
 
-;; SEQUENCE FUNCTIONS
+;;; SEQUENCE FUNCTIONS
 (testing "sequences")
 
 (defun nth (seq n)
@@ -1267,7 +1267,7 @@
   (arity 2)
   (see (dict get set)))
 
-;; SYNCHRONIZATION PRIMITIVES
+;;; SYNCHRONIZATION PRIMITIVES AND SYNCHRONIZED DATA STRUCTURES
 (defmacro with-mutex-lock (mu &rest body)
   `(progn
      (mutex-lock ,mu)
@@ -1876,7 +1876,8 @@
   (see (task task-send))
   (warn "Tasks scheduled by run-at are not persistent! They are only run until the system is shutdown."))
 
-;; ERROR HANDLING
+;;; ERROR HANDLING
+;;; This is an essential part of the system, ported from Z3S5 Machine.
 
 ;; do something with colors and restore the original ones
 (defun with-colors (f b proc)
@@ -2139,12 +2140,16 @@
   (arity -3)
   (see (with-final with-error-handler)))
 
-;; HOOKS
-;; check whether the hook is supported
+;;; HOOKS
 
 (setq *custom-hooks* (dict))
 (dfc! '*custom-hook-counter*)
 
+;; many of the following hooks are from Z3S5 Machine and not used
+;; in Z3S5 Lisp at this time. Shutdown hook is operational in z3 executable
+;; but it must be run manually if Z3S5 Lisp is used in Go. It is up to you
+;; to decide what counts as a shutdown, e.g. window close or application quit.
+;; The shutdown hook should also be called on a force quit or a fatal error.
 (setq *hooks*
       (dict
        '(set-cursor 1
@@ -3588,7 +3593,7 @@
 
 (defhelp readall
     (use "(readall stream) => sexpr")
-  (info "Read all data from stream with numeric ID #stream and return it as an sexpr.")
+  (info "Read all data from #stream and return it as an sexpr.")
   (type proc)
   (arity 1)
   (see (read write open close)))
@@ -4462,7 +4467,118 @@
   
   )
 
-;; PREAMBLE END
+;;; LIBRARIES
+;;; A library loading system, based on the library system of Z3S5 Machine.
+
+;; We expand macros, then first pass (ident -> prefix.ident in table), then second pass (replace symbols
+;; unless shadowed), then evaluate every transformed expression.
+(defun _include-library (in last table)
+  (foreach (_library-transform table *_current-lib*
+			       (_forward-symbol-table table *_current-lib*
+						      (expand-macros (readall in))))
+	   eval))
+
+(defun load (prefix &rest fi)
+  (cond
+    ((null? fi) (_load prefix (str+ (sysdir 'z3s5-data) "/prg/" (sym->str prefix) "/" (sym->str prefix) ".lisp")))
+    (t (apply _load (cons prefix fi)))))
+
+(defun _load (prefix &rest fi)
+  (unless (sym? prefix)
+    (error "load - symbol required as prefix, given %v" prefix))
+  (_push-current-lib prefix)
+  (let ((io nil)
+	(table (dict)))
+    (try ((when io (close io)))
+	 (setq io (apply open fi))
+	 (_include-library io (void) table)))
+  (_pop-current-lib))
+
+(defhelp load
+    (use "(load prefix [fi])")
+  (info "Loads the Lisp file at #fi as a library or program with the given #prefix. If only a prefix is specified, load attempts to find a corresponding file at path \"<z3s5-data>/prg/prefix/prefix.lisp\", where #<z3s5-data> is the result of (sysdir 'z3s5-data). Loading binds all non-global toplevel symbols of the definitions in file #fi to the form prefix.symbol and replaces calls to them in the definitions appropriately. Symbols starting with \"*\" such as *cancel* are not modified. To give an example, if #fi contains a definition (defun bar ...) and the prefix is 'foo, then the result of the import is equivalent to (defun foo.bar ...), and so on for any other definitions. To make a program or library import-ready in this way, global definitions that are referred to in a definition must be forward-declared using #declare. This is required since the program transformation takes place at the time of the import, not at runtime, and therefore symbols not yet defined in #fi would not be recognized by the importer as symbols that are top-level modified by #setq in #fi without a prior forward-declaration. Basically, the importer preorder-traverses the source and looks for setq and lambdas after macro expansion has taken place. By convention, the entry point of executable programs is a function (run) so the loaded program can be executed with the command (prefix.run).")
+  (type proc)
+  (arity -2)
+  (see (include declare)))
+
+(defun global-sym? (s)
+  (and (sym? s)
+       (equal? (slice (sym->str s) 0 1) "*")))
+
+(defhelp global-sym?
+    (use "(global-sym? sym) => bool")
+  (info "Returns true if #sym is a global symbol, nil otherwise. By convention, a symbol counts as global if it starts with a \"*\" character. This is used by library functions to determine whether a top-level symbol ought to be treated as local or global to the library.")
+  (type proc)
+  (arity 1)
+  (see (import sym?)))
+
+;; Second pass: We replace identifier symbols with the prefix.ident versions stored
+;; in the table in the first pass, unless these are shadowed by lambda (let, letrec)
+;; or are global variables.
+(defun _library-transform (table prefix datum)
+  (cond
+    ((sym? datum)
+     (cond 
+       ((global-sym? datum) datum) ; ignore global symbols
+       (t
+	(getstacked table datum datum))))
+    ((not (list? datum))
+     datum)
+    ((null? datum) datum)
+    ((equal? (car datum) 'progn)
+     (cons 'progn (_library-transform table prefix (cdr datum))))
+    ((equal? (car datum) 'quote)
+     datum)
+    ((equal? (car datum) 'lambda)
+     (foreach (2nd datum nil)
+	      (lambda (ident)
+		(pushstacked table ident ident)))
+     (let ((lambda-term
+	    (cons 'lambda
+		  (cons (cadr datum)
+			(_library-transform table prefix (cddr datum))))))
+       (foreach (2nd datum nil)
+		(lambda (ident)
+		  (popstacked table ident ident)))
+       lambda-term))
+    (t
+     (cons (_library-transform table prefix (car datum))
+	   (_library-transform table prefix (cdr datum))))))
+
+;; First pass: We look at all setq applications in the code to take note of the modified
+;; identifiers, transformation from ident -> prefix.ident, storing them in table.
+(defun _forward-symbol-table (table prefix datum)
+  (cond
+    ((not (list? datum)) datum)
+    ((null? datum) datum)
+    ((equal? (car datum) 'quote) datum)
+    ((equal? (car datum) 'setq)
+     (cons 'setq (map-pairwise
+		  (cdr datum)
+		  (lambda (ident val)
+		    (cond
+		      ((has-key? table ident)
+		       (list (getstacked table ident ident)
+			     (_forward-symbol-table table prefix val)))
+		      ((global-sym? ident) ; don't modify global symbols
+		       (list ident (_forward-symbol-table table prefix val)))
+		      (t
+		       (pushstacked
+			table ident (str->sym
+				     (str+
+				      (_library-prefix-convert prefix)
+				      "."
+				      (sym->str ident))))
+		       (list (getstacked table ident ident)
+			     (_forward-symbol-table table prefix val))))))))
+    (t
+     (cons (_forward-symbol-table table prefix (car datum))
+	   (_forward-symbol-table table prefix (cdr datum))))))
+
+(defun _library-prefix-convert (prefixes)
+  (str-join (map prefixes sym->str) "."))
+
+;;; PREAMBLE END
 
 ;;;  Copyright (c) 2019-2022 Erich Rast
 ;;;

@@ -2140,6 +2140,11 @@ func (interp *Interp) Define_Base() {
 		return AsLispBool(result.(bool))
 	})
 
+	// (expand-macros expr) => expr
+	interp.Def("expand-macros", 1, func(a []any) any {
+		return interp.ExpandMacros(a[0], 200)
+	})
+
 }
 
 /*
