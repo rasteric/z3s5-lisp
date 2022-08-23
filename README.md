@@ -1,5 +1,5 @@
 # Z3S5 Lisp
-"I want my 1980s Lisp!"
+*I want my 80s Lisp!*
 
 ![Z3S5](docs/Z3S5.png)
 [![GoDoc](https://godoc.org/github.com/rasteric/z3s5-lisp/go?status.svg)](https://godoc.org/github.com/rasteric/z3s5-lisp)
