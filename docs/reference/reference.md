@@ -2,9 +2,9 @@
 title: Z3S5 Lisp Reference Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: Version 2.3.8+076af0c
+footer-left: Version 2.3.8+c7da68e
 author: by Erich Rast and all Help system contributors
-date: 2022-8-23 13:28
+date: 2022-8-23 16:42
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -13,7 +13,7 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
-For Z3S5 Lisp Version 2.3.8+076af0c with installed modules (oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).
+For Z3S5 Lisp Version 2.3.8+c7da68e with installed modules (oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).
 
 # Introduction
 
@@ -3276,7 +3276,7 @@ See also: [`has-method?`](#link6861732d6d6574686f643f), [`new`](#link6e6577), [`
 
 Usage: `(isa? obj class) => bool`
 
-Return true if `obj` is an instance of `class`, nil otherwise. Argument `class` can be either a class name symbol or a class itself.
+Return true if `obj` is an instance of `class`, nil otherwise.
 
 See also: [`supers`](#link737570657273).	 [→index](#idx)
 
@@ -7478,7 +7478,7 @@ See also: [`functional?`](#link66756e6374696f6e616c3f), [`macro?`](#link6d616372
 
 Usage: `(isa? obj class) => bool`
 
-Return true if `obj` is an instance of `class`, nil otherwise. Argument `class` can be either a class name symbol or a class itself.
+Return true if `obj` is an instance of `class`, nil otherwise.
 
 See also: [`supers`](#link737570657273).	 [→index](#idx) [→topic](#oop)
 

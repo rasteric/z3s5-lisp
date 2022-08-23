@@ -4804,9 +4804,8 @@
     ((eq? (array-ref obj 1) cname) t)
     ((class? cname) (isa? obj (class-name cname)))
     (t
-     (let ((c (_class-by-name cname)))
-       (unless c (error "isa?: %v is not the name of a registered class" cname))
-       (_isa? (array-ref obj 1) (supers c))))))
+     (unless (_class-by-name cname) (error "isa?: %v is not the name of a registered class" cname))
+     (_isa? cname (supers (class-of obj))))))
 
 (defun _isa? (cname li)
   (cond
@@ -4816,7 +4815,7 @@
 
 (defhelp isa?
     (use "(isa? obj class) => bool")
-  (info "Return true if #obj is an instance of #class, nil otherwise. Argument #class can be either a class name symbol or a class itself.")
+  (info "Return true if #obj is an instance of #class, nil otherwise.")
   (type proc)
   (topic (oop))
   (arity 2)
