@@ -20,9 +20,9 @@
 <header id="title-block-header">
 <h1 class="title">Z3S5 Lisp Reference Manual</h1>
 <p class="author">by Erich Rast and all Help system contributors</p>
-<p class="date">2022-8-23 9:51</p>
+<p class="date">2022-8-23 10:09</p>
 </header>
-<p>For Z3S5 Lisp Version 2.3.8+4b56c62 with installed modules (kvdb zimage tasks help beep db fileio decimal ling float console base).</p>
+<p>For Z3S5 Lisp Version 2.3.8+a59f77d with installed modules (kvdb zimage tasks help beep db fileio decimal ling float console base).</p>
 <h1 data-number="1" id="introduction"><span class="header-section-number">1</span> Introduction</h1>
 <p>This is the reference manual for Z3S5 Lisp. This manual has been automatically generated from the entries of the online help system. The reference manual is divided into two large sections. Section <a href="#topics">By Topics</a> lists functions and symbols organized by topics. Within each topic, entries are sorted alphabetically. Section <a href="#reference">Complete Reference</a> lists all functions and symbols alphabetically. Please consult the <em>User Manual</em> and the <em>Readme</em> document for more general information about Z3S5 Lisp, an introduction to its use, and how to embedd it into Go programs.</p>
 <p>Incorrect documentation strings are bugs. Please report bugs using the corresponding <a href="https://github.com/rasteric/z3s5-lisp/issues">Github issue tracker for Z3S5 Lisp</a> and be as precise as possible. Superfluous and missing documentation entries are misfeatures and may also be reported.</p>
@@ -1102,11 +1102,11 @@
 <h3 data-number="3.13.1" id="global-sym-procedure1"><span class="header-section-number">3.13.1</span> <code>global-sym?</code> : procedure/1</h3>
 <p>Usage: <code>(global-sym? sym) =&gt; bool</code></p>
 <p>Returns true if <code>sym</code> is a global symbol, nil otherwise. By convention, a symbol counts as global if it starts with a "*" character. This is used by library functions to determine whether a top-level symbol ought to be treated as local or global to the library.</p>
-<p>See also: <a href="#link696d706f7274"><code>import</code></a>, <a href="#link73796d3f"><code>sym?</code></a>. <a href="#idx">→index</a></p>
+<p>See also: <a href="#link6c6f6164"><code>load</code></a>, <a href="#link696e636c756465"><code>include</code></a>, <a href="#link73796d3f"><code>sym?</code></a>. <a href="#idx">→index</a></p>
 <h3 data-number="3.13.2" id="load-procedure1-or-more"><span class="header-section-number">3.13.2</span> <code>load</code> : procedure/1 or more</h3>
 <p>Usage: <code>(load prefix [fi])</code></p>
-<p>Loads the Lisp file at <code>fi</code> as a library or program with the given <code>prefix</code>. If only a prefix is specified, load attempts to find a corresponding file at path “<z3s5-data>/prg/prefix/prefix.lisp”, where <code>&lt;z3s5-data&gt;</code> is the result of (sysdir ’z3s5-data). Loading binds all non-global toplevel symbols of the definitions in file <code>fi</code> to the form prefix.symbol and replaces calls to them in the definitions appropriately. Symbols starting with "<em>" such as </em>cancel* are not modified. To give an example, if <code>fi</code> contains a definition (defun bar …) and the prefix is ’foo, then the result of the import is equivalent to (defun foo.bar …), and so on for any other definitions. To make a program or library import-ready in this way, global definitions that are referred to in a definition must be forward-declared using <code>declare</code>. This is required since the program transformation takes place at the time of the import, not at runtime, and therefore symbols not yet defined in <code>fi</code> would not be recognized by the importer as symbols that are top-level modified by <code>setq</code> in <code>fi</code> without a prior forward-declaration. Basically, the importer preorder-traverses the source and looks for setq and lambdas after macro expansion has taken place. By convention, the entry point of executable programs is a function (run) so the loaded program can be executed with the command (prefix.run).</p>
-<p>See also: <a href="#link696e636c756465"><code>include</code></a>, <a href="#link6465636c617265"><code>declare</code></a>. <a href="#idx">→index</a></p>
+<p>Loads the Lisp file at <code>fi</code> as a library or program with the given <code>prefix</code>. If only a prefix is specified, load attempts to find a corresponding file at path (str+ (sysdir ’z3s5-data) “/prg/prefix/prefix.lisp”). Loading binds all non-global toplevel symbols of the definitions in file <code>fi</code> to the form prefix.symbol and replaces calls to them in the definitions appropriately. Symbols starting with "<em>" such as </em>cancel* are not modified. To give an example, if <code>fi</code> contains a definition (defun bar …) and the prefix is ’foo, then the result of the import is equivalent to (defun foo.bar …), and so on for any other definitions. The importer preorder-traverses the source and looks for setq and lambdas after macro expansion has taken place. By convention, the entry point of executable programs is a function (run) so the loaded program can be executed with the command (prefix.run).</p>
+<p>See also: <a href="#link696e636c756465"><code>include</code></a>, <a href="#link676c6f62616c2d73796d3f"><code>global-sym?</code></a>. <a href="#idx">→index</a></p>
 <h2 data-number="3.14" id="ling"><span class="header-section-number">3.14</span> Soundex, Metaphone, etc.</h2>
 <p>The package <code>ling</code> provides various phonemic transcription functions like Soundex and Metaphone that are commonly used for fuzzy search and similarity comparisons between strings.</p>
 <h3 data-number="3.14.1" id="ling.damerau-levenshtein-procedure2"><span class="header-section-number">3.14.1</span> <code>ling.damerau-levenshtein</code> : procedure/2</h3>
@@ -1724,11 +1724,11 @@
 <h3 data-number="3.19.1" id="beep-procedure1"><span class="header-section-number">3.19.1</span> <code>beep</code> : procedure/1</h3>
 <p>Usage: <code>(beep sel)</code></p>
 <p>Play a built-in system sound. The argument <code>sel</code> may be one of ’(error start ready click okay confirm info).</p>
-<p>See also: <a href="#link706c61792d736f756e64"><code>play-sound</code></a>, <a href="#link6c6f61642d736f756e64"><code>load-sound</code></a>. <a href="#idx">→index</a></p>
+<p>See also: <a href="#link7365742d766f6c756d65"><code>set-volume</code></a>. <a href="#idx">→index</a></p>
 <h3 data-number="3.19.2" id="set-volume-procedure1"><span class="header-section-number">3.19.2</span> <code>set-volume</code> : procedure/1</h3>
 <p>Usage: <code>(set-volume fl)</code></p>
 <p>Set the master volume for all sound to <code>fl</code>, a value between 0.0 and 1.0.</p>
-<p>See also: <a href="#link706c61792d736f756e64"><code>play-sound</code></a>, <a href="#link706c61792d6d75736963"><code>play-music</code></a>. <a href="#idx">→index</a></p>
+<p>See also: <a href="#link62656570"><code>beep</code></a>. <a href="#idx">→index</a></p>
 <h2 data-number="3.20" id="str"><span class="header-section-number">3.20</span> String Manipulation</h2>
 <p>These functions all manipulate strings in one way or another.</p>
 <h3 data-number="3.20.1" id="fmt-procedure1-or-more"><span class="header-section-number">3.20.1</span> <code>fmt</code> : procedure/1 or more</h3>
@@ -2632,7 +2632,7 @@
 <h2 data-number="4.63" id="link62656570"><span class="header-section-number">4.63</span> <code>beep</code> : procedure/1</h2>
 <p>Usage: <code>(beep sel)</code></p>
 <p>Play a built-in system sound. The argument <code>sel</code> may be one of ’(error start ready click okay confirm info).</p>
-<p>See also: <a href="#link706c61792d736f756e64"><code>play-sound</code></a>, <a href="#link6c6f61642d736f756e64"><code>load-sound</code></a>. <a href="#idx">→index</a> <a href="#sound">→topic</a></p>
+<p>See also: <a href="#link7365742d766f6c756d65"><code>set-volume</code></a>. <a href="#idx">→index</a> <a href="#sound">→topic</a></p>
 <h2 data-number="4.64" id="link62696e64"><span class="header-section-number">4.64</span> <code>bind</code> : procedure/2</h2>
 <p>Usage: <code>(bind sym value)</code></p>
 <p>Bind <code>value</code> to the global symbol <code>sym</code>. In contrast to setq both values need quoting.</p>
@@ -3463,7 +3463,7 @@
 <h2 data-number="4.269" id="link676c6f62616c2d73796d3f"><span class="header-section-number">4.269</span> <code>global-sym?</code> : procedure/1</h2>
 <p>Usage: <code>(global-sym? sym) =&gt; bool</code></p>
 <p>Returns true if <code>sym</code> is a global symbol, nil otherwise. By convention, a symbol counts as global if it starts with a "*" character. This is used by library functions to determine whether a top-level symbol ought to be treated as local or global to the library.</p>
-<p>See also: <a href="#link696d706f7274"><code>import</code></a>, <a href="#link73796d3f"><code>sym?</code></a>. <a href="#idx">→index</a> <a href="#lib">→topic</a></p>
+<p>See also: <a href="#link6c6f6164"><code>load</code></a>, <a href="#link696e636c756465"><code>include</code></a>, <a href="#link73796d3f"><code>sym?</code></a>. <a href="#idx">→index</a> <a href="#lib">→topic</a></p>
 <h2 data-number="4.270" id="link686173"><span class="header-section-number">4.270</span> <code>has</code> : procedure/2</h2>
 <p>Usage: <code>(has dict key) =&gt; bool</code></p>
 <p>Return true if the dict <code>dict</code> contains an entry for <code>key</code>, nil otherwise.</p>
@@ -3735,8 +3735,8 @@
 <p>See also: <a href="#link636f6e733f"><code>cons?</code></a>, <a href="#link61746f6d3f"><code>atom?</code></a>, <a href="#link6e756c6c3f"><code>null?</code></a>. <a href="#idx">→index</a> <a href="#lisp">→topic</a></p>
 <h2 data-number="4.336" id="link6c6f6164"><span class="header-section-number">4.336</span> <code>load</code> : procedure/1 or more</h2>
 <p>Usage: <code>(load prefix [fi])</code></p>
-<p>Loads the Lisp file at <code>fi</code> as a library or program with the given <code>prefix</code>. If only a prefix is specified, load attempts to find a corresponding file at path “<z3s5-data>/prg/prefix/prefix.lisp”, where <code>&lt;z3s5-data&gt;</code> is the result of (sysdir ’z3s5-data). Loading binds all non-global toplevel symbols of the definitions in file <code>fi</code> to the form prefix.symbol and replaces calls to them in the definitions appropriately. Symbols starting with "<em>" such as </em>cancel* are not modified. To give an example, if <code>fi</code> contains a definition (defun bar …) and the prefix is ’foo, then the result of the import is equivalent to (defun foo.bar …), and so on for any other definitions. To make a program or library import-ready in this way, global definitions that are referred to in a definition must be forward-declared using <code>declare</code>. This is required since the program transformation takes place at the time of the import, not at runtime, and therefore symbols not yet defined in <code>fi</code> would not be recognized by the importer as symbols that are top-level modified by <code>setq</code> in <code>fi</code> without a prior forward-declaration. Basically, the importer preorder-traverses the source and looks for setq and lambdas after macro expansion has taken place. By convention, the entry point of executable programs is a function (run) so the loaded program can be executed with the command (prefix.run).</p>
-<p>See also: <a href="#link696e636c756465"><code>include</code></a>, <a href="#link6465636c617265"><code>declare</code></a>. <a href="#idx">→index</a> <a href="#lib">→topic</a></p>
+<p>Loads the Lisp file at <code>fi</code> as a library or program with the given <code>prefix</code>. If only a prefix is specified, load attempts to find a corresponding file at path (str+ (sysdir ’z3s5-data) “/prg/prefix/prefix.lisp”). Loading binds all non-global toplevel symbols of the definitions in file <code>fi</code> to the form prefix.symbol and replaces calls to them in the definitions appropriately. Symbols starting with "<em>" such as </em>cancel* are not modified. To give an example, if <code>fi</code> contains a definition (defun bar …) and the prefix is ’foo, then the result of the import is equivalent to (defun foo.bar …), and so on for any other definitions. The importer preorder-traverses the source and looks for setq and lambdas after macro expansion has taken place. By convention, the entry point of executable programs is a function (run) so the loaded program can be executed with the command (prefix.run).</p>
+<p>See also: <a href="#link696e636c756465"><code>include</code></a>, <a href="#link676c6f62616c2d73796d3f"><code>global-sym?</code></a>. <a href="#idx">→index</a> <a href="#lib">→topic</a></p>
 <h2 data-number="4.337" id="link6c6f61642d7a696d616765"><span class="header-section-number">4.337</span> <code>load-zimage</code> : procedure/1 or more</h2>
 <p>Usage: <code>(load-zimage fi) =&gt; li</code></p>
 <p>Load the zimage file <code>fi</code>, if possible, and return a list containing information about the zimage after it has been loaded. If the zimage fails the semantic version check, then an error is raised.</p>
@@ -4222,7 +4222,7 @@
 <h2 data-number="4.456" id="link7365742d766f6c756d65"><span class="header-section-number">4.456</span> <code>set-volume</code> : procedure/1</h2>
 <p>Usage: <code>(set-volume fl)</code></p>
 <p>Set the master volume for all sound to <code>fl</code>, a value between 0.0 and 1.0.</p>
-<p>See also: <a href="#link706c61792d736f756e64"><code>play-sound</code></a>, <a href="#link706c61792d6d75736963"><code>play-music</code></a>. <a href="#idx">→index</a> <a href="#sound">→topic</a></p>
+<p>See also: <a href="#link62656570"><code>beep</code></a>. <a href="#idx">→index</a> <a href="#sound">→topic</a></p>
 <h2 data-number="4.457" id="link7365743f"><span class="header-section-number">4.457</span> <code>set?</code> : procedure/1</h2>
 <p>Usage: <code>(set? x) =&gt; bool</code></p>
 <p>Return true if <code>x</code> can be used as a set, nil otherwise.</p>

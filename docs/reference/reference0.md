@@ -2,9 +2,9 @@
 title: Z3S5 Lisp Reference Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: Version 2.3.8+4b56c62
+footer-left: Version 2.3.8+a59f77d
 author: by Erich Rast and all Help system contributors
-date: 2022-8-23 9:51
+date: 2022-8-23 10:09
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -13,7 +13,7 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
-For Z3S5 Lisp Version 2.3.8+4b56c62 with installed modules (kvdb zimage tasks help beep db fileio decimal ling float console base).
+For Z3S5 Lisp Version 2.3.8+a59f77d with installed modules (kvdb zimage tasks help beep db fileio decimal ling float console base).
 
 # Introduction
 
@@ -2202,15 +2202,15 @@ Usage: `(global-sym? sym) => bool`
 
 Returns true if `sym` is a global symbol, nil otherwise. By convention, a symbol counts as global if it starts with a "*" character. This is used by library functions to determine whether a top-level symbol ought to be treated as local or global to the library.
 
-See also: [`import`](#link696d706f7274), [`sym?`](#link73796d3f).	 [→index](#idx)
+See also: [`load`](#link6c6f6164), [`include`](#link696e636c756465), [`sym?`](#link73796d3f).	 [→index](#idx)
 
 ### `load` : procedure/1 or more
 
 Usage: `(load prefix [fi])`
 
-Loads the Lisp file at `fi` as a library or program with the given `prefix`. If only a prefix is specified, load attempts to find a corresponding file at path "<z3s5-data>/prg/prefix/prefix.lisp", where `<z3s5-data>` is the result of (sysdir 'z3s5-data). Loading binds all non-global toplevel symbols of the definitions in file `fi` to the form prefix.symbol and replaces calls to them in the definitions appropriately. Symbols starting with "*" such as *cancel* are not modified. To give an example, if `fi` contains a definition (defun bar ...) and the prefix is 'foo, then the result of the import is equivalent to (defun foo.bar ...), and so on for any other definitions. To make a program or library import-ready in this way, global definitions that are referred to in a definition must be forward-declared using `declare`. This is required since the program transformation takes place at the time of the import, not at runtime, and therefore symbols not yet defined in `fi` would not be recognized by the importer as symbols that are top-level modified by `setq` in `fi` without a prior forward-declaration. Basically, the importer preorder-traverses the source and looks for setq and lambdas after macro expansion has taken place. By convention, the entry point of executable programs is a function (run) so the loaded program can be executed with the command (prefix.run).
+Loads the Lisp file at `fi` as a library or program with the given `prefix`. If only a prefix is specified, load attempts to find a corresponding file at path (str+ (sysdir 'z3s5-data) "/prg/prefix/prefix.lisp"). Loading binds all non-global toplevel symbols of the definitions in file `fi` to the form prefix.symbol and replaces calls to them in the definitions appropriately. Symbols starting with "*" such as *cancel* are not modified. To give an example, if `fi` contains a definition (defun bar ...) and the prefix is 'foo, then the result of the import is equivalent to (defun foo.bar ...), and so on for any other definitions. The importer preorder-traverses the source and looks for setq and lambdas after macro expansion has taken place. By convention, the entry point of executable programs is a function (run) so the loaded program can be executed with the command (prefix.run).
 
-See also: [`include`](#link696e636c756465), [`declare`](#link6465636c617265).	 [→index](#idx)
+See also: [`include`](#link696e636c756465), [`global-sym?`](#link676c6f62616c2d73796d3f).	 [→index](#idx)
 
 
 
@@ -3458,7 +3458,7 @@ Usage: `(beep sel)`
 
 Play a built-in system sound. The argument `sel` may be one of '(error start ready click okay confirm info).
 
-See also: [`play-sound`](#link706c61792d736f756e64), [`load-sound`](#link6c6f61642d736f756e64).	 [→index](#idx)
+See also: [`set-volume`](#link7365742d766f6c756d65).	 [→index](#idx)
 
 ### `set-volume` : procedure/1
 
@@ -3466,7 +3466,7 @@ Usage: `(set-volume fl)`
 
 Set the master volume for all sound to `fl`, a value between 0.0 and 1.0.
 
-See also: [`play-sound`](#link706c61792d736f756e64), [`play-music`](#link706c61792d6d75736963).	 [→index](#idx)
+See also: [`beep`](#link62656570).	 [→index](#idx)
 
 
 
@@ -5286,7 +5286,7 @@ Usage: `(beep sel)`
 
 Play a built-in system sound. The argument `sel` may be one of '(error start ready click okay confirm info).
 
-See also: [`play-sound`](#link706c61792d736f756e64), [`load-sound`](#link6c6f61642d736f756e64).	 [→index](#idx) [→topic](#sound)
+See also: [`set-volume`](#link7365742d766f6c756d65).	 [→index](#idx) [→topic](#sound)
 
 ## `bind` : procedure/2 {#link62696e64}
 
@@ -6948,7 +6948,7 @@ Usage: `(global-sym? sym) => bool`
 
 Returns true if `sym` is a global symbol, nil otherwise. By convention, a symbol counts as global if it starts with a "*" character. This is used by library functions to determine whether a top-level symbol ought to be treated as local or global to the library.
 
-See also: [`import`](#link696d706f7274), [`sym?`](#link73796d3f).	 [→index](#idx) [→topic](#lib)
+See also: [`load`](#link6c6f6164), [`include`](#link696e636c756465), [`sym?`](#link73796d3f).	 [→index](#idx) [→topic](#lib)
 
 ## `has` : procedure/2 {#link686173}
 
@@ -7492,9 +7492,9 @@ See also: [`cons?`](#link636f6e733f), [`atom?`](#link61746f6d3f), [`null?`](#lin
 
 Usage: `(load prefix [fi])`
 
-Loads the Lisp file at `fi` as a library or program with the given `prefix`. If only a prefix is specified, load attempts to find a corresponding file at path "<z3s5-data>/prg/prefix/prefix.lisp", where `<z3s5-data>` is the result of (sysdir 'z3s5-data). Loading binds all non-global toplevel symbols of the definitions in file `fi` to the form prefix.symbol and replaces calls to them in the definitions appropriately. Symbols starting with "*" such as *cancel* are not modified. To give an example, if `fi` contains a definition (defun bar ...) and the prefix is 'foo, then the result of the import is equivalent to (defun foo.bar ...), and so on for any other definitions. To make a program or library import-ready in this way, global definitions that are referred to in a definition must be forward-declared using `declare`. This is required since the program transformation takes place at the time of the import, not at runtime, and therefore symbols not yet defined in `fi` would not be recognized by the importer as symbols that are top-level modified by `setq` in `fi` without a prior forward-declaration. Basically, the importer preorder-traverses the source and looks for setq and lambdas after macro expansion has taken place. By convention, the entry point of executable programs is a function (run) so the loaded program can be executed with the command (prefix.run).
+Loads the Lisp file at `fi` as a library or program with the given `prefix`. If only a prefix is specified, load attempts to find a corresponding file at path (str+ (sysdir 'z3s5-data) "/prg/prefix/prefix.lisp"). Loading binds all non-global toplevel symbols of the definitions in file `fi` to the form prefix.symbol and replaces calls to them in the definitions appropriately. Symbols starting with "*" such as *cancel* are not modified. To give an example, if `fi` contains a definition (defun bar ...) and the prefix is 'foo, then the result of the import is equivalent to (defun foo.bar ...), and so on for any other definitions. The importer preorder-traverses the source and looks for setq and lambdas after macro expansion has taken place. By convention, the entry point of executable programs is a function (run) so the loaded program can be executed with the command (prefix.run).
 
-See also: [`include`](#link696e636c756465), [`declare`](#link6465636c617265).	 [→index](#idx) [→topic](#lib)
+See also: [`include`](#link696e636c756465), [`global-sym?`](#link676c6f62616c2d73796d3f).	 [→index](#idx) [→topic](#lib)
 
 ## `load-zimage` : procedure/1 or more {#link6c6f61642d7a696d616765}
 
@@ -8466,7 +8466,7 @@ Usage: `(set-volume fl)`
 
 Set the master volume for all sound to `fl`, a value between 0.0 and 1.0.
 
-See also: [`play-sound`](#link706c61792d736f756e64), [`play-music`](#link706c61792d6d75736963).	 [→index](#idx) [→topic](#sound)
+See also: [`beep`](#link62656570).	 [→index](#idx) [→topic](#sound)
 
 ## `set?` : procedure/1 {#link7365743f}
 

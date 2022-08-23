@@ -1734,7 +1734,7 @@
   (type proc)
   (topic (sound ui))
   (arity 1)
-  (see (play-sound load-sound)))
+  (see (set-volume)))
 
 (defhelp set-volume
     (use "(set-volume fl)")
@@ -1742,7 +1742,7 @@
   (type proc)
   (topic (sound ui))
   (arity 1)
-  (see (play-sound play-music)))
+  (see (beep)))
 
 (defhelp sleep
     (use "(sleep ms)")
