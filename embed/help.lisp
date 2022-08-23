@@ -73,13 +73,16 @@
 		     "This section lists functions and symbols that have no associated help topic.")
 (set-help-topic-info 'db
 		     "Databases"
-		     "These functions allow for Sqlite3 database access. The module needs to be enabled with the \"db\" build tag.")
+		     "These functions allow for Sqlite3 database access. The module needs to be enabled with the \"db\" build tag. It also provides access to key-value databases with prefix 'kvdb and the automated remember-recall system, both of which are implemented in Z3S5 Lisp on top of the 'db module. To use the remember system, it needs to be initialized first by calling `(init-remember)`.")
 (set-help-topic-info 'zimage
 		     "Runtime System Images"
 		     "The following functions provide functionality for saving, loading, and running of runtime system images to and from disk.")
 (set-help-topic-info 'lib
 		     "Library System"
 		     "This miscellaneous mini-library system allows importing programs with a prefix by source-transforming them.")
+(set-help-topic-info 'oop
+		     "Object-oriented Programming"
+		     "The OOP system uses arrays to store objects and also offers a more lightweight array-based structure system. It is not built for performance but may be useful to prevent writing object-oriented wrapper data structures again and again. This is also the reason why it was decided to embed the OOP system with a fixed API rather than providing it as an include file, allowing for interoperable object-oriented programming without having to worry about whether the extension is loaded. It's very simple and lightweight.")
 
 ;;; help for builtin functions (intrinsics)
 
@@ -1191,6 +1194,14 @@
   (topic (lisp))
   (arity -1)
   (see (void?)))
+
+(defhelp void?
+    (use "(void? datum)")
+  (info "Return true if #datum is the special symbol void, nil otherwise.")
+  (type proc)
+  (topic (lisp))
+  (arity 1)
+  (see (void)))
 
 (defhelp fmt
     (use "(fmt s [args] ...) => str")

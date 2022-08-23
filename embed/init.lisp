@@ -4470,115 +4470,671 @@
 ;;; LIBRARIES
 ;;; A library loading system, based on the library system of Z3S5 Machine.
 
-;; We expand macros, then first pass (ident -> prefix.ident in table), then second pass (replace symbols
-;; unless shadowed), then evaluate every transformed expression.
-(defun _include-library (in last table)
-  (foreach (_library-transform table *_current-lib*
-			       (_forward-symbol-table table *_current-lib*
-						      (expand-macros (readall in))))
-	   eval))
+(when (member 'fileio *reflect*)
+  ;; We expand macros, then first pass (ident -> prefix.ident in table), then second pass (replace symbols
+  ;; unless shadowed), then evaluate every transformed expression.
+  (defun _include-library (in last table)
+    (foreach (_library-transform table *_current-lib*
+				 (_forward-symbol-table table *_current-lib*
+							(expand-macros (readall in))))
+	     eval))
 
-(defun load (prefix &rest fi)
-  (cond
-    ((null? fi) (_load prefix (str+ (sysdir 'z3s5-data) "/prg/" (sym->str prefix) "/" (sym->str prefix) ".lisp")))
-    (t (apply _load (cons prefix fi)))))
+  (defun load (prefix &rest fi)
+    (cond
+      ((null? fi) (_load prefix (str+ (sysdir 'z3s5-data) "/prg/" (sym->str prefix) "/" (sym->str prefix) ".lisp")))
+      (t (apply _load (cons prefix fi)))))
 
-(defun _load (prefix &rest fi)
-  (unless (sym? prefix)
-    (error "load - symbol required as prefix, given %v" prefix))
-  (_push-current-lib prefix)
-  (let ((io nil)
-	(table (dict)))
-    (try ((when io (close io)))
-	 (setq io (apply open fi))
-	 (_include-library io (void) table)))
-  (_pop-current-lib))
+  (defun _load (prefix &rest fi)
+    (unless (sym? prefix)
+      (error "load - symbol required as prefix, given %v" prefix))
+    (_push-current-lib prefix)
+    (let ((io nil)
+	  (table (dict)))
+      (try ((when io (close io)))
+	   (setq io (apply open fi))
+	   (_include-library io (void) table)))
+    (_pop-current-lib))
 
-(defhelp load
-    (use "(load prefix [fi])")
-  (info "Loads the Lisp file at #fi as a library or program with the given #prefix. If only a prefix is specified, load attempts to find a corresponding file at path (str+ (sysdir 'z3s5-data) \"/prg/prefix/prefix.lisp\"). Loading binds all non-global toplevel symbols of the definitions in file #fi to the form prefix.symbol and replaces calls to them in the definitions appropriately. Symbols starting with \"*\" such as *cancel* are not modified. To give an example, if #fi contains a definition (defun bar ...) and the prefix is 'foo, then the result of the import is equivalent to (defun foo.bar ...), and so on for any other definitions. The importer preorder-traverses the source and looks for setq and lambdas after macro expansion has taken place. By convention, the entry point of executable programs is a function (run) so the loaded program can be executed with the command (prefix.run).")
-  (type proc)
-  (topic (lib system))
-  (arity -2)
-  (see (include global-sym?)))
+  (defhelp load
+      (use "(load prefix [fi])")
+    (info "Loads the Lisp file at #fi as a library or program with the given #prefix. If only a prefix is specified, load attempts to find a corresponding file at path (str+ (sysdir 'z3s5-data) \"/prg/prefix/prefix.lisp\"). Loading binds all non-global toplevel symbols of the definitions in file #fi to the form prefix.symbol and replaces calls to them in the definitions appropriately. Symbols starting with \"*\" such as *cancel* are not modified. To give an example, if #fi contains a definition (defun bar ...) and the prefix is 'foo, then the result of the import is equivalent to (defun foo.bar ...), and so on for any other definitions. The importer preorder-traverses the source and looks for setq and lambdas after macro expansion has taken place. By convention, the entry point of executable programs is a function (run) so the loaded program can be executed with the command (prefix.run).")
+    (type proc)
+    (topic (lib system))
+    (arity -2)
+    (see (include global-sym?)))
 
-(defun global-sym? (s)
-  (and (sym? s)
-       (equal? (slice (sym->str s) 0 1) "*")))
+  (defun global-sym? (s)
+    (and (sym? s)
+	 (equal? (slice (sym->str s) 0 1) "*")))
 
-(defhelp global-sym?
-    (use "(global-sym? sym) => bool")
-  (info "Returns true if #sym is a global symbol, nil otherwise. By convention, a symbol counts as global if it starts with a \"*\" character. This is used by library functions to determine whether a top-level symbol ought to be treated as local or global to the library.")
-  (type proc)
-  (topic (lib system))
-  (arity 1)
-  (see (load include sym?)))
+  (defhelp global-sym?
+      (use "(global-sym? sym) => bool")
+    (info "Returns true if #sym is a global symbol, nil otherwise. By convention, a symbol counts as global if it starts with a \"*\" character. This is used by library functions to determine whether a top-level symbol ought to be treated as local or global to the library.")
+    (type proc)
+    (topic (lib system))
+    (arity 1)
+    (see (load include sym?)))
 
-;; Second pass: We replace identifier symbols with the prefix.ident versions stored
-;; in the table in the first pass, unless these are shadowed by lambda (let, letrec)
-;; or are global variables.
-(defun _library-transform (table prefix datum)
-  (cond
-    ((sym? datum)
-     (cond 
-       ((global-sym? datum) datum) ; ignore global symbols
-       (t
-	(getstacked table datum datum))))
-    ((not (list? datum))
-     datum)
-    ((null? datum) datum)
-    ((equal? (car datum) 'progn)
-     (cons 'progn (_library-transform table prefix (cdr datum))))
-    ((equal? (car datum) 'quote)
-     datum)
-    ((equal? (car datum) 'lambda)
-     (foreach (2nd datum nil)
-	      (lambda (ident)
-		(pushstacked table ident ident)))
-     (let ((lambda-term
-	    (cons 'lambda
-		  (cons (cadr datum)
-			(_library-transform table prefix (cddr datum))))))
+  ;; Second pass: We replace identifier symbols with the prefix.ident versions stored
+  ;; in the table in the first pass, unless these are shadowed by lambda (let, letrec)
+  ;; or are global variables.
+  (defun _library-transform (table prefix datum)
+    (cond
+      ((sym? datum)
+       (cond 
+	 ((global-sym? datum) datum) ; ignore global symbols
+	 (t
+	  (getstacked table datum datum))))
+      ((not (list? datum))
+       datum)
+      ((null? datum) datum)
+      ((equal? (car datum) 'progn)
+       (cons 'progn (_library-transform table prefix (cdr datum))))
+      ((equal? (car datum) 'quote)
+       datum)
+      ((equal? (car datum) 'lambda)
        (foreach (2nd datum nil)
 		(lambda (ident)
-		  (popstacked table ident ident)))
-       lambda-term))
-    (t
-     (cons (_library-transform table prefix (car datum))
-	   (_library-transform table prefix (cdr datum))))))
+		  (pushstacked table ident ident)))
+       (let ((lambda-term
+	      (cons 'lambda
+		    (cons (cadr datum)
+			  (_library-transform table prefix (cddr datum))))))
+	 (foreach (2nd datum nil)
+		  (lambda (ident)
+		    (popstacked table ident ident)))
+	 lambda-term))
+      (t
+       (cons (_library-transform table prefix (car datum))
+	     (_library-transform table prefix (cdr datum))))))
 
-;; First pass: We look at all setq applications in the code to take note of the modified
-;; identifiers, transformation from ident -> prefix.ident, storing them in table.
-(defun _forward-symbol-table (table prefix datum)
+  ;; First pass: We look at all setq applications in the code to take note of the modified
+  ;; identifiers, transformation from ident -> prefix.ident, storing them in table.
+  (defun _forward-symbol-table (table prefix datum)
+    (cond
+      ((not (list? datum)) datum)
+      ((null? datum) datum)
+      ((equal? (car datum) 'quote) datum)
+      ((equal? (car datum) 'setq)
+       (cons 'setq (map-pairwise
+		    (cdr datum)
+		    (lambda (ident val)
+		      (cond
+			((has-key? table ident)
+			 (list (getstacked table ident ident)
+			       (_forward-symbol-table table prefix val)))
+			((global-sym? ident) ; don't modify global symbols
+			 (list ident (_forward-symbol-table table prefix val)))
+			(t
+			 (pushstacked
+			  table ident (str->sym
+				       (str+
+					(_library-prefix-convert prefix)
+					"."
+					(sym->str ident))))
+			 (list (getstacked table ident ident)
+			       (_forward-symbol-table table prefix val))))))))
+      (t
+       (cons (_forward-symbol-table table prefix (car datum))
+	     (_forward-symbol-table table prefix (cdr datum))))))
+
+  (defun _library-prefix-convert (prefixes)
+    (str-join (map prefixes sym->str) "."))
+
+  (setq *reflect* (cons 'lib *reflect*))
+  )
+
+;;; OOP
+;;; A poor man's object system.
+
+;; register the oop in reflection
+(when (bound? *reflect*)
+  (setq *reflect* (cons 'oop *reflect*)))
+
+(unless (bound? *classes*)
+  (setq *classes* (dict)))
+
+(defun _register-class (class)
+  (set *classes* (class-name class) class))
+
+(defun _class-by-name (cname)
+  (get *classes* cname nil))
+
+(defun _make-class (name supers slots)
+  (let ((mapping (dict))
+	(superclasses (map supers (lambda (x)
+			 (if (list? x)
+			     (list (_class-by-name (car x))(cdr x))
+			     (_class-by-name x))))))
+    (foreach
+     slots
+     (lambda (slot)
+       (set mapping (if (list? slot) (car slot) slot) (if (list? slot) (eval (cadr slot)) nil))))
+    (array '%class
+	   name
+	   superclasses
+	   mapping
+	   (_merge-class-dicts 4 superclasses))))
+
+(defun _instantiate (class slots)
+  (array
+   '%object
+   (class-name class)
+   (let ((d (_merge-class-dicts 3 (cons class (array-ref class 2)))))
+     (foreach
+      slots
+      (lambda (slot)
+	(unless (list? slot)
+	  (error "new: class %v, slots argument must be an alist, given %v with incorrect slot %v"))
+	(set d (car slot) (cadr slot))))
+     d)
+   (gensym)))
+
+(defun _merge-class-dicts (idx li)
+  (let ((d (dict)))
+    (list-foreach
+     li
+     (lambda (c)
+       (cond
+	 ((list? c) 
+	  (let ((d2 (alist->dict (cdr c))))
+	    (dict-foreach
+	     (array-ref (car c) idx)
+	     (lambda (k v)
+	       (if (has-key? d2 k)
+		   (let ((newkey (get d2 k)))
+		     (when (not (has-key? d (if (list? newkey) (car newkey) newkey)))
+		       (set d (if (list? newkey) (car newkey) newkey) v)))
+		   (when (not (has-key? d k))
+		     (set d k v)))))))
+	 (t 
+	  (dict-foreach
+	   (array-ref c idx)
+	   (lambda (k v)
+	     (when (not (has-key? d k))
+	       (set d k v))))))))
+    d))
+
+(defun prop (obj slot)
+  (letrec ((n (array-ref obj 3))
+	   (datum (get (array-ref obj 2) slot n)))
+    (if (not (equal? datum n))
+	datum
+	(error "prop: class %v does not have a property %v" (array-ref obj 1) slot))))
+
+(defhelp prop
+    (use "(prop obj slot) => any")
+  (info "Return the value in #obj for property #slot, or an error if the object does not have a property with that name.")
+  (type proc)
+  (topic (oop))
+  (arity 2)
+  (see (new isa? setslot object? class-name supers props methods has-slot?)))
+
+(defun setprop (obj slot value)
+  (unless (has-key? (array-ref obj 2) slot)
+    (error "setprop: class %v does not have a property %v" (array-ref obj 1) slot))
+  (set (array-ref obj 2) slot value))
+
+(defhelp setprop
+    (use "(setprop obj slot value)")
+  (info "Set property #slot in #obj to #value. An error occurs if the object does not have a property with that name.")
+  (type proc)
+  (topic (oop))
+  (arity 3)
+  (see (new isa? slot object? class-name supers props methods has-slot?)))
+
+(defun class? (c)
+  (and (array? c)
+       (eq? (array-ref c 0) '%class)))
+
+(defhelp class?
+    (use "(class? c) => bool")
+  (info "Return true if #c is a class array (not a name for a class!), nil otherwise.")
+  (type proc)
+  (topic (oop))
+  (arity 1)
+  (see (object? isa?)))
+
+(defun object? (obj)
+  (and (array? obj)
+       (>= (array-len obj) 3)
+       (eq? (array-ref obj 0) '%object)))
+
+(defhelp object?
+    (use "(object? obj) => bool")
+  (info "Return true of #obj is an object array, nil otherwise.")
+  (type proc)
+  (topic (oop))
+  (arity 1)
+  (see (class? isa?)))
+
+(defun class-name (c)
+   (unless (class? c)
+    (error "class-name: expected class, given %v" c))
+   (array-ref c 1))
+
+(defhelp class-name
+    (use "(class-name c) => sym")
+  (info "Return the name of a class #c. An error occurs if #c is not a valid class.")
+  (type proc)
+  (topic (oop))
+  (arity 1)
+  (see (class? isa?)))
+
+(defun supers (c)
+  (unless (class? c)
+    (error "supers: expected class, given %v" c))
+  (map (array-ref c 2) (lambda (x) (if (list? x) (car x) x))))
+
+(defhelp supers
+    (use "(supers c) => li")
+  (info "Return the list of superclasses of class #c. An error occurs if #c is not a valid class.")
+  (type proc)
+  (topic (oop))
+  (arity 1)
+  (see (class? isa? class-name)))
+
+(defun props (obj)
+   (unless (object? obj)
+    (error "props: expected an object, given %v" obj))
+   (let ((li nil))
+     (dict-foreach
+      (array-ref obj 2)
+      (lambda (k v)
+	(setq li (cons k li))))
+     li))
+
+(defhelp props
+    (use "(props obj) => li")
+  (info "Return the list of properties of #obj. An error occurs if #obj is not a valid object.")
+  (type proc)
+  (topic (oop))
+  (arity 1)
+  (see (methods has-prop? new prop setprop)))
+
+(defun _methods (class)
+   (let ((li nil))
+     (dict-foreach
+      (array-ref class 4)
+      (lambda (k v)
+	  (setq li (cons k li))))
+     li))
+
+(defun methods (obj)
   (cond
-    ((not (list? datum)) datum)
-    ((null? datum) datum)
-    ((equal? (car datum) 'quote) datum)
-    ((equal? (car datum) 'setq)
-     (cons 'setq (map-pairwise
-		  (cdr datum)
-		  (lambda (ident val)
-		    (cond
-		      ((has-key? table ident)
-		       (list (getstacked table ident ident)
-			     (_forward-symbol-table table prefix val)))
-		      ((global-sym? ident) ; don't modify global symbols
-		       (list ident (_forward-symbol-table table prefix val)))
-		      (t
-		       (pushstacked
-			table ident (str->sym
-				     (str+
-				      (_library-prefix-convert prefix)
-				      "."
-				      (sym->str ident))))
-		       (list (getstacked table ident ident)
-			     (_forward-symbol-table table prefix val))))))))
-    (t
-     (cons (_forward-symbol-table table prefix (car datum))
-	   (_forward-symbol-table table prefix (cdr datum))))))
+    ((object? obj) (_methods (class-of obj)))
+    ((class? obj) (_methods obj))
+    ((_class-by-name obj) (_methods (_class-by-name obj)))
+    (t (error "methods: expected class or object, given %v" obj))))
+  
+(defhelp methods
+    (use "(methods obj) => li")
+  (info "Return the list of methods of #obj, which must be a class, object, or class name.")
+  (type proc)
+  (topic (oop))
+  (arity 1)
+  (see (has-method? new props prop setprop has-prop?)))
 
-(defun _library-prefix-convert (prefixes)
-  (str-join (map prefixes sym->str) "."))
+(defun has-prop? (obj slot)
+  (has-key? (array-ref obj 2) (sym->str slot)))
+
+(defhelp has-prop?
+    (use "(has-prop? obj slot) => bool")
+  (info "Return true if #obj has a property named #slot, nil otherwise.")
+  (type proc)
+  (topic (oop))
+  (arity 2)
+  (see (has-method? new props methods prop setprop)))
+
+(defun has-method? (obj name)
+  (has-key? (array-ref (class-of obj) 4) name))
+
+(defhelp has-method?
+    (use "(has-method? obj name) => bool")
+  (info "Return true if #obj has a method with name #name, nil otherwise.")
+  (type proc)
+  (topic (oop))
+  (arity 2)
+  (see (defmethod has-prop? new props methods prop setprop)))
+
+(defun isa? (obj cname)
+  (unless (object? obj)
+    (error "isa?: the first argument must be a valid object array, given %v" obj))
+  (cond
+    ((eq? (array-ref obj 1) cname) t)
+    ((class? cname) (isa? obj (class-name cname)))
+    (t
+     (let ((c (_class-by-name cname)))
+       (unless c (error "isa?: %v is not the name of a registered class" cname))
+       (_isa? (array-ref obj 1) (supers c))))))
+
+(defun _isa? (cname li)
+  (cond
+    ((null? li) nil)
+    ((eq? cname (class-name (car li))) t)
+    (t (_isa? cname (cdr li)))))
+
+(defhelp isa?
+    (use "(isa? obj class) => bool")
+  (info "Return true if #obj is an instance of #class, nil otherwise. Argument #class can be either a class name symbol or a class itself.")
+  (type proc)
+  (topic (oop))
+  (arity 2)
+  (see (supers)))
+
+(defun class-of (obj)
+  (if (object? obj)
+      (_class-by-name (array-ref obj 1))
+      nil))
+
+(defhelp class-of
+    (use "(class-of obj) => class or nil")
+  (info "Return the class of object #obj, nil if #obj is not a valid object array.")
+  (type proc)
+  (topic (oop))
+  (arity 1)
+  (see (new isa?)))
+
+(defun _setmethod (class mname proc)
+  (when (= (functional-arity proc) 0)
+    (error "defmethod: a method procedure must take the object as first argument, but the given procedure takes no arguments"))
+  (unless (class? class)
+    (error "defmethod: the method name class part must be a valid class name, given %v" class))
+  (set (array-ref class 4) mname proc))
+
+(defun call-method (obj name args)
+  (apply (get (array-ref (class-of obj) 4) name) (cons obj args)))
+
+(defhelp call-method
+    (use "(call-method obj mname args) => any")
+  (info "Execute method #mname of object #obj with additional arguments in list #args. The first argument in the method call is always #obj itself.")
+  (type proc)
+  (topic (oop))
+  (arity 3)
+  (see (defmethod defclass new isa? class-of)))
+
+(defun call-super (obj name args)
+  (let ((supers (array-ref (class-of obj) 2) nil))
+    (unless supers
+      (error "call-super: class %v does not have any super classes" (class-of obj)))
+    (_call-super obj supers name args)))
+
+(defun _call-super (obj sup name args)
+  (cond
+    ((null? supers)
+     (error "call-super: no superclass of class %v has method '%v, superclasses are '%v"
+	    (class-of obj) name (supers obj)))
+    ((has-key? (array-ref (car sup) 4) name)
+     (apply (get (array-ref (car sup) 4) name) (cons obj args)))
+    (t (_call-super obj (cdr sup) name args))))
+    
+(defhelp call-super
+    (use "(call-super obj mname args) => any")
+  (info "Execute method #mname of the first superclass of #obj that has a method with that name.")
+  (type proc)
+  (topic (oop))
+  (arity 3)
+  (see (call-method supers)))
+
+(defmacro defclass (name supers &rest slots)
+  (let ((c (gensym)))
+    `(let ((,c (_make-class ',name (if (list? ',supers) ',supers (list ',supers)) ',slots)))
+       (setq ,name ,c)
+       (bind (str->sym (str+ (sym->str ',name) "?")) (lambda (obj) (and (object? obj) (let ((c (class-of obj))) (if c (eq? (class-name c) ',name) nil)))))
+       (_register-class ,name)
+       (dict-foreach
+	(array-ref ,c 4)
+	(lambda (k v)
+	  (bind (str->sym (str+ (sym->str ',name) "-" (sym->str k)))
+		v))))))
+  
+(defhelp defclass
+    (use "(defclass name supers [props] ...)")
+  (info "Defines symbol #name as class with superclasses #supers and property clauses #props listed as remaining arguments. A #props clause is either a symbol for a property or a list of the form (sym default) for the property #sym with #default value. The class is bound to #name and a class predicate #name? is created. Argument #supers may be a class name or a list of class names.")
+  (type macro)
+  (topic (oop))
+  (arity -3)
+  (see (defmethod new)))
+
+(defmacro new (class &rest args)
+  `(_instantiate ,class ',args))
+
+(defhelp new
+    (use "(new class [props] ...)")
+  (info "Create a new object of class #class with initial property bindings #props clauses as remaining arguments. Each #props clause must be a list of the form (sym value) assigning #value to property #sym.")
+  (type macro)
+  (topic (oop))
+  (arity -2)
+  (see (defclass)))
+
+(defmacro defmethod (name args &rest body)
+  `(progn
+     (_setmethod (_class-from-name ',name) (_mname-from-name ',name) (lambda ,args ,@body))
+     (setq ,name (lambda (obj &rest ag) (call-method obj (_mname-from-name ',name) ag)))))
+
+(defhelp defmethod
+    (use "(defmethod class-name args [body] ...)")
+  (info "Define a method #class-name for class #class and method name #name with a syntax parallel to defun, where #args are the arguments of the methods and #body is the rest of the method. The given #class-name must decompose into a valid class name #class of a previously created class and method name #name and is bound to the symbol #class-name. The remaining arguments are like for defun. So for example (defmethod employee-name (this) (slot this 'last-name)) defines a method #name for an existing class #employee which retrieves the property #last-name.")
+  (type macro)
+  (topic (oop))
+  (arity -3)
+  (see (defclass new call-method)))
+
+(defun _class-from-name (name)
+  (letrec ((s (sym->str name))
+	   (idx (instr s "-")))
+    (when (< idx 2)
+      (error "defmethod: a method name must start with the class name followed by \"-\", given \"%v\"" s))
+    (let ((result (_class-by-name (str->sym (str-slice s 0 idx)))))
+      (if result result
+	  (error "defmethod: no class %v registered" (str-slice s 0 idx))))))
+
+(defun _mname-from-name (name)
+  (letrec ((s (sym->str name))
+	   (idx (instr s "-")))
+     (when (< idx 2)
+       (error "defmethod: a method name must start with the class name followed by \"-\", given \"%v\"" s))
+     (when (< (- (strlen s) (add1 idx)) 1)
+       (error "defmethod: the method name does have a class name but does not have a slot name part, given \"%v\"" s))
+     (str->sym (str-slice s (add1 idx) (strlen s)))))
+
+;; lightweight structures
+
+(defun new-struct (name props)
+  (let ((ali (map
+	      props
+	      (lambda (x)
+		(if (list? x)
+		    (cons (car x) (cadr x))
+		    (cons x nil)))))
+	(c 1))
+    (array '%struct name
+	   (alist->dict ali)
+	   (alist->dict (map ali
+			     (lambda (x)
+			       (setq c (add1 c))
+			       (cons (1st x) c))))
+	   (len props))))
+
+(defhelp new-struct
+    (use "(new-struct name li)")
+  (info "Defines a new structure #name with the properties in the a-list #li. Structs are more leightweight than classes, but do not allow for inheritance. Instances of structs (\"records\") are arrays.")
+  (type proc)
+  (topic (oop))
+  (arity 2)
+  (see (defstruct)))
+			       
+(defun struct-name (s)
+  (2nd s nil))
+
+(defhelp struct-name
+    (use "(struct-name s) => sym")
+  (info "Returns the name of a struct #s. This is rarely needed since the struct is bound to a symbol with the same name.")
+  (type proc)
+  (topic (oop))
+  (arity 1)
+  (see (defstruct)))
+
+(defun struct-props (s)
+  (3rd s (dict)))
+
+(defhelp struct-props
+    (use "(struct-props s) => dict")
+  (info "Returns the properties of structure #s as dict.")
+  (type proc)
+  (topic (oop))
+  (arity 1)
+  (see (defstruct)))
+
+(defun struct-index (s)
+  (4th s (dict)))
+
+(defhelp struct-index
+    (use "(struct-index s) => dict")
+  (info "Returns the index of struct #s as a dict. This dict is an internal representation of the struct's instance data.")
+  (type proc)
+  (topic (oop))
+  (arity 1)
+  (see (defstruct)))
+
+(defun struct-size (s)
+  (5th s 0))
+
+(defhelp struct-size
+    (use "(strict-size s) => int")
+  (info "Returns the number of properties of struct #s.")
+  (type proc)
+  (topic (oop))
+  (arity 1)
+  (see (defstruct)))
+
+(defun struct? (s)
+  (and (array? s)
+       (equal? (1st s nil) '%struct)))
+
+(defhelp struct?
+    (use "(struct? datum) => boo")
+  (info "Returns true if #datum is a struct, nil otherwise.")
+  (type proc)
+  (topic (oop))
+  (arity 1)
+  (see (defstruct)))
+
+(defun record? (s)
+  (and (array? s)
+       (equal? (1st s nil) '%record)))
+
+(defhelp record?
+    (use "(record? s) => bool")
+  (info "Returns true if #s is a struct record, i.e., an instance of a struct; nil otherwise. Notice that records are not really types distinct from arrays, they simply contain a marker '%record as first element. With normal use no confusion should arise. Since the internal representation might change, you ought not use ordinary array procedures for records.")
+  (type proc)
+  (topic (oop))
+  (arity 1)
+  (see (struct? defstruct)))
+
+(defun struct-instantiate (s propli)
+  (let ((defaults (struct-props s))
+	(index (struct-index s))
+	(arr (build-array (+ 2 (struct-size s)) nil)))
+    (array-set arr 0 '%record)
+    (array-set arr 1 (struct-name s))
+    (dict-foreach
+     index
+     (lambda (k idx)
+       (array-set arr idx (_struct-lookup k propli defaults))))
+    arr))
+
+(defhelp struct-instantiate
+    (use "(struct-instantiate s li) => record")
+  (info "Instantiates the struct #s with property a-list #li as values for its properties and return the record. If a property is not in #li, its value is set to nil.")
+  (type proc)
+  (topic (oop))
+  (arity 2)
+  (see (make defstruct struct? record?)))
+
+(defun _struct-lookup (k values defaults)
+  (let ((v (assoc k values)))
+    (if v
+	(cadr v)
+	(get defaults k nil))))
+
+(defun copy-record (r)
+  (array-copy r))
+
+(defhelp copy-record
+    (use "(copy-record r) => record")
+  (info "Creates a non-recursive, shallow copy of record #r.")
+  (type proc)
+  (topic (oop))
+  (arity 1)
+  (see (record?)))
+
+(defmacro defstruct (name &rest props)
+  `(progn
+     (bind ',name (,new-struct ',name ',props))
+     (bind (str->sym (str+ (sym->str ',name) "?"))
+	   (lambda (x)
+	     (and (record? x)
+		  (equal? ',name (array-ref x 1)))))
+     (bind (str->sym (str+ (sym->str ',name) "*"))
+	   (lambda (x proc)
+	     (unless (record? x)
+	       (error "struct error: not a %v, given %v" ',name x))
+	     (let ((y (copy-record x)))
+	       (proc y))))
+     (foreach
+      ',props
+      (lambda (x)
+	(let ((propsym (if (list? x) (car x) x)))
+	  (bind (str->sym (str+ (sym->str ',name) "-" (sym->str propsym) "*"))
+		(lambda (r v proc)
+		  (let ((v2 (array-ref r (get (struct-index ,name) propsym))))
+		    (array-set r (get (struct-index ,name) propsym) v)
+		    (proc)
+		    (array-set r (get (struct-index ,name) propsym) v2))))
+	  (bind (str->sym (str+ (sym->str ',name) "-" (sym->str propsym)))
+		(lambda (r)
+		  (unless (and (record? r)
+			       (equal? ',name (array-ref r 1)))
+		    (error "struct get error: not a %v, given %v" ',name r))
+		  (array-ref r (get (struct-index ,name) propsym))))
+	  (bind (str->sym (str+ (sym->str ',name) "-" (sym->str propsym) "!"))
+		(lambda (r v)
+		  (unless (and (record? r)
+			       (equal? ',name (array-ref r 1)))
+		    (error "struct set error: not a %v, given %v and value %v" ',name r v))
+		  (array-set r (get (struct-index ,name) propsym) v))))))
+     ))
+
+(defhelp defstruct
+    (use "(defstruct name props ...) => struct")
+  (info "Binds symbol #name to a struct with name #name and with properties #props. Each clause of #props must be either a symbol for the property name or a list of the form (prop default-value) where #prop is the symbol for the property name and #default-value is the value it has by default. For each property #p, accessors #name-p and setters #name-p! are created, as well as a function #name-p* that takes a record #r, a value #v, and a procedure #proc that takes no arguments. When #name-p* is called on record #r, it temporarily sets property #p of #r to the provided value #v and calls the procedure #proc. Afterwards, the original value of #p is restored. Since this function mutates the record during the execution of #proc and does not protect this operation against race conditions, it is not thread-safe. (But you can include a mutex as property and make it thread-safe by wrapping it into #with-mutex-lock.) The defstruct macro returns the struct that is bound to #name.")
+  (type macro)
+  (topic (oop))
+  (arity -2)
+  (see (new-struct make with-mutex-lock)))
+
+(defmacro make (name props)
+  `(struct-instantiate ,name ,props))
+
+(defhelp make
+    (use "(make name props)")
+  (info "Create a new record (struct instance) of struct #name (unquoted) with properties #props. Each clause in #props must be a list of property name and initial value.")
+  (type macro)
+  (topic (oop))
+  (arity 2)
+  (see (make* defstruct)))
+
+(defmacro make* (name &rest props)
+  `(struct-instantiate ,name ',props))
+
+(defhelp make*
+    (use "(make* name prop1 ...)")
+  (info "Create a new record (struct instance) of struct #name (unquoted) with property clauses #prop-1 ... #prop-n, where each clause is a list of property name and initial value like in #make.")
+  (type macro)
+  (topic (oop))
+  (arity -2)
+  (see (make defstruct)))
 
 ;;; PREAMBLE END
 

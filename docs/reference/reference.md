@@ -2,9 +2,9 @@
 title: Z3S5 Lisp Reference Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: Version 2.3.8+a59f77d
+footer-left: Version 2.3.8+076af0c
 author: by Erich Rast and all Help system contributors
-date: 2022-8-23 10:09
+date: 2022-8-23 13:28
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -13,7 +13,7 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
-For Z3S5 Lisp Version 2.3.8+a59f77d with installed modules (kvdb zimage tasks help beep db fileio decimal ling float console base).
+For Z3S5 Lisp Version 2.3.8+076af0c with installed modules (oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).
 
 # Introduction
 
@@ -24,7 +24,7 @@ Incorrect documentation strings are bugs. Please report bugs using the correspon
 
 # Index {#idx}
 
-[`%`](#link25) [`*`](#link2a) [`*colors*`](#link2a636f6c6f72732a) [`*error-handler*`](#link2a6572726f722d68616e646c65722a) [`*error-printer*`](#link2a6572726f722d7072696e7465722a) [`*help*`](#link2a68656c702a) [`*hooks*`](#link2a686f6f6b732a) [`*last-error*`](#link2a6c6173742d6572726f722a) [`*reflect*`](#link2a7265666c6563742a) [`+`](#link2b) [`-`](#link2d) [`/`](#link2f) [`/=`](#link2f3d) [`10th`](#link31307468) [`1st`](#link317374) [`2nd`](#link326e64) [`3rd`](#link337264) [`4th`](#link347468) [`5th`](#link357468) [`6th`](#link367468) [`7th`](#link377468) [`8th`](#link387468) [`9th`](#link397468) [`<`](#link3c) [`<=`](#link3c3d) [`=`](#link3d) [`>`](#link3e) [`>=`](#link3e3d) [`abs`](#link616273) [`add-hook`](#link6164642d686f6f6b) [`add-hook-internal`](#link6164642d686f6f6b2d696e7465726e616c) [`add-hook-once`](#link6164642d686f6f6b2d6f6e6365) [`add1`](#link61646431) [`alist->dict`](#link616c6973742d3e64696374) [`alist?`](#link616c6973743f) [`and`](#link616e64) [`append`](#link617070656e64) [`apply`](#link6170706c79) [`apropos`](#link6170726f706f73) [`array`](#link6172726179) [`array->list`](#link61727261792d3e6c697374) [`array->str`](#link61727261792d3e737472) [`array-copy`](#link61727261792d636f7079) [`array-exists?`](#link61727261792d6578697374733f) [`array-forall?`](#link61727261792d666f72616c6c3f) [`array-foreach`](#link61727261792d666f7265616368) [`array-len`](#link61727261792d6c656e) [`array-map!`](#link61727261792d6d617021) [`array-pmap!`](#link61727261792d706d617021) [`array-ref`](#link61727261792d726566) [`array-reverse`](#link61727261792d72657665727365) [`array-set`](#link61727261792d736574) [`array-slice`](#link61727261792d736c696365) [`array-sort`](#link61727261792d736f7274) [`array-walk`](#link61727261792d77616c6b) [`array?`](#link61727261793f) [`ascii85->blob`](#link617363696938352d3e626c6f62) [`assoc`](#link6173736f63) [`assoc1`](#link6173736f6331) [`assq`](#link61737371) [`atom?`](#link61746f6d3f) [`base64->blob`](#link6261736536342d3e626c6f62) [`beep`](#link62656570) [`bind`](#link62696e64) [`bitand`](#link626974616e64) [`bitclear`](#link626974636c656172) [`bitor`](#link6269746f72) [`bitshl`](#link62697473686c) [`bitshr`](#link626974736872) [`bitxor`](#link626974786f72) [`blob->ascii85`](#link626c6f622d3e61736369693835) [`blob->base64`](#link626c6f622d3e626173653634) [`blob->hex`](#link626c6f622d3e686578) [`blob->str`](#link626c6f622d3e737472) [`blob-chksum`](#link626c6f622d63686b73756d) [`blob-equal?`](#link626c6f622d657175616c3f) [`blob-free`](#link626c6f622d66726565) [`blob?`](#link626c6f623f) [`bound?`](#link626f756e643f) [`build-array`](#link6275696c642d6172726179) [`build-list`](#link6275696c642d6c697374) [`caaar`](#link6361616172) [`caadr`](#link6361616472) [`caar`](#link63616172) [`cadar`](#link6361646172) [`caddr`](#link6361646472) [`cadr`](#link63616472) [`can-externalize?`](#link63616e2d65787465726e616c697a653f) [`car`](#link636172) [`case`](#link63617365) [`ccmp`](#link63636d70) [`cdaar`](#link6364616172) [`cdadr`](#link6364616472) [`cdar`](#link63646172) [`cddar`](#link6364646172) [`cdddr`](#link6364646472) [`cddr`](#link63646472) [`cdec!`](#link6364656321) [`cdr`](#link636472) [`char->str`](#link636861722d3e737472) [`chars`](#link6368617273) [`chars->str`](#link63686172732d3e737472) [`cinc!`](#link63696e6321) [`close`](#link636c6f7365) [`closure?`](#link636c6f737572653f) [`collect-garbage`](#link636f6c6c6563742d67617262616765) [`color`](#link636f6c6f72) [`cons`](#link636f6e73) [`cons?`](#link636f6e733f) [`count-partitions`](#link636f756e742d706172746974696f6e73) [`cpunum`](#link6370756e756d) [`cst!`](#link63737421) [`current-error-handler`](#link63757272656e742d6572726f722d68616e646c6572) [`current-zimage`](#link63757272656e742d7a696d616765) [`cwait`](#link6377616974) [`darken`](#link6461726b656e) [`date->epoch-ns`](#link646174652d3e65706f63682d6e73) [`datelist->epoch-ns`](#link646174656c6973742d3e65706f63682d6e73) [`datestr`](#link64617465737472) [`datestr*`](#link646174657374722a) [`datestr->datelist`](#link646174657374722d3e646174656c697374) [`day+`](#link6461792b) [`day-of-week`](#link6461792d6f662d7765656b) [`db.blob`](#link64622e626c6f62) [`db.close`](#link64622e636c6f7365) [`db.close-result`](#link64622e636c6f73652d726573756c74) [`db.exec`](#link64622e65786563) [`db.float`](#link64622e666c6f6174) [`db.int`](#link64622e696e74) [`db.open`](#link64622e6f70656e) [`db.open*`](#link64622e6f70656e2a) [`db.query`](#link64622e7175657279) [`db.result-column-count`](#link64622e726573756c742d636f6c756d6e2d636f756e74) [`db.result-columns`](#link64622e726573756c742d636f6c756d6e73) [`db.row`](#link64622e726f77) [`db.step`](#link64622e73746570) [`db.str`](#link64622e737472) [`declare-volatile`](#link6465636c6172652d766f6c6174696c65) [`def-custom-hook`](#link6465662d637573746f6d2d686f6f6b) [`default-error-handler`](#link64656661756c742d6572726f722d68616e646c6572) [`defmacro`](#link6465666d6163726f) [`delete`](#link64656c657465) [`dequeue!`](#link6465717565756521) [`dict`](#link64696374) [`dict->alist`](#link646963742d3e616c697374) [`dict->array`](#link646963742d3e6172726179) [`dict->keys`](#link646963742d3e6b657973) [`dict->list`](#link646963742d3e6c697374) [`dict->values`](#link646963742d3e76616c756573) [`dict-copy`](#link646963742d636f7079) [`dict-empty?`](#link646963742d656d7074793f) [`dict-foreach`](#link646963742d666f7265616368) [`dict-map`](#link646963742d6d6170) [`dict-map!`](#link646963742d6d617021) [`dict-merge`](#link646963742d6d65726765) [`dict-protect`](#link646963742d70726f74656374) [`dict-protected?`](#link646963742d70726f7465637465643f) [`dict-unprotect`](#link646963742d756e70726f74656374) [`dict?`](#link646963743f) [`dir`](#link646972) [`dir?`](#link6469723f) [`div`](#link646976) [`dolist`](#link646f6c697374) [`dotimes`](#link646f74696d6573) [`dump`](#link64756d70) [`dump-bindings`](#link64756d702d62696e64696e6773) [`enq`](#link656e71) [`enqueue!`](#link656e717565756521) [`epoch-ns->datelist`](#link65706f63682d6e732d3e646174656c697374) [`eq?`](#link65713f) [`eql?`](#link65716c3f) [`equal?`](#link657175616c3f) [`error`](#link6572726f72) [`error->str`](#link6572726f722d3e737472) [`error?`](#link6572726f723f) [`eval`](#link6576616c) [`even?`](#link6576656e3f) [`exists?`](#link6578697374733f) [`exit`](#link65786974) [`expand-macros`](#link657870616e642d6d6163726f73) [`expect`](#link657870656374) [`expect-err`](#link6578706563742d657272) [`expect-false`](#link6578706563742d66616c7365) [`expect-ok`](#link6578706563742d6f6b) [`expect-true`](#link6578706563742d74727565) [`expr->str`](#link657870722d3e737472) [`externalize`](#link65787465726e616c697a65) [`externalize0`](#link65787465726e616c697a6530) [`fdelete`](#link6664656c657465) [`feature?`](#link666561747572653f) [`file-port?`](#link66696c652d706f72743f) [`filter`](#link66696c746572) [`find-missing-help-entries`](#link66696e642d6d697373696e672d68656c702d656e7472696573) [`find-unneeded-help-entries`](#link66696e642d756e6e65656465642d68656c702d656e7472696573) [`fl.abs`](#link666c2e616273) [`fl.acos`](#link666c2e61636f73) [`fl.asin`](#link666c2e6173696e) [`fl.asinh`](#link666c2e6173696e68) [`fl.atan`](#link666c2e6174616e) [`fl.atan2`](#link666c2e6174616e32) [`fl.atanh`](#link666c2e6174616e68) [`fl.cbrt`](#link666c2e63627274) [`fl.ceil`](#link666c2e6365696c) [`fl.cos`](#link666c2e636f73) [`fl.cosh`](#link666c2e636f7368) [`fl.dim`](#link666c2e64696d) [`fl.erf`](#link666c2e657266) [`fl.erfc`](#link666c2e65726663) [`fl.erfcinv`](#link666c2e65726663696e76) [`fl.erfinv`](#link666c2e657266696e76) [`fl.exp`](#link666c2e657870) [`fl.exp2`](#link666c2e65787032) [`fl.expm1`](#link666c2e6578706d31) [`fl.floor`](#link666c2e666c6f6f72) [`fl.fma`](#link666c2e666d61) [`fl.frexp`](#link666c2e6672657870) [`fl.gamma`](#link666c2e67616d6d61) [`fl.hypot`](#link666c2e6879706f74) [`fl.ilogb`](#link666c2e696c6f6762) [`fl.inf`](#link666c2e696e66) [`fl.is-nan?`](#link666c2e69732d6e616e3f) [`fl.j0`](#link666c2e6a30) [`fl.j1`](#link666c2e6a31) [`fl.jn`](#link666c2e6a6e) [`fl.ldexp`](#link666c2e6c64657870) [`fl.lgamma`](#link666c2e6c67616d6d61) [`fl.log`](#link666c2e6c6f67) [`fl.log10`](#link666c2e6c6f673130) [`fl.log1p`](#link666c2e6c6f673170) [`fl.log2`](#link666c2e6c6f6732) [`fl.logb`](#link666c2e6c6f6762) [`fl.max`](#link666c2e6d6178) [`fl.min`](#link666c2e6d696e) [`fl.mod`](#link666c2e6d6f64) [`fl.modf`](#link666c2e6d6f6466) [`fl.nan`](#link666c2e6e616e) [`fl.next-after`](#link666c2e6e6578742d6166746572) [`fl.pow`](#link666c2e706f77) [`fl.pow10`](#link666c2e706f773130) [`fl.remainder`](#link666c2e72656d61696e646572) [`fl.round`](#link666c2e726f756e64) [`fl.round-to-even`](#link666c2e726f756e642d746f2d6576656e) [`fl.signbit`](#link666c2e7369676e626974) [`fl.sin`](#link666c2e73696e) [`fl.sinh`](#link666c2e73696e68) [`fl.sqrt`](#link666c2e73717274) [`fl.tan`](#link666c2e74616e) [`fl.tanh`](#link666c2e74616e68) [`fl.trunc`](#link666c2e7472756e63) [`fl.y0`](#link666c2e7930) [`fl.y1`](#link666c2e7931) [`fl.yn`](#link666c2e796e) [`flatten`](#link666c617474656e) [`float`](#link666c6f6174) [`fmt`](#link666d74) [`forall?`](#link666f72616c6c3f) [`force`](#link666f726365) [`foreach`](#link666f7265616368) [`forget`](#link666f72676574) [`functional-arity`](#link66756e6374696f6e616c2d6172697479) [`functional-has-rest?`](#link66756e6374696f6e616c2d6861732d726573743f) [`functional?`](#link66756e6374696f6e616c3f) [`gensym`](#link67656e73796d) [`get`](#link676574) [`get-or-set`](#link6765742d6f722d736574) [`get-partitions`](#link6765742d706172746974696f6e73) [`getstacked`](#link676574737461636b6564) [`glance`](#link676c616e6365) [`global-sym?`](#link676c6f62616c2d73796d3f) [`has`](#link686173) [`has-key?`](#link6861732d6b65793f) [`help`](#link68656c70) [`help->manual-entry`](#link68656c702d3e6d616e75616c2d656e747279) [`help-about`](#link68656c702d61626f7574) [`help-entry`](#link68656c702d656e747279) [`help-topic-info`](#link68656c702d746f7069632d696e666f) [`help-topics`](#link68656c702d746f70696373) [`hex->blob`](#link6865782d3e626c6f62) [`hook`](#link686f6f6b) [`hour+`](#link686f75722b) [`identity`](#link6964656e74697479) [`if`](#link6966) [`inchars`](#link696e6368617273) [`include`](#link696e636c756465) [`index`](#link696e646578) [`init-remember`](#link696e69742d72656d656d626572) [`instr`](#link696e737472) [`int`](#link696e74) [`intern`](#link696e7465726e) [`internalize`](#link696e7465726e616c697a65) [`intrinsic`](#link696e7472696e736963) [`intrinsic?`](#link696e7472696e7369633f) [`iterate`](#link69746572617465) [`kvdb.begin`](#link6b7664622e626567696e) [`kvdb.close`](#link6b7664622e636c6f7365) [`kvdb.commit`](#link6b7664622e636f6d6d6974) [`kvdb.db?`](#link6b7664622e64623f) [`kvdb.forget`](#link6b7664622e666f72676574) [`kvdb.forget-everything`](#link6b7664622e666f726765742d65766572797468696e67) [`kvdb.get`](#link6b7664622e676574) [`kvdb.info`](#link6b7664622e696e666f) [`kvdb.open`](#link6b7664622e6f70656e) [`kvdb.rollback`](#link6b7664622e726f6c6c6261636b) [`kvdb.search`](#link6b7664622e736561726368) [`kvdb.set`](#link6b7664622e736574) [`kvdb.when`](#link6b7664622e7768656e) [`last`](#link6c617374) [`lcons`](#link6c636f6e73) [`len`](#link6c656e) [`let`](#link6c6574) [`letrec`](#link6c6574726563) [`lighten`](#link6c69676874656e) [`ling.damerau-levenshtein`](#link6c696e672e64616d657261752d6c6576656e73687465696e) [`ling.hamming`](#link6c696e672e68616d6d696e67) [`ling.jaro`](#link6c696e672e6a61726f) [`ling.jaro-winkler`](#link6c696e672e6a61726f2d77696e6b6c6572) [`ling.levenshtein`](#link6c696e672e6c6576656e73687465696e) [`ling.match-rating-codex`](#link6c696e672e6d617463682d726174696e672d636f646578) [`ling.match-rating-compare`](#link6c696e672e6d617463682d726174696e672d636f6d70617265) [`ling.metaphone`](#link6c696e672e6d65746170686f6e65) [`ling.nysiis`](#link6c696e672e6e7973696973) [`ling.porter`](#link6c696e672e706f72746572) [`ling.soundex`](#link6c696e672e736f756e646578) [`list`](#link6c697374) [`list->array`](#link6c6973742d3e6172726179) [`list->set`](#link6c6973742d3e736574) [`list->str`](#link6c6973742d3e737472) [`list-exists?`](#link6c6973742d6578697374733f) [`list-forall?`](#link6c6973742d666f72616c6c3f) [`list-foreach`](#link6c6973742d666f7265616368) [`list-last`](#link6c6973742d6c617374) [`list-ref`](#link6c6973742d726566) [`list-reverse`](#link6c6973742d72657665727365) [`list-slice`](#link6c6973742d736c696365) [`list?`](#link6c6973743f) [`load`](#link6c6f6164) [`load-zimage`](#link6c6f61642d7a696d616765) [`macro?`](#link6d6163726f3f) [`make-blob`](#link6d616b652d626c6f62) [`make-mutex`](#link6d616b652d6d75746578) [`make-queue`](#link6d616b652d7175657565) [`make-set`](#link6d616b652d736574) [`make-stack`](#link6d616b652d737461636b) [`make-symbol`](#link6d616b652d73796d626f6c) [`map`](#link6d6170) [`map-pairwise`](#link6d61702d7061697277697365) [`mapcar`](#link6d6170636172) [`max`](#link6d6178) [`member`](#link6d656d626572) [`memq`](#link6d656d71) [`memstats`](#link6d656d7374617473) [`min`](#link6d696e) [`minmax`](#link6d696e6d6178) [`minute+`](#link6d696e7574652b) [`mod`](#link6d6f64) [`month+`](#link6d6f6e74682b) [`mutex-lock`](#link6d757465782d6c6f636b) [`mutex-rlock`](#link6d757465782d726c6f636b) [`mutex-runlock`](#link6d757465782d72756e6c6f636b) [`mutex-unlock`](#link6d757465782d756e6c6f636b) [`nconc`](#link6e636f6e63) [`nl`](#link6e6c) [`nonce`](#link6e6f6e6365) [`not`](#link6e6f74) [`now`](#link6e6f77) [`now-ms`](#link6e6f772d6d73) [`now-ns`](#link6e6f772d6e73) [`nreverse`](#link6e72657665727365) [`nth`](#link6e7468) [`nth-partition`](#link6e74682d706172746974696f6e) [`nthdef`](#link6e7468646566) [`null?`](#link6e756c6c3f) [`num?`](#link6e756d3f) [`odd?`](#link6f64643f) [`on-feature`](#link6f6e2d66656174757265) [`open`](#link6f70656e) [`or`](#link6f72) [`out`](#link6f7574) [`outy`](#link6f757479) [`peek`](#link7065656b) [`permission?`](#link7065726d697373696f6e3f) [`permissions`](#link7065726d697373696f6e73) [`poke`](#link706f6b65) [`pop!`](#link706f7021) [`pop-error-handler`](#link706f702d6572726f722d68616e646c6572) [`pop-finalizer`](#link706f702d66696e616c697a6572) [`popstacked`](#link706f70737461636b6564) [`prin1`](#link7072696e31) [`princ`](#link7072696e63) [`print`](#link7072696e74) [`proc?`](#link70726f633f) [`protect`](#link70726f74656374) [`protect-toplevel-symbols`](#link70726f746563742d746f706c6576656c2d73796d626f6c73) [`protected?`](#link70726f7465637465643f) [`prune-task-table`](#link7072756e652d7461736b2d7461626c65) [`prune-unneeded-help-entries`](#link7072756e652d756e6e65656465642d68656c702d656e7472696573) [`push!`](#link7075736821) [`push-error-handler`](#link707573682d6572726f722d68616e646c6572) [`push-finalizer`](#link707573682d66696e616c697a6572) [`pushstacked`](#link70757368737461636b6564) [`queue-empty?`](#link71756575652d656d7074793f) [`queue-len`](#link71756575652d6c656e) [`queue?`](#link71756575653f) [`rand`](#link72616e64) [`random-color`](#link72616e646f6d2d636f6c6f72) [`read`](#link72656164) [`read-binary`](#link726561642d62696e617279) [`read-string`](#link726561642d737472696e67) [`read-zimage`](#link726561642d7a696d616765) [`readall`](#link72656164616c6c) [`readall-str`](#link72656164616c6c2d737472) [`recall`](#link726563616c6c) [`recall-info`](#link726563616c6c2d696e666f) [`recall-when`](#link726563616c6c2d7768656e) [`recollect`](#link7265636f6c6c656374) [`remember`](#link72656d656d626572) [`remove-duplicates`](#link72656d6f76652d6475706c696361746573) [`remove-hook`](#link72656d6f76652d686f6f6b) [`remove-hook-internal`](#link72656d6f76652d686f6f6b2d696e7465726e616c) [`remove-hooks`](#link72656d6f76652d686f6f6b73) [`replace-hook`](#link7265706c6163652d686f6f6b) [`reverse`](#link72657665727365) [`rnd`](#link726e64) [`rndseed`](#link726e6473656564) [`rplaca`](#link72706c616361) [`run-at`](#link72756e2d6174) [`run-hook`](#link72756e2d686f6f6b) [`run-hook-internal`](#link72756e2d686f6f6b2d696e7465726e616c) [`run-selftest`](#link72756e2d73656c6674657374) [`run-zimage`](#link72756e2d7a696d616765) [`save-zimage`](#link736176652d7a696d616765) [`sec+`](#link7365632b) [`semver.build`](#link73656d7665722e6275696c64) [`semver.canonical`](#link73656d7665722e63616e6f6e6963616c) [`semver.compare`](#link73656d7665722e636f6d70617265) [`semver.is-valid?`](#link73656d7665722e69732d76616c69643f) [`semver.major`](#link73656d7665722e6d616a6f72) [`semver.major-minor`](#link73656d7665722e6d616a6f722d6d696e6f72) [`semver.max`](#link73656d7665722e6d6178) [`semver.prerelease`](#link73656d7665722e70726572656c65617365) [`seq?`](#link7365713f) [`set`](#link736574) [`set*`](#link7365742a) [`set->list`](#link7365742d3e6c697374) [`set-color`](#link7365742d636f6c6f72) [`set-complement`](#link7365742d636f6d706c656d656e74) [`set-difference`](#link7365742d646966666572656e6365) [`set-element?`](#link7365742d656c656d656e743f) [`set-empty?`](#link7365742d656d7074793f) [`set-equal?`](#link7365742d657175616c3f) [`set-help-topic-info`](#link7365742d68656c702d746f7069632d696e666f) [`set-intersection`](#link7365742d696e74657273656374696f6e) [`set-permissions`](#link7365742d7065726d697373696f6e73) [`set-subset?`](#link7365742d7375627365743f) [`set-union`](#link7365742d756e696f6e) [`set-volume`](#link7365742d766f6c756d65) [`set?`](#link7365743f) [`setcar`](#link736574636172) [`setcdr`](#link736574636472) [`shorten`](#link73686f7274656e) [`sleep`](#link736c656570) [`sleep-ns`](#link736c6565702d6e73) [`slice`](#link736c696365) [`sort`](#link736f7274) [`sort-symbols`](#link736f72742d73796d626f6c73) [`spaces`](#link737061636573) [`stack-empty?`](#link737461636b2d656d7074793f) [`stack-len`](#link737461636b2d6c656e) [`stack?`](#link737461636b3f) [`str+`](#link7374722b) [`str->array`](#link7374722d3e6172726179) [`str->blob`](#link7374722d3e626c6f62) [`str->char`](#link7374722d3e63686172) [`str->chars`](#link7374722d3e6368617273) [`str->expr`](#link7374722d3e65787072) [`str->expr*`](#link7374722d3e657870722a) [`str->list`](#link7374722d3e6c697374) [`str->sym`](#link7374722d3e73796d) [`str-count-substr`](#link7374722d636f756e742d737562737472) [`str-empty?`](#link7374722d656d7074793f) [`str-exists?`](#link7374722d6578697374733f) [`str-forall?`](#link7374722d666f72616c6c3f) [`str-foreach`](#link7374722d666f7265616368) [`str-index`](#link7374722d696e646578) [`str-join`](#link7374722d6a6f696e) [`str-port?`](#link7374722d706f72743f) [`str-ref`](#link7374722d726566) [`str-remove-number`](#link7374722d72656d6f76652d6e756d626572) [`str-remove-prefix`](#link7374722d72656d6f76652d707265666978) [`str-remove-suffix`](#link7374722d72656d6f76652d737566666978) [`str-replace`](#link7374722d7265706c616365) [`str-replace*`](#link7374722d7265706c6163652a) [`str-reverse`](#link7374722d72657665727365) [`str-segment`](#link7374722d7365676d656e74) [`str-slice`](#link7374722d736c696365) [`str?`](#link7374723f) [`strbuild`](#link7374726275696c64) [`strcase`](#link73747263617365) [`strcenter`](#link73747263656e746572) [`strcnt`](#link737472636e74) [`strleft`](#link7374726c656674) [`strlen`](#link7374726c656e) [`strless`](#link7374726c657373) [`strlimit`](#link7374726c696d6974) [`strmap`](#link7374726d6170) [`stropen`](#link7374726f70656e) [`strright`](#link7374727269676874) [`strsplit`](#link73747273706c6974) [`sub1`](#link73756231) [`sym->str`](#link73796d2d3e737472) [`sym?`](#link73796d3f) [`synout`](#link73796e6f7574) [`synouty`](#link73796e6f757479) [`sys-key?`](#link7379732d6b65793f) [`sysmsg`](#link7379736d7367) [`sysmsg*`](#link7379736d73672a) [`take`](#link74616b65) [`task`](#link7461736b) [`task-broadcast`](#link7461736b2d62726f616463617374) [`task-recv`](#link7461736b2d72656376) [`task-remove`](#link7461736b2d72656d6f7665) [`task-run`](#link7461736b2d72756e) [`task-schedule`](#link7461736b2d7363686564756c65) [`task-send`](#link7461736b2d73656e64) [`task-state`](#link7461736b2d7374617465) [`task?`](#link7461736b3f) [`terpri`](#link746572707269) [`testing`](#link74657374696e67) [`the-color`](#link7468652d636f6c6f72) [`the-color-names`](#link7468652d636f6c6f722d6e616d6573) [`time`](#link74696d65) [`truncate`](#link7472756e63617465) [`try`](#link747279) [`unless`](#link756e6c657373) [`unprotect`](#link756e70726f74656374) [`unprotect-toplevel-symbols`](#link756e70726f746563742d746f706c6576656c2d73796d626f6c73) [`valid?`](#link76616c69643f) [`void`](#link766f6964) [`wait-for`](#link776169742d666f72) [`wait-for*`](#link776169742d666f722a) [`wait-for-empty*`](#link776169742d666f722d656d7074792a) [`wait-until`](#link776169742d756e74696c) [`wait-until*`](#link776169742d756e74696c2a) [`warn`](#link7761726e) [`week+`](#link7765656b2b) [`week-of-date`](#link7765656b2d6f662d64617465) [`when`](#link7768656e) [`when-permission`](#link7768656e2d7065726d697373696f6e) [`while`](#link7768696c65) [`with-colors`](#link776974682d636f6c6f7273) [`with-error-handler`](#link776974682d6572726f722d68616e646c6572) [`with-final`](#link776974682d66696e616c) [`with-mutex-lock`](#link776974682d6d757465782d6c6f636b) [`with-mutex-rlock`](#link776974682d6d757465782d726c6f636b) [`write`](#link7772697465) [`write-binary`](#link77726974652d62696e617279) [`write-binary-at`](#link77726974652d62696e6172792d6174) [`write-string`](#link77726974652d737472696e67) [`write-zimage`](#link77726974652d7a696d616765) [`year+`](#link796561722b) [`zimage-header`](#link7a696d6167652d686561646572) [`zimage-loadable?`](#link7a696d6167652d6c6f616461626c653f) [`zimage-runable?`](#link7a696d6167652d72756e61626c653f) 
+[`%`](#link25) [`*`](#link2a) [`*colors*`](#link2a636f6c6f72732a) [`*error-handler*`](#link2a6572726f722d68616e646c65722a) [`*error-printer*`](#link2a6572726f722d7072696e7465722a) [`*help*`](#link2a68656c702a) [`*hooks*`](#link2a686f6f6b732a) [`*last-error*`](#link2a6c6173742d6572726f722a) [`*reflect*`](#link2a7265666c6563742a) [`+`](#link2b) [`-`](#link2d) [`/`](#link2f) [`/=`](#link2f3d) [`10th`](#link31307468) [`1st`](#link317374) [`2nd`](#link326e64) [`3rd`](#link337264) [`4th`](#link347468) [`5th`](#link357468) [`6th`](#link367468) [`7th`](#link377468) [`8th`](#link387468) [`9th`](#link397468) [`<`](#link3c) [`<=`](#link3c3d) [`=`](#link3d) [`>`](#link3e) [`>=`](#link3e3d) [`abs`](#link616273) [`add-hook`](#link6164642d686f6f6b) [`add-hook-internal`](#link6164642d686f6f6b2d696e7465726e616c) [`add-hook-once`](#link6164642d686f6f6b2d6f6e6365) [`add1`](#link61646431) [`alist->dict`](#link616c6973742d3e64696374) [`alist?`](#link616c6973743f) [`and`](#link616e64) [`append`](#link617070656e64) [`apply`](#link6170706c79) [`apropos`](#link6170726f706f73) [`array`](#link6172726179) [`array->list`](#link61727261792d3e6c697374) [`array->str`](#link61727261792d3e737472) [`array-copy`](#link61727261792d636f7079) [`array-exists?`](#link61727261792d6578697374733f) [`array-forall?`](#link61727261792d666f72616c6c3f) [`array-foreach`](#link61727261792d666f7265616368) [`array-len`](#link61727261792d6c656e) [`array-map!`](#link61727261792d6d617021) [`array-pmap!`](#link61727261792d706d617021) [`array-ref`](#link61727261792d726566) [`array-reverse`](#link61727261792d72657665727365) [`array-set`](#link61727261792d736574) [`array-slice`](#link61727261792d736c696365) [`array-sort`](#link61727261792d736f7274) [`array-walk`](#link61727261792d77616c6b) [`array?`](#link61727261793f) [`ascii85->blob`](#link617363696938352d3e626c6f62) [`assoc`](#link6173736f63) [`assoc1`](#link6173736f6331) [`assq`](#link61737371) [`atom?`](#link61746f6d3f) [`base64->blob`](#link6261736536342d3e626c6f62) [`beep`](#link62656570) [`bind`](#link62696e64) [`bitand`](#link626974616e64) [`bitclear`](#link626974636c656172) [`bitor`](#link6269746f72) [`bitshl`](#link62697473686c) [`bitshr`](#link626974736872) [`bitxor`](#link626974786f72) [`blob->ascii85`](#link626c6f622d3e61736369693835) [`blob->base64`](#link626c6f622d3e626173653634) [`blob->hex`](#link626c6f622d3e686578) [`blob->str`](#link626c6f622d3e737472) [`blob-chksum`](#link626c6f622d63686b73756d) [`blob-equal?`](#link626c6f622d657175616c3f) [`blob-free`](#link626c6f622d66726565) [`blob?`](#link626c6f623f) [`bound?`](#link626f756e643f) [`build-array`](#link6275696c642d6172726179) [`build-list`](#link6275696c642d6c697374) [`caaar`](#link6361616172) [`caadr`](#link6361616472) [`caar`](#link63616172) [`cadar`](#link6361646172) [`caddr`](#link6361646472) [`cadr`](#link63616472) [`call-method`](#link63616c6c2d6d6574686f64) [`call-super`](#link63616c6c2d7375706572) [`can-externalize?`](#link63616e2d65787465726e616c697a653f) [`car`](#link636172) [`case`](#link63617365) [`ccmp`](#link63636d70) [`cdaar`](#link6364616172) [`cdadr`](#link6364616472) [`cdar`](#link63646172) [`cddar`](#link6364646172) [`cdddr`](#link6364646472) [`cddr`](#link63646472) [`cdec!`](#link6364656321) [`cdr`](#link636472) [`char->str`](#link636861722d3e737472) [`chars`](#link6368617273) [`chars->str`](#link63686172732d3e737472) [`cinc!`](#link63696e6321) [`class-name`](#link636c6173732d6e616d65) [`class-of`](#link636c6173732d6f66) [`class?`](#link636c6173733f) [`close`](#link636c6f7365) [`closure?`](#link636c6f737572653f) [`collect-garbage`](#link636f6c6c6563742d67617262616765) [`color`](#link636f6c6f72) [`cons`](#link636f6e73) [`cons?`](#link636f6e733f) [`copy-record`](#link636f70792d7265636f7264) [`count-partitions`](#link636f756e742d706172746974696f6e73) [`cpunum`](#link6370756e756d) [`cst!`](#link63737421) [`current-error-handler`](#link63757272656e742d6572726f722d68616e646c6572) [`current-zimage`](#link63757272656e742d7a696d616765) [`cwait`](#link6377616974) [`darken`](#link6461726b656e) [`date->epoch-ns`](#link646174652d3e65706f63682d6e73) [`datelist->epoch-ns`](#link646174656c6973742d3e65706f63682d6e73) [`datestr`](#link64617465737472) [`datestr*`](#link646174657374722a) [`datestr->datelist`](#link646174657374722d3e646174656c697374) [`day+`](#link6461792b) [`day-of-week`](#link6461792d6f662d7765656b) [`db.blob`](#link64622e626c6f62) [`db.close`](#link64622e636c6f7365) [`db.close-result`](#link64622e636c6f73652d726573756c74) [`db.exec`](#link64622e65786563) [`db.float`](#link64622e666c6f6174) [`db.int`](#link64622e696e74) [`db.open`](#link64622e6f70656e) [`db.open*`](#link64622e6f70656e2a) [`db.query`](#link64622e7175657279) [`db.result-column-count`](#link64622e726573756c742d636f6c756d6e2d636f756e74) [`db.result-columns`](#link64622e726573756c742d636f6c756d6e73) [`db.row`](#link64622e726f77) [`db.step`](#link64622e73746570) [`db.str`](#link64622e737472) [`declare-volatile`](#link6465636c6172652d766f6c6174696c65) [`def-custom-hook`](#link6465662d637573746f6d2d686f6f6b) [`default-error-handler`](#link64656661756c742d6572726f722d68616e646c6572) [`defclass`](#link646566636c617373) [`defmacro`](#link6465666d6163726f) [`defmethod`](#link6465666d6574686f64) [`defstruct`](#link646566737472756374) [`delete`](#link64656c657465) [`dequeue!`](#link6465717565756521) [`dict`](#link64696374) [`dict->alist`](#link646963742d3e616c697374) [`dict->array`](#link646963742d3e6172726179) [`dict->keys`](#link646963742d3e6b657973) [`dict->list`](#link646963742d3e6c697374) [`dict->values`](#link646963742d3e76616c756573) [`dict-copy`](#link646963742d636f7079) [`dict-empty?`](#link646963742d656d7074793f) [`dict-foreach`](#link646963742d666f7265616368) [`dict-map`](#link646963742d6d6170) [`dict-map!`](#link646963742d6d617021) [`dict-merge`](#link646963742d6d65726765) [`dict-protect`](#link646963742d70726f74656374) [`dict-protected?`](#link646963742d70726f7465637465643f) [`dict-unprotect`](#link646963742d756e70726f74656374) [`dict?`](#link646963743f) [`dir`](#link646972) [`dir?`](#link6469723f) [`div`](#link646976) [`dolist`](#link646f6c697374) [`dotimes`](#link646f74696d6573) [`dump`](#link64756d70) [`dump-bindings`](#link64756d702d62696e64696e6773) [`enq`](#link656e71) [`enqueue!`](#link656e717565756521) [`epoch-ns->datelist`](#link65706f63682d6e732d3e646174656c697374) [`eq?`](#link65713f) [`eql?`](#link65716c3f) [`equal?`](#link657175616c3f) [`error`](#link6572726f72) [`error->str`](#link6572726f722d3e737472) [`error?`](#link6572726f723f) [`eval`](#link6576616c) [`even?`](#link6576656e3f) [`exists?`](#link6578697374733f) [`exit`](#link65786974) [`expand-macros`](#link657870616e642d6d6163726f73) [`expect`](#link657870656374) [`expect-err`](#link6578706563742d657272) [`expect-false`](#link6578706563742d66616c7365) [`expect-ok`](#link6578706563742d6f6b) [`expect-true`](#link6578706563742d74727565) [`expr->str`](#link657870722d3e737472) [`externalize`](#link65787465726e616c697a65) [`externalize0`](#link65787465726e616c697a6530) [`fdelete`](#link6664656c657465) [`feature?`](#link666561747572653f) [`file-port?`](#link66696c652d706f72743f) [`filter`](#link66696c746572) [`find-missing-help-entries`](#link66696e642d6d697373696e672d68656c702d656e7472696573) [`find-unneeded-help-entries`](#link66696e642d756e6e65656465642d68656c702d656e7472696573) [`fl.abs`](#link666c2e616273) [`fl.acos`](#link666c2e61636f73) [`fl.asin`](#link666c2e6173696e) [`fl.asinh`](#link666c2e6173696e68) [`fl.atan`](#link666c2e6174616e) [`fl.atan2`](#link666c2e6174616e32) [`fl.atanh`](#link666c2e6174616e68) [`fl.cbrt`](#link666c2e63627274) [`fl.ceil`](#link666c2e6365696c) [`fl.cos`](#link666c2e636f73) [`fl.cosh`](#link666c2e636f7368) [`fl.dim`](#link666c2e64696d) [`fl.erf`](#link666c2e657266) [`fl.erfc`](#link666c2e65726663) [`fl.erfcinv`](#link666c2e65726663696e76) [`fl.erfinv`](#link666c2e657266696e76) [`fl.exp`](#link666c2e657870) [`fl.exp2`](#link666c2e65787032) [`fl.expm1`](#link666c2e6578706d31) [`fl.floor`](#link666c2e666c6f6f72) [`fl.fma`](#link666c2e666d61) [`fl.frexp`](#link666c2e6672657870) [`fl.gamma`](#link666c2e67616d6d61) [`fl.hypot`](#link666c2e6879706f74) [`fl.ilogb`](#link666c2e696c6f6762) [`fl.inf`](#link666c2e696e66) [`fl.is-nan?`](#link666c2e69732d6e616e3f) [`fl.j0`](#link666c2e6a30) [`fl.j1`](#link666c2e6a31) [`fl.jn`](#link666c2e6a6e) [`fl.ldexp`](#link666c2e6c64657870) [`fl.lgamma`](#link666c2e6c67616d6d61) [`fl.log`](#link666c2e6c6f67) [`fl.log10`](#link666c2e6c6f673130) [`fl.log1p`](#link666c2e6c6f673170) [`fl.log2`](#link666c2e6c6f6732) [`fl.logb`](#link666c2e6c6f6762) [`fl.max`](#link666c2e6d6178) [`fl.min`](#link666c2e6d696e) [`fl.mod`](#link666c2e6d6f64) [`fl.modf`](#link666c2e6d6f6466) [`fl.nan`](#link666c2e6e616e) [`fl.next-after`](#link666c2e6e6578742d6166746572) [`fl.pow`](#link666c2e706f77) [`fl.pow10`](#link666c2e706f773130) [`fl.remainder`](#link666c2e72656d61696e646572) [`fl.round`](#link666c2e726f756e64) [`fl.round-to-even`](#link666c2e726f756e642d746f2d6576656e) [`fl.signbit`](#link666c2e7369676e626974) [`fl.sin`](#link666c2e73696e) [`fl.sinh`](#link666c2e73696e68) [`fl.sqrt`](#link666c2e73717274) [`fl.tan`](#link666c2e74616e) [`fl.tanh`](#link666c2e74616e68) [`fl.trunc`](#link666c2e7472756e63) [`fl.y0`](#link666c2e7930) [`fl.y1`](#link666c2e7931) [`fl.yn`](#link666c2e796e) [`flatten`](#link666c617474656e) [`float`](#link666c6f6174) [`fmt`](#link666d74) [`forall?`](#link666f72616c6c3f) [`force`](#link666f726365) [`foreach`](#link666f7265616368) [`forget`](#link666f72676574) [`functional-arity`](#link66756e6374696f6e616c2d6172697479) [`functional-has-rest?`](#link66756e6374696f6e616c2d6861732d726573743f) [`functional?`](#link66756e6374696f6e616c3f) [`gensym`](#link67656e73796d) [`get`](#link676574) [`get-or-set`](#link6765742d6f722d736574) [`get-partitions`](#link6765742d706172746974696f6e73) [`getstacked`](#link676574737461636b6564) [`glance`](#link676c616e6365) [`global-sym?`](#link676c6f62616c2d73796d3f) [`has`](#link686173) [`has-key?`](#link6861732d6b65793f) [`has-method?`](#link6861732d6d6574686f643f) [`has-prop?`](#link6861732d70726f703f) [`help`](#link68656c70) [`help->manual-entry`](#link68656c702d3e6d616e75616c2d656e747279) [`help-about`](#link68656c702d61626f7574) [`help-entry`](#link68656c702d656e747279) [`help-topic-info`](#link68656c702d746f7069632d696e666f) [`help-topics`](#link68656c702d746f70696373) [`hex->blob`](#link6865782d3e626c6f62) [`hook`](#link686f6f6b) [`hour+`](#link686f75722b) [`identity`](#link6964656e74697479) [`if`](#link6966) [`inchars`](#link696e6368617273) [`include`](#link696e636c756465) [`index`](#link696e646578) [`init-remember`](#link696e69742d72656d656d626572) [`instr`](#link696e737472) [`int`](#link696e74) [`intern`](#link696e7465726e) [`internalize`](#link696e7465726e616c697a65) [`intrinsic`](#link696e7472696e736963) [`intrinsic?`](#link696e7472696e7369633f) [`isa?`](#link6973613f) [`iterate`](#link69746572617465) [`kvdb.begin`](#link6b7664622e626567696e) [`kvdb.close`](#link6b7664622e636c6f7365) [`kvdb.commit`](#link6b7664622e636f6d6d6974) [`kvdb.db?`](#link6b7664622e64623f) [`kvdb.forget`](#link6b7664622e666f72676574) [`kvdb.forget-everything`](#link6b7664622e666f726765742d65766572797468696e67) [`kvdb.get`](#link6b7664622e676574) [`kvdb.info`](#link6b7664622e696e666f) [`kvdb.open`](#link6b7664622e6f70656e) [`kvdb.rollback`](#link6b7664622e726f6c6c6261636b) [`kvdb.search`](#link6b7664622e736561726368) [`kvdb.set`](#link6b7664622e736574) [`kvdb.when`](#link6b7664622e7768656e) [`last`](#link6c617374) [`lcons`](#link6c636f6e73) [`len`](#link6c656e) [`let`](#link6c6574) [`letrec`](#link6c6574726563) [`lighten`](#link6c69676874656e) [`ling.damerau-levenshtein`](#link6c696e672e64616d657261752d6c6576656e73687465696e) [`ling.hamming`](#link6c696e672e68616d6d696e67) [`ling.jaro`](#link6c696e672e6a61726f) [`ling.jaro-winkler`](#link6c696e672e6a61726f2d77696e6b6c6572) [`ling.levenshtein`](#link6c696e672e6c6576656e73687465696e) [`ling.match-rating-codex`](#link6c696e672e6d617463682d726174696e672d636f646578) [`ling.match-rating-compare`](#link6c696e672e6d617463682d726174696e672d636f6d70617265) [`ling.metaphone`](#link6c696e672e6d65746170686f6e65) [`ling.nysiis`](#link6c696e672e6e7973696973) [`ling.porter`](#link6c696e672e706f72746572) [`ling.soundex`](#link6c696e672e736f756e646578) [`list`](#link6c697374) [`list->array`](#link6c6973742d3e6172726179) [`list->set`](#link6c6973742d3e736574) [`list->str`](#link6c6973742d3e737472) [`list-exists?`](#link6c6973742d6578697374733f) [`list-forall?`](#link6c6973742d666f72616c6c3f) [`list-foreach`](#link6c6973742d666f7265616368) [`list-last`](#link6c6973742d6c617374) [`list-ref`](#link6c6973742d726566) [`list-reverse`](#link6c6973742d72657665727365) [`list-slice`](#link6c6973742d736c696365) [`list?`](#link6c6973743f) [`load`](#link6c6f6164) [`load-zimage`](#link6c6f61642d7a696d616765) [`macro?`](#link6d6163726f3f) [`make`](#link6d616b65) [`make*`](#link6d616b652a) [`make-blob`](#link6d616b652d626c6f62) [`make-mutex`](#link6d616b652d6d75746578) [`make-queue`](#link6d616b652d7175657565) [`make-set`](#link6d616b652d736574) [`make-stack`](#link6d616b652d737461636b) [`make-symbol`](#link6d616b652d73796d626f6c) [`map`](#link6d6170) [`map-pairwise`](#link6d61702d7061697277697365) [`mapcar`](#link6d6170636172) [`max`](#link6d6178) [`member`](#link6d656d626572) [`memq`](#link6d656d71) [`memstats`](#link6d656d7374617473) [`methods`](#link6d6574686f6473) [`min`](#link6d696e) [`minmax`](#link6d696e6d6178) [`minute+`](#link6d696e7574652b) [`mod`](#link6d6f64) [`month+`](#link6d6f6e74682b) [`mutex-lock`](#link6d757465782d6c6f636b) [`mutex-rlock`](#link6d757465782d726c6f636b) [`mutex-runlock`](#link6d757465782d72756e6c6f636b) [`mutex-unlock`](#link6d757465782d756e6c6f636b) [`nconc`](#link6e636f6e63) [`new`](#link6e6577) [`new-struct`](#link6e65772d737472756374) [`nl`](#link6e6c) [`nonce`](#link6e6f6e6365) [`not`](#link6e6f74) [`now`](#link6e6f77) [`now-ms`](#link6e6f772d6d73) [`now-ns`](#link6e6f772d6e73) [`nreverse`](#link6e72657665727365) [`nth`](#link6e7468) [`nth-partition`](#link6e74682d706172746974696f6e) [`nthdef`](#link6e7468646566) [`null?`](#link6e756c6c3f) [`num?`](#link6e756d3f) [`object?`](#link6f626a6563743f) [`odd?`](#link6f64643f) [`on-feature`](#link6f6e2d66656174757265) [`open`](#link6f70656e) [`or`](#link6f72) [`out`](#link6f7574) [`outy`](#link6f757479) [`peek`](#link7065656b) [`permission?`](#link7065726d697373696f6e3f) [`permissions`](#link7065726d697373696f6e73) [`poke`](#link706f6b65) [`pop!`](#link706f7021) [`pop-error-handler`](#link706f702d6572726f722d68616e646c6572) [`pop-finalizer`](#link706f702d66696e616c697a6572) [`popstacked`](#link706f70737461636b6564) [`prin1`](#link7072696e31) [`princ`](#link7072696e63) [`print`](#link7072696e74) [`proc?`](#link70726f633f) [`prop`](#link70726f70) [`props`](#link70726f7073) [`protect`](#link70726f74656374) [`protect-toplevel-symbols`](#link70726f746563742d746f706c6576656c2d73796d626f6c73) [`protected?`](#link70726f7465637465643f) [`prune-task-table`](#link7072756e652d7461736b2d7461626c65) [`prune-unneeded-help-entries`](#link7072756e652d756e6e65656465642d68656c702d656e7472696573) [`push!`](#link7075736821) [`push-error-handler`](#link707573682d6572726f722d68616e646c6572) [`push-finalizer`](#link707573682d66696e616c697a6572) [`pushstacked`](#link70757368737461636b6564) [`queue-empty?`](#link71756575652d656d7074793f) [`queue-len`](#link71756575652d6c656e) [`queue?`](#link71756575653f) [`rand`](#link72616e64) [`random-color`](#link72616e646f6d2d636f6c6f72) [`read`](#link72656164) [`read-binary`](#link726561642d62696e617279) [`read-string`](#link726561642d737472696e67) [`read-zimage`](#link726561642d7a696d616765) [`readall`](#link72656164616c6c) [`readall-str`](#link72656164616c6c2d737472) [`recall`](#link726563616c6c) [`recall-info`](#link726563616c6c2d696e666f) [`recall-when`](#link726563616c6c2d7768656e) [`recollect`](#link7265636f6c6c656374) [`record?`](#link7265636f72643f) [`remember`](#link72656d656d626572) [`remove-duplicates`](#link72656d6f76652d6475706c696361746573) [`remove-hook`](#link72656d6f76652d686f6f6b) [`remove-hook-internal`](#link72656d6f76652d686f6f6b2d696e7465726e616c) [`remove-hooks`](#link72656d6f76652d686f6f6b73) [`replace-hook`](#link7265706c6163652d686f6f6b) [`reverse`](#link72657665727365) [`rnd`](#link726e64) [`rndseed`](#link726e6473656564) [`rplaca`](#link72706c616361) [`run-at`](#link72756e2d6174) [`run-hook`](#link72756e2d686f6f6b) [`run-hook-internal`](#link72756e2d686f6f6b2d696e7465726e616c) [`run-selftest`](#link72756e2d73656c6674657374) [`run-zimage`](#link72756e2d7a696d616765) [`save-zimage`](#link736176652d7a696d616765) [`sec+`](#link7365632b) [`semver.build`](#link73656d7665722e6275696c64) [`semver.canonical`](#link73656d7665722e63616e6f6e6963616c) [`semver.compare`](#link73656d7665722e636f6d70617265) [`semver.is-valid?`](#link73656d7665722e69732d76616c69643f) [`semver.major`](#link73656d7665722e6d616a6f72) [`semver.major-minor`](#link73656d7665722e6d616a6f722d6d696e6f72) [`semver.max`](#link73656d7665722e6d6178) [`semver.prerelease`](#link73656d7665722e70726572656c65617365) [`seq?`](#link7365713f) [`set`](#link736574) [`set*`](#link7365742a) [`set->list`](#link7365742d3e6c697374) [`set-color`](#link7365742d636f6c6f72) [`set-complement`](#link7365742d636f6d706c656d656e74) [`set-difference`](#link7365742d646966666572656e6365) [`set-element?`](#link7365742d656c656d656e743f) [`set-empty?`](#link7365742d656d7074793f) [`set-equal?`](#link7365742d657175616c3f) [`set-help-topic-info`](#link7365742d68656c702d746f7069632d696e666f) [`set-intersection`](#link7365742d696e74657273656374696f6e) [`set-permissions`](#link7365742d7065726d697373696f6e73) [`set-subset?`](#link7365742d7375627365743f) [`set-union`](#link7365742d756e696f6e) [`set-volume`](#link7365742d766f6c756d65) [`set?`](#link7365743f) [`setcar`](#link736574636172) [`setcdr`](#link736574636472) [`setprop`](#link73657470726f70) [`shorten`](#link73686f7274656e) [`sleep`](#link736c656570) [`sleep-ns`](#link736c6565702d6e73) [`slice`](#link736c696365) [`sort`](#link736f7274) [`sort-symbols`](#link736f72742d73796d626f6c73) [`spaces`](#link737061636573) [`stack-empty?`](#link737461636b2d656d7074793f) [`stack-len`](#link737461636b2d6c656e) [`stack?`](#link737461636b3f) [`str+`](#link7374722b) [`str->array`](#link7374722d3e6172726179) [`str->blob`](#link7374722d3e626c6f62) [`str->char`](#link7374722d3e63686172) [`str->chars`](#link7374722d3e6368617273) [`str->expr`](#link7374722d3e65787072) [`str->expr*`](#link7374722d3e657870722a) [`str->list`](#link7374722d3e6c697374) [`str->sym`](#link7374722d3e73796d) [`str-count-substr`](#link7374722d636f756e742d737562737472) [`str-empty?`](#link7374722d656d7074793f) [`str-exists?`](#link7374722d6578697374733f) [`str-forall?`](#link7374722d666f72616c6c3f) [`str-foreach`](#link7374722d666f7265616368) [`str-index`](#link7374722d696e646578) [`str-join`](#link7374722d6a6f696e) [`str-port?`](#link7374722d706f72743f) [`str-ref`](#link7374722d726566) [`str-remove-number`](#link7374722d72656d6f76652d6e756d626572) [`str-remove-prefix`](#link7374722d72656d6f76652d707265666978) [`str-remove-suffix`](#link7374722d72656d6f76652d737566666978) [`str-replace`](#link7374722d7265706c616365) [`str-replace*`](#link7374722d7265706c6163652a) [`str-reverse`](#link7374722d72657665727365) [`str-segment`](#link7374722d7365676d656e74) [`str-slice`](#link7374722d736c696365) [`str?`](#link7374723f) [`strbuild`](#link7374726275696c64) [`strcase`](#link73747263617365) [`strcenter`](#link73747263656e746572) [`strcnt`](#link737472636e74) [`strleft`](#link7374726c656674) [`strlen`](#link7374726c656e) [`strless`](#link7374726c657373) [`strlimit`](#link7374726c696d6974) [`strmap`](#link7374726d6170) [`stropen`](#link7374726f70656e) [`strright`](#link7374727269676874) [`strsplit`](#link73747273706c6974) [`struct-index`](#link7374727563742d696e646578) [`struct-instantiate`](#link7374727563742d696e7374616e7469617465) [`struct-name`](#link7374727563742d6e616d65) [`struct-props`](#link7374727563742d70726f7073) [`struct-size`](#link7374727563742d73697a65) [`struct?`](#link7374727563743f) [`sub1`](#link73756231) [`supers`](#link737570657273) [`sym->str`](#link73796d2d3e737472) [`sym?`](#link73796d3f) [`synout`](#link73796e6f7574) [`synouty`](#link73796e6f757479) [`sys-key?`](#link7379732d6b65793f) [`sysmsg`](#link7379736d7367) [`sysmsg*`](#link7379736d73672a) [`take`](#link74616b65) [`task`](#link7461736b) [`task-broadcast`](#link7461736b2d62726f616463617374) [`task-recv`](#link7461736b2d72656376) [`task-remove`](#link7461736b2d72656d6f7665) [`task-run`](#link7461736b2d72756e) [`task-schedule`](#link7461736b2d7363686564756c65) [`task-send`](#link7461736b2d73656e64) [`task-state`](#link7461736b2d7374617465) [`task?`](#link7461736b3f) [`terpri`](#link746572707269) [`testing`](#link74657374696e67) [`the-color`](#link7468652d636f6c6f72) [`the-color-names`](#link7468652d636f6c6f722d6e616d6573) [`time`](#link74696d65) [`truncate`](#link7472756e63617465) [`try`](#link747279) [`unless`](#link756e6c657373) [`unprotect`](#link756e70726f74656374) [`unprotect-toplevel-symbols`](#link756e70726f746563742d746f706c6576656c2d73796d626f6c73) [`valid?`](#link76616c69643f) [`void`](#link766f6964) [`void?`](#link766f69643f) [`wait-for`](#link776169742d666f72) [`wait-for*`](#link776169742d666f722a) [`wait-for-empty*`](#link776169742d666f722d656d7074792a) [`wait-until`](#link776169742d756e74696c) [`wait-until*`](#link776169742d756e74696c2a) [`warn`](#link7761726e) [`week+`](#link7765656b2b) [`week-of-date`](#link7765656b2d6f662d64617465) [`when`](#link7768656e) [`when-permission`](#link7768656e2d7065726d697373696f6e) [`while`](#link7768696c65) [`with-colors`](#link776974682d636f6c6f7273) [`with-error-handler`](#link776974682d6572726f722d68616e646c6572) [`with-final`](#link776974682d66696e616c) [`with-mutex-lock`](#link776974682d6d757465782d6c6f636b) [`with-mutex-rlock`](#link776974682d6d757465782d726c6f636b) [`write`](#link7772697465) [`write-binary`](#link77726974652d62696e617279) [`write-binary-at`](#link77726974652d62696e6172792d6174) [`write-string`](#link77726974652d737472696e67) [`write-zimage`](#link77726974652d7a696d616765) [`year+`](#link796561722b) [`zimage-header`](#link7a696d6167652d686561646572) [`zimage-loadable?`](#link7a696d6167652d6c6f616461626c653f) [`zimage-runable?`](#link7a696d6167652d72756e61626c653f) 
 
 # By Topics {#topics}
 
@@ -1084,7 +1084,7 @@ See also: [`make-stack`](#link6d616b652d737461636b), [`push!`](#link7075736821),
 
 ## Databases {#db}
 
-These functions allow for Sqlite3 database access. The module needs to be enabled with the "db" build tag.
+These functions allow for Sqlite3 database access. The module needs to be enabled with the "db" build tag. It also provides access to key-value databases with prefix 'kvdb and the automated remember-recall system, both of which are implemented in Z3S5 Lisp on top of the 'db module. To use the remember system, it needs to be initialized first by calling `(init-remember)`.
 
 ### `db.blob` : procedure/2
 
@@ -2930,6 +2930,14 @@ Always returns void, no matter what values are given to it. Void is a special va
 
 See also: [`void?`](#link766f69643f).	 [→index](#idx)
 
+### `void?` : procedure/1
+
+Usage: `(void? datum)`
+
+Return true if `datum` is the special symbol void, nil otherwise.
+
+See also: [`void`](#link766f6964).	 [→index](#idx)
+
 ### `when` : macro/1 or more
 
 Usage: `(when cond expr ...) => any`
@@ -3169,6 +3177,244 @@ Usage: `(truncate x [y]) => int`
 Round down to nearest integer of `x`. If `y` is present, divide `x` by `y` and round down to the nearest integer.
 
 See also: [`div`](#link646976), [`/`](#link2f), [`int`](#link696e74).	 [→index](#idx)
+
+
+
+## Object-oriented Programming {#oop}
+
+The OOP system uses arrays to store objects and also offers a more lightweight array-based structure system. It is not built for performance but may be useful to prevent writing object-oriented wrapper data structures again and again. This is also the reason why it was decided to embed the OOP system with a fixed API rather than providing it as an include file, allowing for interoperable object-oriented programming without having to worry about whether the extension is loaded. It's very simple and lightweight.
+
+### `call-method` : procedure/3
+
+Usage: `(call-method obj mname args) => any`
+
+Execute method `mname` of object `obj` with additional arguments in list `args`. The first argument in the method call is always `obj` itself.
+
+See also: [`defmethod`](#link6465666d6574686f64), [`defclass`](#link646566636c617373), [`new`](#link6e6577), [`isa?`](#link6973613f), [`class-of`](#link636c6173732d6f66).	 [→index](#idx)
+
+### `call-super` : procedure/3
+
+Usage: `(call-super obj mname args) => any`
+
+Execute method `mname` of the first superclass of `obj` that has a method with that name.
+
+See also: [`call-method`](#link63616c6c2d6d6574686f64), [`supers`](#link737570657273).	 [→index](#idx)
+
+### `class-name` : procedure/1
+
+Usage: `(class-name c) => sym`
+
+Return the name of a class `c`. An error occurs if `c` is not a valid class.
+
+See also: [`class?`](#link636c6173733f), [`isa?`](#link6973613f).	 [→index](#idx)
+
+### `class-of` : procedure/1
+
+Usage: `(class-of obj) => class or nil`
+
+Return the class of object `obj`, nil if `obj` is not a valid object array.
+
+See also: [`new`](#link6e6577), [`isa?`](#link6973613f).	 [→index](#idx)
+
+### `class?` : procedure/1
+
+Usage: `(class? c) => bool`
+
+Return true if `c` is a class array (not a name for a class!), nil otherwise.
+
+See also: [`object?`](#link6f626a6563743f), [`isa?`](#link6973613f).	 [→index](#idx)
+
+### `copy-record` : procedure/1
+
+Usage: `(copy-record r) => record`
+
+Creates a non-recursive, shallow copy of record `r.`
+
+See also: [`record?`](#link7265636f72643f).	 [→index](#idx)
+
+### `defclass` : macro/2 or more
+
+Usage: `(defclass name supers [props] ...)`
+
+Defines symbol `name` as class with superclasses `supers` and property clauses `props` listed as remaining arguments. A `props` clause is either a symbol for a property or a list of the form (sym default) for the property `sym` with `default` value. The class is bound to `name` and a class predicate `name?` is created. Argument `supers` may be a class name or a list of class names.
+
+See also: [`defmethod`](#link6465666d6574686f64), [`new`](#link6e6577).	 [→index](#idx)
+
+### `defmethod` : macro/2 or more
+
+Usage: `(defmethod class-name args [body] ...)`
+
+Define a method `class-name` for class `class` and method name `name` with a syntax parallel to defun, where `args` are the arguments of the methods and `body` is the rest of the method. The given `class-name` must decompose into a valid class name `class` of a previously created class and method name `name` and is bound to the symbol `class-name`. The remaining arguments are like for defun. So for example (defmethod employee-name (this) (slot this 'last-name)) defines a method `name` for an existing class `employee` which retrieves the property `last-name.`
+
+See also: [`defclass`](#link646566636c617373), [`new`](#link6e6577), [`call-method`](#link63616c6c2d6d6574686f64).	 [→index](#idx)
+
+### `defstruct` : macro/1 or more
+
+Usage: `(defstruct name props ...) => struct`
+
+Binds symbol `name` to a struct with name `name` and with properties `props`. Each clause of `props` must be either a symbol for the property name or a list of the form (prop default-value) where `prop` is the symbol for the property name and `default-value` is the value it has by default. For each property `p`, accessors `name-p` and setters `name-p!` are created, as well as a function `name-p*` that takes a record `r`, a value `v`, and a procedure `proc` that takes no arguments. When `name-p*` is called on record `r`, it temporarily sets property `p` of `r` to the provided value `v` and calls the procedure `proc`. Afterwards, the original value of `p` is restored. Since this function mutates the record during the execution of `proc` and does not protect this operation against race conditions, it is not thread-safe. (But you can include a mutex as property and make it thread-safe by wrapping it into `with-mutex-lock`.) The defstruct macro returns the struct that is bound to `name.`
+
+See also: [`new-struct`](#link6e65772d737472756374), [`make`](#link6d616b65), [`with-mutex-lock`](#link776974682d6d757465782d6c6f636b).	 [→index](#idx)
+
+### `has-method?` : procedure/2
+
+Usage: `(has-method? obj name) => bool`
+
+Return true if `obj` has a method with name `name`, nil otherwise.
+
+See also: [`defmethod`](#link6465666d6574686f64), [`has-prop?`](#link6861732d70726f703f), [`new`](#link6e6577), [`props`](#link70726f7073), [`methods`](#link6d6574686f6473), [`prop`](#link70726f70), [`setprop`](#link73657470726f70).	 [→index](#idx)
+
+### `has-prop?` : procedure/2
+
+Usage: `(has-prop? obj slot) => bool`
+
+Return true if `obj` has a property named `slot`, nil otherwise.
+
+See also: [`has-method?`](#link6861732d6d6574686f643f), [`new`](#link6e6577), [`props`](#link70726f7073), [`methods`](#link6d6574686f6473), [`prop`](#link70726f70), [`setprop`](#link73657470726f70).	 [→index](#idx)
+
+### `isa?` : procedure/2
+
+Usage: `(isa? obj class) => bool`
+
+Return true if `obj` is an instance of `class`, nil otherwise. Argument `class` can be either a class name symbol or a class itself.
+
+See also: [`supers`](#link737570657273).	 [→index](#idx)
+
+### `make` : macro/2
+
+Usage: `(make name props)`
+
+Create a new record (struct instance) of struct `name` (unquoted) with properties `props`. Each clause in `props` must be a list of property name and initial value.
+
+See also: [`make*`](#link6d616b652a), [`defstruct`](#link646566737472756374).	 [→index](#idx)
+
+### `make*` : macro/1 or more
+
+Usage: `(make* name prop1 ...)`
+
+Create a new record (struct instance) of struct `name` (unquoted) with property clauses `prop-1` ... `prop-n`, where each clause is a list of property name and initial value like in `make.`
+
+See also: [`make`](#link6d616b65), [`defstruct`](#link646566737472756374).	 [→index](#idx)
+
+### `methods` : procedure/1
+
+Usage: `(methods obj) => li`
+
+Return the list of methods of `obj`, which must be a class, object, or class name.
+
+See also: [`has-method?`](#link6861732d6d6574686f643f), [`new`](#link6e6577), [`props`](#link70726f7073), [`prop`](#link70726f70), [`setprop`](#link73657470726f70), [`has-prop?`](#link6861732d70726f703f).	 [→index](#idx)
+
+### `new` : macro/1 or more
+
+Usage: `(new class [props] ...)`
+
+Create a new object of class `class` with initial property bindings `props` clauses as remaining arguments. Each `props` clause must be a list of the form (sym value) assigning `value` to property `sym.`
+
+See also: [`defclass`](#link646566636c617373).	 [→index](#idx)
+
+### `new-struct` : procedure/2
+
+Usage: `(new-struct name li)`
+
+Defines a new structure `name` with the properties in the a-list `li`. Structs are more leightweight than classes, but do not allow for inheritance. Instances of structs ("records") are arrays.
+
+See also: [`defstruct`](#link646566737472756374).	 [→index](#idx)
+
+### `object?` : procedure/1
+
+Usage: `(object? obj) => bool`
+
+Return true of `obj` is an object array, nil otherwise.
+
+See also: [`class?`](#link636c6173733f), [`isa?`](#link6973613f).	 [→index](#idx)
+
+### `prop` : procedure/2
+
+Usage: `(prop obj slot) => any`
+
+Return the value in `obj` for property `slot`, or an error if the object does not have a property with that name.
+
+See also: [`new`](#link6e6577), [`isa?`](#link6973613f), [`setslot`](#link736574736c6f74), [`object?`](#link6f626a6563743f), [`class-name`](#link636c6173732d6e616d65), [`supers`](#link737570657273), [`props`](#link70726f7073), [`methods`](#link6d6574686f6473), [`has-slot?`](#link6861732d736c6f743f).	 [→index](#idx)
+
+### `props` : procedure/1
+
+Usage: `(props obj) => li`
+
+Return the list of properties of `obj`. An error occurs if `obj` is not a valid object.
+
+See also: [`methods`](#link6d6574686f6473), [`has-prop?`](#link6861732d70726f703f), [`new`](#link6e6577), [`prop`](#link70726f70), [`setprop`](#link73657470726f70).	 [→index](#idx)
+
+### `record?` : procedure/1
+
+Usage: `(record? s) => bool`
+
+Returns true if `s` is a struct record, i.e., an instance of a struct; nil otherwise. Notice that records are not really types distinct from arrays, they simply contain a marker '%record as first element. With normal use no confusion should arise. Since the internal representation might change, you ought not use ordinary array procedures for records.
+
+See also: [`struct?`](#link7374727563743f), [`defstruct`](#link646566737472756374).	 [→index](#idx)
+
+### `setprop` : procedure/3
+
+Usage: `(setprop obj slot value)`
+
+Set property `slot` in `obj` to `value`. An error occurs if the object does not have a property with that name.
+
+See also: [`new`](#link6e6577), [`isa?`](#link6973613f), [`slot`](#link736c6f74), [`object?`](#link6f626a6563743f), [`class-name`](#link636c6173732d6e616d65), [`supers`](#link737570657273), [`props`](#link70726f7073), [`methods`](#link6d6574686f6473), [`has-slot?`](#link6861732d736c6f743f).	 [→index](#idx)
+
+### `struct-index` : procedure/1
+
+Usage: `(struct-index s) => dict`
+
+Returns the index of struct `s` as a dict. This dict is an internal representation of the struct's instance data.
+
+See also: [`defstruct`](#link646566737472756374).	 [→index](#idx)
+
+### `struct-instantiate` : procedure/2
+
+Usage: `(struct-instantiate s li) => record`
+
+Instantiates the struct `s` with property a-list `li` as values for its properties and return the record. If a property is not in `li`, its value is set to nil.
+
+See also: [`make`](#link6d616b65), [`defstruct`](#link646566737472756374), [`struct?`](#link7374727563743f), [`record?`](#link7265636f72643f).	 [→index](#idx)
+
+### `struct-name` : procedure/1
+
+Usage: `(struct-name s) => sym`
+
+Returns the name of a struct `s`. This is rarely needed since the struct is bound to a symbol with the same name.
+
+See also: [`defstruct`](#link646566737472756374).	 [→index](#idx)
+
+### `struct-props` : procedure/1
+
+Usage: `(struct-props s) => dict`
+
+Returns the properties of structure `s` as dict.
+
+See also: [`defstruct`](#link646566737472756374).	 [→index](#idx)
+
+### `struct-size` : procedure/1
+
+Usage: `(strict-size s) => int`
+
+Returns the number of properties of struct `s.`
+
+See also: [`defstruct`](#link646566737472756374).	 [→index](#idx)
+
+### `struct?` : procedure/1
+
+Usage: `(struct? datum) => boo`
+
+Returns true if `datum` is a struct, nil otherwise.
+
+See also: [`defstruct`](#link646566737472756374).	 [→index](#idx)
+
+### `supers` : procedure/1
+
+Usage: `(supers c) => li`
+
+Return the list of superclasses of class `c`. An error occurs if `c` is not a valid class.
+
+See also: [`class?`](#link636c6173733f), [`isa?`](#link6973613f), [`class-name`](#link636c6173732d6e616d65).	 [→index](#idx)
 
 
 
@@ -5480,6 +5726,22 @@ Equivalent to (car (cdr `x`)).
 
 See also: [`car`](#link636172), [`cdr`](#link636472), [`caar`](#link63616172), [`cdar`](#link63646172), [`cddr`](#link63646472), [`caaar`](#link6361616172), [`caadr`](#link6361616472), [`cadar`](#link6361646172), [`caddr`](#link6361646472), [`cdaar`](#link6364616172), [`cdadr`](#link6364616472), [`cddar`](#link6364646172), [`cdddr`](#link6364646472), [`nth`](#link6e7468), [`1st`](#link317374), [`2nd`](#link326e64), [`3rd`](#link337264).	 [→index](#idx) [→topic](#lisp)
 
+## `call-method` : procedure/3 {#link63616c6c2d6d6574686f64}
+
+Usage: `(call-method obj mname args) => any`
+
+Execute method `mname` of object `obj` with additional arguments in list `args`. The first argument in the method call is always `obj` itself.
+
+See also: [`defmethod`](#link6465666d6574686f64), [`defclass`](#link646566636c617373), [`new`](#link6e6577), [`isa?`](#link6973613f), [`class-of`](#link636c6173732d6f66).	 [→index](#idx) [→topic](#oop)
+
+## `call-super` : procedure/3 {#link63616c6c2d7375706572}
+
+Usage: `(call-super obj mname args) => any`
+
+Execute method `mname` of the first superclass of `obj` that has a method with that name.
+
+See also: [`call-method`](#link63616c6c2d6d6574686f64), [`supers`](#link737570657273).	 [→index](#idx) [→topic](#oop)
+
 ## `can-externalize?` : procedure/1 {#link63616e2d65787465726e616c697a653f}
 
 Usage: `(can-externalize? datum) => bool`
@@ -5608,6 +5870,30 @@ Increase the integer value stored in top-level symbol `sym` by 1 and return the 
 
 See also: [`cdec!`](#link6364656321), [`cwait`](#link6377616974), [`ccmp`](#link63636d70), [`cst!`](#link63737421).	 [→index](#idx) [→topic](#concurrency)
 
+## `class-name` : procedure/1 {#link636c6173732d6e616d65}
+
+Usage: `(class-name c) => sym`
+
+Return the name of a class `c`. An error occurs if `c` is not a valid class.
+
+See also: [`class?`](#link636c6173733f), [`isa?`](#link6973613f).	 [→index](#idx) [→topic](#oop)
+
+## `class-of` : procedure/1 {#link636c6173732d6f66}
+
+Usage: `(class-of obj) => class or nil`
+
+Return the class of object `obj`, nil if `obj` is not a valid object array.
+
+See also: [`new`](#link6e6577), [`isa?`](#link6973613f).	 [→index](#idx) [→topic](#oop)
+
+## `class?` : procedure/1 {#link636c6173733f}
+
+Usage: `(class? c) => bool`
+
+Return true if `c` is a class array (not a name for a class!), nil otherwise.
+
+See also: [`object?`](#link6f626a6563743f), [`isa?`](#link6973613f).	 [→index](#idx) [→topic](#oop)
+
 ## `close` : procedure/1 {#link636c6f7365}
 
 Usage: `(close p)`
@@ -5657,6 +5943,14 @@ Usage: `(cons? x) => bool`
 return true if `x` is not an atom, nil otherwise.
 
 See also: [`atom?`](#link61746f6d3f).	 [→index](#idx) [→topic](#lisp)
+
+## `copy-record` : procedure/1 {#link636f70792d7265636f7264}
+
+Usage: `(copy-record r) => record`
+
+Creates a non-recursive, shallow copy of record `r.`
+
+See also: [`record?`](#link7265636f72643f).	 [→index](#idx) [→topic](#oop)
 
 ## `count-partitions` : procedure/2 {#link636f756e742d706172746974696f6e73}
 
@@ -5908,6 +6202,14 @@ Return the default error handler, irrespectively of the current-error-handler.
 
 See also: [`current-error-handler`](#link63757272656e742d6572726f722d68616e646c6572), [`push-error-handler`](#link707573682d6572726f722d68616e646c6572), [`pop-error-handler`](#link706f702d6572726f722d68616e646c6572), [`*current-error-handler*`](#link2a63757272656e742d6572726f722d68616e646c65722a), [`*current-error-continuation*`](#link2a63757272656e742d6572726f722d636f6e74696e756174696f6e2a).	 [→index](#idx) [→topic](#system)
 
+## `defclass` : macro/2 or more {#link646566636c617373}
+
+Usage: `(defclass name supers [props] ...)`
+
+Defines symbol `name` as class with superclasses `supers` and property clauses `props` listed as remaining arguments. A `props` clause is either a symbol for a property or a list of the form (sym default) for the property `sym` with `default` value. The class is bound to `name` and a class predicate `name?` is created. Argument `supers` may be a class name or a list of class names.
+
+See also: [`defmethod`](#link6465666d6574686f64), [`new`](#link6e6577).	 [→index](#idx) [→topic](#oop)
+
 ## `defmacro` : macro/2 or more {#link6465666d6163726f}
 
 Usage: `(defmacro name args body ...)`
@@ -5915,6 +6217,22 @@ Usage: `(defmacro name args body ...)`
 Define a macro `name` with argument list `args` and `body`. Macros are expanded at compile-time.
 
 See also: [`macro`](#link6d6163726f).	 [→index](#idx) [→topic](#lisp)
+
+## `defmethod` : macro/2 or more {#link6465666d6574686f64}
+
+Usage: `(defmethod class-name args [body] ...)`
+
+Define a method `class-name` for class `class` and method name `name` with a syntax parallel to defun, where `args` are the arguments of the methods and `body` is the rest of the method. The given `class-name` must decompose into a valid class name `class` of a previously created class and method name `name` and is bound to the symbol `class-name`. The remaining arguments are like for defun. So for example (defmethod employee-name (this) (slot this 'last-name)) defines a method `name` for an existing class `employee` which retrieves the property `last-name.`
+
+See also: [`defclass`](#link646566636c617373), [`new`](#link6e6577), [`call-method`](#link63616c6c2d6d6574686f64).	 [→index](#idx) [→topic](#oop)
+
+## `defstruct` : macro/1 or more {#link646566737472756374}
+
+Usage: `(defstruct name props ...) => struct`
+
+Binds symbol `name` to a struct with name `name` and with properties `props`. Each clause of `props` must be either a symbol for the property name or a list of the form (prop default-value) where `prop` is the symbol for the property name and `default-value` is the value it has by default. For each property `p`, accessors `name-p` and setters `name-p!` are created, as well as a function `name-p*` that takes a record `r`, a value `v`, and a procedure `proc` that takes no arguments. When `name-p*` is called on record `r`, it temporarily sets property `p` of `r` to the provided value `v` and calls the procedure `proc`. Afterwards, the original value of `p` is restored. Since this function mutates the record during the execution of `proc` and does not protect this operation against race conditions, it is not thread-safe. (But you can include a mutex as property and make it thread-safe by wrapping it into `with-mutex-lock`.) The defstruct macro returns the struct that is bound to `name.`
+
+See also: [`new-struct`](#link6e65772d737472756374), [`make`](#link6d616b65), [`with-mutex-lock`](#link776974682d6d757465782d6c6f636b).	 [→index](#idx) [→topic](#oop)
 
 ## `delete` : procedure/2 {#link64656c657465}
 
@@ -6966,6 +7284,22 @@ Return true if `d` has key `key`, nil otherwise.
 
 See also: [`dict?`](#link646963743f), [`get`](#link676574), [`set`](#link736574), [`delete`](#link64656c657465).	 [→index](#idx) [→topic](#dict)
 
+## `has-method?` : procedure/2 {#link6861732d6d6574686f643f}
+
+Usage: `(has-method? obj name) => bool`
+
+Return true if `obj` has a method with name `name`, nil otherwise.
+
+See also: [`defmethod`](#link6465666d6574686f64), [`has-prop?`](#link6861732d70726f703f), [`new`](#link6e6577), [`props`](#link70726f7073), [`methods`](#link6d6574686f6473), [`prop`](#link70726f70), [`setprop`](#link73657470726f70).	 [→index](#idx) [→topic](#oop)
+
+## `has-prop?` : procedure/2 {#link6861732d70726f703f}
+
+Usage: `(has-prop? obj slot) => bool`
+
+Return true if `obj` has a property named `slot`, nil otherwise.
+
+See also: [`has-method?`](#link6861732d6d6574686f643f), [`new`](#link6e6577), [`props`](#link70726f7073), [`methods`](#link6d6574686f6473), [`prop`](#link70726f70), [`setprop`](#link73657470726f70).	 [→index](#idx) [→topic](#oop)
+
 ## `help` : macro/1 {#link68656c70}
 
 Usage: `(help sym)`
@@ -7139,6 +7473,14 @@ Return true if `x` is an intrinsic built-in function, nil otherwise. Notice that
 See also: [`functional?`](#link66756e6374696f6e616c3f), [`macro?`](#link6d6163726f3f), [`closure?`](#link636c6f737572653f).	 [→index](#idx)
 
 **Warning: What counts as an intrinsic or not may change from version to version. This is for internal use only.** [→topic](#system)
+
+## `isa?` : procedure/2 {#link6973613f}
+
+Usage: `(isa? obj class) => bool`
+
+Return true if `obj` is an instance of `class`, nil otherwise. Argument `class` can be either a class name symbol or a class itself.
+
+See also: [`supers`](#link737570657273).	 [→index](#idx) [→topic](#oop)
 
 ## `iterate` : procedure/2 {#link69746572617465}
 
@@ -7512,6 +7854,22 @@ Return true if `x` is a macro, nil otherwise.
 
 See also: [`functional?`](#link66756e6374696f6e616c3f), [`intrinsic?`](#link696e7472696e7369633f), [`closure?`](#link636c6f737572653f), [`functional-arity`](#link66756e6374696f6e616c2d6172697479), [`functional-has-rest?`](#link66756e6374696f6e616c2d6861732d726573743f).	 [→index](#idx) [→topic](#system)
 
+## `make` : macro/2 {#link6d616b65}
+
+Usage: `(make name props)`
+
+Create a new record (struct instance) of struct `name` (unquoted) with properties `props`. Each clause in `props` must be a list of property name and initial value.
+
+See also: [`make*`](#link6d616b652a), [`defstruct`](#link646566737472756374).	 [→index](#idx) [→topic](#oop)
+
+## `make*` : macro/1 or more {#link6d616b652a}
+
+Usage: `(make* name prop1 ...)`
+
+Create a new record (struct instance) of struct `name` (unquoted) with property clauses `prop-1` ... `prop-n`, where each clause is a list of property name and initial value like in `make.`
+
+See also: [`make`](#link6d616b65), [`defstruct`](#link646566737472756374).	 [→index](#idx) [→topic](#oop)
+
 ## `make-blob` : procedure/1 {#link6d616b652d626c6f62}
 
 Usage: `(make-blob n) => blob`
@@ -7620,6 +7978,14 @@ Return a dict with detailed memory statistics for the system.
 
 See also: [`collect-garbage`](#link636f6c6c6563742d67617262616765).	 [→index](#idx) [→topic](#system)
 
+## `methods` : procedure/1 {#link6d6574686f6473}
+
+Usage: `(methods obj) => li`
+
+Return the list of methods of `obj`, which must be a class, object, or class name.
+
+See also: [`has-method?`](#link6861732d6d6574686f643f), [`new`](#link6e6577), [`props`](#link70726f7073), [`prop`](#link70726f70), [`setprop`](#link73657470726f70), [`has-prop?`](#link6861732d70726f703f).	 [→index](#idx) [→topic](#oop)
+
 ## `min` : procedure/1 or more {#link6d696e}
 
 Usage: `(min x1 x2 ...) => num`
@@ -7699,6 +8065,22 @@ Usage: `(nconc li1 li2 ...) => li`
 Concatenate `li1`, `li2`, and so forth, like with append, but destructively modifies `li1.`
 
 See also: [`append`](#link617070656e64).	 [→index](#idx) [→topic](#lisp)
+
+## `new` : macro/1 or more {#link6e6577}
+
+Usage: `(new class [props] ...)`
+
+Create a new object of class `class` with initial property bindings `props` clauses as remaining arguments. Each `props` clause must be a list of the form (sym value) assigning `value` to property `sym.`
+
+See also: [`defclass`](#link646566636c617373).	 [→index](#idx) [→topic](#oop)
+
+## `new-struct` : procedure/2 {#link6e65772d737472756374}
+
+Usage: `(new-struct name li)`
+
+Defines a new structure `name` with the properties in the a-list `li`. Structs are more leightweight than classes, but do not allow for inheritance. Instances of structs ("records") are arrays.
+
+See also: [`defstruct`](#link646566737472756374).	 [→index](#idx) [→topic](#oop)
 
 ## `nl` : procedure/0 {#link6e6c}
 
@@ -7795,6 +8177,14 @@ Usage: `(num? n) => bool`
 Return true if `n` is a number (exact or inexact), nil otherwise.
 
 See also: [`str?`](#link7374723f), [`atom?`](#link61746f6d3f), [`sym?`](#link73796d3f), [`closure?`](#link636c6f737572653f), [`intrinsic?`](#link696e7472696e7369633f), [`macro?`](#link6d6163726f3f).	 [→index](#idx) [→topic](#lisp)
+
+## `object?` : procedure/1 {#link6f626a6563743f}
+
+Usage: `(object? obj) => bool`
+
+Return true of `obj` is an object array, nil otherwise.
+
+See also: [`class?`](#link636c6173733f), [`isa?`](#link6973613f).	 [→index](#idx) [→topic](#oop)
 
 ## `odd?` : procedure/1 {#link6f64643f}
 
@@ -7939,6 +8329,22 @@ Usage: `(proc? arg) => bool`
 Return true if `arg` is a procedure, nil otherwise.
 
 See also: [`functional?`](#link66756e6374696f6e616c3f), [`closure?`](#link636c6f737572653f), [`functional-arity`](#link66756e6374696f6e616c2d6172697479), [`functional-has-rest?`](#link66756e6374696f6e616c2d6861732d726573743f).	 [→index](#idx) [→topic](#system)
+
+## `prop` : procedure/2 {#link70726f70}
+
+Usage: `(prop obj slot) => any`
+
+Return the value in `obj` for property `slot`, or an error if the object does not have a property with that name.
+
+See also: [`new`](#link6e6577), [`isa?`](#link6973613f), [`setslot`](#link736574736c6f74), [`object?`](#link6f626a6563743f), [`class-name`](#link636c6173732d6e616d65), [`supers`](#link737570657273), [`props`](#link70726f7073), [`methods`](#link6d6574686f6473), [`has-slot?`](#link6861732d736c6f743f).	 [→index](#idx) [→topic](#oop)
+
+## `props` : procedure/1 {#link70726f7073}
+
+Usage: `(props obj) => li`
+
+Return the list of properties of `obj`. An error occurs if `obj` is not a valid object.
+
+See also: [`methods`](#link6d6574686f6473), [`has-prop?`](#link6861732d70726f703f), [`new`](#link6e6577), [`prop`](#link70726f70), [`setprop`](#link73657470726f70).	 [→index](#idx) [→topic](#oop)
 
 ## `protect` : procedure/0 or more {#link70726f74656374}
 
@@ -8133,6 +8539,14 @@ Usage: `(recollect s [keytype] [limit] [fuzzer]) => li`
 Search for remembered items based on search query `s` and return a list of matching keys. The optional `keytype` parameter must be one of '(all str sym int expr), where the default is 'all for all kinds of keys. Up to `limit` results are returned, default is kvdb.*default-search-limit*. The optional `fuzzer` procedure takes a word string and yields a 'fuzzy' version of it. If fuzzer is specified and a procedure, then a fuzzy search is performed.
 
 See also: [`kvdb.search`](#link6b7664622e736561726368), [`recall`](#link726563616c6c), [`recall-info`](#link726563616c6c2d696e666f), [`recall-when`](#link726563616c6c2d7768656e), [`remember`](#link72656d656d626572).	 [→index](#idx) [→topic](#db)
+
+## `record?` : procedure/1 {#link7265636f72643f}
+
+Usage: `(record? s) => bool`
+
+Returns true if `s` is a struct record, i.e., an instance of a struct; nil otherwise. Notice that records are not really types distinct from arrays, they simply contain a marker '%record as first element. With normal use no confusion should arise. Since the internal representation might change, you ought not use ordinary array procedures for records.
+
+See also: [`struct?`](#link7374727563743f), [`defstruct`](#link646566737472756374).	 [→index](#idx) [→topic](#oop)
 
 ## `remember` : procedure/2 {#link72656d656d626572}
 
@@ -8491,6 +8905,14 @@ Usage: `(setcdr li1 li2) => li`
 Mutate `li1` such that its cdr is `li2`. Same as rplacd.
 
 See also: [`rplacd`](#link72706c616364), [`rplaca`](#link72706c616361), [`setcar`](#link736574636172).	 [→index](#idx) [→topic](#lisp)
+
+## `setprop` : procedure/3 {#link73657470726f70}
+
+Usage: `(setprop obj slot value)`
+
+Set property `slot` in `obj` to `value`. An error occurs if the object does not have a property with that name.
+
+See also: [`new`](#link6e6577), [`isa?`](#link6973613f), [`slot`](#link736c6f74), [`object?`](#link6f626a6563743f), [`class-name`](#link636c6173732d6e616d65), [`supers`](#link737570657273), [`props`](#link70726f7073), [`methods`](#link6d6574686f6473), [`has-slot?`](#link6861732d736c6f743f).	 [→index](#idx) [→topic](#oop)
 
 ## `shorten` : procedure/2 {#link73686f7274656e}
 
@@ -8886,6 +9308,54 @@ Return an array of strings obtained from `s` by splitting `s` at each occurrence
 
 See also: [`str?`](#link7374723f).	 [→index](#idx) [→topic](#str)
 
+## `struct-index` : procedure/1 {#link7374727563742d696e646578}
+
+Usage: `(struct-index s) => dict`
+
+Returns the index of struct `s` as a dict. This dict is an internal representation of the struct's instance data.
+
+See also: [`defstruct`](#link646566737472756374).	 [→index](#idx) [→topic](#oop)
+
+## `struct-instantiate` : procedure/2 {#link7374727563742d696e7374616e7469617465}
+
+Usage: `(struct-instantiate s li) => record`
+
+Instantiates the struct `s` with property a-list `li` as values for its properties and return the record. If a property is not in `li`, its value is set to nil.
+
+See also: [`make`](#link6d616b65), [`defstruct`](#link646566737472756374), [`struct?`](#link7374727563743f), [`record?`](#link7265636f72643f).	 [→index](#idx) [→topic](#oop)
+
+## `struct-name` : procedure/1 {#link7374727563742d6e616d65}
+
+Usage: `(struct-name s) => sym`
+
+Returns the name of a struct `s`. This is rarely needed since the struct is bound to a symbol with the same name.
+
+See also: [`defstruct`](#link646566737472756374).	 [→index](#idx) [→topic](#oop)
+
+## `struct-props` : procedure/1 {#link7374727563742d70726f7073}
+
+Usage: `(struct-props s) => dict`
+
+Returns the properties of structure `s` as dict.
+
+See also: [`defstruct`](#link646566737472756374).	 [→index](#idx) [→topic](#oop)
+
+## `struct-size` : procedure/1 {#link7374727563742d73697a65}
+
+Usage: `(strict-size s) => int`
+
+Returns the number of properties of struct `s.`
+
+See also: [`defstruct`](#link646566737472756374).	 [→index](#idx) [→topic](#oop)
+
+## `struct?` : procedure/1 {#link7374727563743f}
+
+Usage: `(struct? datum) => boo`
+
+Returns true if `datum` is a struct, nil otherwise.
+
+See also: [`defstruct`](#link646566737472756374).	 [→index](#idx) [→topic](#oop)
+
 ## `sub1` : procedure/1 {#link73756231}
 
 Usage: `(sub1 n) => num`
@@ -8893,6 +9363,14 @@ Usage: `(sub1 n) => num`
 Subtract 1 from `n.`
 
 See also: [`add1`](#link61646431), [`+`](#link2b), [`-`](#link2d).	 [→index](#idx) [→topic](#numeric)
+
+## `supers` : procedure/1 {#link737570657273}
+
+Usage: `(supers c) => li`
+
+Return the list of superclasses of class `c`. An error occurs if `c` is not a valid class.
+
+See also: [`class?`](#link636c6173733f), [`isa?`](#link6973613f), [`class-name`](#link636c6173732d6e616d65).	 [→index](#idx) [→topic](#oop)
 
 ## `sym->str` : procedure/1 {#link73796d2d3e737472}
 
@@ -9131,6 +9609,14 @@ Usage: `(void [any] ...)`
 Always returns void, no matter what values are given to it. Void is a special value that is not printed in the console.
 
 See also: [`void?`](#link766f69643f).	 [→index](#idx) [→topic](#lisp)
+
+## `void?` : procedure/1 {#link766f69643f}
+
+Usage: `(void? datum)`
+
+Return true if `datum` is the special symbol void, nil otherwise.
+
+See also: [`void`](#link766f6964).	 [→index](#idx) [→topic](#lisp)
 
 ## `wait-for` : procedure/2 {#link776169742d666f72}
 

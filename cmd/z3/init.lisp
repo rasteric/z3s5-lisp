@@ -14,7 +14,7 @@
      (out "Z3S5 Lisp")
      (set-color 'back bc)
      (set-color 'text (the-color 'z3s5-sysmsg-text))
-     (out " on ")(out (caddr (sys 'version nil)))(out " with ")
+     (out " on \"")(out (5th (sys 'version nil) "localhost"))(out "\" (")(out (caddr (sys 'version nil)))(out ")")(out " with ")
      (out (cadr (sys 'version nil)))
      (out " cores!\n")
      (out "The session started on ")(out (datestr (now)))(out " UTC.\n")

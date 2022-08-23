@@ -6,6 +6,8 @@ Build tags: `db fts` for Sqlite3 support, `fileio` for file access.
 
 - Library system ported from Z3S5 Machine, providing the (load prefix) command. See (help load).
 
+- Object-oriented programming: An `'oop` extension is embedded into the Lisp, ensuring that it is always available. Check out the help entries for symbols in `(help-about 'oop)`.
+
 
 ## Version 2.3.7
 

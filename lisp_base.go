@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"math"
+	"os"
 	"runtime"
 	"runtime/debug"
 	"sort"
@@ -847,6 +848,18 @@ func (interp *Interp) Define_Base() {
 	// (void ...) does nothing and returns Void.
 	interp.Def("void", -1, func(a []any) any {
 		return Void
+	})
+
+	// (void? datum) => bool return true if the datum is void, nil otherwise.
+	interp.Def("void?", 1, func(a []any) any {
+		s, ok := a[0].(*Sym)
+		if !ok {
+			return Nil
+		}
+		if s == Void {
+			return true
+		}
+		return Nil
 	})
 
 	// (fmt s args ...) => str formats the string according to given arguments.
@@ -2032,6 +2045,10 @@ func (interp *Interp) Define_Base() {
 			if !ok {
 				v = "<unknown-version>"
 			}
+			hostname, err := os.Hostname()
+			if err != nil {
+				hostname = "<unknown-host>"
+			}
 			return &Cell{
 				v,
 				&Cell{
@@ -2041,7 +2058,9 @@ func (interp *Interp) Define_Base() {
 							runtime.GOOS, runtime.GOARCH),
 						&Cell{
 							NewSym("Z3S5-Lisp"),
-							Nil,
+							&Cell{
+								hostname,
+								Nil},
 						}}}}
 		case "linecount":
 			return goarith.AsNumber(40)
