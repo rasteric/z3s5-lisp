@@ -2,9 +2,9 @@
 title: Z3S5 Lisp Reference Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: Version 2.3.7+71a101c
+footer-left: Version 2.3.8+4b56c62
 author: by Erich Rast and all Help system contributors
-date: 2022-8-23 9:40
+date: 2022-8-23 9:51
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -13,7 +13,7 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
-For Z3S5 Lisp Version 2.3.7+71a101c with installed modules (kvdb zimage tasks help beep db fileio decimal ling float console base).
+For Z3S5 Lisp Version 2.3.8+4b56c62 with installed modules (kvdb zimage tasks help beep db fileio decimal ling float console base).
 
 # Introduction
 
@@ -2189,6 +2189,28 @@ Set a human-readable information entry for help `topic` with human-readable `hea
 See also: [`defhelp`](#link64656668656c70), [`help-topic-info`](#link68656c702d746f7069632d696e666f).	 [→index](#idx)
 
 
+
+
+
+## Library System {#lib}
+
+This miscellaneous mini-library system allows importing programs with a prefix by source-transforming them.
+
+### `global-sym?` : procedure/1
+
+Usage: `(global-sym? sym) => bool`
+
+Returns true if `sym` is a global symbol, nil otherwise. By convention, a symbol counts as global if it starts with a "*" character. This is used by library functions to determine whether a top-level symbol ought to be treated as local or global to the library.
+
+See also: [`import`](#link696d706f7274), [`sym?`](#link73796d3f).	 [→index](#idx)
+
+### `load` : procedure/1 or more
+
+Usage: `(load prefix [fi])`
+
+Loads the Lisp file at `fi` as a library or program with the given `prefix`. If only a prefix is specified, load attempts to find a corresponding file at path "<z3s5-data>/prg/prefix/prefix.lisp", where `<z3s5-data>` is the result of (sysdir 'z3s5-data). Loading binds all non-global toplevel symbols of the definitions in file `fi` to the form prefix.symbol and replaces calls to them in the definitions appropriately. Symbols starting with "*" such as *cancel* are not modified. To give an example, if `fi` contains a definition (defun bar ...) and the prefix is 'foo, then the result of the import is equivalent to (defun foo.bar ...), and so on for any other definitions. To make a program or library import-ready in this way, global definitions that are referred to in a definition must be forward-declared using `declare`. This is required since the program transformation takes place at the time of the import, not at runtime, and therefore symbols not yet defined in `fi` would not be recognized by the importer as symbols that are top-level modified by `setq` in `fi` without a prior forward-declaration. Basically, the importer preorder-traverses the source and looks for setq and lambdas after macro expansion has taken place. By convention, the entry point of executable programs is a function (run) so the loaded program can be executed with the command (prefix.run).
+
+See also: [`include`](#link696e636c756465), [`declare`](#link6465636c617265).	 [→index](#idx)
 
 
 
@@ -4670,9 +4692,9 @@ See also: [`*colors*`](#link2a636f6c6f72732a), [`the-color`](#link7468652d636f6c
 
 
 
-## Runtime System Images (defunct) {#zimage}
+## Runtime System Images {#zimage}
 
-The following functions provide functionality for saving, loading, and running of runtime system images to and from disk. This module is currently broken and under maintenance.
+The following functions provide functionality for saving, loading, and running of runtime system images to and from disk.
 
 ### `current-zimage` : procedure/0
 
@@ -6926,7 +6948,7 @@ Usage: `(global-sym? sym) => bool`
 
 Returns true if `sym` is a global symbol, nil otherwise. By convention, a symbol counts as global if it starts with a "*" character. This is used by library functions to determine whether a top-level symbol ought to be treated as local or global to the library.
 
-See also: [`import`](#link696d706f7274), [`sym?`](#link73796d3f).	 [→index](#idx)
+See also: [`import`](#link696d706f7274), [`sym?`](#link73796d3f).	 [→index](#idx) [→topic](#lib)
 
 ## `has` : procedure/2 {#link686173}
 
@@ -7472,7 +7494,7 @@ Usage: `(load prefix [fi])`
 
 Loads the Lisp file at `fi` as a library or program with the given `prefix`. If only a prefix is specified, load attempts to find a corresponding file at path "<z3s5-data>/prg/prefix/prefix.lisp", where `<z3s5-data>` is the result of (sysdir 'z3s5-data). Loading binds all non-global toplevel symbols of the definitions in file `fi` to the form prefix.symbol and replaces calls to them in the definitions appropriately. Symbols starting with "*" such as *cancel* are not modified. To give an example, if `fi` contains a definition (defun bar ...) and the prefix is 'foo, then the result of the import is equivalent to (defun foo.bar ...), and so on for any other definitions. To make a program or library import-ready in this way, global definitions that are referred to in a definition must be forward-declared using `declare`. This is required since the program transformation takes place at the time of the import, not at runtime, and therefore symbols not yet defined in `fi` would not be recognized by the importer as symbols that are top-level modified by `setq` in `fi` without a prior forward-declaration. Basically, the importer preorder-traverses the source and looks for setq and lambdas after macro expansion has taken place. By convention, the entry point of executable programs is a function (run) so the loaded program can be executed with the command (prefix.run).
 
-See also: [`include`](#link696e636c756465), [`declare`](#link6465636c617265).	 [→index](#idx)
+See also: [`include`](#link696e636c756465), [`declare`](#link6465636c617265).	 [→index](#idx) [→topic](#lib)
 
 ## `load-zimage` : procedure/1 or more {#link6c6f61642d7a696d616765}
 

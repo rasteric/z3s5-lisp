@@ -75,8 +75,11 @@
 		     "Databases"
 		     "These functions allow for Sqlite3 database access. The module needs to be enabled with the \"db\" build tag.")
 (set-help-topic-info 'zimage
-		     "Runtime System Images (defunct)"
-		     "The following functions provide functionality for saving, loading, and running of runtime system images to and from disk. This module is currently broken and under maintenance.")
+		     "Runtime System Images"
+		     "The following functions provide functionality for saving, loading, and running of runtime system images to and from disk.")
+(set-help-topic-info 'lib
+		     "Library System"
+		     "This miscellaneous mini-library system allows importing programs with a prefix by source-transforming them.")
 
 ;;; help for builtin functions (intrinsics)
 

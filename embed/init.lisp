@@ -4498,6 +4498,7 @@
     (use "(load prefix [fi])")
   (info "Loads the Lisp file at #fi as a library or program with the given #prefix. If only a prefix is specified, load attempts to find a corresponding file at path \"<z3s5-data>/prg/prefix/prefix.lisp\", where #<z3s5-data> is the result of (sysdir 'z3s5-data). Loading binds all non-global toplevel symbols of the definitions in file #fi to the form prefix.symbol and replaces calls to them in the definitions appropriately. Symbols starting with \"*\" such as *cancel* are not modified. To give an example, if #fi contains a definition (defun bar ...) and the prefix is 'foo, then the result of the import is equivalent to (defun foo.bar ...), and so on for any other definitions. To make a program or library import-ready in this way, global definitions that are referred to in a definition must be forward-declared using #declare. This is required since the program transformation takes place at the time of the import, not at runtime, and therefore symbols not yet defined in #fi would not be recognized by the importer as symbols that are top-level modified by #setq in #fi without a prior forward-declaration. Basically, the importer preorder-traverses the source and looks for setq and lambdas after macro expansion has taken place. By convention, the entry point of executable programs is a function (run) so the loaded program can be executed with the command (prefix.run).")
   (type proc)
+  (topic (lib system))
   (arity -2)
   (see (include declare)))
 
@@ -4509,6 +4510,7 @@
     (use "(global-sym? sym) => bool")
   (info "Returns true if #sym is a global symbol, nil otherwise. By convention, a symbol counts as global if it starts with a \"*\" character. This is used by library functions to determine whether a top-level symbol ought to be treated as local or global to the library.")
   (type proc)
+  (topic (lib system))
   (arity 1)
   (see (import sym?)))
 
