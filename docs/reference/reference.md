@@ -2,9 +2,9 @@
 title: Z3S5 Lisp Reference Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: Version 2.3.8+c7da68e
+footer-left: Version 2.3.8+e66e327
 author: by Erich Rast and all Help system contributors
-date: 2022-8-23 16:42
+date: 2022-8-25 10:13
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -13,7 +13,7 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
-For Z3S5 Lisp Version 2.3.8+c7da68e with installed modules (oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).
+For Z3S5 Lisp Version 2.3.8+e66e327 with installed modules (oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).
 
 # Introduction
 
@@ -3244,7 +3244,7 @@ See also: [`defmethod`](#link6465666d6574686f64), [`new`](#link6e6577).	 [→ind
 
 Usage: `(defmethod class-name args [body] ...)`
 
-Define a method `class-name` for class `class` and method name `name` with a syntax parallel to defun, where `args` are the arguments of the methods and `body` is the rest of the method. The given `class-name` must decompose into a valid class name `class` of a previously created class and method name `name` and is bound to the symbol `class-name`. The remaining arguments are like for defun. So for example (defmethod employee-name (this) (slot this 'last-name)) defines a method `name` for an existing class `employee` which retrieves the property `last-name.`
+Define a method `class-name` for class `class` and method name `name` with a syntax parallel to defun, where `args` are the arguments of the methods and `body` is the rest of the method. The given `class-name` must decompose into a valid class name `class` of a previously created class and method name `name` and is bound to the symbol `class-name`. The remaining arguments are like for defun. So for example (defmethod employee-name (this) (slot this 'last-name)) defines a method `name` for an existing class `employee` which retrieves the property `last-name`. Note that `defmethod` is dynamic: If you define a class B with class A as superclass, then B only inherits methods from A that have already been defined for A at the time of defining B!
 
 See also: [`defclass`](#link646566636c617373), [`new`](#link6e6577), [`call-method`](#link63616c6c2d6d6574686f64).	 [→index](#idx)
 
@@ -3316,7 +3316,7 @@ See also: [`defclass`](#link646566636c617373).	 [→index](#idx)
 
 Usage: `(new-struct name li)`
 
-Defines a new structure `name` with the properties in the a-list `li`. Structs are more leightweight than classes, but do not allow for inheritance. Instances of structs ("records") are arrays.
+Defines a new structure `name` with the properties in the a-list `li`. Structs are more leightweight than classes and do not allow for inheritance. Instances of structs ("records") are arrays.
 
 See also: [`defstruct`](#link646566737472756374).	 [→index](#idx)
 
@@ -6222,7 +6222,7 @@ See also: [`macro`](#link6d6163726f).	 [→index](#idx) [→topic](#lisp)
 
 Usage: `(defmethod class-name args [body] ...)`
 
-Define a method `class-name` for class `class` and method name `name` with a syntax parallel to defun, where `args` are the arguments of the methods and `body` is the rest of the method. The given `class-name` must decompose into a valid class name `class` of a previously created class and method name `name` and is bound to the symbol `class-name`. The remaining arguments are like for defun. So for example (defmethod employee-name (this) (slot this 'last-name)) defines a method `name` for an existing class `employee` which retrieves the property `last-name.`
+Define a method `class-name` for class `class` and method name `name` with a syntax parallel to defun, where `args` are the arguments of the methods and `body` is the rest of the method. The given `class-name` must decompose into a valid class name `class` of a previously created class and method name `name` and is bound to the symbol `class-name`. The remaining arguments are like for defun. So for example (defmethod employee-name (this) (slot this 'last-name)) defines a method `name` for an existing class `employee` which retrieves the property `last-name`. Note that `defmethod` is dynamic: If you define a class B with class A as superclass, then B only inherits methods from A that have already been defined for A at the time of defining B!
 
 See also: [`defclass`](#link646566636c617373), [`new`](#link6e6577), [`call-method`](#link63616c6c2d6d6574686f64).	 [→index](#idx) [→topic](#oop)
 
@@ -8078,7 +8078,7 @@ See also: [`defclass`](#link646566636c617373).	 [→index](#idx) [→topic](#oop
 
 Usage: `(new-struct name li)`
 
-Defines a new structure `name` with the properties in the a-list `li`. Structs are more leightweight than classes, but do not allow for inheritance. Instances of structs ("records") are arrays.
+Defines a new structure `name` with the properties in the a-list `li`. Structs are more leightweight than classes and do not allow for inheritance. Instances of structs ("records") are arrays.
 
 See also: [`defstruct`](#link646566737472756374).	 [→index](#idx) [→topic](#oop)
 

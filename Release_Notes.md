@@ -8,6 +8,8 @@ Build tags: `db fts` for Sqlite3 support, `fileio` for file access.
 
 - Object-oriented programming: An `'oop` extension is embedded into the Lisp, ensuring that it is always available. Check out the help entries for symbols in `(help-about 'oop)`.
 
+- Fixed bugs in OOP, wrote tests for OOP module.
+
 
 ## Version 2.3.7
 

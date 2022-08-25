@@ -20,9 +20,9 @@
 <header id="title-block-header">
 <h1 class="title">Z3S5 Lisp Reference Manual</h1>
 <p class="author">by Erich Rast and all Help system contributors</p>
-<p class="date">2022-8-23 16:42</p>
+<p class="date">2022-8-25 10:13</p>
 </header>
-<p>For Z3S5 Lisp Version 2.3.8+c7da68e with installed modules (oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).</p>
+<p>For Z3S5 Lisp Version 2.3.8+e66e327 with installed modules (oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).</p>
 <h1 data-number="1" id="introduction"><span class="header-section-number">1</span> Introduction</h1>
 <p>This is the reference manual for Z3S5 Lisp. This manual has been automatically generated from the entries of the online help system. The reference manual is divided into two large sections. Section <a href="#topics">By Topics</a> lists functions and symbols organized by topics. Within each topic, entries are sorted alphabetically. Section <a href="#reference">Complete Reference</a> lists all functions and symbols alphabetically. Please consult the <em>User Manual</em> and the <em>Readme</em> document for more general information about Z3S5 Lisp, an introduction to its use, and how to embedd it into Go programs.</p>
 <p>Incorrect documentation strings are bugs. Please report bugs using the corresponding <a href="https://github.com/rasteric/z3s5-lisp/issues">Github issue tracker for Z3S5 Lisp</a> and be as precise as possible. Superfluous and missing documentation entries are misfeatures and may also be reported.</p>
@@ -1619,7 +1619,7 @@
 <p>See also: <a href="#link6465666d6574686f64"><code>defmethod</code></a>, <a href="#link6e6577"><code>new</code></a>. <a href="#idx">→index</a></p>
 <h3 data-number="3.17.8" id="defmethod-macro2-or-more"><span class="header-section-number">3.17.8</span> <code>defmethod</code> : macro/2 or more</h3>
 <p>Usage: <code>(defmethod class-name args [body] ...)</code></p>
-<p>Define a method <code>class-name</code> for class <code>class</code> and method name <code>name</code> with a syntax parallel to defun, where <code>args</code> are the arguments of the methods and <code>body</code> is the rest of the method. The given <code>class-name</code> must decompose into a valid class name <code>class</code> of a previously created class and method name <code>name</code> and is bound to the symbol <code>class-name</code>. The remaining arguments are like for defun. So for example (defmethod employee-name (this) (slot this ’last-name)) defines a method <code>name</code> for an existing class <code>employee</code> which retrieves the property <code>last-name.</code></p>
+<p>Define a method <code>class-name</code> for class <code>class</code> and method name <code>name</code> with a syntax parallel to defun, where <code>args</code> are the arguments of the methods and <code>body</code> is the rest of the method. The given <code>class-name</code> must decompose into a valid class name <code>class</code> of a previously created class and method name <code>name</code> and is bound to the symbol <code>class-name</code>. The remaining arguments are like for defun. So for example (defmethod employee-name (this) (slot this ’last-name)) defines a method <code>name</code> for an existing class <code>employee</code> which retrieves the property <code>last-name</code>. Note that <code>defmethod</code> is dynamic: If you define a class B with class A as superclass, then B only inherits methods from A that have already been defined for A at the time of defining B!</p>
 <p>See also: <a href="#link646566636c617373"><code>defclass</code></a>, <a href="#link6e6577"><code>new</code></a>, <a href="#link63616c6c2d6d6574686f64"><code>call-method</code></a>. <a href="#idx">→index</a></p>
 <h3 data-number="3.17.9" id="defstruct-macro1-or-more"><span class="header-section-number">3.17.9</span> <code>defstruct</code> : macro/1 or more</h3>
 <p>Usage: <code>(defstruct name props ...) =&gt; struct</code></p>
@@ -1655,7 +1655,7 @@
 <p>See also: <a href="#link646566636c617373"><code>defclass</code></a>. <a href="#idx">→index</a></p>
 <h3 data-number="3.17.17" id="new-struct-procedure2"><span class="header-section-number">3.17.17</span> <code>new-struct</code> : procedure/2</h3>
 <p>Usage: <code>(new-struct name li)</code></p>
-<p>Defines a new structure <code>name</code> with the properties in the a-list <code>li</code>. Structs are more leightweight than classes, but do not allow for inheritance. Instances of structs (“records”) are arrays.</p>
+<p>Defines a new structure <code>name</code> with the properties in the a-list <code>li</code>. Structs are more leightweight than classes and do not allow for inheritance. Instances of structs (“records”) are arrays.</p>
 <p>See also: <a href="#link646566737472756374"><code>defstruct</code></a>. <a href="#idx">→index</a></p>
 <h3 data-number="3.17.18" id="object-procedure1"><span class="header-section-number">3.17.18</span> <code>object?</code> : procedure/1</h3>
 <p>Usage: <code>(object? obj) =&gt; bool</code></p>
@@ -3099,7 +3099,7 @@
 <p>See also: <a href="#link6d6163726f"><code>macro</code></a>. <a href="#idx">→index</a> <a href="#lisp">→topic</a></p>
 <h2 data-number="4.149" id="link6465666d6574686f64"><span class="header-section-number">4.149</span> <code>defmethod</code> : macro/2 or more</h2>
 <p>Usage: <code>(defmethod class-name args [body] ...)</code></p>
-<p>Define a method <code>class-name</code> for class <code>class</code> and method name <code>name</code> with a syntax parallel to defun, where <code>args</code> are the arguments of the methods and <code>body</code> is the rest of the method. The given <code>class-name</code> must decompose into a valid class name <code>class</code> of a previously created class and method name <code>name</code> and is bound to the symbol <code>class-name</code>. The remaining arguments are like for defun. So for example (defmethod employee-name (this) (slot this ’last-name)) defines a method <code>name</code> for an existing class <code>employee</code> which retrieves the property <code>last-name.</code></p>
+<p>Define a method <code>class-name</code> for class <code>class</code> and method name <code>name</code> with a syntax parallel to defun, where <code>args</code> are the arguments of the methods and <code>body</code> is the rest of the method. The given <code>class-name</code> must decompose into a valid class name <code>class</code> of a previously created class and method name <code>name</code> and is bound to the symbol <code>class-name</code>. The remaining arguments are like for defun. So for example (defmethod employee-name (this) (slot this ’last-name)) defines a method <code>name</code> for an existing class <code>employee</code> which retrieves the property <code>last-name</code>. Note that <code>defmethod</code> is dynamic: If you define a class B with class A as superclass, then B only inherits methods from A that have already been defined for A at the time of defining B!</p>
 <p>See also: <a href="#link646566636c617373"><code>defclass</code></a>, <a href="#link6e6577"><code>new</code></a>, <a href="#link63616c6c2d6d6574686f64"><code>call-method</code></a>. <a href="#idx">→index</a> <a href="#oop">→topic</a></p>
 <h2 data-number="4.150" id="link646566737472756374"><span class="header-section-number">4.150</span> <code>defstruct</code> : macro/1 or more</h2>
 <p>Usage: <code>(defstruct name props ...) =&gt; struct</code></p>
@@ -4027,7 +4027,7 @@
 <p>See also: <a href="#link646566636c617373"><code>defclass</code></a>. <a href="#idx">→index</a> <a href="#oop">→topic</a></p>
 <h2 data-number="4.378" id="link6e65772d737472756374"><span class="header-section-number">4.378</span> <code>new-struct</code> : procedure/2</h2>
 <p>Usage: <code>(new-struct name li)</code></p>
-<p>Defines a new structure <code>name</code> with the properties in the a-list <code>li</code>. Structs are more leightweight than classes, but do not allow for inheritance. Instances of structs (“records”) are arrays.</p>
+<p>Defines a new structure <code>name</code> with the properties in the a-list <code>li</code>. Structs are more leightweight than classes and do not allow for inheritance. Instances of structs (“records”) are arrays.</p>
 <p>See also: <a href="#link646566737472756374"><code>defstruct</code></a>. <a href="#idx">→index</a> <a href="#oop">→topic</a></p>
 <h2 data-number="4.379" id="link6e6c"><span class="header-section-number">4.379</span> <code>nl</code> : procedure/0</h2>
 <p>Usage: <code>(nl)</code></p>

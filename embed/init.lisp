@@ -4586,6 +4586,13 @@
 
 ;;; OOP
 ;;; A poor man's object system.
+(testing "oop")
+
+(expect-ok (defclass _testclass1 nil (a "string") b c))
+(expect-ok (defmethod _testclass1-bar (this x y) (+ x y)))
+(expect-ok (defclass _testclass2 _testclass1 x y z))
+(expect-ok (defmethod _testclass2-foo (this n) (+ n 1)))
+(expect-ok (defmethod _testclass1-priv (this x y) (- x y)))
 
 ;; register the oop in reflection
 (when (bound? *reflect*)
@@ -4670,6 +4677,16 @@
   (arity 2)
   (see (new isa? setslot object? class-name supers props methods has-slot?)))
 
+(expect-ok (setq _obj1 (new _testclass1)))
+(expect-ok (setq _obj2 (new _testclass2 (x 10) (y 20) (a "hello world"))))
+(expect-true (equal? (prop _obj1 'a) "string"))
+(expect-true (equal? (prop _obj1 'b) nil))
+(expect-true (equal? (prop _obj2 'a) "hello world"))
+(expect-true (equal? (prop _obj2 'b) nil))
+(expect-true (equal? (prop _obj2 'x) 10))
+(expect-true (equal? (prop _obj2 'y) 20))
+(expect-true (equal? (prop _obj2 'z) nil))
+
 (defun setprop (obj slot value)
   (unless (has-key? (array-ref obj 2) slot)
     (error "setprop: class %v does not have a property %v" (array-ref obj 1) slot))
@@ -4683,8 +4700,14 @@
   (arity 3)
   (see (new isa? slot object? class-name supers props methods has-slot?)))
 
+(expect-ok (lambda () (setprop _obj2 'z 'test)(unless (equal? (prop _obj2 'z) 'test)
+						(error "oop test failed"))))
+(expect-ok (lambda () (setprop _obj2 'z nil)(unless (equal? (prop _obj2 'z) nil)
+					      (error "oop test failed"))))
+
 (defun class? (c)
   (and (array? c)
+       (>= (len c) 3)
        (eq? (array-ref c 0) '%class)))
 
 (defhelp class?
@@ -4694,6 +4717,13 @@
   (topic (oop))
   (arity 1)
   (see (object? isa?)))
+
+(expect-true (class? _testclass1))
+(expect-true (class? _testclass2))
+(expect-false (class? #(test array)))
+(expect-false (class? 'hello))
+(expect-false (class? nil))
+(expect-false (class? #()))
 
 (defun object? (obj)
   (and (array? obj)
@@ -4708,6 +4738,13 @@
   (arity 1)
   (see (class? isa?)))
 
+(expect-true (object? _obj1))
+(expect-true (object? _obj2))
+(expect-false (object? #(object test)))
+(expect-false (object? 'object))
+(expect-false (object? nil))
+(expect-false (object? #()))
+
 (defun class-name (c)
    (unless (class? c)
     (error "class-name: expected class, given %v" c))
@@ -4721,6 +4758,13 @@
   (arity 1)
   (see (class? isa?)))
 
+(expect-true (equal? (class-name _testclass1) '_testclass1))
+(expect-true (equal? (class-name _testclass2) '_testclass2))
+(expect-false (equal? (class-name _testclass1) '_testclass2))
+(expect-false (equal? (class-name _testclass2) '_testclass1))
+(expect-true (sym? (class-name _testclass1)))
+(expect-err (class-name '_testclass1))
+
 (defun supers (c)
   (unless (class? c)
     (error "supers: expected class, given %v" c))
@@ -4733,6 +4777,9 @@
   (topic (oop))
   (arity 1)
   (see (class? isa? class-name)))
+
+(expect-true (equal? (supers _testclass1) nil))
+(expect-true (equal? (supers _testclass2) (list _testclass1)))
 
 (defun props (obj)
    (unless (object? obj)
@@ -4752,6 +4799,15 @@
   (arity 1)
   (see (methods has-prop? new prop setprop)))
 
+(expect-true (member 'a (props _obj2)))
+(expect-true (member 'b (props _obj2)))
+(expect-false (member 'd (props _obj2)))
+(expect-true (member 'x (props _obj2)))
+(expect-true (member 'y (props _obj2)))
+(expect-true (member 'z (props _obj2)))
+(expect-true (equal? (len (props _obj1)) 3))
+(expect-true (equal? (len (props _obj2)) 6))
+
 (defun _methods (class)
    (let ((li nil))
      (dict-foreach
@@ -4766,7 +4822,14 @@
     ((class? obj) (_methods obj))
     ((_class-by-name obj) (_methods (_class-by-name obj)))
     (t (error "methods: expected class or object, given %v" obj))))
-  
+
+(expect-true (member 'bar (methods _obj1)))
+(expect-true (member 'bar (methods _testclass1)))
+(expect-true (member 'priv (methods _obj1)))
+(expect-true (member 'priv (methods _testclass1)))
+(expect-true (member 'bar (methods _obj2)))
+(expect-true (member 'foo (methods _obj2)))
+
 (defhelp methods
     (use "(methods obj) => li")
   (info "Return the list of methods of #obj, which must be a class, object, or class name.")
@@ -4776,7 +4839,7 @@
   (see (has-method? new props prop setprop has-prop?)))
 
 (defun has-prop? (obj slot)
-  (has-key? (array-ref obj 2) (sym->str slot)))
+  (has-key? (array-ref obj 2) slot))
 
 (defhelp has-prop?
     (use "(has-prop? obj slot) => bool")
@@ -4785,6 +4848,13 @@
   (topic (oop))
   (arity 2)
   (see (has-method? new props methods prop setprop)))
+
+(expect-true (has-prop? _obj1 'a))
+(expect-true (has-prop? _obj1 'b))
+(expect-true (has-prop? _obj2 'a))
+(expect-true (has-prop? _obj2 'x))
+(expect-false (has-prop? _obj1 'x))
+(expect-err (has-prop? #(test) 'd))
 
 (defun has-method? (obj name)
   (has-key? (array-ref (class-of obj) 4) name))
@@ -4796,6 +4866,10 @@
   (topic (oop))
   (arity 2)
   (see (defmethod has-prop? new props methods prop setprop)))
+
+(expect-true (has-method? _obj1 'bar))
+(expect-true (has-method? _obj2 'foo))
+(expect-true (has-method? _obj2 'bar))
 
 (defun isa? (obj cname)
   (unless (object? obj)
@@ -4821,6 +4895,10 @@
   (arity 2)
   (see (supers)))
 
+(expect-true (isa? _obj2 _testclass1))
+(expect-true (isa? _obj2 _testclass2))
+(expect-true (isa? _obj1 '_testclass1))
+
 (defun class-of (obj)
   (if (object? obj)
       (_class-by-name (array-ref obj 1))
@@ -4833,6 +4911,9 @@
   (topic (oop))
   (arity 1)
   (see (new isa?)))
+
+(expect-true (equal? (class-of _obj1) _testclass1))
+(expect-true (equal? (class-of _obj2) _testclass2))
 
 (defun _setmethod (class mname proc)
   (when (= (functional-arity proc) 0)
@@ -4852,6 +4933,11 @@
   (arity 3)
   (see (defmethod defclass new isa? class-of)))
 
+(expect-true (equal? 15 (call-method _obj1 'bar '(10 5))))
+(expect-true (equal? 30 (call-method _obj2 'bar '(20 10))))
+(expect-true (equal? 11 (call-method _obj2 'foo '(10))))
+(expect-err (call-method _obj1 'foo '(10)))
+ 
 (defun call-super (obj name args)
   (let ((supers (array-ref (class-of obj) 2) nil))
     (unless supers
@@ -4874,6 +4960,9 @@
   (topic (oop))
   (arity 3)
   (see (call-method supers)))
+
+(expect-true (equal? 7 (call-super _obj2 'priv '(10 3))))
+(expect-err (call-method _obj2 'priv '(10 3)))
 
 (defmacro defclass (name supers &rest slots)
   (let ((c (gensym)))
@@ -4906,6 +4995,8 @@
   (arity -2)
   (see (defclass)))
 
+(expect-true (equal? 13 (let ((a (new _testclass2 (x 10) (y 3)))) (+ (prop a 'x) (prop a 'y)))))
+
 (defmacro defmethod (name args &rest body)
   `(progn
      (_setmethod (_class-from-name ',name) (_mname-from-name ',name) (lambda ,args ,@body))
@@ -4913,7 +5004,7 @@
 
 (defhelp defmethod
     (use "(defmethod class-name args [body] ...)")
-  (info "Define a method #class-name for class #class and method name #name with a syntax parallel to defun, where #args are the arguments of the methods and #body is the rest of the method. The given #class-name must decompose into a valid class name #class of a previously created class and method name #name and is bound to the symbol #class-name. The remaining arguments are like for defun. So for example (defmethod employee-name (this) (slot this 'last-name)) defines a method #name for an existing class #employee which retrieves the property #last-name.")
+  (info "Define a method #class-name for class #class and method name #name with a syntax parallel to defun, where #args are the arguments of the methods and #body is the rest of the method. The given #class-name must decompose into a valid class name #class of a previously created class and method name #name and is bound to the symbol #class-name. The remaining arguments are like for defun. So for example (defmethod employee-name (this) (slot this 'last-name)) defines a method #name for an existing class #employee which retrieves the property #last-name. Note that #defmethod is dynamic: If you define a class B with class A as superclass, then B only inherits methods from A that have already been defined for A at the time of defining B!")
   (type macro)
   (topic (oop))
   (arity -3)
@@ -4957,11 +5048,13 @@
 
 (defhelp new-struct
     (use "(new-struct name li)")
-  (info "Defines a new structure #name with the properties in the a-list #li. Structs are more leightweight than classes, but do not allow for inheritance. Instances of structs (\"records\") are arrays.")
+  (info "Defines a new structure #name with the properties in the a-list #li. Structs are more leightweight than classes and do not allow for inheritance. Instances of structs (\"records\") are arrays.")
   (type proc)
   (topic (oop))
   (arity 2)
   (see (defstruct)))
+
+(expect-ok (defstruct _teststruct (x 10)(y 20))) ; uses new-struct anyway
 			       
 (defun struct-name (s)
   (2nd s nil))
@@ -4974,6 +5067,8 @@
   (arity 1)
   (see (defstruct)))
 
+(expect-true (equal? (struct-name _teststruct) '_teststruct))
+
 (defun struct-props (s)
   (3rd s (dict)))
 
@@ -4984,6 +5079,10 @@
   (topic (oop))
   (arity 1)
   (see (defstruct)))
+
+(expect-true (has-key? (struct-props _teststruct) 'x))
+(expect-true (has-key? (struct-props _teststruct) 'y))
+(expect-false (has-key? (struct-props _teststruct) 'z))
 
 (defun struct-index (s)
   (4th s (dict)))
@@ -5007,6 +5106,8 @@
   (arity 1)
   (see (defstruct)))
 
+(expect-true (equal? (struct-size _teststruct) 2))
+
 (defun struct? (s)
   (and (array? s)
        (equal? (1st s nil) '%struct)))
@@ -5018,6 +5119,10 @@
   (topic (oop))
   (arity 1)
   (see (defstruct)))
+
+(expect-true (struct? _teststruct))
+(expect-false (struct? '_teststruct))
+(expect-false (struct? #(struct blabla another test)))
 
 (defun record? (s)
   (and (array? s)
@@ -5051,6 +5156,13 @@
   (arity 2)
   (see (make defstruct struct? record?)))
 
+(expect-ok (setq _testrecord (struct-instantiate _teststruct '((x 5)))))
+(expect-true (record? _testrecord))
+(expect-false (record? '_testrecord))
+(expect-false (record? #(record not really a record)))
+(expect-true (equal? 5 (_teststruct-x _testrecord)))
+(expect-true (equal? 20 (_teststruct-y _testrecord)))
+
 (defun _struct-lookup (k values defaults)
   (let ((v (assoc k values)))
     (if v
@@ -5067,6 +5179,9 @@
   (topic (oop))
   (arity 1)
   (see (record?)))
+
+(expect-true (equal? _testrecord (copy-record _testrecord)))
+(expect-true (equal? 20 (_teststruct-y (copy-record _testrecord))))
 
 (defmacro defstruct (name &rest props)
   `(progn
@@ -5124,6 +5239,8 @@
   (arity 2)
   (see (make* defstruct)))
 
+(expect-ok (make _teststruct '((x 20)(y 50))))
+
 (defmacro make* (name &rest props)
   `(struct-instantiate ,name ',props))
 
@@ -5134,6 +5251,10 @@
   (topic (oop))
   (arity -2)
   (see (make defstruct)))
+
+(expect-ok (make* _teststruct (x 20)(y 50)))
+(expect-ok (unbind '_teststruct)(unbind '_testrecord)(unbind '_testclass1)(unbind '_testclass2)
+	   (unbind '_obj1)(unbind '_obj2))
 
 ;;; PREAMBLE END
 
