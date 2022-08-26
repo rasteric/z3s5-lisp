@@ -2,9 +2,9 @@
 title: Z3S5 Lisp User Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: "2.3.8+e66e327"
+footer-left: "2.3.9+b6459de"
 author: by Erich Rast
-date: 2022-7-22 16:00
+date: 2022-8-26 18:30
 header-includes: |
   \lstset{% for listings
     basicstyle=\footnotesize\ttfamily,
@@ -13,7 +13,7 @@ header-includes: |
   \usepackage{xcolor}
 ---
 
-for Z3S5 Lisp Version "2.3.8+e66e327"
+for Z3S5 Lisp Version "2.3.9+b6459de"
 
 # Introduction
 
@@ -235,6 +235,76 @@ Finally, not all values can be externalized. For example, ports, tasks, futures,
 The build tags `db` and `fts5` enable a database module with Sqlite3 support. See `(dump 'db.)` for available functions and consult the reference and help system for more information on them. The tag `fts5` is required if `db` is used, since the key-value module `kvdb` makes use of the fts5 text indexing features of Sqlite. So the tags always have to be combined.
 
 Take a look at `(dump 'kvdb)` for more information about the key-value database and look up `(help remember)` for information on the remember system. Basically, you can use `(remember key value)` to remember a value, `(recall key) => value` to recall it, and `(forget key)` to forget it. However, this requires `(init-remember)` to be executed first once. In the `z3` executable this is loaded in the local `init.lisp` file that also prints the start banner, but you might want to disable it if you don't use remember because it slows down startup.
+
+## Object-oriented Programming
+
+The extension for object-oriented programming is embedded into the init file and adds the symbol `oop` in `*reflect*`. It provides a simple object system with multiple inheritance and more lightweight structure. Both of them are based on arrays whose first element is a symbol starting with `%`, so it is best not to use arrays starting with such symbols for other purposes.
+
+### Classes, Objects, Methods
+
+Classes should be created with the `defclass` macro; there are other ways of creating them but this is most convenient. When a class is created, it's name, a possibly empty list of superclasses, and if necessary some properties can be declared:
+
+~~~~{.Lisp}
+(defclass named nil (name "<unknown>"))
+~~~~
+
+This defines a class called `named` with no superclasses and a `name` property with default value `"<unknown>"`. Methods that subclasses shall inherit must be defined *before* the respective subclass is defined. So let's add a convenience method to retrieve the name:
+
+~~~~{.Lisp}
+(defmethod named-name (this) (prop this 'name))
+~~~~
+
+This method takes the instance of the class as first argument ("this") and retrieves the instance's property `name`. The name in the first unquoted argument must be composed out of a valid class name and the method name. The following definitions illustrate inheritance:
+
+~~~~{.Lisp}
+(defclass point (named) (x 0) (y 0))
+(defmethod point-move (this delta-x delta-y) 
+  (setprop this 'x (+ (prop this 'x) delta-x))
+  (setprop this 'y (+ (prop this 'y) delta-y)))
+~~~~
+
+This defines a named point with methods `point-name` and `point-move`, where the former is inherited from the superclass `named`. To make instances, use `new` as follows:
+
+~~~~{.Lisp}
+(setq a (new point (x 10) (y 20) (name "A")))
+(point-name a)
+==> "A"
+(prop a 'x)
+(setprop a 'x 99)
+(prop a 'x)
+==> 99
+(point-move a 1 20)
+(prop a 'x)
+==> 100
+(prop a 'y)
+==> 40
+~~~~
+
+As you can see in the example, the "this" argument must be named in the definition of `point-move` but when calling the method does not need to be taken into account; when the method is called, the first argument is always the object it is called upon. If no property value is specified in a `new` call, then a property gets its default value. If no default value has been specified during class definition, then the value is nil. Aside from the direct names bound by `defmethod`, it is also possible to use the `method` function to call methods, and properties can be get and set with `prop` and `setprop` respectively. There are a few more helper functions such as `object?` and `class?` to test for objects and classes, as well as `isa?` for checking whether an object is a subclass of a given class. Check out the "Object-oriented Programming" section of the Reference Manual for a complete list.
+
+One thing to bear in mind when using this very simple OOP extension is that everything is defined dynamically at runtime and order matters. If you instantiate a class before all of its methods are defined, the resulting object will not take into account any future changes or definitions of the class, it will just be derived from the current state of the class. Likewise, when a subclass is defined, the methods of the superclass need to be defined already or else they will not become part of the subclass. If you look at the implementation, you can see why: It simply copies symbols and their closure from dictionaries.
+
+### Structures
+
+Structures are more lightweight array-based representations of named fields without inheritance. They are similar to association lists and the corresponding macros allow the getting and setting of values based on a name in the struct (which is just an assessor to the array):
+
+~~~~{.Lisp}
+(defstruct point (x 0) (y 0))
+~~~~
+
+This is similar to the previous example but no inheritance is possible. Instances of a struct are arays called "records" and created with `make` and `make*`:
+
+~~~~{.Lisp}
+(setq a (make point '((x 20)(y 100))))
+(setq b (make* point (x 10) (y 10)))
+(point-x a)
+==> 20
+(point-x! a 30)
+(point-x a)
+==> 30
+~~~~
+
+That's about it. These macros basically just provide conveniently named getter and setter functions for arrays. Consult the Reference Manual for a complete list of all structure-related functions.
 
 ## Language Stability
 

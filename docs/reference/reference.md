@@ -2,9 +2,9 @@
 title: Z3S5 Lisp Reference Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: Version 2.3.8+e66e327
+footer-left: Version 2.3.9+b6459de
 author: by Erich Rast and all Help system contributors
-date: 2022-8-25 10:13
+date: 2022-8-26 17:29
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -13,7 +13,7 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
-For Z3S5 Lisp Version 2.3.8+e66e327 with installed modules (oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).
+For Z3S5 Lisp Version 2.3.9+b6459de with installed modules (oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).
 
 # Introduction
 
@@ -3244,7 +3244,7 @@ See also: [`defmethod`](#link6465666d6574686f64), [`new`](#link6e6577).	 [→ind
 
 Usage: `(defmethod class-name args [body] ...)`
 
-Define a method `class-name` for class `class` and method name `name` with a syntax parallel to defun, where `args` are the arguments of the methods and `body` is the rest of the method. The given `class-name` must decompose into a valid class name `class` of a previously created class and method name `name` and is bound to the symbol `class-name`. The remaining arguments are like for defun. So for example (defmethod employee-name (this) (slot this 'last-name)) defines a method `name` for an existing class `employee` which retrieves the property `last-name`. Note that `defmethod` is dynamic: If you define a class B with class A as superclass, then B only inherits methods from A that have already been defined for A at the time of defining B!
+Define a method `class-name` for class `class` and method name `name` with a syntax parallel to defun, where `args` are the arguments of the methods and `body` is the rest of the method. The given `class-name` must decompose into a valid class name `class` of a previously created class and method name `name` and is bound to the symbol `class-name`. The remaining arguments are like for defun. So for example (defmethod employee-name (this) (prop this 'last-name)) defines a method `name` for an existing class `employee` which retrieves the property `last-name`. Note that `defmethod` is dynamic: If you define a class B with class A as superclass, then B only inherits methods from A that have already been defined for A at the time of defining B!
 
 See also: [`defclass`](#link646566636c617373), [`new`](#link6e6577), [`call-method`](#link63616c6c2d6d6574686f64).	 [→index](#idx)
 
@@ -3358,7 +3358,7 @@ Usage: `(setprop obj slot value)`
 
 Set property `slot` in `obj` to `value`. An error occurs if the object does not have a property with that name.
 
-See also: [`new`](#link6e6577), [`isa?`](#link6973613f), [`slot`](#link736c6f74), [`object?`](#link6f626a6563743f), [`class-name`](#link636c6173732d6e616d65), [`supers`](#link737570657273), [`props`](#link70726f7073), [`methods`](#link6d6574686f6473), [`has-slot?`](#link6861732d736c6f743f).	 [→index](#idx)
+See also: [`new`](#link6e6577), [`isa?`](#link6973613f), [`prop`](#link70726f70), [`object?`](#link6f626a6563743f), [`class-name`](#link636c6173732d6e616d65), [`supers`](#link737570657273), [`props`](#link70726f7073), [`methods`](#link6d6574686f6473), [`has-prop?`](#link6861732d70726f703f).	 [→index](#idx)
 
 ### `struct-index` : procedure/1
 
@@ -6222,7 +6222,7 @@ See also: [`macro`](#link6d6163726f).	 [→index](#idx) [→topic](#lisp)
 
 Usage: `(defmethod class-name args [body] ...)`
 
-Define a method `class-name` for class `class` and method name `name` with a syntax parallel to defun, where `args` are the arguments of the methods and `body` is the rest of the method. The given `class-name` must decompose into a valid class name `class` of a previously created class and method name `name` and is bound to the symbol `class-name`. The remaining arguments are like for defun. So for example (defmethod employee-name (this) (slot this 'last-name)) defines a method `name` for an existing class `employee` which retrieves the property `last-name`. Note that `defmethod` is dynamic: If you define a class B with class A as superclass, then B only inherits methods from A that have already been defined for A at the time of defining B!
+Define a method `class-name` for class `class` and method name `name` with a syntax parallel to defun, where `args` are the arguments of the methods and `body` is the rest of the method. The given `class-name` must decompose into a valid class name `class` of a previously created class and method name `name` and is bound to the symbol `class-name`. The remaining arguments are like for defun. So for example (defmethod employee-name (this) (prop this 'last-name)) defines a method `name` for an existing class `employee` which retrieves the property `last-name`. Note that `defmethod` is dynamic: If you define a class B with class A as superclass, then B only inherits methods from A that have already been defined for A at the time of defining B!
 
 See also: [`defclass`](#link646566636c617373), [`new`](#link6e6577), [`call-method`](#link63616c6c2d6d6574686f64).	 [→index](#idx) [→topic](#oop)
 
@@ -8912,7 +8912,7 @@ Usage: `(setprop obj slot value)`
 
 Set property `slot` in `obj` to `value`. An error occurs if the object does not have a property with that name.
 
-See also: [`new`](#link6e6577), [`isa?`](#link6973613f), [`slot`](#link736c6f74), [`object?`](#link6f626a6563743f), [`class-name`](#link636c6173732d6e616d65), [`supers`](#link737570657273), [`props`](#link70726f7073), [`methods`](#link6d6574686f6473), [`has-slot?`](#link6861732d736c6f743f).	 [→index](#idx) [→topic](#oop)
+See also: [`new`](#link6e6577), [`isa?`](#link6973613f), [`prop`](#link70726f70), [`object?`](#link6f626a6563743f), [`class-name`](#link636c6173732d6e616d65), [`supers`](#link737570657273), [`props`](#link70726f7073), [`methods`](#link6d6574686f6473), [`has-prop?`](#link6861732d70726f703f).	 [→index](#idx) [→topic](#oop)
 
 ## `shorten` : procedure/2 {#link73686f7274656e}
 

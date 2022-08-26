@@ -4698,7 +4698,7 @@
   (type proc)
   (topic (oop))
   (arity 3)
-  (see (new isa? slot object? class-name supers props methods has-slot?)))
+  (see (new isa? prop object? class-name supers props methods has-prop?)))
 
 (expect-ok (lambda () (setprop _obj2 'z 'test)(unless (equal? (prop _obj2 'z) 'test)
 						(error "oop test failed"))))
@@ -5004,7 +5004,7 @@
 
 (defhelp defmethod
     (use "(defmethod class-name args [body] ...)")
-  (info "Define a method #class-name for class #class and method name #name with a syntax parallel to defun, where #args are the arguments of the methods and #body is the rest of the method. The given #class-name must decompose into a valid class name #class of a previously created class and method name #name and is bound to the symbol #class-name. The remaining arguments are like for defun. So for example (defmethod employee-name (this) (slot this 'last-name)) defines a method #name for an existing class #employee which retrieves the property #last-name. Note that #defmethod is dynamic: If you define a class B with class A as superclass, then B only inherits methods from A that have already been defined for A at the time of defining B!")
+  (info "Define a method #class-name for class #class and method name #name with a syntax parallel to defun, where #args are the arguments of the methods and #body is the rest of the method. The given #class-name must decompose into a valid class name #class of a previously created class and method name #name and is bound to the symbol #class-name. The remaining arguments are like for defun. So for example (defmethod employee-name (this) (prop this 'last-name)) defines a method #name for an existing class #employee which retrieves the property #last-name. Note that #defmethod is dynamic: If you define a class B with class A as superclass, then B only inherits methods from A that have already been defined for A at the time of defining B!")
   (type macro)
   (topic (oop))
   (arity -3)
@@ -5025,7 +5025,7 @@
      (when (< idx 2)
        (error "defmethod: a method name must start with the class name followed by \"-\", given \"%v\"" s))
      (when (< (- (strlen s) (add1 idx)) 1)
-       (error "defmethod: the method name does have a class name but does not have a slot name part, given \"%v\"" s))
+       (error "defmethod: the method name does have a class name but does not have a property name part, given \"%v\"" s))
      (str->sym (str-slice s (add1 idx) (strlen s)))))
 
 ;; lightweight structures
