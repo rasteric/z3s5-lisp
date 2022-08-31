@@ -1951,6 +1951,14 @@
   (arity -2)
   (see (bind unbind)))
 
+(defhelp defun
+    (use "(defun ident (params ...) body ...)")
+  (info "Define a function with name #ident, a possibly empty list of #params, and the remaining #body expressions. This is a macro for (setq ident (lambda (params ...) body ...)) and binds the lambda-form to the given symbol. Like lambdas, the #params of #defun allow for a #&rest keyword before the last parameter name. This binds all remaining arguments of a variadic function call to this parameter as a list.")
+  (type macro)
+  (topic (lisp))
+  (arity -2)
+  (see (setq defmacro)))
+
 (defhelp =
     (use "(= x y) => bool")
   (info "Return true if number #x equals number #y, nil otherwise.")
@@ -1966,6 +1974,14 @@
   (topic (lisp))
   (arity 1)
   (see (not list? cons?)))
+
+(defhelp bool?
+    (use "(bool? datum) => bool")
+  (info "Return true if #datum is either true or nil. Note: This predicate only exists for type-completeness and you should never use it as part of testing whether something is true or false - per convention, a value is true if it is non-nil and not when it is true, which is the special boolean value this predicate tests in addition to nil.")
+  (type proc)
+  (topic (lisp))
+  (arity 1)
+  (see (null? not)))
 
 (defhelp setcar
     (use "(setcar li elem) => li")

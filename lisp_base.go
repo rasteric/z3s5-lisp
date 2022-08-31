@@ -224,6 +224,18 @@ func (interp *Interp) Define_Base() {
 		return Nil
 	})
 
+	interp.Def("bool?", 1, func(a []any) any {
+		if _, ok := a[0].(bool); ok {
+			return true
+		}
+		if s, ok := a[0].(*Cell); ok {
+			if s == Nil {
+				return true
+			}
+		}
+		return Nil
+	})
+
 	interp.Def("closure?", 1, func(a []any) any {
 		if _, ok := a[0].(*Closure); ok {
 			return true

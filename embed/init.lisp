@@ -513,6 +513,22 @@
 	 (list 'fg 'z3s5-help-entry-arg (list 'bg 'z3s5-help-back (2nd x)))
 	 (list 'fg 'z3s5-help-text (list 'bg 'z3s5-help-back (2nd x)))))))
 
+(defun help-strings (sym del)
+  (let ((e (help-entry sym)))
+    (fmt (str+"%v" del "%v" del "%v" del "%v" del "%v" del)
+       (cadr (assoc 'use e))
+       (cadr (assoc 'info e))
+       (cadr (assoc 'type e))
+       (cadr (assoc 'arity e))
+       (cadr (assoc 'see e)))))
+
+(defhelp help-strings
+    (use "(help-strings sym del) => li")
+  (info "Obtain a string of help strings for a given symbol #sym. The fields in the string are separated by string #del.")
+  (type proc)
+  (arity 2)
+  (topic (help))
+  (see (help help-entry *help*)))
 
 ;; help for early defined macros
 (defhelp case
