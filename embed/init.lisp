@@ -5272,6 +5272,30 @@
 (expect-ok (unbind '_teststruct)(unbind '_testrecord)(unbind '_testclass1)(unbind '_testclass2)
 	   (unbind '_obj1)(unbind '_obj2))
 
+(defun type-of (datum)
+  (cond
+    ((sym? datum) 'sym)
+    ((list? datum) 'list)
+    ((array? datum) 'array)
+    ((bool? datum) 'bool)
+    ((num? datum) 'num)
+    ((str? datum) 'str)
+    ((eof? datum) 'eof)
+    ((boxed? datum) 'boxed)
+    ((blob? datum) 'blob)
+    ((intrinsic? datum) 'intrinsic)
+    ((closure? datum) 'closure)
+    ((macro? datum) 'macro)
+    (t 'unknown)))
+
+(defhelp type-of
+    (use "(type-of datum) => sym")
+  (info "Return the type of #datum as a symbol. This uses existing predicates and therefore is not faster than testing with predicates directly.")
+  (type proc)
+  (arity 1)
+  (topic (lisp))
+  (see (num? str? sym? list? array? bool? eof? boxed? intrinsic? closure? macro? blob?)))
+
 ;;; PREAMBLE END
 
 ;;;  Copyright (c) 2019-2022 Erich Rast

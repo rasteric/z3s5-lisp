@@ -236,6 +236,13 @@ func (interp *Interp) Define_Base() {
 		return Nil
 	})
 
+	interp.Def("boxed?", 1, func(a []any) any {
+		if _, ok := a[0].(*Boxed); ok {
+			return true
+		}
+		return Nil
+	})
+
 	interp.Def("closure?", 1, func(a []any) any {
 		if _, ok := a[0].(*Closure); ok {
 			return true

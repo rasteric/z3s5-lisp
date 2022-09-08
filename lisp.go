@@ -2101,6 +2101,25 @@ func (interp *Interp) Run(input io.Reader) bool {
 	}
 }
 
+// EvalString evaluates a string and returns the result or an error. If string contains more than one expression, then
+// only the first expression is executed. To prevent this, you may wrap several expressions into (progn expr ...).
+// If the expression is empty, io.EOF error is returned. Use Str(result) to print the result in human-readable form.
+func (interp *Interp) EvalString(s string) (any, error) {
+	reader := NewReader(strings.NewReader(s))
+	x, err := reader.Read()
+	if err != nil {
+		return Void, err.(error)
+	}
+	if x == EofToken {
+		return Void, io.EOF
+	}
+	result, err := interp.SafeEval(x, Nil)
+	if err != nil {
+		return Void, err.(error)
+	}
+	return result, nil
+}
+
 // Main runs each element of args as a name of Lisp script file.
 // It ignores args[0].
 // If it does not have args[1] or some element is "-", it begins REPL.

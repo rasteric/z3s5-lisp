@@ -214,6 +214,14 @@
   (topic (system))
   (see (functional? intrinsic? closure? functional-arity functional-has-rest?)))
 
+(defhelp boxed?
+    (use "(boxed? x) => bool")
+  (info "Return true if #x is a boxed value, nil otherwise. Boxed values are special objects that are special in the system and sometimes cannot be garbage collected.")
+  (type proc)
+  (arity 1)
+  (topic (system))
+  (see (type-of num? str? sym? list? array? macro? closure? intrinsic? eof?)))
+
 (defhelp functional-arity
     (use "(functional-arity proc) => int")
   (info "Return the arity of a functional #proc.")
