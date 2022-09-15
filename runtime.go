@@ -2,8 +2,10 @@ package z3s5
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	seq "github.com/jirenius/taskqueue"
@@ -63,6 +65,29 @@ func (rt *BasicRuntime) Enqueue(f func()) {
 
 var _ Runtime = &BasicRuntime{}
 
+// SimpleColor is to simpify 8-bit color handling. It's an ad hoc structure.
+type Color struct {
+	R    uint8
+	G    uint8
+	B    uint8
+	A    uint8
+	Used bool
+}
+
+func (c Color) String() string {
+	if !c.Used {
+		return ""
+	}
+	return fmt.Sprintf("%v %v %v 255", c.R, c.G, c.B)
+}
+
+func (c Color) RGBA() (uint32, uint32, uint32, uint32) {
+	return uint32(c.R), uint32(c.G), uint32(c.B), uint32(c.A)
+}
+
+var ColorWhite = Color{255, 255, 255, 255, true}
+var ColorBlack = Color{0, 0, 0, 255, true}
+
 // BasicEditor provides only basic string entering for a REPL.
 type BasicEditor struct {
 	reader   *bufio.Reader
@@ -70,8 +95,8 @@ type BasicEditor struct {
 	err      *bufio.Writer
 	cb       func()
 	s        string
-	fgCol    string
-	bgCol    string
+	fgCol    Color
+	bgCol    Color
 	colorSet bool
 }
 
@@ -86,20 +111,36 @@ func NewBasicEditor() *BasicEditor {
 }
 
 func (ed *BasicEditor) Print(s string) (int, int) {
+	lines := strings.Count(s, "\n")
 	ed.writer.WriteString(s)
 	ed.writer.Flush()
-	return 1, 1
+	return lines, lines
 }
 
-func (ed *BasicEditor) SetColor(bg bool, r, g, b, a uint8) {
+func (ed *BasicEditor) SetColor(bg bool, color Color) {
 	ed.colorSet = true
+	if bg {
+		ed.bgCol = color
+		return
+	}
+	ed.fgCol = color
 }
 
-func (ed *BasicEditor) Color(bg bool) (uint8, uint8, uint8, uint8) {
+func (ed *BasicEditor) Color(bg bool) Color {
 	if bg {
-		return 0, 0, 0, 255
+		if ed.colorSet {
+			return ed.bgCol
+		}
+		return ColorWhite
 	}
-	return 255, 255, 255, 255
+	if ed.colorSet {
+		return ed.fgCol
+	}
+	return ColorBlack
+}
+
+func (ed *BasicEditor) ResetColor() {
+
 }
 
 func (ed *BasicEditor) StartInput(cb func()) {

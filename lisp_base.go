@@ -2178,6 +2178,18 @@ func (interp *Interp) Define_Base() {
 		return AsLispBool(result.(bool))
 	})
 
+	// (out datum) prints a datum to the runtime output (which may not be the OS console).
+	interp.Def("out", 1, func(a []any) any {
+		interp.Print(Str2(a[0], false))
+		return Void
+	})
+
+	// (out* datum) prints datum to the runtime output like out but quoting strings.
+	interp.Def("out*", 1, func(a []any) any {
+		interp.Print(Str2(a[0], true))
+		return Void
+	})
+
 	// (expand-macros expr) => expr
 	interp.Def("expand-macros", 1, func(a []any) any {
 		return interp.ExpandMacros(a[0], 200)

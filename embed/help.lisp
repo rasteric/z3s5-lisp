@@ -1052,11 +1052,11 @@
 
 (defhelp color
     (use "(color sel) => (r g b a)")
-  (info "Return the color based on #sel, which may be 'text for the text color, 'back for the background color, 'textarea for the color of the text area, 'gfx for the current graphics foreground color, and 'frame for the frame color.")
+  (info "Return the color based on #sel, which may be 'text for the text color, 'back for the background color, 'textarea for the color of the text area, 'gfx for the current graphics foreground color, and 'frame for the frame color. In standard Z3S5 Lisp only 'text and 'back are available as selectors and implementations are free to ignore these.")
   (type proc)
   (topic (ui console))
   (arity 1)
-  (see (set-color the-color with-colors)))
+  (see (set-color reset-color the-color with-colors)))
 
 (defhelp set-color
     (use "(set-color sel colorlist)")
@@ -1064,7 +1064,15 @@
   (type proc)
   (topic (ui console))
   (arity 1)
-  (see (color the-color with-colors)))
+  (see (color reset-color the-color with-colors)))
+
+(defhelp reset-color
+    (use "(reset-color)")
+  (info "Reset the 'text and 'back colors of the display to default values. These values are not specified in the color database and depend on the runtime implementation. Other colors like 'gfx or 'frame are not affected.")
+  (type proc)
+  (topic (ui console))
+  (arity 0)
+  (see (set-color color the-color with-colors)))
 
 (defhelp rnd
     (use "(rnd prng) => num")

@@ -2108,6 +2108,7 @@ func (interp *Interp) EvalString(s string) (any, error) {
 	reader := NewReader(strings.NewReader(s))
 	x, err := reader.Read()
 	if err != nil {
+		interp.HandleError(err)
 		return Void, err.(error)
 	}
 	if x == EofToken {
@@ -2118,6 +2119,12 @@ func (interp *Interp) EvalString(s string) (any, error) {
 		return Void, err.(error)
 	}
 	return result, nil
+}
+
+// Print outputs a string according using the runtime EditorInterface Print function. This is equivalent to
+// using (out datum) on the Lisp side.
+func (interp *Interp) Print(s string) {
+	interp.pc.EditorInterface().Print(s)
 }
 
 // Main runs each element of args as a name of Lisp script file.

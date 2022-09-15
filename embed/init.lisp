@@ -8,9 +8,6 @@
   `(cond
      ((permission? ,perm) ,@body)))
 
-(defun out (s)
- (void (princ s)))
-
 (defun protect (&rest symbols)
   (cond
     ((permission? 'allow-protect) (list-foreach symbols _protect))
@@ -5272,7 +5269,7 @@
 (expect-ok (unbind '_teststruct)(unbind '_testrecord)(unbind '_testclass1)(unbind '_testclass2)
 	   (unbind '_obj1)(unbind '_obj2))
 
-(defun type-of (datum)
+(defun type-of* (datum)
   (cond
     ((sym? datum) 'sym)
     ((list? datum) 'list)
@@ -5288,13 +5285,26 @@
     ((macro? datum) 'macro)
     (t 'unknown)))
 
-(defhelp type-of
-    (use "(type-of datum) => sym")
+(defhelp type-of*
+    (use "(type-of* datum) => sym")
   (info "Return the type of #datum as a symbol. This uses existing predicates and therefore is not faster than testing with predicates directly.")
   (type proc)
   (arity 1)
   (topic (lisp))
   (see (num? str? sym? list? array? bool? eof? boxed? intrinsic? closure? macro? blob?)))
+
+(defmacro type-of (datum)
+  `(cond
+     ((and (sym? ',datum)(not (bound? ,datum))) 'unbound)
+     (t (type-of* ,datum))))
+
+(defhelp type-of
+    (use "(type-of datum) => sym")
+  (info "Returns the type of #datum as symbol like type-of* but without having to quote the argument. If #datum is an unbound symbol, then this macro returns 'unbound. Otherwise the type of a given symbol's value or the type of a given literal is returned.")
+  (type macro)
+  (arity 1)
+  (topic (lisp))
+  (see (type-of*)))
 
 ;;; PREAMBLE END
 
