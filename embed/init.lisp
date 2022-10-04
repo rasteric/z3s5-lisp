@@ -4646,7 +4646,7 @@
       (lambda (slot)
 	(unless (list? slot)
 	  (error "new: class %v, slots argument must be an alist, given %v with incorrect slot %v"))
-	(set d (car slot) (cadr slot))))
+	(set d (car slot) (eval (cadr slot)))))
      d)
    (gensym)))
 
@@ -5002,7 +5002,7 @@
 
 (defhelp new
     (use "(new class [props] ...)")
-  (info "Create a new object of class #class with initial property bindings #props clauses as remaining arguments. Each #props clause must be a list of the form (sym value) assigning #value to property #sym.")
+  (info "Create a new object of class #class with initial property bindings #props clauses as remaining arguments. Each #props clause must be a list of the form (sym value), where #sym is a symbol and #value is evaluated first before it is assigned to #sym.")
   (type macro)
   (topic (oop))
   (arity -2)
@@ -5305,6 +5305,178 @@
   (arity 1)
   (topic (lisp))
   (see (type-of*)))
+
+;;; Actions: a plugin system for Z3S5 Lisp - Go interaction.
+;;;
+;;; This system requires the implementation of functions for the actual
+;;; interaction between Lisp and Go within the Go implementation.
+;;; The initialization checks for the presense of these callback functions.
+
+(set-help-topic-info 'action
+		     "Actions"
+		     "This section concerns the action class and related functions. Actions can be used as an asynchronous interface to the host system, provided the functions action.start, action.progress, action.result, action.error, and action.get-args are defined. These functions serve as callbacks into the Go part and need to be implemented on the Go side by the user of the action system. Once these are available, instances of the action class can execute arbitrary functions asynchronously using action-start and action-stop, which run and stop tasks calling the objects proc procedure. This procedure takes an action and a taskid and performs the action. To make action-stop work, you have listen to the 'stop message using task-recv and shutdown the action appropriately. While the action runs, periodically call action.progress. Call action.result once the action ends and action.error if an error occurs that does not allow the action to complete. Use action.get-args to obtain the arguments of the action, which must be an array of valid Z3S5 Lisp objects. The host system might e.g. prompt the user for values, or these may depend on selected objects in a GUI interface.")
+
+(defclass action ()
+  id     ; a unique ID
+  info   ; a user-readable info string for the action
+  name   ; the action's name as string; a name is an action type, the id makes the action unique
+  (argspec #()) ; an implementation-specific specification of the argument types and arity the action requires
+  (args #())   ; the arguments of the action, which must be in the format required by argspec
+  result ; the initially empty result of the action
+  error  ; an error message if there was an error, "" otherwise
+  state  ; an arbitrary state variable
+  task   ; a task that is running the action asynchronously
+  (proc (lambda (action taskid) (error (fmt "action %v is not implemented" (action-namestr action))))))
+
+(defhelp action
+    (use "(new action <info-clause> <name-clause> <proc-clause> ...) => action")
+  (type class)
+  (arity 0)
+  (topic (action system))
+  (info "The action class describes instances of actions that serve as plugins for the system hosting Z3S5 Lisp. Each action has a #name and #info string property and a unique #id. Property #args is an array that specifies the type of arguments of the action. This may be used by an implementation of action.get-args. The #proc property must be a function taking the action and a task-id as argument and processing the action sequentially until it is completed or #task-recv returns the 'stop signal. An action may store the result of computation in the #result property, an error in the #error property, and an arbitrary state in the #state property. After processing or if an error occurs, action.result should be called so the host can process the result or error. The action system requires the implementation of procedures action.start, action.progress, action.get-args, and action.result. These are usually defined in the host system, for example in the Go implementation of an application using Z3S5 Lisp actions, and serve as callback functions from Lisp to Go.")
+  (see (action action-stop action.start action.progress action.get-args action.result)))
+
+(defmethod action-start (this)
+  (setprop this 'id (gensym))
+  (setprop this 'args (action.get-args this (prop this 'name)(prop this 'id)(prop this 'argspec)))
+  (action.start this (prop this 'name)(prop this 'id))
+  (setprop this 'task
+	     (task 'remove (lambda (task-id) ((prop this 'proc) this task-id))))
+  (task-run (prop this 'task)))
+
+(defhelp action-start
+    (use "(action-start action)")
+  (info "Start #action, which runs the action's #proc in a task with the action and a task-id as argument. The #proc of the #action should periodically check for the 'stop signal using #task-recv if the action should be cancellable, should call action.progress to report progress, action.error in case of an error, and action.result to report the result.")
+  (topic (action system))
+  (type method)
+  (arity 1)
+  (see (action action-stop action.start action.progress action.get-args action.result)))
+
+(defmethod action-namestr (this)
+  (fmt "\"%v\" %v" (prop this 'name)(prop this 'id)))
+
+(defhelp action-namestr
+    (use "(action-namestr action) => str")
+  (info "Return a canonical name string for the #action, which contains both the action's name and its ID.")
+  (type method)
+  (arity 1)
+  (topic (action system))
+  (see (action action-stop action.start action.progress action.get-args action.result)))
+
+(defmethod action-stop (this)
+  (unless (prop this 'task)
+    (error (fmt "action %v has not been initialized and started yet" (action-namestr this))))
+  (task-send (prop this 'task) 'stop))
+
+(defhelp action-stop
+    (use "(action-stop action)")
+  (info "The stop method sends a 'stop signal to the action's running #proc. It is up to the #proc to check for the signal using #task-recv and terminate the action gracefully.")
+  (type method)
+  (arity 1)
+  (topic (action system))
+  (see (action action-stop action.start action.progress action.get-args action.result)))
+
+(defhelp action.start
+    (use "(action.start action name id)")
+  (info "Used to notify the host system that #action with #name and #id has been started. The second and third argument are provided for convenience, since processing a #name string and an #id symbol is much easier for a dispatch function in Go than the #action itself, which is an object instance and internally represented as a complex array.")
+  (type proc)
+  (arity 3)
+  (topic (action system))
+  (see (action action-stop action.start action.progress action.get-args action.result)))
+
+(defhelp action.progress
+    (use "(action.progress action name id perc msg)")
+  (info "Used to notify the host system from within a running #proc that #action with #name and #id is making progress to #perc (a float between 0 and 1) with a message #msg. Leave the message string empty if it is not needed. Implemented in the host system in Go, this function may, for instance, display a progress bar to inform an end-user.")
+  (type proc)
+  (arity 5)
+  (topic (action system))
+  (see (action action-stop action.start action.progress action.get-args action.result)))
+
+(defhelp action.get-args
+    (use "(action.get-args action name id arg-spec) => array")
+  (info "Used to request an array of arguments for #action with #name and #id from the host system, according to the specification given in #arg-spec, which is usually the same as #argspec.")
+  (type proc)
+  (arity 4)
+   (topic (action system))
+   (see (action action-stop action.start action.progress action.get-args action.result)))
+
+(defhelp action.result
+    (use "(action.result action name id result error?)")
+  (info "Used to notify the host system of the result of #action with #name and #id. The #result may be of any type, but #error? needs to be a bool that indicates whether an error has occured. If #error? is not nil, then the host implementation should interpret #result as an error message.")
+  (type proc)
+  (arity 5)
+  (topic (action system))
+    (see (action action-stop action.start action.progress action.get-args action.result)))
+  
+
+(defun has-action-system? ()
+  (if (member 'action *reflect*) t nil))
+
+(defhelp has-action-system?
+    (use "(has-action-system?) => bool")
+  (info "This predicate is true if the action system is available, #false otherwise.")
+  (type proc)
+  (topic (action system))
+  (arity 0)
+  (see (action init-actions action-start action-stop registered-actions register-action)))
+
+;;; Required host functions are:
+;;; (action.start action name id) notify that action with #name and #id is started
+;;; (action.progress action name id perc msg) notify that action with name, #id is progressing as #msg and finished to #perc percent (float)
+;;; (action.result action name id result error?) notify that action #name and #id has finished with #result or whether an error has occured, in case of which #error? is true.
+;;; (action.get-args action name id args) => array obtain an array of arguments for action with #name and #id.
+(defun init-actions ()
+  (cond
+    ((and (bound? action.start)
+	       (bound? action.progress)
+	       (bound? action.result)
+	       (bound? action.get-args))
+     (warn "init-actions: the action system is not available; it requires defined functions action.start, action.progress, action.result, and action.get-args, but one or more of these functions is not defined or 'action is not a member of *reflect*.")))
+  (setq *reflect* (cons 'action *reflect*)))
+
+(defhelp init-actions
+    (use "(init-actions)")
+  (info "Initialize the action system, signals an error if the action system is not available.")
+  (type proc)
+  (arity 0)
+  (topic (action system))
+  (see (action has-action-system? action-start action-stop)))
+
+(defun _test-actions ()
+  (let ((protected (protected? '*reflect*)))
+    (unprotect '*reflect*)
+    (setq *reflect* (cons 'action *reflect*))
+    (defun action.start (action name id)
+      (sysmsg (fmt "starting action %v" (action-namestr action))))
+    (defun action.progress (action name id perc msg)
+      (sysmsg (fmt "action progress %v: %v%% - %v" (action-namestr action) (int (* perc 100)) msg)))
+    (defun action.get-args (action name id args)
+      nil)
+    (defun action.result (action name id result)
+      (sysmsg (fmt "action result %v: %v" (action-namestr action) result)))
+    (init-actions)
+    (when protected (protect '*reflect*))))
+
+(defun _action-testproc (action taskid)
+  (letrec ((n 0)
+	   (done (lambda () (action.result action (prop action 'name)(prop action 'id) 'done)))
+	   (doit (lambda (n)
+		   (cond
+		     ((equal? (task-recv taskid) 'stop) (done))
+		     ((= n 50) (done))
+		     (t
+		      (action.progress action (prop action 'name)(prop action 'id) (/ n 50) "doing something")
+		      (sleep 500)
+		      (doit (add1 n)))))))
+    (doit 0)
+    (done)))
+
+(setq _testaction
+      (new action
+	   (info "Perform a test action.")
+	   (name "test")
+	   (state 0)
+	   (proc  _action-testproc)))
 
 ;;; PREAMBLE END
 

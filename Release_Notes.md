@@ -1,5 +1,15 @@
 # Version History
 
+## Version 2.3.10
+
+Build tags: `db fts` for Sqlite3 support, `fileio` for file access.
+
+- Added OOP module 'oop, a simple object-oriented framework.
+
+- Added experimental support for actions, which provide an OOP way to interface with the Go host implementation.
+
+- Fixed bugs in the OOP implementation.
+
 ## Version 2.3.8
 
 Build tags: `db fts` for Sqlite3 support, `fileio` for file access.
