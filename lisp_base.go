@@ -979,12 +979,12 @@ func (interp *Interp) Define_Base() {
 		return a[0].([]any)[n[0]:n[1]]
 	})
 
-	// (array-len arr) ==> int returns the length of the array.
+	// (array-len arr) => int returns the length of the array.
 	interp.Def("array-len", 1, func(a []any) any {
 		return goarith.AsNumber(len(a[0].([]any)))
 	})
 
-	// (array-append arr v)
+	// (array-append arr v) => array
 	interp.Def("array-append", 2, func(a []any) any {
 		arr := a[0].([]any)
 		arr = append(arr, a[1])

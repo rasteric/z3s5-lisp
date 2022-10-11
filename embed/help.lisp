@@ -1289,15 +1289,23 @@
   (type proc)
   (topic (array))
   (arity 2)
-  (see (array array?)))
+  (see (array array? array-slice array-append array-copy)))
 
 (defhelp array-slice
     (use "(array-slice arr low high) => array")
-  (info "Slice the array #arr starting from #low (inclusive) and ending at #high (exclusive) and return the slice.")
+  (info "Slice the array #arr starting from #low (inclusive) and ending at #high (exclusive) and return the slice. This function is destrcutive and mutates the slice. Use array-copy if you need a copy.")
   (type proc)
   (topic (array))
   (arity 3)
-  (see (array-ref array-len)))
+  (see (array-ref array-len array-append build-array array array-copy)))
+
+(defhelp array-append
+    (use "(array-append arr elem) => array")
+  (info "Append #elem to the array #arr. This function is destructive and mutates the array. Use array-copy if you need a copy.")
+  (type proc)
+  (topic (array))
+  (arity 2)
+  (see (array-ref array-len build-array array-slice array array-copy)))
 
 (defhelp array-len
     (use "(array-len arr) => int")

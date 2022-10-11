@@ -12,6 +12,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"math/big"
 	"math/rand"
 	"os"
@@ -2119,6 +2120,17 @@ func (interp *Interp) EvalString(s string) (any, error) {
 		return Void, err.(error)
 	}
 	return result, nil
+}
+
+// EvalFile evaluates a file, returns true if no error has occurred and false if an error has occurred.
+func (interp *Interp) EvalFile(path string) bool {
+	input, err := os.Open(path)
+	defer input.Close()
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	return interp.Run(input)
 }
 
 // Print outputs a string according using the runtime EditorInterface Print function. This is equivalent to

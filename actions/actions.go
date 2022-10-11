@@ -1,0 +1,233 @@
+// Package actions contains helper functions for implementing actions (plugins) in a program using
+// Z3S5 Lisp. The Go wrapper of an action takes a base directory and the name of an action, which must
+// be a string containing only unicode letters, digits, and the underscore character. The action directory
+// is created at relpath/action-name/. This directory must contain a file action.lisp that can be loaded
+// as a library using `(load 'action-name)` and must register the action under its name when `(action-name.run)`
+// is called. The function `action.Load()` does exactly this. The function `action.Run()` runs the action
+// by looking it up in the action registry `*actions*` and starting it via `action-start`.
+//
+// Each action must for itself call the respective action.progress and action.result functions of the host
+// system to allow Go feedback. Note that `action-start` executes an action asynchronously in a task. The
+// action's `proc` should check and react to the 'stop signal using `task-recv`.
+//
+// The action system assumes that other information such as an action's icon is available in the action
+// directory. All data of an action must be kept within the action's local directory.
+//
+// Actions reside within the base directory within directories with the action name (case insensitive). When an
+// action is renamed, it is both renamed in the Lisp system where it is registered and on disk by renaming
+// the directory. Although this is cumbersome and a bit more error-prone, this and additional checks guarantee that
+// each action resides in a directory of its own name and has a unique name within the system. The action id is only
+// used for faster access internally. This keeps action directories user-maintainable and readable.
+package actions
+
+import (
+	"errors"
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+	"strings"
+	"unicode"
+
+	z3 "github.com/rasteric/z3s5-lisp"
+)
+
+var ErrInvalidActionName = errors.New("a new action could not be created because its name is not valid")
+var ErrDuplicateActionDir = errors.New("an action could not be created or renamed because the action directory is already in use")
+var ErrDuplicateActionName = errors.New("an action with that name is already registered")
+var ErrRenameActionFailed = errors.New("renaming an action has failed")
+
+type Action struct {
+	name string
+	id   string
+	path string
+}
+
+// IsValidActionName returns true if the given name is a valid name for an action.
+// This function is very strict and only allows unicode letters, digits, _ and -.
+func IsValidActionName(name string) bool {
+	runes := []rune(name)
+	for _, r := range runes {
+		if !IsValidActionNameRune(r) {
+			return false
+		}
+	}
+	return true
+}
+
+// IsValidFilenameRune returns true if the given rune is a valid file name component,
+// according to some very strict rules that only allows letters, digits, score, and the underscore.
+func IsValidActionNameRune(r rune) bool {
+	return unicode.IsLetter(r) || unicode.IsNumber(r) || r == '_' || r == '-'
+}
+
+// SubdirAvailable returns true if a subdir of root with the given name already exists.
+// This function checks for any case-variants of name even on case-sensitive filesystems.
+// If a filesystem error occurs, this function returns true and the error.
+func SubdirNameTaken(root string, name string) (bool, error) {
+	infos, err := os.ReadDir(root)
+	if err != nil {
+		return true, err
+	}
+	found := false
+	for _, info := range infos {
+		if strings.EqualFold(info.Name(), name) {
+			found = true
+			break
+		}
+	}
+	if found {
+		return true, nil
+	}
+	return false, nil
+}
+
+// HasAction returns true if the given interpreter has an action registered with the given
+// name. An error and true is returned when an error occurs.
+func HasAction(interp *z3.Interp, name string) (bool, error) {
+	b, err := interp.EvalString(fmt.Sprintf("(has-action? \"%v\")", name))
+	if err != nil {
+		return true, err
+	}
+	hasAction, ok := b.(bool)
+	if ok && hasAction {
+		return true, ErrDuplicateActionName
+	}
+	return false, nil
+}
+
+// NewAction creates a new action based on basedir and the given name, which must be a valid
+// subdirectory in basedir that must contain a proper program.lisp file containing
+// a matching action registered with a name that is case-insensitive equal to the directory name.
+// In other words, the action in Lisp must be defined with a name that matches the subdirectory name.
+// This makes renaming actions harder but makes the directory structure much more readable and human
+// editable. It is always basedir/action1, basedir/action2, and so on, and each action name
+// may only contain alphanumeric characters, _, and -. See action.Rename() for the renaming of
+// an action, which involves renaming the directory.
+func NewAction(interp *z3.Interp, basedir string, name string) (*Action, error) {
+	if !IsValidActionName(name) {
+		return nil, ErrInvalidActionName
+	}
+	if ok, _ := HasAction(interp, name); ok {
+		return nil, ErrDuplicateActionName
+	}
+	if taken, _ := SubdirNameTaken(basedir, name); taken {
+		return nil, ErrDuplicateActionDir
+	}
+	dir := filepath.Join(basedir, name)
+	a := &Action{
+		name: name,
+		path: dir,
+	}
+	if err := a.load(interp); err != nil {
+		return a, err
+	}
+	return a, nil
+}
+
+// Name returns the name of the action.
+func (a *Action) Name() string {
+	return a.name
+}
+
+// Path returns the action's path.
+func (a *Action) Path() string {
+	return a.path
+}
+
+// Id returns the action's identity string, a GUI nonce.
+func (a *Action) Id() string {
+	return a.id
+}
+
+// Rename renames the action to the given name. This changes the actions file path and may fail if the new
+// name is not valid.
+func (a *Action) Rename(interp *z3.Interp, newName string) error {
+	// check the new name is valid
+	if !IsValidActionName(newName) {
+		return ErrInvalidActionName
+	}
+
+	// check the new name isn't alrady taken on the file system
+	dir := filepath.Dir(a.path)
+	taken, err := SubdirNameTaken(dir, newName)
+	if err != nil {
+		return err
+	}
+	if taken {
+		return ErrDuplicateActionDir
+	}
+
+	// check the new name isn't already taken on the Lisp side
+	hasAction, err := HasAction(interp, newName)
+	if err != nil {
+		return err
+	}
+	if hasAction {
+		return ErrDuplicateActionName
+	}
+
+	// rename on the Lisp side
+	result, err := interp.EvalString(fmt.Sprintf("(rename-action \"%v\" \"%v\")", a.id, newName))
+	if err != nil {
+		return err
+	}
+	renameSuccess, ok := result.(bool)
+	if !(ok && renameSuccess) {
+		return ErrRenameActionFailed
+	}
+
+	// rename on the file system
+	newPath := filepath.Join(dir, newName)
+	err = os.Rename(a.path, newPath)
+	if err != nil {
+		return err
+	}
+	a.path = newPath
+
+	// we got here, so it's a success
+	a.name = newName
+	return nil
+}
+
+// load loads the action into the given interpreter, making it available for running it.
+// This function loads the source code of the action and makes it ready for execution.
+func (a *Action) load(interp *z3.Interp) error {
+	path := filepath.Join(a.path, "program.lisp")
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return fmt.Errorf("invalid action, missing program file \"%v\": %w", path, err)
+	}
+	// execute the file
+	if !interp.EvalFile(path) {
+		return fmt.Errorf("loading action \"%v\" failed; the action is invalid because a script error occurred", filepath.Base(path))
+	}
+	// load the action's name and id (cached because access is very slow)
+	n, err := interp.EvalString("(action-name *provided-action*)")
+	if err != nil {
+		return fmt.Errorf("invalid action \"%v\"; the name could not be retrieved: %w", filepath.Base(path), err)
+	}
+	name, ok := n.(string)
+	if !ok {
+		return fmt.Errorf("invalid action \"%v\"; the name could not be retrieved", filepath.Base(path))
+	}
+	if !strings.EqualFold(name, a.name) {
+		log.Printf("WARN the action \"%v\" has a path that does not match its name (this shoudl be avoided): %v", name, a.name)
+	}
+	a.name = name
+	id, err := interp.EvalString("(action-id *provided-action*)")
+	if err != nil {
+		return fmt.Errorf("invalid action \"%v\"; the ID could not be retrieved: %w", name, err)
+	}
+	idstr, ok := id.(string)
+	if !ok {
+		return fmt.Errorf("invalid action \"%v\"; the ID could not be retrieved", name)
+	}
+	a.id = idstr
+	return nil
+}
+
+// Run runs the action, which must take care of progress and reporting the result.
+func (a *Action) Run(interp *z3.Interp) error {
+	_, err := interp.EvalString(fmt.Sprintf("(action-start (get-action \"%v\"))", a.id))
+	return err
+}
