@@ -1,8 +1,8 @@
 // Package actions contains helper functions for implementing actions (plugins) in a program using
 // Z3S5 Lisp. The Go wrapper of an action takes a base directory and the name of an action, which must
 // be a string containing only unicode letters, digits, and the underscore character. The action directory
-// is created at relpath/action-name/. This directory must contain a file action.lisp that can be loaded
-// as a library using `(load 'action-name)` and must register the action under its name when `(action-name.run)`
+// is created at relpath/action-name/. This directory must contain a file program.lisp that can be loaded
+// as a library using `(load 'action-name)` and must register the action under its name when `(<action-name>.run)`
 // is called. The function `action.Load()` does exactly this. The function `action.Run()` runs the action
 // by looking it up in the action registry `*actions*` and starting it via `action-start`.
 //
@@ -195,11 +195,14 @@ func (a *Action) load(interp *z3.Interp) error {
 		return fmt.Errorf("invalid action, missing program file \"%v\": %w", path, err)
 	}
 	// execute the file
-	if !interp.EvalFile(path) {
+	if _, err := interp.EvalString(fmt.Sprintf("(load '%v \"%v\")", a.Name(), path)); err != nil {
 		return fmt.Errorf("loading action \"%v\" failed; the action is invalid because a script error occurred", filepath.Base(path))
 	}
+	if _, err := interp.EvalString(fmt.Sprintf("(%v.run)", a.Name())); err != nil {
+		return fmt.Errorf("loading action \"%v\" failed; no run function or error in run function", filepath.Base(path))
+	}
 	// load the action's name and id (cached because access is very slow)
-	n, err := interp.EvalString("(action-name *provided-action*)")
+	n, err := interp.EvalString("(prop *provided-action* 'name)")
 	if err != nil {
 		return fmt.Errorf("invalid action \"%v\"; the name could not be retrieved: %w", filepath.Base(path), err)
 	}
@@ -211,7 +214,7 @@ func (a *Action) load(interp *z3.Interp) error {
 		log.Printf("WARN the action \"%v\" has a path that does not match its name (this shoudl be avoided): %v", name, a.name)
 	}
 	a.name = name
-	id, err := interp.EvalString("(action-id *provided-action*)")
+	id, err := interp.EvalString("(prop *provided-action* 'id)")
 	if err != nil {
 		return fmt.Errorf("invalid action \"%v\"; the ID could not be retrieved: %w", name, err)
 	}
