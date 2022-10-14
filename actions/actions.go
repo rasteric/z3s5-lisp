@@ -111,9 +111,6 @@ func NewAction(interp *z3.Interp, basedir string, name string) (*Action, error) 
 	if ok, _ := HasAction(interp, name); ok {
 		return nil, ErrDuplicateActionName
 	}
-	if taken, _ := SubdirNameTaken(basedir, name); taken {
-		return nil, ErrDuplicateActionDir
-	}
 	dir := filepath.Join(basedir, name)
 	a := &Action{
 		name: name,

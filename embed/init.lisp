@@ -5456,7 +5456,7 @@
   (see (action has-action-system? action-start action-stop register-action)))
 
 (defun has-action? (name)
-  (if (member name (map (dict->values *actions*) action-name))
+  (if (member name (map (dict->values *actions*) (lambda (x) (prop x 'name))))
       t
       nil))
 
@@ -5520,6 +5520,8 @@
 	   (name "test")
 	   (state 0)
 	   (proc  _action-testproc)))
+
+(_test-actions)
 
 ;;; PREAMBLE END
 
