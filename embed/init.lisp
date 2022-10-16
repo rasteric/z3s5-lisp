@@ -5319,6 +5319,7 @@
 (defclass action ()
   id     ; a unique ID
   name   ; a user-readable name for the action type
+  prefix ; a user-readable prefix (category) string for the action type
   info   ; a user-readable info string for the action
   (argspec #()) ; an implementation-specific specification of the argument types and arity the action requires
   (args #())   ; the arguments of the action, which must be in the format required by argspec
@@ -5333,14 +5334,14 @@
   (type class)
   (arity 0)
   (topic (action system))
-  (info "The action class describes instances of actions that serve as plugins for the system hosting Z3S5 Lisp. Each action has a #name and #info string property and a unique #id. Property #args is an array that specifies the type of arguments of the action. This may be used by an implementation of action.get-args. The #proc property must be a function taking the action and a task-id as argument and processing the action sequentially until it is completed or #task-recv returns the 'stop signal. An action may store the result of computation in the #result property, an error in the #error property, and an arbitrary state in the #state property. After processing or if an error occurs, action.result should be called so the host can process the result or error. The action system requires the implementation of procedures action.start, action.progress, action.get-args, and action.result. These are usually defined in the host system, for example in the Go implementation of an application using Z3S5 Lisp actions, and serve as callback functions from Lisp to Go.")
+  (info "The action class describes instances of actions that serve as plugins for the system hosting Z3S5 Lisp. Each action has a #name, #prefix and #info string property and a unique #id. Property #args is an array that specifies the type of arguments of the action. This may be used by an implementation of action.get-args. The #proc property must be a function taking the action and a task-id as argument and processing the action sequentially until it is completed or #task-recv returns the 'stop signal. An action may store the result of computation in the #result property, an error in the #error property, and an arbitrary state in the #state property. After processing or if an error occurs, action.result should be called so the host can process the result or error. The action system requires the implementation of procedures action.start, action.progress, action.get-args, and action.result. These are usually defined in the host system, for example in the Go implementation of an application using Z3S5 Lisp actions, and serve as callback functions from Lisp to Go.")
   (see (action action-stop action.start action.progress action.get-args action.result)))
 
 (defmethod action-start (this)
-  (setprop this 'args (action.get-args (prop this 'name)(prop this 'id)(prop this 'argspec)))
+  (setprop this 'args (action.get-args (prop this 'prefix)(prop this 'name)(prop this 'id)(prop this 'argspec)))
   (setprop this 'taskid
 	   (task 'remove (lambda (task-id) ((prop this 'proc) this task-id))))
-  (action.start (prop this 'name)(prop this 'id)(prop this 'taskid))
+  (action.start (prop this 'prefix)(prop this 'name)(prop this 'id)(prop this 'taskid))
   (task-run (prop this 'taskid)))
 
 (defhelp action-start
@@ -5365,32 +5366,32 @@
   (see (action action-stop action.start action.progress action.get-args action.result)))
 
 (defhelp action.start
-    (use "(action.start name id taskid)")
-  (info "Used to notify the host system that the action with #name, #id, and #taskid has been started.")
+    (use "(action.start prefix name id taskid)")
+  (info "Used to notify the host system that the action with #prefix, #name, #id, and #taskid has been started.")
   (type proc)
   (arity 3)
   (topic (action system))
   (see (action action-stop action.start action.progress action.get-args action.result)))
 
 (defhelp action.progress
-    (use "(action.progress name id taskid perc msg)")
-  (info "Used to notify the host system from within a running #proc that the action with #name, #id, and #taskid is making progress to #perc (a float between 0 and 1) with a message #msg. Leave the message string empty if it is not needed. Implemented in the host system in Go, this function may, for instance, display a progress bar to inform an end-user.")
+    (use "(action.progress prefix name id taskid perc msg)")
+  (info "Used to notify the host system from within a running #proc that the action with #prefix, #name, #id, and #taskid is making progress to #perc (a float between 0 and 1) with a message #msg. Leave the message string empty if it is not needed. Implemented in the host system in Go, this function may, for instance, display a progress bar to inform an end-user.")
   (type proc)
   (arity 5)
   (topic (action system))
   (see (action action-stop action.start action.progress action.get-args action.result)))
 
 (defhelp action.get-args
-    (use "(action.get-args name id arg-spec) => array")
-  (info "Used to request an array of arguments for an action with #name and #id from the host system, according to the specification given in #arg-spec, which is usually the same as #argspec.")
+    (use "(action.get-args prefix name id arg-spec) => array")
+  (info "Used to request an array of arguments for an action with #prefix, #name and #id from the host system, according to the specification given in #arg-spec, which is usually the same as #argspec.")
   (type proc)
   (arity 3)
    (topic (action system))
    (see (action action-stop action.start action.progress action.get-args action.result)))
 
 (defhelp action.result
-    (use "(action.result name id taskid result error?)")
-  (info "Used to notify the host system of the result of an action with #name, #id, and #taskid. The #result may be of any type, but #error? needs to be a bool that indicates whether an error has occured. If #error? is not nil, then the host implementation should interpret #result as an error message.")
+    (use "(action.result prefix name id taskid result error?)")
+  (info "Used to notify the host system of the result of an action with #prefix, #name, #id, and #taskid. The #result may be of any type, but #error? needs to be a bool that indicates whether an error has occured. If #error? is not nil, then the host implementation should interpret #result as an error message.")
   (type proc)
   (arity 5)
   (topic (action system))
@@ -5455,14 +5456,15 @@
   (topic (action system))
   (see (action has-action-system? action-start action-stop register-action)))
 
-(defun has-action? (name)
-  (if (member name (map (dict->values *actions*) (lambda (x) (prop x 'name))))
-      t
-      nil))
+(defun has-action? (prefix name)
+  (let ((prefixed-name (str+ prefix "." name)))
+    (if (member prefixed-name (map (dict->values *actions*) (lambda (x) (str+ (prop x 'prefix) "." (prop x 'name)))))
+	t
+	nil)))
 
 (defhelp has-action?
-    (use "(has-action? name) => bool")
-  (info "Return true if an action with the given name is registered, nil otherwise. Actions are indexec by id, so this is much slower than using #get-action to retrieve a registered action by the value of the 'id property.")
+    (use "(has-action? prefix name) => bool")
+  (info "Return true if an action with the given #prefix and #name is registered, nil otherwise. Actions are indexed by id, so this is much slower than using #get-action to retrieve a registered action by the value of the 'id property.")
   (type proc)
   (arity 1)
   (topic (action system))
@@ -5482,32 +5484,65 @@
   (type proc)
   (arity 2)
   (topic (action system))
-  (see (get-action has-action? action)))
+  (see (change-action-prefix change-all-action-prefixes get-action has-action? action)))
+
+(defun change-action-prefix (id new-prefix)
+  (cond
+    ((action? id) (setprop id 'prefix new-prefix) t)
+    (t (let ((a (get-action id)))
+	 (cond
+	   (a (setprop a 'prefix new-prefix) t)
+	   (t nil))))))
+
+(defhelp change-action-prefix
+    (use "(change-action-prefix id new-prefix) => bool")
+  (info "Change the prefix of a registered action with given #id, or change the prefix of action given by #id, to #new-prefix. If the operation succeeds, it returns true, otherwise it returns nil.")
+  (type proc)
+  (arity 2)
+  (topic (action system))
+  (see (change-all-action-prefixes rename-action get-action action? action)))
+
+(defun change-all-action-prefixes (old-prefix new-prefix)
+  (dict-map!
+   *actions*
+   (lambda (key action)
+     (cond
+       ((equal? (prop action 'prefix) old-prefix)
+	(setprop action 'prefix new-prefix) action)
+       (t action)))))
+	 
+(defhelp change-all-action-prefixes
+    (use "(change-all-action-prefixes old-prefix new-prefix)")
+  (info "Change the prefixes of all registered actions with #old-prefix to #new-prefix.")
+  (type proc)
+  (arity 2)
+  (topic (action system))
+  (see (change-action-prefix rename-action get-action register-action action? action)))
 
 (defun _test-actions ()
   (let ((protected (protected? '*reflect*)))
     (unprotect '*reflect*)
     (setq *reflect* (cons 'action *reflect*))
-    (defun action.start (name id taskid)
-      (sysmsg (fmt "starting action \"%v\" (id \"%v\") task %v" name id taskid)))
-    (defun action.progress (name id taskid perc msg)
-      (sysmsg (fmt "action progress \"%v\" (id \"%v\") task %v: %v%% - %v" name id taskid (int (* perc 100)) msg)))
-    (defun action.get-args (name id args)
+    (defun action.start (prefix name id taskid)
+      (sysmsg (fmt "starting action \"%v.%v\" (id \"%v\") task %v" prefix name id taskid)))
+    (defun action.progress (prefix name id taskid perc msg)
+      (sysmsg (fmt "action progress \"%v.%v\" (id \"%v\") task %v: %v%% - %v"prefix  name id taskid (int (* perc 100)) msg)))
+    (defun action.get-args (prefix name id args)
       nil)
-    (defun action.result (name id taskid result error?)
-      (sysmsg (fmt "action result \"%v\" (id \"%v\") task %v: %v %v" name id taskid result error?)))
+    (defun action.result (prefix name id taskid result error?)
+      (sysmsg (fmt "action result \"%v.%v\" (id \"%v\") task %v: %v %v" prefix name id taskid result error?)))
     (init-actions)
     (when protected (protect '*reflect*))))
 
 (defun _action-testproc (action taskid)
   (letrec ((n 0)
-	   (done (lambda () (action.result (prop action 'name)(prop action 'id) taskid 'done nil)))
+	   (done (lambda () (action.result (prop action 'prefix)(prop action 'name)(prop action 'id) taskid 'done nil)))
 	   (doit (lambda (n)
 		   (cond
 		     ((equal? (task-recv taskid) 'stop) (done))
 		     ((= n 50) (done))
 		     (t
-		      (action.progress (prop action 'name)(prop action 'id) taskid (/ n 50) "doing something")
+		      (action.progress (prop action 'prefix)(prop action 'name)(prop action 'id) taskid (/ n 50) "doing something")
 		      (sleep 500)
 		      (doit (add1 n)))))))
     (doit 0)

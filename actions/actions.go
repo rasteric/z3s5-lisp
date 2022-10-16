@@ -1,7 +1,7 @@
 // Package actions contains helper functions for implementing actions (plugins) in a program using
-// Z3S5 Lisp. The Go wrapper of an action takes a base directory and the name of an action, which must
-// be a string containing only unicode letters, digits, and the underscore character. The action directory
-// is created at relpath/action-name/. This directory must contain a file program.lisp that can be loaded
+// Z3S5 Lisp. The Go wrapper of an action takes a base directory, a prefix, and the name of an action. The last two must
+// be strings containing only unicode letters, digits, and the underscore character. The action directory
+// is created at relpath/prefix/action-name/. This directory must contain a file program.lisp that can be loaded
 // as a library using `(load 'action-name)` and must register the action under its name when `(<action-name>.run)`
 // is called. The function `action.Load()` does exactly this. The function `action.Run()` runs the action
 // by looking it up in the action registry `*actions*` and starting it via `action-start`.
@@ -13,10 +13,13 @@
 // The action system assumes that other information such as an action's icon is available in the action
 // directory. All data of an action must be kept within the action's local directory.
 //
-// Actions reside within the base directory within directories with the action name (case insensitive). When an
-// action is renamed, it is both renamed in the Lisp system where it is registered and on disk by renaming
-// the directory. Although this is cumbersome and a bit more error-prone, this and additional checks guarantee that
-// each action resides in a directory of its own name and has a unique name within the system. The action id is only
+// Actions reside within the base directory within directories with the prefix, and under this directory in
+// a directory with the action name (case insensitive). When an action is renamed, it is both renamed in the Lisp system where
+// it is registered and on disk by renaming the directory. Action prefixes can also be changed, which also requires
+// changing the action directory and the action prefixes on the Lisp side.
+//
+// Although this is cumbersome and a bit more error-prone, this and additional checks guarantee that
+// each action resides in a directory of its own name and has a unique name within the prefix directory. The action id is only
 // used for faster access internally. This keeps action directories user-maintainable and readable.
 package actions
 
@@ -36,11 +39,13 @@ var ErrInvalidActionName = errors.New("a new action could not be created because
 var ErrDuplicateActionDir = errors.New("an action could not be created or renamed because the action directory is already in use")
 var ErrDuplicateActionName = errors.New("an action with that name is already registered")
 var ErrRenameActionFailed = errors.New("renaming an action has failed")
+var ErrInvalidPrefixName = errors.New("a new action could not be created because the prefix is invalid")
 
 type Action struct {
-	name string
-	id   string
-	path string
+	name   string
+	prefix string
+	id     string
+	path   string
 }
 
 // IsValidActionName returns true if the given name is a valid name for an action.
@@ -61,10 +66,16 @@ func IsValidActionNameRune(r rune) bool {
 	return unicode.IsLetter(r) || unicode.IsNumber(r) || r == '_' || r == '-'
 }
 
+// IsValidPrefixName returns true if the given prefix string contains valid characters.
+// This currently has the same rules as action names, see IsValidActionName() for more info.
+func IsValidPrefixName(prefix string) bool {
+	return IsValidActionName(prefix)
+}
+
 // SubdirAvailable returns true if a subdir of root with the given name already exists.
 // This function checks for any case-variants of name even on case-sensitive filesystems.
 // If a filesystem error occurs, this function returns true and the error.
-func SubdirNameTaken(root string, name string) (bool, error) {
+func SubdirNameTaken(root, name string) (bool, error) {
 	infos, err := os.ReadDir(root)
 	if err != nil {
 		return true, err
@@ -101,20 +112,24 @@ func HasAction(interp *z3.Interp, name string) (bool, error) {
 // a matching action registered with a name that is case-insensitive equal to the directory name.
 // In other words, the action in Lisp must be defined with a name that matches the subdirectory name.
 // This makes renaming actions harder but makes the directory structure much more readable and human
-// editable. It is always basedir/action1, basedir/action2, and so on, and each action name
-// may only contain alphanumeric characters, _, and -. See action.Rename() for the renaming of
-// an action, which involves renaming the directory.
-func NewAction(interp *z3.Interp, basedir string, name string) (*Action, error) {
+// editable. It is always basedir/prefix/action1, basedir/prefix/action2, and so on, and each action name
+// and prefix may only contain alphanumeric characters, _, and -. See action.Rename() for the renaming of
+// an action, which involves renaming the action's directory.
+func NewAction(interp *z3.Interp, basedir, prefix, name string) (*Action, error) {
 	if !IsValidActionName(name) {
 		return nil, ErrInvalidActionName
+	}
+	if !IsValidPrefixName(prefix) {
+		return nil, ErrInvalidPrefixName
 	}
 	if ok, _ := HasAction(interp, name); ok {
 		return nil, ErrDuplicateActionName
 	}
-	dir := filepath.Join(basedir, name)
+	dir := filepath.Join(basedir, prefix, name)
 	a := &Action{
-		name: name,
-		path: dir,
+		name:   name,
+		prefix: prefix,
+		path:   dir,
 	}
 	if err := a.load(interp); err != nil {
 		return a, err
@@ -130,6 +145,11 @@ func (a *Action) Name() string {
 // Path returns the action's path.
 func (a *Action) Path() string {
 	return a.path
+}
+
+// Prefix returns the action's prefix.
+func (a *Action) Prefix() string {
+	return a.prefix
 }
 
 // Id returns the action's identity string, a GUI nonce.
