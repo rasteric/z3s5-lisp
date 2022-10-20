@@ -5556,8 +5556,6 @@
 	   (state 0)
 	   (proc  _action-testproc)))
 
-(_test-actions)
-
 ;;; PREAMBLE END
 
 ;;;  Copyright (c) 2019-2022 Erich Rast

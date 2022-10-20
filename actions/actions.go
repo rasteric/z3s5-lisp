@@ -29,6 +29,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"unicode"
 
@@ -41,12 +42,17 @@ var ErrDuplicateActionName = errors.New("an action with that name is already reg
 var ErrRenameActionFailed = errors.New("renaming an action has failed")
 var ErrInvalidPrefixName = errors.New("a new action could not be created because the prefix is invalid")
 
+// Action is a struct holding all data for an action, some of which is cached because
+// retrieving it from the interpreter every time is too inefficient.
 type Action struct {
 	name   string
 	prefix string
 	id     string
 	path   string
 }
+
+// Actions is an array of actions with some extra convenience methods.
+type Actions []*Action
 
 // IsValidActionName returns true if the given name is a valid name for an action.
 // This function is very strict and only allows unicode letters, digits, _ and -.
@@ -95,8 +101,8 @@ func SubdirNameTaken(root, name string) (bool, error) {
 
 // HasAction returns true if the given interpreter has an action registered with the given
 // name. An error and true is returned when an error occurs.
-func HasAction(interp *z3.Interp, name string) (bool, error) {
-	b, err := interp.EvalString(fmt.Sprintf("(has-action? \"%v\")", name))
+func HasAction(interp *z3.Interp, prefix, name string) (bool, error) {
+	b, err := interp.EvalString(fmt.Sprintf("(has-action? \"%v\" \"%v\")", prefix, name))
 	if err != nil {
 		return true, err
 	}
@@ -105,6 +111,27 @@ func HasAction(interp *z3.Interp, name string) (bool, error) {
 		return true, ErrDuplicateActionName
 	}
 	return false, nil
+}
+
+// ======
+// Action
+// ======
+
+// ComposeActionName returns a canonical action name composed out of prefix and name.
+// The name is specific to a particular platform.
+func ComposeActionName(prefix, name string) string {
+	return prefix + string(os.PathSeparator) + name
+}
+
+// StopActionTask request the interpreter to stop an action task by sending the 'stop signal.
+// This is a shortcut to avoid having to find the running copy of the action itself.
+// Use action.Stop() if you have the action available.
+func StopActionTask(interp *z3.Interp, taskid string) {
+	if _, err := strconv.Atoi(taskid); err != nil {
+		log.Printf("WARN StopActionTask: action taskid is not valid, given %v\n", taskid)
+		return
+	}
+	interp.EvalString(fmt.Sprintf("(task-send %v 'stop)", taskid))
 }
 
 // NewAction creates a new action based on basedir and the given name, which must be a valid
@@ -122,7 +149,7 @@ func NewAction(interp *z3.Interp, basedir, prefix, name string) (*Action, error)
 	if !IsValidPrefixName(prefix) {
 		return nil, ErrInvalidPrefixName
 	}
-	if ok, _ := HasAction(interp, name); ok {
+	if ok, _ := HasAction(interp, prefix, name); ok {
 		return nil, ErrDuplicateActionName
 	}
 	dir := filepath.Join(basedir, prefix, name)
@@ -152,6 +179,12 @@ func (a *Action) Prefix() string {
 	return a.prefix
 }
 
+// PrefixName returns the prefix plus the name as a path string
+// of the form prefix/name.
+func (a *Action) PrefixName() string {
+	return ComposeActionName(a.prefix, a.name)
+}
+
 // Id returns the action's identity string, a GUI nonce.
 func (a *Action) Id() string {
 	return a.id
@@ -176,7 +209,7 @@ func (a *Action) Rename(interp *z3.Interp, newName string) error {
 	}
 
 	// check the new name isn't already taken on the Lisp side
-	hasAction, err := HasAction(interp, newName)
+	hasAction, err := HasAction(interp, a.Prefix(), newName)
 	if err != nil {
 		return err
 	}
@@ -216,19 +249,19 @@ func (a *Action) load(interp *z3.Interp) error {
 	}
 	// execute the file
 	if _, err := interp.EvalString(fmt.Sprintf("(load '%v \"%v\")", a.Name(), path)); err != nil {
-		return fmt.Errorf("loading action \"%v\" failed; the action is invalid because a script error occurred", filepath.Base(path))
+		return fmt.Errorf("loading action \"%v\" failed; the action is invalid because a script error occurred", a.path)
 	}
 	if _, err := interp.EvalString(fmt.Sprintf("(%v.run)", a.Name())); err != nil {
-		return fmt.Errorf("loading action \"%v\" failed; no run function or error in run function", filepath.Base(path))
+		return fmt.Errorf("loading action \"%v\" failed; no run function or error in run function", a.path)
 	}
 	// load the action's name and id (cached because access is very slow)
 	n, err := interp.EvalString("(prop *provided-action* 'name)")
 	if err != nil {
-		return fmt.Errorf("invalid action \"%v\"; the name could not be retrieved: %w", filepath.Base(path), err)
+		return fmt.Errorf("invalid action \"%v\"; the name could not be retrieved: %w", a.path, err)
 	}
 	name, ok := n.(string)
 	if !ok {
-		return fmt.Errorf("invalid action \"%v\"; the name could not be retrieved", filepath.Base(path))
+		return fmt.Errorf("invalid action \"%v\"; the name could not be retrieved", a.path)
 	}
 	if !strings.EqualFold(name, a.name) {
 		log.Printf("WARN the action \"%v\" has a path that does not match its name (this shoudl be avoided): %v", name, a.name)
@@ -250,4 +283,73 @@ func (a *Action) load(interp *z3.Interp) error {
 func (a *Action) Run(interp *z3.Interp) error {
 	_, err := interp.EvalString(fmt.Sprintf("(action-start (get-action \"%v\"))", a.id))
 	return err
+}
+
+// Stop stops the action, which sends the 'stop message to the Lisp task.
+func (a *Action) Stop(interp *z3.Interp) error {
+	_, err := interp.EvalString(fmt.Sprintf("(action-stop (get-action \"%v\"))", a.id))
+	return err
+}
+
+// =======
+// Actions
+// =======
+
+func strAdd(s1, s2, sep string) string {
+	if s1 == "" {
+		return s2
+	}
+	s1 += sep
+	s1 += s2
+	return s1
+}
+
+// NewActions creates a new Actions array from all actions in the given basedir.
+// The directory structure is basedir/prefix/action. Any directory that doesn't have
+// a valid prefix name is skipped, e.g. directories with a dot in the name are ignored.
+// This function returns the Actions or nil, an error string, a string containing the
+// names of the actions that caused the error (if any, otherwise ""), and an error
+// count.
+func NewActions(interp *z3.Interp, basedir string) (Actions, string, string, int) {
+	prefixes, err := os.ReadDir(basedir)
+	if err != nil {
+		return nil, err.Error(), "", 1
+	}
+	actions := make(Actions, 0)
+	errcount := 0
+	errstr := ""
+	erractions := ""
+	for _, prefix := range prefixes {
+		if !IsValidPrefixName(prefix.Name()) {
+			continue
+		}
+		infos, err := os.ReadDir(filepath.Join(basedir, prefix.Name()))
+		if err != nil {
+			errcount++
+			errstr = strAdd(errstr, err.Error(), "; ")
+			return nil, errstr, erractions, errcount
+		}
+		for _, info := range infos {
+			path := filepath.Join(basedir, prefix.Name(), info.Name())
+			fileInfo, err := os.Stat(path)
+			if err != nil {
+				errcount++
+				errstr = strAdd(errstr, err.Error(), "; ")
+				erractions = strAdd(erractions, info.Name(), ", ")
+				return nil, errstr, erractions, errcount
+			}
+			if !fileInfo.IsDir() {
+				continue
+			}
+			action, err := NewAction(interp, basedir, prefix.Name(), info.Name())
+			if err != nil {
+				errcount++
+				errstr = strAdd(errstr, err.Error(), "; ")
+				erractions = strAdd(erractions, info.Name(), ", ")
+				continue
+			}
+			actions = append(actions, action)
+		}
+	}
+	return actions, errstr, erractions, errcount
 }
