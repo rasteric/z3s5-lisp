@@ -1,1 +1,1 @@
-(setq *z3s5-version* (str+ "2.3.10+" BUILT))
+(setq *z3s5-version* (str+ "2.3.11+" BUILT))

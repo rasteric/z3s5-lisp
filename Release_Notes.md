@@ -1,5 +1,16 @@
 # Version History
 
+## Version 2.3.11
+
+Build tags: `db fts` for Sqlite3 support, `fileio` for file access.
+
+- Fixed various bugs with actions. However, the API is not yet final.
+
+- Added EvalString to evaluate strings.
+
+- There is an open problem with (load ...) requiring fileio. This might change in future to allow loading libraries from local relative paths directly even when general fileio is not allowed.
+
+
 ## Version 2.3.10
 
 Build tags: `db fts` for Sqlite3 support, `fileio` for file access.
