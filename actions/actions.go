@@ -57,8 +57,7 @@ type Actions []*Action
 // IsValidActionName returns true if the given name is a valid name for an action.
 // This function is very strict and only allows unicode letters, digits, _ and -.
 func IsValidActionName(name string) bool {
-	runes := []rune(name)
-	for _, r := range runes {
+	for _, r := range name {
 		if !IsValidActionNameRune(r) {
 			return false
 		}

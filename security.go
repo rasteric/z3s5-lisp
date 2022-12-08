@@ -103,37 +103,37 @@ func (p Permissions) Set(perm string, v any) (Permissions, error) {
 	value, _ := v.(bool)
 	switch perm {
 	case "load-prelude":
-		if p.LoadPrelude == false && value == true {
+		if !p.LoadPrelude && value {
 			return p, ErrSecurityViolation
 		}
 		p.LoadPrelude = value
 	case "load-user-init":
-		if p.LoadUserInit == false && value == true {
+		if !p.LoadUserInit && value {
 			return p, ErrSecurityViolation
 		}
 		p.LoadUserInit = value
 	case "allow-unprotect":
-		if p.AllowUnprotect == false && value == true {
+		if !p.AllowUnprotect && value {
 			return p, ErrSecurityViolation
 		}
 		p.AllowUnprotect = value
 	case "allow-protect":
-		if p.AllowProtect == false && value == true {
+		if !p.AllowProtect && value {
 			return p, ErrSecurityViolation
 		}
 		p.AllowProtect = value
 	case "interactive":
-		if p.Interactive == false && value == true {
+		if !p.Interactive && value {
 			return p, ErrSecurityViolation
 		}
 		p.Interactive = value
 	case "file-read":
-		if p.AllowFileRead == false && value == true {
+		if !p.AllowFileRead && value {
 			return p, ErrSecurityViolation
 		}
 		p.AllowFileRead = value
 	case "file-write":
-		if p.AllowFileWrite == false && value == true {
+		if !p.AllowFileWrite && value {
 			return p, ErrSecurityViolation
 		}
 		p.AllowFileWrite = value

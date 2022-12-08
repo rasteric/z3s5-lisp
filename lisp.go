@@ -118,8 +118,8 @@ func Same(a, b any) bool {
 				if a1[i] != a2[i] {
 					return false
 				}
-				return true
 			}
+			return true
 		}
 		return false
 	}
@@ -580,7 +580,7 @@ var EofToken error = io.EOF
 // ValueHolder is a miscellaneous structure to hold interface{} values with
 // symbols as keys. The additional indirection is tolerated to avoid having to
 // use two map lookups, one for the value and one for the Protected feature.
-// Performance: The performance impact on this should be analyzed.
+// Performance: The performance impact should be analyzed.
 type ValueHolder struct {
 	Value     any
 	Protected bool
@@ -820,8 +820,8 @@ func (interp *Interp) equal(a, b any) bool {
 				if !interp.equal(v, m2[k]) {
 					return false
 				}
-				return true
 			}
+			return true
 		} else {
 			return false
 		}
@@ -1566,7 +1566,6 @@ func (rr *Reader) readToken() {
 		return
 	}
 	rr.token = NewSym(s)
-	return
 }
 
 func tryToReadNumber(s string) (goarith.Number, bool) {
@@ -1778,7 +1777,7 @@ func (interp *Interp) externalize5(env *Cell, a any, quoteString bool, count int
 	case goarith.Number:
 		return fmt.Sprintf("%v", a)
 	case Externalizable:
-		return x.(Externalizable).Externalize(interp, env)
+		return x.Externalize(interp, env)
 	}
 	panic(fmt.Sprintf("externalize: value is not externalizable: %v", a))
 }
@@ -1946,13 +1945,13 @@ func (interp *Interp) Boot() error {
 	}
 	if p.LoadUserInit {
 		file, err := os.Open(`init.lisp`)
-		defer file.Close()
 		if err != nil {
 			if !os.IsNotExist(err) {
 				return fmt.Errorf("Z3S5 Lisp could not open the init.lisp file: %w", err)
 			}
 			return nil
 		}
+		defer file.Close()
 		if !interp.Run(file) {
 			return errors.New(`Z3S5 Lisp encountered an error in init.lisp.`)
 		}
@@ -1990,7 +1989,7 @@ func (interp *Interp) EndLineInput() {
 			interp.PrintError(err)
 		} else {
 			if s, ok := x.(*Sym); ok && s == Void {
-				interp.pc.EditorInterface().Print(fmt.Sprintf(""))
+				// interp.pc.EditorInterface().Print("<void>")
 			} else {
 				interp.pc.EditorInterface().Print(fmt.Sprintf("%v\n", Str(x)))
 			}
@@ -2125,11 +2124,11 @@ func (interp *Interp) EvalString(s string) (any, error) {
 // EvalFile evaluates a file, returns true if no error has occurred and false if an error has occurred.
 func (interp *Interp) EvalFile(path string) bool {
 	input, err := os.Open(path)
-	defer input.Close()
 	if err != nil {
 		log.Println(err)
 		return false
 	}
+	defer input.Close()
 	return interp.Run(input)
 }
 

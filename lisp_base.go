@@ -1489,7 +1489,11 @@ func (interp *Interp) Define_Base() {
 
 	// (semver.max s1 s2) => str
 	interp.Def("semver.max", 2, func(a []any) any {
-		return semver.Max(a[0].(string), a[1].(string))
+		cp := semver.Compare(a[0].(string), a[1].(string))
+		if cp >= 0 {
+			return a[0]
+		}
+		return a[1]
 	})
 
 	// (semver.prerelease str) => str
@@ -1632,7 +1636,7 @@ func (interp *Interp) Define_Base() {
 	// (str->chars s) => array of int convert a UTF-8 string into an array of runes
 	interp.Def("str->chars", 1, func(a []any) any {
 		runes := []rune(norm.NFC.String(a[0].(string)))
-		arr := make([]any, len(runes), len(runes))
+		arr := make([]any, len(runes))
 		for i := range runes {
 			arr[i] = goarith.AsNumber(runes[i])
 		}
@@ -1642,7 +1646,7 @@ func (interp *Interp) Define_Base() {
 	// (chars->str a) => s convert an array of utf-8 runes into a UTF-8 string
 	interp.Def("chars->str", 1, func(a []any) any {
 		arr := a[0].([]any)
-		runes := make([]rune, len(arr), len(arr))
+		runes := make([]rune, len(arr))
 		for i := range arr {
 			n, exact := goarith.AsNumber(arr[i]).Int()
 			if !exact {
@@ -1764,7 +1768,7 @@ func (interp *Interp) Define_Base() {
 			}
 			return Nil
 		}
-		if bytes.Compare(blob1.Datum.([]byte), blob2.Datum.([]byte)) == 0 {
+		if bytes.Equal(blob1.Datum.([]byte), blob2.Datum.([]byte)) {
 			return true
 		}
 		return Nil
@@ -2050,10 +2054,10 @@ func (interp *Interp) Define_Base() {
 			var buildInfoStr string
 			arr := make([]any, 0)
 			if ok {
-				buildInfoStr = fmt.Sprintf("%s", bi.Main.Version)
+				buildInfoStr = bi.Main.Version
 				arr = append(arr, &Cell{bi.Main.Path, buildInfoStr})
 				for _, v := range bi.Deps {
-					arr = append(arr, &Cell{v.Path, fmt.Sprintf("%s", v.Version)})
+					arr = append(arr, &Cell{v.Path, v.Version})
 				}
 			}
 			return arr

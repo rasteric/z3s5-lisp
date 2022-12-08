@@ -65,10 +65,7 @@ func AsLispBool(b bool) any {
 
 // ToBool takes a Lisp bool and returns a Go bool. See asLispBool for more information.
 func ToBool(a any) bool {
-	if a == Nil {
-		return false
-	}
-	return true
+	return a != Nil
 }
 
 // ToUInt8 convert a value to uint8
@@ -85,49 +82,49 @@ func ToUInt32(a any) uint32 {
 
 // ToUInt64 attempts to convert a value to uint64
 func toUInt64(caller string, a any) uint64 {
-	switch a.(type) {
+	switch n := a.(type) {
 	case goarith.Int32:
-		return uint64(a.(goarith.Int32))
+		return uint64(n)
 	case goarith.Int64:
-		return uint64(a.(goarith.Int64))
+		return uint64(n)
 	default:
-		n, exact := goarith.AsNumber(a).Int()
+		num, exact := goarith.AsNumber(a).Int()
 		if !exact {
 			panic(fmt.Sprintf("%v: expected exact integer, given %v", caller, a))
 		}
-		return uint64(n)
+		return uint64(num)
 	}
 }
 
 // ToMaybeUInt64 attempts to convert a value to uint64
 func ToMaybeUInt64(a any) (uint64, bool) {
-	switch a.(type) {
+	switch n := a.(type) {
 	case goarith.Int32:
-		return uint64(a.(goarith.Int32)), true
-	case goarith.Int64:
-		return uint64(a.(goarith.Int64)), true
-	default:
-		n, exact := goarith.AsNumber(a).Int()
-		if !exact {
-			return uint64(n), false
-		}
 		return uint64(n), true
+	case goarith.Int64:
+		return uint64(n), true
+	default:
+		num, exact := goarith.AsNumber(a).Int()
+		if !exact {
+			return uint64(num), false
+		}
+		return uint64(num), true
 	}
 }
 
-// toInt64 attempts to convert a value to int64
+// ToInt64 attempts to convert a value to int64
 func ToInt64(caller string, a any) int64 {
-	switch a.(type) {
+	switch n := a.(type) {
 	case goarith.Int32:
-		return int64(a.(goarith.Int32))
+		return int64(n)
 	case goarith.Int64:
-		return int64(a.(goarith.Int64))
+		return int64(n)
 	default:
-		n, exact := goarith.AsNumber(a).Int()
+		num, exact := goarith.AsNumber(a).Int()
 		if !exact {
 			panic(fmt.Sprintf("%v: expected exact integer, given %v", caller, a))
 		}
-		return int64(n)
+		return int64(num)
 	}
 }
 
@@ -159,38 +156,38 @@ func ConvertIntsToNumbers(a []any) {
 }
 
 func ToFloat64(x any) float64 {
-	switch x.(type) {
+	switch v := x.(type) {
 	case goarith.Int32:
-		return float64(x.(goarith.Int32))
+		return float64(v)
 	case goarith.Int64:
-		return float64(int64(x.(goarith.Int64)))
+		return float64(int64(v))
 	case goarith.Float64:
-		return float64(x.(goarith.Float64))
+		return float64(v)
 	case *goarith.BigInt:
-		z := new(big.Rat).SetInt((*big.Int)(x.(*goarith.BigInt)))
+		z := new(big.Rat).SetInt((*big.Int)(v))
 		f, _ := z.Float64() // f may be infinity.
 		return float64(f)
 	case float32:
-		return float64(x.(float32))
+		return float64(v)
 	default:
 		panic(fmt.Sprintf("expected floating point value, given %v", x))
 	}
 }
 
 func toFloat32(x any) float32 {
-	switch x.(type) {
+	switch v := x.(type) {
 	case goarith.Int32:
-		return float32(x.(goarith.Int32))
+		return float32(v)
 	case goarith.Int64:
-		return float32(int64(x.(goarith.Int64)))
+		return float32(int64(v))
 	case goarith.Float64:
-		return float32(x.(goarith.Float64))
+		return float32(v)
 	case *goarith.BigInt:
-		z := new(big.Rat).SetInt((*big.Int)(x.(*goarith.BigInt)))
+		z := new(big.Rat).SetInt((*big.Int)(v))
 		f, _ := z.Float64() // f may be infinity.
 		return float32(f)
 	case float32:
-		return x.(float32)
+		return v
 	default:
 		panic(fmt.Sprintf("expected floating point value, given %v", x))
 	}
@@ -235,7 +232,7 @@ func ArrayToList(arr []any) *Cell {
 	}
 	start := &Cell{}
 	li := start
-	for i, _ := range arr {
+	for i := range arr {
 		li.Car = arr[i]
 		if i != len(arr)-1 {
 			li.Cdr = &Cell{}
