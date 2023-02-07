@@ -84,7 +84,8 @@ func (interp *Interp) Define_FileIO() {
 
 		var err error
 		var fi *os.File
-		fi, err = os.OpenFile(filepath.FromSlash(file), flags, os.FileMode(perm))
+		path := filepath.FromSlash(file)
+		fi, err = os.OpenFile(path, flags, os.FileMode(perm))
 		if err != nil {
 			panic(fmt.Errorf("open: %w", err))
 		}
@@ -94,7 +95,7 @@ func (interp *Interp) Define_FileIO() {
 		iowriter, _ := port.Datum.(io.Writer)
 		ioseeker, _ := port.Datum.(io.Seeker)
 		iowriterat, _ := port.Datum.(io.WriterAt)
-		stream := NewStream(ioReader, iowriter, ioseeker, iowriterat)
+		stream := NewStream(NewFileSource(path), ioReader, iowriter, ioseeker, iowriterat)
 		interp.Streams().Store(port, stream)
 		return port
 	})
@@ -473,7 +474,7 @@ func (interp *Interp) Define_FileIO() {
 			panic(fmt.Errorf(`stropen:%w`, ErrPortNotWritable))
 		}
 
-		stream := NewStream(in, out, nil, nil)
+		stream := NewStream(NewInternalSource("stropen", s), in, out, nil, nil)
 		interp.Streams().Store(obj, stream)
 		return obj
 	})

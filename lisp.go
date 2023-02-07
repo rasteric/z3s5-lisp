@@ -1421,17 +1421,16 @@ type Reader struct {
 	token   any      // the current token
 	tokens  []string // tokens read from the current line
 	index   int      // the next index of tokens
-	line    string   // the current line
-	lineNo  int      // the current line number
+	source  *Source  // the source location, including line
 	erred   bool     // a flag if an error has happened
 }
 
 // NewReader constructs a reader which will read Lisp expressions from r.
-func NewReader(r io.Reader) *Reader {
+func NewReader(r io.Reader, source *Source) *Reader {
 	scanner := bufio.NewScanner(r)
 	buff := make([]byte, DEFAULT_BUFFSIZE)
 	scanner.Buffer(buff, DEFAULT_BUFFMAX)
-	return &Reader{scanner, r, nil, nil, 0, "", 0, false}
+	return &Reader{scanner, r, nil, nil, 0, source, false}
 }
 
 // IOReader returns the underlying Go io.Reader for direct use.
@@ -1453,10 +1452,10 @@ func (rr *Reader) Read() (result any, err any) {
 	return rr.parseExpression(), nil
 }
 
-func (rr *Reader) newSynatxError(msg string, arg any) *EvalError {
+func (rr *Reader) newSyntaxError(msg string, arg any) *EvalError {
 	rr.erred = true
-	s := fmt.Sprintf("syntax error: %s -- %d: %s",
-		fmt.Sprintf(msg, arg), rr.lineNo, rr.line)
+	s := fmt.Sprintf("syntax error: %s -- %s:%d: %s",
+		fmt.Sprintf(msg, arg), rr.source.Path, rr.source.LineNo, rr.source.Line)
 	return &EvalError{s, nil}
 }
 
@@ -1481,7 +1480,7 @@ func (rr *Reader) parseExpression() any {
 		rr.readToken()
 		return ListToArray(rr.parseExpression().(*Cell))
 	case DotSym, RightParenSym:
-		panic(rr.newSynatxError("unexpected \"%v\"", rr.token))
+		panic(rr.newSyntaxError("unexpected \"%v\"", rr.token))
 	default:
 		return rr.token
 	}
@@ -1489,7 +1488,7 @@ func (rr *Reader) parseExpression() any {
 
 func (rr *Reader) parseListBody() *Cell {
 	if rr.token == EofToken {
-		panic(rr.newSynatxError("unexpected EOF%s", ""))
+		panic(rr.newSyntaxError("unexpected EOF%s", ""))
 	} else if rr.token == RightParenSym {
 		return Nil
 	} else {
@@ -1501,7 +1500,7 @@ func (rr *Reader) parseListBody() *Cell {
 			e2 = rr.parseExpression()
 			rr.readToken()
 			if rr.token != RightParenSym {
-				panic(rr.newSynatxError("\")\" expected: %v", rr.token))
+				panic(rr.newSyntaxError("\")\" expected: %v", rr.token))
 			}
 		} else {
 			e2 = rr.parseListBody()
@@ -1516,8 +1515,8 @@ func (rr *Reader) readToken() {
 	for len(rr.tokens) <= rr.index || rr.erred {
 		rr.erred = false
 		if rr.scanner.Scan() {
-			rr.line = rr.scanner.Text()
-			rr.lineNo++
+			rr.source.Line = rr.scanner.Text()
+			rr.source.LineNo++
 		} else {
 			if err := rr.scanner.Err(); err != nil {
 				panic(err)
@@ -1525,7 +1524,7 @@ func (rr *Reader) readToken() {
 			rr.token = EofToken
 			return
 		}
-		mm := tokenPat.FindAllStringSubmatch(rr.line, -1)
+		mm := tokenPat.FindAllStringSubmatch(rr.source.Line, -1)
 		tt := make([]string, 0, len(mm)*3/5) // Estimate 40% will be spaces.
 		for _, m := range mm {
 			if m[1] != "" {
@@ -1541,7 +1540,7 @@ func (rr *Reader) readToken() {
 	if s[0] == '"' {
 		n := len(s) - 1
 		if n < 1 || s[n] != '"' {
-			panic(rr.newSynatxError("bad string: '%s'", s))
+			panic(rr.newSyntaxError("bad string: '%s'", s))
 		}
 		s = s[1:n]
 		s = escapePat.ReplaceAllStringFunc(s, func(t string) string {
@@ -1916,8 +1915,8 @@ type Stream struct {
 	BuffReader   *BufferedReader
 }
 
-func NewStream(ioreader io.Reader, iowriter io.Writer, ioseeker io.Seeker, iowriterat io.WriterAt) *Stream {
-	return &Stream{LispReader: NewReader(ioreader), LispWriter: NewWriter(iowriter),
+func NewStream(source *Source, ioreader io.Reader, iowriter io.Writer, ioseeker io.Seeker, iowriterat io.WriterAt) *Stream {
+	return &Stream{LispReader: NewReader(ioreader, source), LispWriter: NewWriter(iowriter),
 		LispSeeker: NewSeeker(ioseeker), LispWriterAt: NewWriterAt(iowriterat), BuffReader: NewBufferedReader(ioreader)}
 }
 
@@ -1927,19 +1926,19 @@ func (interp *Interp) Boot() error {
 	p := interp.pc.Perm()
 	if p.LoadPrelude {
 		ss := strings.NewReader(Prelude)
-		if !interp.Run(ss) {
+		if !interp.Run(ss, NewInternalSource("standard-prelude", Prelude)) {
 			return errors.New(`Z3S5 Lisp standard prelude boot sequence failed`)
 		}
 		preamble := bytes.NewReader(initFile)
-		if !interp.Run(preamble) {
+		if !interp.Run(preamble, NewInternalSource("embed/init.lisp", "")) {
 			return errors.New(`Z3S5 Lisp preamble failed`)
 		}
 		help := bytes.NewReader(helpFile)
-		if !interp.Run(help) {
+		if !interp.Run(help, NewInternalSource("embed/help.lisp", "")) {
 			return errors.New(`Z3S5 Lisp help definitions failed`)
 		}
 		version := bytes.NewReader(versionFile)
-		if !interp.Run(version) {
+		if !interp.Run(version, NewInternalSource("embed/version.lisp", "")) {
 			return errors.New(`Z3S5 Lisp could not read the version information`)
 		}
 	}
@@ -1952,7 +1951,7 @@ func (interp *Interp) Boot() error {
 			return nil
 		}
 		defer file.Close()
-		if !interp.Run(file) {
+		if !interp.Run(file, NewFileSource("init.lisp")) {
 			return errors.New(`Z3S5 Lisp encountered an error in init.lisp.`)
 		}
 	}
@@ -1979,7 +1978,7 @@ func (interp *Interp) EndLineInput() {
 	}
 	// cur := interp.pc.VRAM().HiddenCursor()
 	// interp.pc.VRAM().SetHideCursor(true)
-	reader := NewReader(strings.NewReader(in))
+	reader := NewReader(strings.NewReader(in), NewInternalSource("console-input", in))
 	x, err := reader.Read()
 	if err != nil {
 		interp.PrintError(err)
@@ -2066,12 +2065,12 @@ func (interp *Interp) HandleError(err any) (any, bool) {
 // Run executes REPL (Read-Eval-Print Loop).
 // It returns false if REPL was ceased by an error.
 // It returns true if REPL was finished normally.
-func (interp *Interp) Run(input io.Reader) bool {
+func (interp *Interp) Run(input io.Reader, source *Source) bool {
 	interactive := (input == nil)
 	if interactive {
 		input = os.Stdin
 	}
-	reader := NewReader(input)
+	reader := NewReader(input, source)
 	for {
 		if interactive {
 			interp.pc.EditorInterface().Print("> ")
@@ -2105,7 +2104,7 @@ func (interp *Interp) Run(input io.Reader) bool {
 // only the first expression is executed. To prevent this, you may wrap several expressions into (progn expr ...).
 // If the expression is empty, io.EOF error is returned. Use Str(result) to print the result in human-readable form.
 func (interp *Interp) EvalString(s string) (any, error) {
-	reader := NewReader(strings.NewReader(s))
+	reader := NewReader(strings.NewReader(s), NewInternalSource("eval-string", s))
 	x, err := reader.Read()
 	if err != nil {
 		interp.HandleError(err)
@@ -2129,7 +2128,7 @@ func (interp *Interp) EvalFile(path string) bool {
 		return false
 	}
 	defer input.Close()
-	return interp.Run(input)
+	return interp.Run(input, NewFileSource(path))
 }
 
 // Print outputs a string according using the runtime EditorInterface Print function. This is equivalent to

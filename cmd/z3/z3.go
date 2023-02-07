@@ -38,7 +38,7 @@ func run() int {
 			panic(err)
 		}
 		defer file.Close()
-		if !interp.Run(file) {
+		if !interp.Run(file, z3.NewFileSource(*load)) {
 			fmt.Fprintf(os.Stderr, "Z3S5 Lisp error in input file \"%v\" given with -l flag.\n", *load)
 			return 3
 		}
@@ -48,7 +48,7 @@ func run() int {
 	}
 	if *exec != "" {
 		ss := strings.NewReader(*exec)
-		if !interp.Run(ss) {
+		if !interp.Run(ss, z3.NewInternalSource("cmdline-exec-string", *exec)) {
 			fmt.Fprintf(os.Stderr, "Z3S5 Lisp error in input expression given with -e flag.\n")
 			return 4
 		}
@@ -56,7 +56,7 @@ func run() int {
 			return 0
 		}
 	}
-	interp.Run(nil)
+	interp.Run(nil, z3.NewInternalSource("repl", ""))
 	return 0
 }
 

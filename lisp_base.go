@@ -1598,7 +1598,7 @@ func (interp *Interp) Define_Base() {
 	interp.Def("str->expr", -1, func(a []any) any {
 		li := a[0].(*Cell)
 		s := li.Car.(string)
-		reader := NewReader(strings.NewReader(s))
+		reader := NewReader(strings.NewReader(s), NewInternalSource("str->expr", s))
 		x, err := reader.Read()
 		if err != nil {
 			if li.CdrCell() != Nil {
@@ -1614,7 +1614,7 @@ func (interp *Interp) Define_Base() {
 	interp.Def("str->expr*", -1, func(a []any) any {
 		li := a[0].(*Cell)
 		s := li.Car.(string)
-		reader := NewReader(strings.NewReader(s))
+		reader := NewReader(strings.NewReader(s), NewInternalSource("str->expr*", s))
 		arr := make([]any, 0)
 		for {
 			x, err := reader.Read()
