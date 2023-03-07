@@ -567,7 +567,7 @@ func NewProtectedVariableError(x any) *EvalError {
 // Error returns a textual representation of the error.
 // It is defined in compliance with the error type.
 func (err *EvalError) Error() string {
-	s := "EvalError: " + err.Message
+	s := "ERROR " + err.Message
 	for _, line := range err.Trace {
 		s += "\n\t" + line
 	}
@@ -1454,8 +1454,12 @@ func (rr *Reader) Read() (result any, err any) {
 
 func (rr *Reader) newSyntaxError(msg string, arg any) *EvalError {
 	rr.erred = true
-	s := fmt.Sprintf("syntax error: %s -- %s:%d: %s",
-		fmt.Sprintf(msg, arg), rr.source.Path, rr.source.LineNo, rr.source.Line)
+	var s string
+	if rr.source.Sort == SourceSortInternal {
+		s = fmt.Sprintf(":%d: %s -- %s", rr.source.LineNo, fmt.Sprintf(msg, arg), rr.source.Line)
+	} else {
+		s = fmt.Sprintf("%s:%d: %s -- %s", rr.source.Path, rr.source.LineNo, fmt.Sprintf(msg, arg), rr.source.Line)
+	}
 	return &EvalError{s, nil}
 }
 
