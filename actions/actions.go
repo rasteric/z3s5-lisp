@@ -41,6 +41,7 @@ var ErrDuplicateActionDir = errors.New("an action could not be created or rename
 var ErrDuplicateActionName = errors.New("an action with that name is already registered")
 var ErrRenameActionFailed = errors.New("renaming an action has failed")
 var ErrInvalidPrefixName = errors.New("a new action could not be created because the prefix is invalid")
+var ErrInvalidInfo = errors.New("an action returned an info field that was not a string; info fields must be strings")
 
 // Action is a struct holding all data for an action, some of which is cached because
 // retrieving it from the interpreter every time is too inefficient.
@@ -288,6 +289,20 @@ func (a *Action) Run(interp *z3.Interp) error {
 func (a *Action) Stop(interp *z3.Interp) error {
 	_, err := interp.EvalString(fmt.Sprintf("(action-stop (get-action \"%v\"))", a.id))
 	return err
+}
+
+// Info returns an action's info string using the provided interpreter. The action system must have been
+// initialized in order for this to work.
+func (a *Action) Info(interp *z3.Interp) (string, error) {
+	result, err := interp.EvalString(fmt.Sprintf("(action-info (get-action \"%v\"))", a.id))
+	if err != nil {
+		return "", err
+	}
+	s, ok := result.(string)
+	if !ok {
+		return "", ErrInvalidInfo
+	}
+	return s, nil
 }
 
 // =======
