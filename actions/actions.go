@@ -294,7 +294,7 @@ func (a *Action) Stop(interp *z3.Interp) error {
 // Info returns an action's info string using the provided interpreter. The action system must have been
 // initialized in order for this to work.
 func (a *Action) Info(interp *z3.Interp) (string, error) {
-	result, err := interp.EvalString(fmt.Sprintf("(action-info (get-action \"%v\"))", a.id))
+	result, err := interp.EvalString(fmt.Sprintf("(prop (get-action \"%v\") 'info)", a.id))
 	if err != nil {
 		return "", err
 	}

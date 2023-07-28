@@ -5350,7 +5350,7 @@
   (topic (action system))
   (type method)
   (arity 1)
-  (see (action action-stop action.start action.progress action.get-args action.result)))
+  (see (action action-stop action-start action.progress action.get-args action.result)))
 
 (defmethod action-stop (this)
   (unless (prop this 'taskid)
@@ -5363,7 +5363,7 @@
   (type method)
   (arity 1)
   (topic (action system))
-  (see (action action-stop action.start action.progress action.get-args action.result)))
+  (see (action action-stop action-start action.progress action.get-args action.result)))
 
 (defhelp action.start
     (use "(action.start prefix name id taskid)")
@@ -5371,7 +5371,7 @@
   (type proc)
   (arity 3)
   (topic (action system))
-  (see (action action-stop action.start action.progress action.get-args action.result)))
+  (see (action action-stop action-start action.start action.progress action.get-args action.result)))
 
 (defhelp action.progress
     (use "(action.progress prefix name id taskid perc msg)")
@@ -5379,7 +5379,7 @@
   (type proc)
   (arity 5)
   (topic (action system))
-  (see (action action-stop action.start action.progress action.get-args action.result)))
+  (see (action action-stop action-start action.start action.progress action.get-args action.result)))
 
 (defhelp action.get-args
     (use "(action.get-args prefix name id arg-spec) => array")

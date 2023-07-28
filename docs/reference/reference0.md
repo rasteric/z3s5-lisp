@@ -2,9 +2,9 @@
 title: Z3S5 Lisp Reference Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: Version 2.3.11+2629aba
+footer-left: Version 2.3.11+3e625e1
 author: by Erich Rast and all Help system contributors
-date: 2023-3-7 9:33
+date: 2023-7-28 16:12
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -13,7 +13,7 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
-For Z3S5 Lisp Version 2.3.11+2629aba with installed modules (oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).
+For Z3S5 Lisp Version 2.3.11+3e625e1 with installed modules (oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).
 
 # Introduction
 
