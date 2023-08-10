@@ -2,9 +2,9 @@
 title: Z3S5 Lisp Reference Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: Version 2.3.11+3e625e1
+footer-left: Version 2.3.11+8edcbf4
 author: by Erich Rast and all Help system contributors
-date: 2023-7-28 16:12
+date: 2023-7-28 16:27
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -13,7 +13,7 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
-For Z3S5 Lisp Version 2.3.11+3e625e1 with installed modules (oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).
+For Z3S5 Lisp Version 2.3.11+8edcbf4 with installed modules (oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).
 
 # Introduction
 
@@ -46,7 +46,7 @@ Usage: `(action-start action)`
 
 Start `action`, which runs the action's `proc` in a task with the action and a task-id as argument. The `proc` of the `action` should periodically check for the 'stop signal using `task-recv` if the action should be cancellable, should call action.progress to report progress, action.error in case of an error, and action.result to report the result.
 
-See also: [`action`](#link616374696f6e), [`action-stop`](#link616374696f6e2d73746f70), [`action.start`](#link616374696f6e2e7374617274), [`action.progress`](#link616374696f6e2e70726f6772657373), [`action.get-args`](#link616374696f6e2e6765742d61726773), [`action.result`](#link616374696f6e2e726573756c74).	 [→index](#idx)
+See also: [`action`](#link616374696f6e), [`action-stop`](#link616374696f6e2d73746f70), [`action-start`](#link616374696f6e2d7374617274), [`action.progress`](#link616374696f6e2e70726f6772657373), [`action.get-args`](#link616374696f6e2e6765742d61726773), [`action.result`](#link616374696f6e2e726573756c74).	 [→index](#idx)
 
 ### action-stop : method
 
@@ -54,7 +54,7 @@ Usage: `(action-stop action)`
 
 The stop method sends a 'stop signal to the action's running `proc`. It is up to the `proc` to check for the signal using `task-recv` and terminate the action gracefully.
 
-See also: [`action`](#link616374696f6e), [`action-stop`](#link616374696f6e2d73746f70), [`action.start`](#link616374696f6e2e7374617274), [`action.progress`](#link616374696f6e2e70726f6772657373), [`action.get-args`](#link616374696f6e2e6765742d61726773), [`action.result`](#link616374696f6e2e726573756c74).	 [→index](#idx)
+See also: [`action`](#link616374696f6e), [`action-stop`](#link616374696f6e2d73746f70), [`action-start`](#link616374696f6e2d7374617274), [`action.progress`](#link616374696f6e2e70726f6772657373), [`action.get-args`](#link616374696f6e2e6765742d61726773), [`action.result`](#link616374696f6e2e726573756c74).	 [→index](#idx)
 
 ### `action.get-args` : procedure/3
 
@@ -70,7 +70,7 @@ Usage: `(action.progress prefix name id taskid perc msg)`
 
 Used to notify the host system from within a running `proc` that the action with `prefix`, `name`, `id`, and `taskid` is making progress to `perc` (a float between 0 and 1) with a message `msg`. Leave the message string empty if it is not needed. Implemented in the host system in Go, this function may, for instance, display a progress bar to inform an end-user.
 
-See also: [`action`](#link616374696f6e), [`action-stop`](#link616374696f6e2d73746f70), [`action.start`](#link616374696f6e2e7374617274), [`action.progress`](#link616374696f6e2e70726f6772657373), [`action.get-args`](#link616374696f6e2e6765742d61726773), [`action.result`](#link616374696f6e2e726573756c74).	 [→index](#idx)
+See also: [`action`](#link616374696f6e), [`action-stop`](#link616374696f6e2d73746f70), [`action-start`](#link616374696f6e2d7374617274), [`action.start`](#link616374696f6e2e7374617274), [`action.progress`](#link616374696f6e2e70726f6772657373), [`action.get-args`](#link616374696f6e2e6765742d61726773), [`action.result`](#link616374696f6e2e726573756c74).	 [→index](#idx)
 
 ### `action.result` : procedure/5
 
@@ -86,7 +86,7 @@ Usage: `(action.start prefix name id taskid)`
 
 Used to notify the host system that the action with `prefix`, `name`, `id`, and `taskid` has been started.
 
-See also: [`action`](#link616374696f6e), [`action-stop`](#link616374696f6e2d73746f70), [`action.start`](#link616374696f6e2e7374617274), [`action.progress`](#link616374696f6e2e70726f6772657373), [`action.get-args`](#link616374696f6e2e6765742d61726773), [`action.result`](#link616374696f6e2e726573756c74).	 [→index](#idx)
+See also: [`action`](#link616374696f6e), [`action-stop`](#link616374696f6e2d73746f70), [`action-start`](#link616374696f6e2d7374617274), [`action.start`](#link616374696f6e2e7374617274), [`action.progress`](#link616374696f6e2e70726f6772657373), [`action.get-args`](#link616374696f6e2e6765742d61726773), [`action.result`](#link616374696f6e2e726573756c74).	 [→index](#idx)
 
 ### `change-action-prefix` : procedure/2
 
@@ -5464,7 +5464,7 @@ Usage: `(action-start action)`
 
 Start `action`, which runs the action's `proc` in a task with the action and a task-id as argument. The `proc` of the `action` should periodically check for the 'stop signal using `task-recv` if the action should be cancellable, should call action.progress to report progress, action.error in case of an error, and action.result to report the result.
 
-See also: [`action`](#link616374696f6e), [`action-stop`](#link616374696f6e2d73746f70), [`action.start`](#link616374696f6e2e7374617274), [`action.progress`](#link616374696f6e2e70726f6772657373), [`action.get-args`](#link616374696f6e2e6765742d61726773), [`action.result`](#link616374696f6e2e726573756c74).	 [→index](#idx) [→topic](#action)
+See also: [`action`](#link616374696f6e), [`action-stop`](#link616374696f6e2d73746f70), [`action-start`](#link616374696f6e2d7374617274), [`action.progress`](#link616374696f6e2e70726f6772657373), [`action.get-args`](#link616374696f6e2e6765742d61726773), [`action.result`](#link616374696f6e2e726573756c74).	 [→index](#idx) [→topic](#action)
 
 ## action-stop : method {#link616374696f6e2d73746f70}
 
@@ -5472,7 +5472,7 @@ Usage: `(action-stop action)`
 
 The stop method sends a 'stop signal to the action's running `proc`. It is up to the `proc` to check for the signal using `task-recv` and terminate the action gracefully.
 
-See also: [`action`](#link616374696f6e), [`action-stop`](#link616374696f6e2d73746f70), [`action.start`](#link616374696f6e2e7374617274), [`action.progress`](#link616374696f6e2e70726f6772657373), [`action.get-args`](#link616374696f6e2e6765742d61726773), [`action.result`](#link616374696f6e2e726573756c74).	 [→index](#idx) [→topic](#action)
+See also: [`action`](#link616374696f6e), [`action-stop`](#link616374696f6e2d73746f70), [`action-start`](#link616374696f6e2d7374617274), [`action.progress`](#link616374696f6e2e70726f6772657373), [`action.get-args`](#link616374696f6e2e6765742d61726773), [`action.result`](#link616374696f6e2e726573756c74).	 [→index](#idx) [→topic](#action)
 
 ## `add-hook` : procedure/2 {#link6164642d686f6f6b}
 
