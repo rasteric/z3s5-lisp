@@ -3,6 +3,7 @@
 ;;; Feel free to hack this file as you like!
 
 (init-remember) ;; initializes the remember system, slows down start-up, remove if not needed
+(include "test-gui.lisp") ;; include tests for GUI
 
 (defun print-start-banner ()
    (let ((tc (color 'text))
