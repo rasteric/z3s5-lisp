@@ -21,7 +21,7 @@
      (out "The session started on ")(out (datestr (now)))(out " UTC.\n")
      (out "Enter (exit) to close the session. Happy hacking!\n")))
 
-(when *interactive-session* (print-start-banner))
+(when *interactive-session* (print-start-banner) (include "demo.lisp"))
 
 ;;;  Copyright (c) 2019-2022 Erich Rast
 ;;;

@@ -10,4 +10,15 @@
     (gui.window-resize w (gui.new-size 300 200))
     (gui.window-show-and-run w)))
 
-(out "Use (demo1) to run \"demo1.lisp\".\n")
+(defun demo2 ()
+  (letrec ((a (gui.new-app "com.z3s5.demo2"))
+	   (w (gui.new-window a "Test Window"))
+	   (b (gui.new-button "Close" (lambda () (gui.window-close w)(exit))))
+	   (l (gui.new-label "Hello world!"))
+	   (c (gui.new-container (gui.new-vbox-layout) l b)))
+    (gui.window-set-content w c)
+    (gui.window-set-master w)
+    (gui.window-show-and-run w)))
+
+(out "Use (demo1) ... (demo2) to run some GUI demos.\n")
+
