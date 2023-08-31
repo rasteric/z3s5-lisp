@@ -8,7 +8,7 @@ import (
 
 	"github.com/rasteric/hooks"
 	z3 "github.com/rasteric/z3s5-lisp"
-	z3gui "github.com/rasteric/z3s5-lisp/gui"
+	z3gui "github.com/rasteric/z3s5-lisp/gui/fyne"
 )
 
 func run() int {

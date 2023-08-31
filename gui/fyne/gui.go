@@ -21,6 +21,7 @@ var BoxedSpacer = z3.NewSym("gui.spacer")
 var BoxedContainer = z3.NewSym("gui.container")
 var BoxedLayout = z3.NewSym("gui.box-layout")
 var BoxedResource = z3.NewSym("gui.resource")
+var BoxedTabItem = z3.NewSym("gui.tabitem")
 
 func DefGUI(interp *z3.Interp) {
 
@@ -218,7 +219,46 @@ func DefGUI(interp *z3.Interp) {
 		if !ok {
 			panic(fmt.Sprintf("gui.new-tabitem argument must be a canvas object, given %v", z3.Str(arg)))
 		}
-		return &z3.Boxed{Datum: container.NewTabItem(title, obj), Sort: BoxedContainer, Valid: true}
+		return &z3.Boxed{Datum: container.NewTabItem(title, obj), Sort: BoxedTabItem, Valid: true}
+	})
+
+	interp.Def("gui.new-tabitem-with-icon", 3, func(a []any) any {
+		title := a[0].(string)
+		icon := z3.MustGetBoxed("gui.new-tabitem-with-icon", a[1], BoxedResource)
+		ics, ok := icon.Datum.(fyne.Resource)
+		if !ok {
+			panic(fmt.Sprintf("gui.new-tabitem-with-icon expected an icon resource as second argument, received: %v", z3.Str(a[1])))
+		}
+		canvas, ok := a[2].(*z3.Boxed)
+		if !ok {
+			panic(fmt.Sprintf("gui.new-tabitem-with-icon expected a container resource as second argument, received: %v", z3.Str(a[2])))
+		}
+		return &z3.Boxed{Datum: container.NewTabItemWithIcon(title, ics, canvas.Datum.(fyne.CanvasObject)),
+			Sort: BoxedTabItem, Valid: true}
+	})
+
+	// container.AppTabs
+	interp.Def("gui.new-app-tabs", -1, func(a []any) any {
+		li := a[0].(*z3.Cell)
+		arr := make([]*container.TabItem, 0)
+		for li != z3.Nil {
+			tab := z3.MustGetBoxed("gui.new-app-tabs", li.Car, BoxedTabItem)
+			arr = append(arr, tab.Datum.(*container.TabItem))
+			li = li.CdrCell()
+		}
+		return &z3.Boxed{Datum: container.NewAppTabs(arr...), Sort: BoxedContainer, Valid: true}
+	})
+
+	// container.DocTabs
+	interp.Def("gui.new-doc-tabs", -1, func(a []any) any {
+		li := a[0].(*z3.Cell)
+		arr := make([]*container.TabItem, 0)
+		for li != z3.Nil {
+			tab := z3.MustGetBoxed("gui.new-doc-tabs", li.Car, BoxedTabItem)
+			arr = append(arr, tab.Datum.(*container.TabItem))
+			li = li.CdrCell()
+		}
+		return &z3.Boxed{Datum: container.NewDocTabs(arr...), Sort: BoxedContainer, Valid: true}
 	})
 
 	// RESOURCES
