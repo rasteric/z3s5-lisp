@@ -8,6 +8,9 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/nukata/goarith"
 	z3 "github.com/rasteric/z3s5-lisp"
@@ -18,17 +21,23 @@ var storage sync.Map
 var apl fyne.App
 var mainWin fyne.Window
 
+// used for transforming hyperlink URLs
 type HyperlinkCheckFunc = func(url *url.URL) *url.URL
+
+// Config stores the configuration for the GUI, which is global and cannot be changed once set.
+// This is passed to DefUI. Use DefaultConfig for a maximally permissive default configuration.
 type Config struct {
-	HyperlinksAllowed bool
-	CheckHyperlinks   HyperlinkCheckFunc
-	WindowsAllowed    bool
+	HyperlinksAllowed bool               // if true, hyperlinks can be created
+	CheckHyperlinks   HyperlinkCheckFunc // if set, transform hyperlink URLs during creation
+	WindowsAllowed    bool               // is true, windows can be created
+	Prefix            string             // a prefix for all identifiers defined (excluding ".")
 }
 
 var DefaultConfig = Config{
 	HyperlinksAllowed: true,
 	CheckHyperlinks:   HyperlinkCheckFunc(func(url *url.URL) *url.URL { return url }),
 	WindowsAllowed:    true,
+	Prefix:            "",
 }
 
 var cfg Config
@@ -51,6 +60,15 @@ func mustGet(caller, arg string, a []any, n int) any {
 	obj, ok := get(a[n])
 	if !ok {
 		panic(fmt.Sprintf("%v: expected valid %v ID as argument %v, given %v", caller, arg, n+1, z3.Str(a[n])))
+	}
+	return obj
+}
+
+// mustGet1 gets the object given in the interface as number, panics otherwise.
+func mustGet1(caller, arg string, a any) any {
+	obj, ok := get(a)
+	if !ok {
+		panic(fmt.Sprintf("%v: expected valid %v ID as argument, given %v", caller, arg, z3.Str(a)))
 	}
 	return obj
 }
@@ -94,52 +112,63 @@ func CloseUI() {
 	})
 }
 
+// DefUI defines the user interface functions. If you want to avoid polluting the namespace, use
+// a config with a custom Prefix. Use DefaultConfig for a maximally permissive default configuration.
+// Various security-sensitive settings such as allowing or disallowing creation of new windows can be adjusted
+// in the Config. If you set these, be sure to also restrict the language using Z3S5 Lisp standard security tools,
+// such as unbinding certain functions and then protecting them and disallowing unprotecting them again.
 func DefUI(interp *z3.Interp, config Config) {
 
 	cfg := config
 
+	pre := func(s string) string {
+		if cfg.Prefix == "" {
+			return s
+		}
+		return cfg.Prefix + "." + s
+	}
 	// WINDOW
 
 	// (new-window <title-string>)
-	interp.Def("new-window", 1, func(a []any) any {
+	interp.Def(pre("new-window"), 1, func(a []any) any {
 		if !cfg.WindowsAllowed {
-			panic("new-window: creating new windows is not permitted!")
+			panic(pre("new-window: creating new windows is not permitted!"))
 		}
 		return put(apl.NewWindow(a[0].(string)))
 	})
 
 	// (set-window-content <window> <canvas-object>)
-	interp.Def("set-window-content", 2, func(a []any) any {
+	interp.Def(pre("set-window-content"), 2, func(a []any) any {
 		win, ok := get(a[0])
 		if !ok {
-			panic(fmt.Sprintf("set-window-content: no window found for %v", z3.Str(a[0])))
+			panic(fmt.Sprintf(pre("set-window-content: no window found for %v"), z3.Str(a[0])))
 		}
 		canvas, ok := get(a[1])
 		if !ok {
-			panic(fmt.Sprintf("set-window-content: no canvas object found for %v", z3.Str(a[1])))
+			panic(fmt.Sprintf(pre("set-window-content: no canvas object found for %v"), z3.Str(a[1])))
 		}
 		win.(fyne.Window).SetContent(canvas.(fyne.CanvasObject))
 		return z3.Void
 	})
 
 	// (close-window <window>)
-	interp.Def("close-window", 1, func(a []any) any {
-		win := mustGet("close-window", "window", a, 0)
+	interp.Def(pre("close-window"), 1, func(a []any) any {
+		win := mustGet(pre("close-window"), "window", a, 0)
 		win.(fyne.Window).Close()
 		clear(win)
 		return z3.Void
 	})
 
 	// (show-window <window>)
-	interp.Def("show-window", 1, func(a []any) any {
-		win := mustGet("show-window", "window", a, 0)
+	interp.Def(pre("show-window"), 1, func(a []any) any {
+		win := mustGet(pre("show-window"), "window", a, 0)
 		win.(fyne.Window).Show()
 		return z3.Void
 	})
 
 	// (resize-window <window> <width-float> <height-float>)
-	interp.Def("resize-window", 3, func(a []any) any {
-		win := mustGet("resize-window", "window", a, 0)
+	interp.Def(pre("resize-window"), 3, func(a []any) any {
+		win := mustGet(pre("resize-window"), "window", a, 0)
 		w := z3.ToFloat64(a[1])
 		h := z3.ToFloat64(a[2])
 		win.(fyne.Window).Resize(fyne.NewSize(float32(w), float32(h)))
@@ -147,15 +176,15 @@ func DefUI(interp *z3.Interp, config Config) {
 	})
 
 	// (hide-window <window>)
-	interp.Def("hide-window", 1, func(a []any) any {
-		win := mustGet("hide-window", "window", a, 0)
+	interp.Def(pre("hide-window"), 1, func(a []any) any {
+		win := mustGet(pre("hide-window"), "window", a, 0)
 		win.(fyne.Window).Hide()
 		return z3.Void
 	})
 
 	// (set-window-on-close-callback <window> <callback>)
-	interp.Def("set-window-on-close-callback", 2, func(a []any) any {
-		win := mustGet("set-window-on-close-callback", "window", a, 0)
+	interp.Def(pre("set-window-on-close-callback"), 2, func(a []any) any {
+		win := mustGet(pre("set-window-on-close-callback"), "window", a, 0)
 		proc := a[1].(*z3.Closure)
 		win.(fyne.Window).SetOnClosed(func() {
 			li2 := z3.Nil
@@ -168,14 +197,14 @@ func DefUI(interp *z3.Interp, config Config) {
 	// LABEL
 
 	// (new-label <string>)
-	interp.Def("new-label", 1, func(a []any) any {
+	interp.Def(pre("new-label"), 1, func(a []any) any {
 		return put(widget.NewLabel(a[0].(string)))
 	})
 
 	// ENTRY
 
 	// (new-entry [<selector>])
-	interp.Def("new-entry", -1, func(a []any) any {
+	interp.Def(pre("new-entry"), -1, func(a []any) any {
 		li := a[0].(*z3.Cell)
 		sort := "single-line"
 		if li != z3.Nil {
@@ -199,8 +228,8 @@ func DefUI(interp *z3.Interp, config Config) {
 	})
 
 	// (set-entry-on-change-callback <entry> (lambda (str) ...))
-	interp.Def("set-entry-on-change-callback", 2, func(a []any) any {
-		e := mustGet("set-entry-on-change-callback", "entry", a, 0)
+	interp.Def(pre("set-entry-on-change-callback"), 2, func(a []any) any {
+		e := mustGet(pre("set-entry-on-change-callback"), "entry", a, 0)
 		proc := a[1].(*z3.Closure)
 		e.(*widget.Entry).OnChanged = func(s string) {
 			li2 := &z3.Cell{Car: s, Cdr: z3.Nil}
@@ -213,7 +242,7 @@ func DefUI(interp *z3.Interp, config Config) {
 	// CHECK
 
 	// (new-check <title-string> (lambda (bool) ...))
-	interp.Def("new-check", 2, func(a []any) any {
+	interp.Def(pre("new-check"), 2, func(a []any) any {
 		title := a[0].(string)
 		proc := a[1].(*z3.Closure)
 		changed := func(b bool) {
@@ -225,7 +254,7 @@ func DefUI(interp *z3.Interp, config Config) {
 	})
 
 	// (new-choice <selector> <string-list> (lambda (str) ...))
-	interp.Def("new-choice", 3, func(a []any) any {
+	interp.Def(pre("new-choice"), 3, func(a []any) any {
 		sort := "select"
 		if s, ok := a[0].(string); ok {
 			sort = s
@@ -257,40 +286,40 @@ func DefUI(interp *z3.Interp, config Config) {
 	// FORM
 
 	// (new-form)
-	interp.Def("new-form", 0, func(a []any) any {
+	interp.Def(pre("new-form"), 0, func(a []any) any {
 		return put(widget.NewForm())
 	})
 
 	// (append-form <form> <string> <canvas-object>)
-	interp.Def("append-form", 3, func(a []any) any {
-		form := mustGet("append-form", "form", a, 0)
-		obj := mustGet("append-form", "canvas-object", a, 2)
+	interp.Def(pre("append-form"), 3, func(a []any) any {
+		form := mustGet(pre("append-form"), "form", a, 0)
+		obj := mustGet(pre("append-form"), "canvas-object", a, 2)
 		form.(*widget.Form).Append(a[1].(string), obj.(fyne.CanvasObject))
 		return z3.Void
 	})
 
 	// HYPERLINK
 
-	interp.Def("new-hyperlink", 2, func(a []any) any {
+	interp.Def(pre("new-hyperlink"), 2, func(a []any) any {
 		if !cfg.HyperlinksAllowed {
-			panic("new-hyperlink: hyperlinks are not permitted!")
+			panic(pre("new-hyperlink: hyperlinks are not permitted!"))
 		}
 		url, err := url.Parse(a[1].(string))
 		if err != nil {
-			panic(fmt.Errorf(`new-hyperlink: %w, given %v`, err, a[1].(string)))
+			panic(fmt.Errorf(pre(`new-hyperlink: %w, given %v`), err, a[1].(string)))
 		}
 		if cfg.CheckHyperlinks != nil {
 			url = cfg.CheckHyperlinks(url)
 		}
 		if url == nil {
-			panic(fmt.Sprintf(`new-hyperlink:the link URL "%v" is not permitted!`, a[1].(string)))
+			panic(fmt.Sprintf(pre(`new-hyperlink:the link URL "%v" is not permitted!`), a[1].(string)))
 		}
 		return put(widget.NewHyperlink(a[0].(string), url))
 	})
 
 	// BUTTON
 
-	interp.Def("new-button", 2, func(a []any) any {
+	interp.Def(pre("new-button"), 2, func(a []any) any {
 		proc := a[1].(*z3.Closure)
 		b := widget.NewButton(a[0].(string), func() {
 			li2 := z3.Nil
@@ -300,9 +329,349 @@ func DefUI(interp *z3.Interp, config Config) {
 		return put(b)
 	})
 
-	interp.Def("close-ui", 0, func(a []any) any {
+	interp.Def(pre("new-button-with-icon"), 3, func(a []any) any {
+		icon := mustGet(pre("new-button-with-icon"), "GUI icon resource ID", a, 1).(fyne.Resource)
+		proc := a[2].(*z3.Closure)
+		b := widget.NewButtonWithIcon(a[0].(string), icon, func() {
+			li2 := z3.Nil
+			li := &z3.Cell{Car: proc, Cdr: li2}
+			interp.Eval(li, z3.Nil)
+		})
+		return put(b)
+	})
+
+	// MISC
+
+	interp.Def(pre("close-ui"), 0, func(a []any) any {
 		CloseUI()
 		return z3.Void
+	})
+
+	// LAYOUTS
+
+	interp.Def(pre("new-spacer"), 0, func(a []any) any {
+		return put(layout.NewSpacer())
+	})
+
+	interp.Def(pre("new-hbox-layout"), 0, func(a []any) any {
+		return put(layout.NewHBoxLayout())
+	})
+
+	interp.Def(pre("new-vbox-layout"), 0, func(a []any) any {
+		return put(layout.NewVBoxLayout())
+	})
+
+	interp.Def(pre("new-grid-layout"), 1, func(a []any) any {
+		n := z3.ToInt64(pre("new-grid-layout"), a[0])
+		return put(layout.NewGridLayout(int(n)))
+	})
+
+	interp.Def(pre("new-grid-wrap-layout"), 2, func(a []any) any {
+		w := z3.ToFloat64(a[0])
+		h := z3.ToFloat64(a[1])
+		return put(layout.NewGridWrapLayout(fyne.NewSize(float32(w), float32(h))))
+	})
+
+	interp.Def(pre("new-form-layout"), 0, func(a []any) any {
+		return put(layout.NewFormLayout())
+	})
+
+	interp.Def(pre("new-center-layout"), 0, func(a []any) any {
+		return put(layout.NewCenterLayout())
+	})
+
+	interp.Def(pre("new-max-layout"), 0, func(a []any) any {
+		return put(layout.NewMaxLayout())
+	})
+
+	// CONTAINER
+
+	interp.Def(pre("new-container"), -1, func(a []any) any {
+		li := a[0].(*z3.Cell)
+		layout := mustGet1(pre("new-container"), "layout", li.Car)
+		li = li.CdrCell()
+		objs := make([]fyne.CanvasObject, 0, len(a)-1)
+		for li != z3.Nil {
+			obj, ok := get(li.Car)
+			if !ok {
+				panic(fmt.Sprintf(pre("new-container: unknown GUI object ID, given %v"), z3.Str(li.Car)))
+			}
+			objs = append(objs, obj.(fyne.CanvasObject))
+			li = li.CdrCell()
+		}
+		c := container.New(layout.(fyne.Layout), objs...)
+		return put(c)
+	})
+
+	interp.Def(pre("new-border"), -1, func(a []any) any {
+		arr := make([]fyne.CanvasObject, 0)
+		args := z3.ListToArray(a[0].(*z3.Cell))
+		if len(args) < 4 {
+			panic(fmt.Sprintf("new-border requires at least top, bottom, left, right arguments, given: %v",
+				a[0].(*z3.Cell)))
+		}
+		for _, arg := range args {
+			if cell, ok := arg.(*z3.Cell); ok {
+				if cell != z3.Nil {
+					panic(fmt.Sprintf(pre("new-border: expected a valid GUI object ID or nil, given a non-nil list: %v"),
+						z3.Str(arg)))
+				}
+				arr = append(arr, nil)
+				continue
+			}
+			obj, ok := get(arg)
+			if !ok {
+				panic(fmt.Sprintf(pre("new-border: expected a valid GUI object ID or nil, given: %v"),
+					z3.Str(arg)))
+			}
+			if canvas, ok := obj.(fyne.CanvasObject); ok {
+				arr = append(arr, canvas)
+				continue
+			}
+			panic(fmt.Sprintf(pre("new-border: expected a valid GUI canvas object, but the given %v is not a canvas object"), z3.Str(arg)))
+		}
+		return put(container.NewBorder(arr[0], arr[1], arr[2], arr[3], arr[4:]...))
+	})
+
+	interp.Def(pre("new-tabitem"), 2, func(a []any) any {
+		title := a[0].(string)
+		arg := mustGet1(pre("new-tabitem"), "GUI canvas object ID", a[1])
+		obj, ok := arg.(fyne.CanvasObject)
+		if !ok {
+			panic(fmt.Sprintf(pre("new-tabitem argument must be a canvas object, given %v"), z3.Str(arg)))
+		}
+		return put(container.NewTabItem(title, obj))
+	})
+
+	interp.Def(pre("new-tabitem-with-icon"), 3, func(a []any) any {
+		title := a[0].(string)
+		icon := mustGet(pre("new-tabitem-with-icon"), "GUI icon resource ID", a, 1)
+		ics, ok := icon.(fyne.Resource)
+		if !ok {
+			panic(fmt.Sprintf(pre("new-tabitem-with-icon expected an icon resource as second argument, received: %v"), z3.Str(a[1])))
+		}
+		canvas := mustGet(pre("new-tabitem-with-icon"), "GUI canvas object ID", a, 2)
+		return put(container.NewTabItemWithIcon(title, ics, canvas.(fyne.CanvasObject)))
+	})
+
+	// container.AppTabs
+	interp.Def(pre("new-app-tabs"), -1, func(a []any) any {
+		li := a[0].(*z3.Cell)
+		arr := make([]*container.TabItem, 0)
+		for li != z3.Nil {
+			tab := mustGet1(pre("new-app-tabs"), "GUI tabitem ID", li.Car)
+			arr = append(arr, tab.(*container.TabItem))
+			li = li.CdrCell()
+		}
+		return put(container.NewAppTabs(arr...))
+	})
+
+	// container.DocTabs
+	interp.Def(pre("new-doc-tabs"), -1, func(a []any) any {
+		li := a[0].(*z3.Cell)
+		arr := make([]*container.TabItem, 0)
+		for li != z3.Nil {
+			tab := mustGet1(pre("new-app-tabs"), "GUI tabitem ID", li.Car)
+			arr = append(arr, tab.(*container.TabItem))
+			li = li.CdrCell()
+		}
+		return put(container.NewDocTabs(arr...))
+	})
+
+	// RESOURCES
+
+	// THEME ICONS
+	interp.Def(pre("theme-icon"), 1, func(a []any) any {
+		var name string
+		if sym, ok := a[0].(*z3.Sym); ok {
+			name = sym.String()
+		} else {
+			name = a[0].(string)
+		}
+		var res fyne.Resource
+		switch name {
+		case "account", "AccountIcon":
+			res = theme.AccountIcon()
+			// The following seem to be misdocumented:
+		// case "arrow-drop-down", "ArrowDropDownIcon":
+		// 	res = theme.Icon(theme.IconNameArrowDropDown)
+		// case "arrow-drop-up", "ArrowDropUpIcon":
+		// 	res = theme.ArrowDropUpIcon()
+		case "cancel", "CancelIcon":
+			res = theme.CancelIcon()
+		case "check-button-checked", "CheckButtonChecked":
+			res = theme.CheckButtonCheckedIcon()
+		case "check-button", "CheckButtonIcon":
+			res = theme.CheckButtonIcon()
+		case "color-achromatic", "ColorAchromaticIcon":
+			res = theme.ColorAchromaticIcon()
+		case "color-chromatic", "ColorChromaticIcon":
+			res = theme.ColorChromaticIcon()
+		case "color-palette", "ColorPaletteIcon":
+			res = theme.ColorPaletteIcon()
+		case "computer", "ComputerIcon":
+			res = theme.ComputerIcon()
+		case "confirm", "ConfirmIcon":
+			res = theme.ConfirmIcon()
+		case "content-add", "ContentAddIcon":
+			res = theme.ContentAddIcon()
+		case "content-clear", "ContentClearIcon":
+			res = theme.ContentClearIcon()
+		case "content-copy", "ContentCopyIcon":
+			res = theme.ContentCopyIcon()
+		case "content-cut", "ContentCutIcon":
+			res = theme.ContentCutIcon()
+		case "content-paste", "ContentPasteIcon":
+			res = theme.ContentPasteIcon()
+		case "content-redo", "ContentRedoIcon":
+			res = theme.ContentRedoIcon()
+		case "content-remove", "ContentRemoveIcon":
+			res = theme.ContentRemoveIcon()
+		case "content-undo", "ContentUndoIcon":
+			res = theme.ContentUndoIcon()
+		case "delete", "DeleteIcon":
+			res = theme.DeleteIcon()
+		case "document-create", "DocumentCreateIcon":
+			res = theme.DocumentCreateIcon()
+		case "document-print", "DocumentPrintIcon":
+			res = theme.DocumentPrintIcon()
+		case "document", "DocumentIcon":
+			res = theme.DocumentIcon()
+		case "download", "DownloadIcon":
+			res = theme.DownloadIcon()
+		case "error", "ErrorIcon":
+			res = theme.ErrorIcon()
+		case "file-application", "FileApplicationIcon":
+			res = theme.FileApplicationIcon()
+		case "file-audio", "FileAudioIcon":
+			res = theme.FileAudioIcon()
+		case "file-image", "FileImageIcon":
+			res = theme.FileImageIcon()
+		case "file-text", "FileTextIcon":
+			res = theme.FileTextIcon()
+		case "file-video", "FileVideoIcon":
+			res = theme.FileVideoIcon()
+		case "file", "FileIcon":
+			res = theme.FileIcon()
+		case "folder-new", "FolderNewIcon":
+			res = theme.FolderNewIcon()
+		case "folder-open", "FolderOpenIcon":
+			res = theme.FolderOpenIcon()
+		case "folder", "FolderIcon":
+			res = theme.FolderIcon()
+		case "grid", "GridIcon":
+			res = theme.GridIcon()
+		case "help", "HelpIcon":
+			res = theme.HelpIcon()
+		case "history", "HistoryIcon":
+			res = theme.HistoryIcon()
+		case "home", "HomeIcon":
+			res = theme.HomeIcon()
+		case "info", "InfoIcon":
+			res = theme.InfoIcon()
+		case "list", "ListIcon":
+			res = theme.ListIcon()
+		case "login", "LoginIcon":
+			res = theme.LoginIcon()
+		case "logout", "LogoutIcon":
+			res = theme.LogoutIcon()
+		case "mail-attachment", "MailAttachmentIcon":
+			res = theme.MailAttachmentIcon()
+		case "mail-compose", "MailComposeIcon":
+			res = theme.MailComposeIcon()
+		case "mail-forward", "MailForwardIcon":
+			res = theme.MailForwardIcon()
+		case "mail-reply-all", "MailReplyAllIcon":
+			res = theme.MailReplyAllIcon()
+		case "mail-reply", "MailReplyIcon":
+			res = theme.MailReplyIcon()
+		case "mail-send", "MailSendIcon":
+			res = theme.MailSendIcon()
+		case "media-fast-forward", "MediaFastForwardIcon":
+			res = theme.MediaFastForwardIcon()
+		case "media-fast-rewind", "MediaFastRewindIcon":
+			res = theme.MediaFastRewindIcon()
+		case "media-music", "MediaMusicIcon":
+			res = theme.MediaMusicIcon()
+		case "media-pause", "MediaPauseIcon":
+			res = theme.MediaPauseIcon()
+		case "media-photo", "MediaPhotoIcon":
+			res = theme.MediaPhotoIcon()
+		case "media-play", "MediaPlayIcon":
+			res = theme.MediaPlayIcon()
+		case "media-record", "MediaRecordIcon":
+			res = theme.MediaRecordIcon()
+		case "media-replay", "MediaReplayIcon":
+			res = theme.MediaReplayIcon()
+		case "media-skip-next", "MediaSkipNextIcon":
+			res = theme.MediaSkipNextIcon()
+		case "media-skip-previous", "MediaSkipPreviousIcon":
+			res = theme.MediaSkipPreviousIcon()
+		case "media-stop", "MediaStopIcon":
+			res = theme.MediaStopIcon()
+		case "media-video", "MediaVideoIcon":
+			res = theme.MediaVideoIcon()
+		case "menu-expand", "MenuExpandIcon":
+			res = theme.MenuExpandIcon()
+		case "menu", "MenuIcon":
+			res = theme.MenuIcon()
+		case "more-horizontal", "MoreHorizontalIcon":
+			res = theme.MoreHorizontalIcon()
+		case "more-vertical", "MoreVerticalIcon":
+			res = theme.MoreVerticalIcon()
+		case "move-down", "MoveDownIcon":
+			res = theme.MoveDownIcon()
+		case "move-up", "MoveUpIcon":
+			res = theme.MoveUpIcon()
+		case "navigate-back", "NavigateBackIcon":
+			res = theme.NavigateBackIcon()
+		case "navigate-next", "NavigateNextIcon":
+			res = theme.NavigateNextIcon()
+		case "question", "QuestionIcon":
+			res = theme.QuestionIcon()
+		case "radio-button-checked", "RadioButtonChecked":
+			res = theme.RadioButtonCheckedIcon()
+		case "radio-button", "RadioButtonIcon":
+			res = theme.RadioButtonIcon()
+		case "search-replace", "SearchReplaceIcon":
+			res = theme.SearchReplaceIcon()
+		case "search", "SearchIcon":
+			res = theme.SearchIcon()
+		case "settings", "SettingsIcon":
+			res = theme.SettingsIcon()
+		case "storage", "StorageIcon":
+			res = theme.StorageIcon()
+		case "upload", "UploadIcon":
+			res = theme.UploadIcon()
+		case "view-full-screen", "ViewFullScreenIcon":
+			res = theme.ViewFullScreenIcon()
+		case "view-refresh", "ViewRefreshIcon":
+			res = theme.ViewRefreshIcon()
+		case "view-restore", "ViewRestoreIcon":
+			res = theme.ViewRestoreIcon()
+			// The following seem to be unavailable / misdocumented:
+		// case "view-zoom-fit", "ViewZoomFitIcon":
+		// 	res = theme.ViewZoomFitIcon()
+		// case "view-zoom-in", "ViewZoomInIcon":
+		// 	res = theme.ViewZoomInIcon()
+		// case "view-zoom-out", "ViewZoomOutIcon":
+		// 	res = theme.ViewZoomOutIcon()
+		case "visibility-off", "VisibilityOffIcon":
+			res = theme.VisibilityOffIcon()
+		case "visibility", "VisibilityIcon":
+			res = theme.VisibilityIcon()
+		case "volume-down", "VolumeDownIcon":
+			res = theme.VolumeDownIcon()
+		case "volume-mute", "VolumeMuteIcon":
+			res = theme.VolumeMuteIcon()
+		case "volume-up", "VolumeUpIcon":
+			res = theme.VolumeUpIcon()
+		case "warning", "WarningIcon":
+			res = theme.WarningIcon()
+		default:
+			panic(fmt.Sprintf(pre("theme-icon: unknown theme icon name, given %v"), z3.Str(a[0])))
+		}
+		return put(res)
 	})
 
 }

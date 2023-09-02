@@ -35,5 +35,13 @@
     (set-window-content win form)
     (show-window win)))
 
-(out "Use (demo1) ... (demo4) to run GUI demos.\n")
+(defun demo5 ()
+  (letrec ((win (new-window "Demo 5"))
+           (button (new-button-with-icon "Press me!" 
+              (theme-icon 'view-restore)
+              (lambda () (close-window win)))))
+    (set-window-content win button)
+    (show-window win)))
+
+(out "Use (demo1) ... (demo5) to run GUI demos.\n")
 
