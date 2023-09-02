@@ -9,7 +9,7 @@ import (
 
 	"github.com/rasteric/hooks"
 	z3 "github.com/rasteric/z3s5-lisp"
-	z3ui "github.com/rasteric/z3s5-lisp/gui/ui"
+	z3ui "github.com/rasteric/z3s5-lisp/gui"
 )
 
 func run() int {
