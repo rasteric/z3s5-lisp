@@ -31,7 +31,7 @@ func run() int {
 		fmt.Fprintf(os.Stderr, "Z3S5 Lisp failed to boot the standard prelude: %v\n", err)
 		return 2
 	}
-	z3ui.DefUI(interp)
+	z3ui.DefUI(interp, z3ui.DefaultConfig)
 	interp.SafeEval(&z3.Cell{Car: z3.NewSym("protect-toplevel-symbols"), Cdr: z3.Nil}, z3.Nil)
 	//	hooks.Exec(z3.StartupHook, nil)
 	defer hooks.Exec(z3.ShutdownHook, nil)
