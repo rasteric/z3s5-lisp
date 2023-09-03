@@ -18,6 +18,7 @@ import (
 
 var counter uint64
 var storage sync.Map
+var revstore sync.Map
 var apl fyne.App
 var mainWin fyne.Window
 
@@ -45,6 +46,7 @@ var cfg Config
 // put stores an object and returns a number in Z3S5 Lisp format.
 func put(obj any) any {
 	n := atomic.AddUint64(&counter, 1)
+	revstore.Store(obj, n)
 	storage.Store(n, obj)
 	return goarith.AsNumber(int64(n))
 }
@@ -53,6 +55,15 @@ func put(obj any) any {
 func get(n any) (any, bool) {
 	k := z3.ToInt64("user interface", n)
 	return storage.Load(uint64(k))
+}
+
+// getID retrieves an object's ID if it is stored, returns false otherwise.
+func getID(obj any) (any, bool) {
+	n, ok := revstore.Load(obj)
+	if !ok {
+		return goarith.AsNumber(-1), false
+	}
+	return goarith.AsNumber(int64(n.(uint64))), true
 }
 
 // mustGet attempts to get the object by number stored in array a at index n, panics otherwise.
@@ -77,7 +88,10 @@ func mustGet1(caller, arg string, a any) any {
 func clear(n any) {
 	k, ok := n.(goarith.Int64)
 	if ok {
-		storage.Delete(uint64(k))
+		obj, loaded := storage.LoadAndDelete(uint64(k))
+		if loaded {
+			revstore.Delete(obj)
+		}
 	}
 }
 
@@ -201,6 +215,13 @@ func DefUI(interp *z3.Interp, config Config) {
 		return put(widget.NewLabel(a[0].(string)))
 	})
 
+	// (set-label-text <label> <string>)
+	interp.Def(pre("set-label-text"), 2, func(a []any) any {
+		label := mustGet(pre("set-label-text"), "GUI label ID", a, 0)
+		label.(*widget.Label).SetText(a[1].(string))
+		return z3.Void
+	})
+
 	// ENTRY
 
 	// (new-entry [<selector>])
@@ -237,6 +258,39 @@ func DefUI(interp *z3.Interp, config Config) {
 			interp.Eval(li, z3.Nil)
 		}
 		return z3.Void
+	})
+
+	// TEXTGRID
+
+	// (new-text-grid [<string>] [show-line-numbers|show-whitespace|tab-width <int>])
+	interp.Def(pre("new-text-grid"), -1, func(a []any) any {
+		grid := widget.NewTextGrid()
+		li := a[0].(*z3.Cell)
+		if li != z3.Nil {
+			for li != z3.Nil {
+				if s, ok := li.Car.(string); ok {
+					grid.SetText(s)
+				} else if sym, ok := li.Car.(*z3.Sym); ok {
+					switch sym.String() {
+					case "show-line-numbers":
+						grid.ShowLineNumbers = true
+					case "show-whitespace":
+						grid.ShowWhitespace = true
+					case "tab-width":
+						li = li.CdrCell()
+						if li == z3.Nil {
+							panic(pre("new-text-grid: expected a width integer after 'tab-width, but it is missing!"))
+						}
+						grid.TabWidth = int(z3.ToInt64(pre("new-text-grid"), li.Car))
+					}
+				} else {
+					panic(fmt.Sprintf(pre("new-text-grid: expected an initial string as content and/or a selector in '(show-line-numbers show-whitespace tab-width), given %v"),
+						z3.Str(li.Car)))
+				}
+				li = li.CdrCell()
+			}
+		}
+		return put(grid)
 	})
 
 	// CHECK
@@ -338,6 +392,92 @@ func DefUI(interp *z3.Interp, config Config) {
 			interp.Eval(li, z3.Nil)
 		})
 		return put(b)
+	})
+
+	// LIST
+
+	// (new-list <len-proc> <prepare-proc> <update-proc>)
+	interp.Def(pre("new-list"), 3, func(a []any) any {
+		lproc := a[0].(*z3.Closure)
+		pproc := a[1].(*z3.Closure)
+		uproc := a[2].(*z3.Closure)
+		lenCB := func() int {
+			n := interp.Eval(&z3.Cell{Car: lproc, Cdr: z3.Nil}, z3.Nil)
+			return int(z3.ToInt64("GUI list length callback", n))
+		}
+		prepCB := func() fyne.CanvasObject {
+			result := interp.Eval(&z3.Cell{Car: pproc, Cdr: z3.Nil}, z3.Nil)
+			obj := mustGet1(pre("new-list"), "GUI canvas object ID (result from list preparation callback)", result)
+			return obj.(fyne.CanvasObject)
+		}
+		updCB := func(i widget.ListItemID, o fyne.CanvasObject) {
+			n := int(i)
+			if id, ok := getID(o); ok {
+				interp.Eval(&z3.Cell{Car: uproc, Cdr: &z3.Cell{Car: goarith.AsNumber(n), Cdr: &z3.Cell{Car: goarith.AsNumber(id), Cdr: z3.Nil}}}, z3.Nil)
+			}
+		}
+		return put(widget.NewList(lenCB, prepCB, updCB))
+	})
+
+	// PROGRESSBAR
+
+	// (new-progress-bar)
+	interp.Def(pre("new-progress-bar"), 0, func(a []any) any {
+		return put(widget.NewProgressBar())
+	})
+
+	// (new-infinite-progress-bar)
+	interp.Def(pre("new-infinite-progress-bar"), 0, func(a []any) any {
+		return put(widget.NewProgressBarInfinite())
+	})
+
+	// (set-progress-bar <bar> <value>|[<selector> <value>])
+	interp.Def(pre("set-progress-bar"), -1, func(a []any) any {
+		li := a[0].(*z3.Cell)
+		bar := mustGet1(pre("set-progress-bar"), "GUI progress-bar ID", li.Car).(*widget.ProgressBar)
+		li = li.CdrCell()
+		if sym, ok := li.Car.(*z3.Sym); ok {
+			li = li.CdrCell()
+			switch sym.String() {
+			case "value":
+				bar.SetValue(z3.ToFloat64(li.Car))
+			case "min":
+				bar.Min = z3.ToFloat64(li.Car)
+			case "max":
+				bar.Max = z3.ToFloat64(li.Car)
+			case "formatter":
+				proc := li.Car.(*z3.Closure)
+				id, _ := getID(bar)
+				fn := func() string {
+					result := interp.Eval(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: id, Cdr: z3.Nil}}, z3.Nil)
+					if s, ok := result.(string); ok {
+						return s
+					}
+					panic(fmt.Sprintf(pre("set-progress-bar: formatter callback is expected to return a string but it returned %v"), z3.Str(result)))
+				}
+				bar.TextFormatter = fn
+			default:
+				panic(fmt.Sprintf(pre("set-progress-bar: expected selector in '(value min max formatter), given %v"), sym.String()))
+			}
+			return z3.Void
+		}
+		bar.SetValue(z3.ToFloat64(li.Car))
+		return z3.Void
+	})
+
+	// (get-progress-bar-value <bar>)
+	interp.Def(pre("get-progress-bar-value"), 1, func(a []any) any {
+		bar := mustGet(pre("get-progress-bar-value"), "GUI progress-bar ID", a, 0)
+		n := bar.(*widget.ProgressBar).Value
+		return goarith.AsNumber(n)
+	})
+
+	// ICON
+
+	// (new-icon <resource>)
+	interp.Def(pre("new-icon"), 1, func(a []any) any {
+		res := mustGet(pre("new-icon"), "GUI resource ID", a, 0)
+		return put(widget.NewIcon(res.(fyne.Resource)))
 	})
 
 	// MISC
