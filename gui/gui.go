@@ -652,6 +652,34 @@ func DefUI(interp *z3.Interp, config Config) {
 		return put(line)
 	})
 
+	interp.Def(pre("new-text"), 2, func(a []any) any {
+		s := a[0].(string)
+		color := mustGet1(pre("new-text"), "GUI nrgba color ID", a[1]).(color.Color)
+		return put(canvas.NewText(s, color))
+	})
+
+	interp.Def(pre("set-text-alignment"), 2, func(a []any) any {
+		text := mustGet1(pre("set-text-alignment"), "GUI text ID", a[0])
+		align, ok := MustGetTextAlign(pre("set-text-alignment"), 1, a[1])
+		if ok {
+			text.(*canvas.Text).Alignment = align
+		}
+		return z3.Void
+	})
+
+	interp.Def(pre("set-text-size"), 2, func(a []any) any {
+		text := mustGet1(pre("set-text-size"), "GUI text ID", a[0])
+		text.(*canvas.Text).TextSize = float32(z3.ToFloat64(a[1]))
+		return z3.Void
+	})
+
+	interp.Def(pre("set-text-style"), 2, func(a []any) any {
+		text := mustGet1(pre("set-text-style"), "GUI text ID", a[0]).(*canvas.Text)
+		style := MustGetTextStyle(pre("set-text-style"), 1, a[1])
+		text.TextStyle = style
+		return z3.Void
+	})
+
 	// PROGRESSBAR
 
 	// (new-progress-bar)
@@ -1166,4 +1194,57 @@ func idxToEnglish(idx int) string {
 	default:
 		return fmt.Sprintf("%vth", idx+1)
 	}
+}
+
+// MustGetTextAlign returns a text align and true, or nil and false if the alignment specified was Nil.
+func MustGetTextAlign(caller string, idx int, a any) (fyne.TextAlign, bool) {
+	sym, ok := a.(*z3.Sym)
+	if !ok {
+		if li, ok := a.(*z3.Cell); ok {
+			if li == z3.Nil {
+				return fyne.TextAlignLeading, false
+			}
+			panic(fmt.Sprintf("%v: expected text alignment symbol in '(leading center trailing) as %v argument, given a non-empty list", caller, idxToEnglish(idx)))
+		}
+		panic(fmt.Sprintf("%v: expected text alignment symbol in '(leading center trailing) as %v argument, given %v", caller, idxToEnglish(idx), z3.Str(a)))
+	}
+	switch sym.String() {
+	case "leading":
+		return fyne.TextAlignLeading, true
+	case "center":
+		return fyne.TextAlignCenter, true
+	case "trailing":
+		return fyne.TextAlignTrailing, true
+	default:
+		panic(fmt.Sprintf("%v: expected text alignment symbol in '(leading center trailing) as %v argument, given %v", caller, idxToEnglish(idx), z3.Str(a)))
+	}
+}
+
+// MustGetTextStyle turns a list of style symbols into a Fyne text style.
+func MustGetTextStyle(caller string, idx int, a any) fyne.TextStyle {
+	li := a.(*z3.Cell)
+	var style fyne.TextStyle
+	for li != z3.Nil {
+		sym, ok := li.Car.(*z3.Sym)
+		if !ok {
+			panic(fmt.Sprintf("%v: expected a list of valid text style symbols as %v argument, given %v", caller, idxToEnglish(idx),
+				z3.Str(a)))
+		}
+		switch sym.String() {
+		case "bold":
+			style.Bold = true
+		case "italic":
+			style.Italic = true
+		case "mono", "monospace":
+			style.Monospace = true
+		case "symbol":
+			style.Symbol = true
+		case "tab-width":
+			li = li.CdrCell()
+			n, _ := goarith.AsNumber(li.Car).Int()
+			style.TabWidth = n
+		}
+		li = li.CdrCell()
+	}
+	return style
 }
