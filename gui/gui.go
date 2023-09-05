@@ -2,12 +2,15 @@ package ui
 
 import (
 	"fmt"
+	"image/color"
+	"math"
 	"net/url"
 	"sync"
 	"sync/atomic"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
@@ -28,17 +31,30 @@ type HyperlinkCheckFunc = func(url *url.URL) *url.URL
 // Config stores the configuration for the GUI, which is global and cannot be changed once set.
 // This is passed to DefUI. Use DefaultConfig for a maximally permissive default configuration.
 type Config struct {
-	HyperlinksAllowed bool               // if true, hyperlinks can be created
-	CheckHyperlinks   HyperlinkCheckFunc // if set, transform hyperlink URLs during creation
-	WindowsAllowed    bool               // is true, windows can be created
-	Prefix            string             // a prefix for all identifiers defined (excluding ".")
+	HyperlinksAllowed   bool               // if true, hyperlinks can be created
+	CheckHyperlinks     HyperlinkCheckFunc // if set, transform hyperlink URLs during creation
+	WindowsAllowed      bool               // is true, windows can be created
+	Prefix              string             // a prefix for all identifiers defined (excluding ".")
+	ClipboardGetAllowed bool               // allow getting the clipboard content (could be used to monitor for passwords)
+	ClipboardSetAllowed bool               // allow setting the clipboard content
 }
 
 var DefaultConfig = Config{
-	HyperlinksAllowed: true,
-	CheckHyperlinks:   HyperlinkCheckFunc(func(url *url.URL) *url.URL { return url }),
-	WindowsAllowed:    true,
-	Prefix:            "",
+	HyperlinksAllowed:   true,
+	CheckHyperlinks:     HyperlinkCheckFunc(func(url *url.URL) *url.URL { return url }),
+	WindowsAllowed:      true,
+	Prefix:              "",
+	ClipboardGetAllowed: true,
+	ClipboardSetAllowed: true,
+}
+
+var RestrictedConfig = Config{
+	HyperlinksAllowed:   false,
+	CheckHyperlinks:     HyperlinkCheckFunc(func(url *url.URL) *url.URL { panic("hyperlinks are not allowed by security policy!") }),
+	WindowsAllowed:      false,
+	Prefix:              "",
+	ClipboardGetAllowed: false,
+	ClipboardSetAllowed: false,
 }
 
 var cfg Config
@@ -162,6 +178,13 @@ func DefUI(interp *z3.Interp, config Config) {
 			panic(fmt.Sprintf(pre("set-window-content: no canvas object found for %v"), z3.Str(a[1])))
 		}
 		win.(fyne.Window).SetContent(canvas.(fyne.CanvasObject))
+		return z3.Void
+	})
+
+	// (set-window-size <window> <width> <height>)
+	interp.Def(pre("set-window-size"), 3, func(a []any) any {
+		win := mustGet(pre("set-window-size"), "GUI window ID", a, 0).(fyne.Window)
+		win.Resize(fyne.NewSize(float32(z3.ToFloat64(a[1])), float32(z3.ToFloat64(a[2]))))
 		return z3.Void
 	})
 
@@ -413,10 +436,220 @@ func DefUI(interp *z3.Interp, config Config) {
 		updCB := func(i widget.ListItemID, o fyne.CanvasObject) {
 			n := int(i)
 			if id, ok := getID(o); ok {
-				interp.Eval(&z3.Cell{Car: uproc, Cdr: &z3.Cell{Car: goarith.AsNumber(n), Cdr: &z3.Cell{Car: goarith.AsNumber(id), Cdr: z3.Nil}}}, z3.Nil)
+				interp.Eval(&z3.Cell{Car: uproc, Cdr: &z3.Cell{Car: goarith.AsNumber(id), Cdr: &z3.Cell{Car: goarith.AsNumber(n), Cdr: z3.Nil}}}, z3.Nil)
 			}
 		}
 		return put(widget.NewList(lenCB, prepCB, updCB))
+	})
+
+	// TABLE
+
+	// (new-table <len-proc> <prepare-proc> <update-proc>)
+	interp.Def(pre("new-table"), 3, func(a []any) any {
+		lproc := a[0].(*z3.Closure)
+		pproc := a[1].(*z3.Closure)
+		uproc := a[2].(*z3.Closure)
+		lenCB := func() (int, int) {
+			c := interp.Eval(&z3.Cell{Car: lproc, Cdr: z3.Nil}, z3.Nil).(*z3.Cell)
+			a := z3.ToInt64("GUI table length callback return element #1", c.Car)
+			c = c.CdrCell()
+			b := z3.ToInt64("GUI table length callback return element #2", c.Car)
+			return int(a), int(b)
+		}
+		prepCB := func() fyne.CanvasObject {
+			result := interp.Eval(&z3.Cell{Car: pproc, Cdr: z3.Nil}, z3.Nil)
+			obj := mustGet1(pre("new-table"), "GUI canvas object ID (result from table preparation callback)", result)
+			return obj.(fyne.CanvasObject)
+		}
+		updCB := func(id widget.TableCellID, o fyne.CanvasObject) {
+			row := id.Row
+			col := id.Col
+			if id, ok := getID(o); ok {
+				interp.Eval(&z3.Cell{Car: uproc, Cdr: &z3.Cell{Car: goarith.AsNumber(id), Cdr: &z3.Cell{Car: goarith.AsNumber(row), Cdr: &z3.Cell{Car: goarith.AsNumber(col), Cdr: z3.Nil}}}}, z3.Nil)
+			}
+		}
+		return put(widget.NewTable(lenCB, prepCB, updCB))
+	})
+
+	// TREE
+
+	// (new-tree <child-uid-proc> <is-branch-proc> <create-node-proc> <update-note-proc)
+	interp.Def(pre("new-tree"), 4, func(a []any) any {
+		proc1 := a[0].(*z3.Closure)
+		proc2 := a[1].(*z3.Closure)
+		proc3 := a[2].(*z3.Closure)
+		proc4 := a[3].(*z3.Closure)
+		fn1 := func(id widget.TreeNodeID) []widget.TreeNodeID {
+			var s string = id
+			li := interp.Eval(&z3.Cell{Car: proc1, Cdr: &z3.Cell{Car: s, Cdr: z3.Nil}}, z3.Nil).(*z3.Cell)
+			arr := make([]widget.TreeNodeID, 0)
+			for li != z3.Nil {
+				arr = append(arr, widget.TreeNodeID(li.Car.(string)))
+				li = li.CdrCell()
+			}
+			return arr
+		}
+		fn2 := func(id widget.TreeNodeID) bool {
+			var s string = id
+			result := interp.Eval(&z3.Cell{Car: proc2, Cdr: &z3.Cell{Car: s, Cdr: z3.Nil}}, z3.Nil)
+			return z3.ToBool(result)
+		}
+		fn3 := func(branch bool) fyne.CanvasObject {
+			result := interp.Eval(&z3.Cell{Car: proc3, Cdr: &z3.Cell{Car: z3.AsLispBool(branch), Cdr: z3.Nil}}, z3.Nil)
+			obj := mustGet1(pre("new-tree"), "GUI tree creation callback canvas object ID", result)
+			return obj.(fyne.CanvasObject)
+		}
+		fn4 := func(id widget.TreeNodeID, branch bool, o fyne.CanvasObject) {
+			var s string = id
+			objID, _ := getID(o)
+			interp.Eval(&z3.Cell{Car: proc4, Cdr: &z3.Cell{Car: s, Cdr: &z3.Cell{Car: z3.AsLispBool(branch), Cdr: &z3.Cell{Car: objID, Cdr: z3.Nil}}}}, z3.Nil)
+		}
+		return put(widget.NewTree(fn1, fn2, fn3, fn4))
+	})
+
+	// IMAGE
+
+	// (new-image-from-resource <resource>)
+	interp.Def(pre("new-image-from-resource"), 1, func(a []any) any {
+		res := mustGet(pre("new-image-from-resource"), "GUI resource ID", a, 0)
+		return put(canvas.NewImageFromResource(res.(fyne.Resource)))
+	})
+
+	// (new-image-from-file <path-string>)
+	interp.Def(pre("new-image-from-file"), 1, func(a []any) any {
+		return put(canvas.NewImageFromFile(a[0].(string)))
+	})
+
+	// DRAWING
+
+	// color helpers
+
+	// (nrgba r g b a) => NRGBA color
+	interp.Def(pre("nrgba"), 4, func(a []any) any {
+		r := z3.ToUInt8(a[0])
+		g := z3.ToUInt8(a[1])
+		b := z3.ToUInt8(a[2])
+		alpha := z3.ToUInt8(a[3])
+		return put(color.NRGBA{R: r, G: g, B: b, A: alpha})
+	})
+
+	// (new-rectangle <fill-color> [<width> <height>] [<position>] [<stroke-color>] [<stroke-width>] [<corner-radius>])
+	interp.Def(pre("new-rectangle"), -1, func(a []any) any {
+		li := a[0].(*z3.Cell)
+		fillColor := mustGet1(pre("new-rectangle"), "GUI nrgba color ID", li.Car).(color.Color)
+		rect := canvas.NewRectangle(fillColor)
+		li = li.CdrCell()
+		if li == z3.Nil {
+			return put(rect)
+		}
+		w := float32(z3.ToFloat64(li.Car))
+		li = li.CdrCell()
+		h := float32(z3.ToFloat64(li.Car))
+		rect.Resize(fyne.NewSize(w, h))
+		li = li.CdrCell()
+		if li == z3.Nil {
+			return put(rect)
+		}
+		pos, ok := MustGetPosition(pre("new-rectangle"), 3, li.Car)
+		if ok {
+			rect.Move(pos)
+		}
+		li = li.CdrCell()
+		if li == z3.Nil {
+			return put(rect)
+		}
+		strokeColor := mustGet1(pre("new-rectangle"), "GUI nrgba color ID", li.Car).(color.Color)
+		rect.StrokeColor = strokeColor
+		li = li.CdrCell()
+		if li == z3.Nil {
+			return put(rect)
+		}
+		rect.StrokeWidth = float32(z3.ToFloat64(li.Car))
+		li = li.CdrCell()
+		if li == z3.Nil {
+			return put(rect)
+		}
+		// TODO requires Fyne 2.4
+		// rect.CornerRadius = float32(z3.ToFloat64(li.Car))
+		return put(rect)
+	})
+
+	interp.Def(pre("set-rectangle-min-size"), 3, func(a []any) any {
+		r := mustGet1(pre("set-rectangle-min-size"), "GUI rectangle ID", a[0])
+		w := z3.ToFloat64(a[1])
+		h := z3.ToFloat64(a[2])
+		r.(*canvas.Rectangle).SetMinSize(fyne.NewSize(float32(w), float32(h)))
+		return z3.Void
+	})
+
+	// (new-circle <fill-color> [<pos1>] [<pos2>] [<stroke-color>] [<stroke-width>])
+	interp.Def(pre("new-circle"), -1, func(a []any) any {
+		li := a[0].(*z3.Cell)
+		fillColor := mustGet1(pre("new-circle"), "GUI nrgba color ID", li.Car).(color.Color)
+		circle := canvas.NewCircle(fillColor)
+		li = li.CdrCell()
+		if li == z3.Nil {
+			return put(circle)
+		}
+		pos1, ok := MustGetPosition(pre("new-circle"), 0, li.Car)
+		if ok {
+			circle.Position1 = pos1
+		}
+		li = li.CdrCell()
+		if li == z3.Nil {
+			return put(circle)
+		}
+		pos2, ok := MustGetPosition(pre("new-circle"), 1, li.Car)
+		if ok {
+			circle.Position2 = pos2
+		}
+		li = li.CdrCell()
+		if li == z3.Nil {
+			return put(circle)
+		}
+		strokeColor := mustGet1(pre("new-circle"), "GUI nrgba color ID", li.Car).(color.Color)
+		circle.StrokeColor = strokeColor
+		li = li.CdrCell()
+		if li == z3.Nil {
+			return put(circle)
+		}
+		circle.StrokeWidth = float32(z3.ToFloat64(li.Car))
+		return put(circle)
+	})
+
+	// (new-line <fill-color> [<pos1>] [<pos2>] [<stroke-color>] [<stroke-width>])
+	interp.Def(pre("new-line"), -1, func(a []any) any {
+		li := a[0].(*z3.Cell)
+		fillColor := mustGet1(pre("new-line"), "GUI nrgba color ID", li.Car).(color.Color)
+		line := canvas.NewLine(fillColor)
+		li = li.CdrCell()
+		if li == z3.Nil {
+			return put(line)
+		}
+		pos1, ok := MustGetPosition(pre("new-line"), 0, li.Car)
+		if ok {
+			line.Position1 = pos1
+		}
+		li = li.CdrCell()
+		if li == z3.Nil {
+			return put(line)
+		}
+		pos2, ok := MustGetPosition(pre("new-line"), 1, li.Car)
+		if ok {
+			line.Position2 = pos2
+		}
+		li = li.CdrCell()
+		if li == z3.Nil {
+			return put(line)
+		}
+		strokeColor := mustGet1(pre("new-line"), "GUI nrgba color ID", li.Car).(color.Color)
+		line.StrokeColor = strokeColor
+		li = li.CdrCell()
+		if li == z3.Nil {
+			return put(line)
+		}
+		line.StrokeWidth = float32(z3.ToFloat64(li.Car))
+		return put(line)
 	})
 
 	// PROGRESSBAR
@@ -472,6 +705,26 @@ func DefUI(interp *z3.Interp, config Config) {
 		return goarith.AsNumber(n)
 	})
 
+	// SLIDER
+
+	// (new-slider <min> <max> <change-cb>)
+	interp.Def(pre("new-slider"), 3, func(a []any) any {
+		proc := a[2].(*z3.Closure)
+		fn := func(v float64) {
+			interp.Eval(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: goarith.AsNumber(v), Cdr: z3.Nil}}, z3.Nil)
+		}
+		slider := widget.NewSlider(z3.ToFloat64(a[0]), z3.ToFloat64(a[1]))
+		slider.OnChanged = fn
+		return put(slider)
+	})
+
+	// (set-slider-value <slider> <value>)
+	interp.Def(pre("set-slider-value"), 2, func(a []any) any {
+		slider := mustGet(pre("set-slider-value"), "GUI slider ID", a, 0).(*widget.Slider)
+		slider.SetValue(z3.ToFloat64(a[1]))
+		return z3.Void
+	})
+
 	// ICON
 
 	// (new-icon <resource>)
@@ -485,6 +738,52 @@ func DefUI(interp *z3.Interp, config Config) {
 	interp.Def(pre("close-ui"), 0, func(a []any) any {
 		CloseUI()
 		return z3.Void
+	})
+
+	interp.Def(pre("get-clipboard-content"), 0, func(a []any) any {
+		if !config.ClipboardGetAllowed {
+			panic("getting clipboard content is prohibited by security policy!")
+		}
+		s := mainWin.Clipboard().Content()
+		return s
+	})
+
+	interp.Def(pre("set-clipboard-content"), 1, func(a []any) any {
+		if !config.ClipboardSetAllowed {
+			panic("setting clipboard content is prohibited by security policy!")
+		}
+		mainWin.Clipboard().SetContent(a[0].(string))
+		return z3.Void
+	})
+
+	interp.Def(pre("get-device-info"), 0, func(a []any) any {
+		arr := make([]any, 0)
+		dev := fyne.CurrentDevice()
+		var sym *z3.Sym
+		switch dev.Orientation() {
+		case fyne.OrientationVertical:
+			sym = z3.NewSym("vertical")
+		case fyne.OrientationVerticalUpsideDown:
+			sym = z3.NewSym("vertical-upside-down")
+		case fyne.OrientationHorizontalLeft:
+			sym = z3.NewSym("left")
+		case fyne.OrientationHorizontalRight:
+			sym = z3.NewSym("right")
+		default:
+			sym = z3.NewSym("unknown")
+		}
+		arr = append(arr, &z3.Cell{Car: z3.NewSym("orientation"), Cdr: &z3.Cell{Car: sym, Cdr: z3.Nil}})
+
+		arr = append(arr, &z3.Cell{Car: z3.NewSym("is-mobile?"),
+			Cdr: &z3.Cell{Car: z3.AsLispBool(dev.IsMobile()), Cdr: z3.Nil}})
+		arr = append(arr, &z3.Cell{Car: z3.NewSym("is-browser?"),
+			Cdr: &z3.Cell{Car: z3.AsLispBool(dev.IsBrowser()), Cdr: z3.Nil}})
+		arr = append(arr, &z3.Cell{Car: z3.NewSym("has-keyboard?"),
+			Cdr: &z3.Cell{Car: z3.AsLispBool(dev.HasKeyboard()), Cdr: z3.Nil}})
+		arr = append(arr, &z3.Cell{Car: z3.NewSym("system-scale"),
+			Cdr: &z3.Cell{Car: goarith.AsNumber(math.Abs(float64(dev.SystemScaleForWindow(mainWin)))), Cdr: z3.Nil}})
+
+		return z3.ArrayToList(arr)
 	})
 
 	// LAYOUTS
@@ -540,6 +839,21 @@ func DefUI(interp *z3.Interp, config Config) {
 			li = li.CdrCell()
 		}
 		c := container.New(layout.(fyne.Layout), objs...)
+		return put(c)
+	})
+
+	interp.Def(pre("new-container-without-layout"), -1, func(a []any) any {
+		li := a[0].(*z3.Cell)
+		objs := make([]fyne.CanvasObject, 0, len(a)-1)
+		for li != z3.Nil {
+			obj, ok := get(li.Car)
+			if !ok {
+				panic(fmt.Sprintf(pre("new-container: unknown GUI object ID, given %v"), z3.Str(li.Car)))
+			}
+			objs = append(objs, obj.(fyne.CanvasObject))
+			li = li.CdrCell()
+		}
+		c := container.NewWithoutLayout(objs...)
 		return put(c)
 	})
 
@@ -814,4 +1128,42 @@ func DefUI(interp *z3.Interp, config Config) {
 		return put(res)
 	})
 
+}
+
+// MustGetPosition expects a position in argument a at argument index argIdx and returns it,
+// panics if a is not a position list. The argument may be nil, in case of which bool is false.
+func MustGetPosition(caller string, argIdx int, a any) (fyne.Position, bool) {
+	li, ok := a.(*z3.Cell)
+	if !ok {
+		panic(fmt.Sprintf("%v: expected GUI position list as %v argument, given %v", caller,
+			idxToEnglish(argIdx), z3.Str(a)))
+	}
+	if li == z3.Nil {
+		return fyne.Position{}, false
+	}
+	x := float32(z3.ToFloat64(li.Car))
+	li = li.CdrCell()
+	y := float32(z3.ToFloat64(li.Car))
+	return fyne.Position{X: x, Y: y}, true
+}
+
+func idxToEnglish(idx int) string {
+	switch idx {
+	case 0:
+		return "first"
+	case 1:
+		return "second"
+	case 2:
+		return "third"
+	case 3:
+		return "fourth"
+	case 4:
+		return "fifth"
+	case 5:
+		return "sixth"
+	case 6:
+		return "seventh"
+	default:
+		return fmt.Sprintf("%vth", idx+1)
+	}
 }

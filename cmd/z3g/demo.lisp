@@ -46,7 +46,7 @@
   (letrec ((win (new-window "Demo 6: List"))
            (li (new-list (lambda () 200000)
 			 (lambda () (new-label "template        "))
-			 (lambda (idx lbl) (set-label-text lbl (fmt "Item %v" idx))))))
+			 (lambda (lbl idx) (set-label-text lbl (fmt "Item %v" idx))))))
     (set-window-content win li)
     (show-window win)))
 
@@ -97,5 +97,49 @@
       (set-progress-bar b2 'value n)
       (set-progress-bar b3 n))))
 
-(out "Use (demo1) ... (demo8) to run GUI demos.\n")
+(defun demo10 ()
+  (letrec ((win (new-window "Demo 10: Slider"))
+	   (label (new-label "<no value yet>"))
+	   (slider (new-slider 0.0 1000.0 (lambda (x) (set-label-text label (fmt "Value: %v" x)))))
+	   (box (new-border label nil nil nil slider)))
+    (set-window-content win box)
+    (show-window win)))
+
+(defun demo11 ()
+  (letrec ((win (new-window "Demo 11: Table"))
+           (li (new-table (lambda () '(200 5))
+			 (lambda () (new-label "template        "))
+			 (lambda (lbl row col) (set-label-text lbl (fmt "Cell %v-%v" row col))))))
+    (set-window-content win li)
+    (show-window win)))
+
+(defun demo12 ()
+  (letrec ((win (new-window "Demo 12: Tree"))
+	   (tree (new-tree
+		  (lambda (id) (case id
+				 (("1 Item") '("1.1 Item" "1.2 Item" "1.3 Item"))
+				 (("2 Item") '("2.1 Item" "2.2 Item" "2.4 Item" "2.5 Item"))
+				 (("3 Item") '("3.1 Item" "3.2 Item"))
+				 (("2.2 Item") '("2.2.1 Item" "2.2.2 Item"))
+				 (("") '("1 Item" "2 Item" "3 Item"))
+				 (t '())))
+		  (lambda (id) (case id
+				 (("" "1 Item" "2 Item" "3 Item" "2.2 Item") t)
+				 (t nil)))
+		  (lambda (is-branch?) (new-label "Tree template"))
+		  (lambda (id is-branch? obj) (set-label-text obj id)))))
+    (set-window-content win tree)
+    (show-window win)))
+
+(defun demo13 ()
+  (letrec ((win (new-window "Demo 13: Drawing"))
+	   (rect (new-rectangle (nrgba 255 100 100 255) 200 100 nil (nrgba 200 50 50 220) 10.0))
+	   (circ (new-circle (nrgba 100 255 100 200) nil nil (nrgba 50 200 50 255) 4.0))
+	   (line (new-line (nrgba 0 0 0 255) nil nil (nrgba 10 10 10 255) 4.0))
+	   (canvas (new-container (new-max-layout) rect circ line)))
+    (set-window-content win canvas)
+    (set-window-size win 400 200)
+    (show-window win)))
+
+(out "Use (demo1) ... (demo13) to run GUI demos.\n")
 
