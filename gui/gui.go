@@ -569,8 +569,7 @@ func DefUI(interp *z3.Interp, config Config) {
 		if li == z3.Nil {
 			return put(rect)
 		}
-		// TODO requires Fyne 2.4
-		// rect.CornerRadius = float32(z3.ToFloat64(li.Car))
+		rect.CornerRadius = float32(z3.ToFloat64(li.Car))
 		return put(rect)
 	})
 
