@@ -12,6 +12,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -705,6 +706,13 @@ func DefUI(interp *z3.Interp, config Config) {
 		return put(raster)
 	})
 
+	// KEYBOARD
+
+	interp.Def(pre("new-shortcut"), -1, func(a []any) any {
+		key, modifier := MustGetShortcut(pre("new-shortcut"), a[0].(*z3.Cell))
+		return put(&desktop.CustomShortcut{KeyName: key, Modifier: modifier})
+	})
+
 	// CANVAS OBJECT (polymorphic methods)
 
 	// (move-object <obj> <pos>) attempts to move a GUI object (polymorphic)
@@ -1345,4 +1353,194 @@ func MustGetTextStyle(caller string, idx int, a any) fyne.TextStyle {
 		li = li.CdrCell()
 	}
 	return style
+}
+
+// MustGetShortcut converts a Z3S5 Lisp list shortcut representations into the key name and modifier
+// of a fyne.KeyShortcut.
+func MustGetShortcut(caller string, li *z3.Cell) (fyne.KeyName, fyne.KeyModifier) {
+	var mod fyne.KeyModifier
+	var key fyne.KeyName
+	for li != z3.Nil {
+		var s string
+		sym, ok := li.Car.(*z3.Sym)
+		if ok {
+			s = sym.String()
+		} else if str, ok := li.Car.(string); ok {
+			s = str
+		} else if n, ok := li.Car.(goarith.Number); ok {
+			s = fmt.Sprintf("%v", n)
+		} else {
+			panic(fmt.Sprintf("%v: expected valid keyboard shortcut list, given %v", caller, z3.Str(li)))
+		}
+		switch s {
+		case "shift":
+			mod = mod | fyne.KeyModifierShift
+		case "control", "ctrl":
+			mod = mod | fyne.KeyModifierControl
+		case "alt":
+			mod = mod | fyne.KeyModifierAlt
+		case "super":
+			mod = mod | fyne.KeyModifierSuper
+		case "esc", "escape":
+			key = fyne.KeyEscape
+		case "ret", "return":
+			key = fyne.KeyReturn
+		case "tab":
+			key = fyne.KeyTab
+		case "backspace", "bkspc":
+			key = fyne.KeyBackspace
+		case "insert", "ins":
+			key = fyne.KeyInsert
+		case "del", "delete":
+			key = fyne.KeyDelete
+		case "right":
+			key = fyne.KeyRight
+		case "left":
+			key = fyne.KeyLeft
+		case "down":
+			key = fyne.KeyDown
+		case "up":
+			key = fyne.KeyUp
+		case "page-up":
+			key = fyne.KeyPageUp
+		case "page-down":
+			key = fyne.KeyPageDown
+		case "home":
+			key = fyne.KeyHome
+		case "end":
+			key = fyne.KeyEnd
+		case "f1":
+			key = fyne.KeyF1
+		case "f2":
+			key = fyne.KeyF2
+		case "f3":
+			key = fyne.KeyF3
+		case "f4":
+			key = fyne.KeyF4
+		case "f5":
+			key = fyne.KeyF5
+		case "f6":
+			key = fyne.KeyF6
+		case "f7":
+			key = fyne.KeyF7
+		case "f8":
+			key = fyne.KeyF8
+		case "f9":
+			key = fyne.KeyF9
+		case "f10":
+			key = fyne.KeyF10
+		case "f11":
+			key = fyne.KeyF11
+		case "f12":
+			key = fyne.KeyF12
+		case "enter":
+			key = fyne.KeyEnter
+		case "key0", "0":
+			key = fyne.Key0
+		case "key1", "1":
+			key = fyne.Key1
+		case "key2", "2":
+			key = fyne.Key2
+		case "key3", "3":
+			key = fyne.Key3
+		case "key4", "4":
+			key = fyne.Key4
+		case "key5", "5":
+			key = fyne.Key5
+		case "key6", "6":
+			key = fyne.Key6
+		case "key7", "7":
+			key = fyne.Key7
+		case "key8", "8":
+			key = fyne.Key8
+		case "key9", "9":
+			key = fyne.Key9
+		case "a":
+			key = fyne.KeyA
+		case "b":
+			key = fyne.KeyB
+		case "c":
+			key = fyne.KeyC
+		case "d":
+			key = fyne.KeyD
+		case "e":
+			key = fyne.KeyE
+		case "f":
+			key = fyne.KeyF
+		case "g":
+			key = fyne.KeyG
+		case "h":
+			key = fyne.KeyH
+		case "i":
+			key = fyne.KeyI
+		case "j":
+			key = fyne.KeyJ
+		case "k":
+			key = fyne.KeyK
+		case "l":
+			key = fyne.KeyL
+		case "m":
+			key = fyne.KeyM
+		case "n":
+			key = fyne.KeyN
+		case "o":
+			key = fyne.KeyO
+		case "p":
+			key = fyne.KeyP
+		case "q":
+			key = fyne.KeyQ
+		case "r":
+			key = fyne.KeyR
+		case "s":
+			key = fyne.KeyS
+		case "t":
+			key = fyne.KeyT
+		case "u":
+			key = fyne.KeyU
+		case "v":
+			key = fyne.KeyV
+		case "w":
+			key = fyne.KeyW
+		case "x":
+			key = fyne.KeyX
+		case "y":
+			key = fyne.KeyY
+		case "z":
+			key = fyne.KeyZ
+		case "space", "spc", " ":
+			key = fyne.KeySpace
+		case "apostrophe", "tick", "'":
+			key = fyne.KeyApostrophe
+		case "comma", ",":
+			key = fyne.KeyComma
+		case "minus", "-":
+			key = fyne.KeyMinus
+		case "period", "dot", ".":
+			key = fyne.KeyPeriod
+		case "slash", "/":
+			key = fyne.KeySlash
+		case "backslash", "\\":
+			key = fyne.KeyBackslash
+		case "left-bracket", "lbracket", "[":
+			key = fyne.KeyLeftBracket
+		case "right-bracket", "rbracket", "]":
+			key = fyne.KeyRightBracket
+		case "semicolon", ";":
+			key = fyne.KeySemicolon
+		case "equal", "=":
+			key = fyne.KeyEqual
+		case "asterisk", "*":
+			key = fyne.KeyAsterisk
+		case "plus", "+":
+			key = fyne.KeyPlus
+		case "back-tick", "backtick", "`":
+			key = fyne.KeyBackTick
+		case "unknown", "":
+			key = fyne.KeyUnknown
+		default:
+			panic(fmt.Sprintf("%v: expected list of valid keyboard shortcut symbols, strings, or digits, but '%v is not valid; other arguments were '%v", caller, s, z3.Str(li)))
+		}
+		li = li.CdrCell()
+	}
+	return key, mod
 }
