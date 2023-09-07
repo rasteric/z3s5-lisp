@@ -679,6 +679,105 @@ func DefUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	// (new-raster-with-pixels <pixel-proc>) where <pixel-proc> takes x, y, w, h and returns
+	// a color list (NOT an nrgba color, for performance reasons this is created at the Go side).
+	interp.Def(pre("new-raster-with-pixels"), 1, func(a []any) any {
+		proc := a[0].(*z3.Closure)
+		raster := canvas.NewRasterWithPixels(func(x, y, w, h int) color.Color {
+			li := &z3.Cell{Car: proc, Cdr: &z3.Cell{Car: goarith.AsNumber(x), Cdr: &z3.Cell{Car: goarith.AsNumber(y),
+				Cdr: &z3.Cell{Car: goarith.AsNumber(w), Cdr: &z3.Cell{Car: goarith.AsNumber(h), Cdr: z3.Nil}}}}}
+			result := interp.Eval(li, z3.Nil)
+			li = result.(*z3.Cell)
+			r := z3.ToUInt8(li.Car)
+			li = li.CdrCell()
+			g := z3.ToUInt8(li.Car)
+			li = li.CdrCell()
+			b := z3.ToUInt8(li.Car)
+			li = li.CdrCell()
+			var alpha uint8
+			if li != z3.Nil {
+				alpha = z3.ToUInt8(li.Car)
+			} else {
+				alpha = 255
+			}
+			return color.NRGBA{R: r, G: g, B: b, A: alpha}
+		})
+		return put(raster)
+	})
+
+	// CANVAS OBJECT (polymorphic methods)
+
+	// (move-object <obj> <pos>) attempts to move a GUI object (polymorphic)
+	interp.Def(pre("move-object"), 2, func(a []any) any {
+		obj := mustGet(pre("move"), "GUI canvas object ID", a, 0)
+		pos, ok := MustGetPosition(pre("gui-move"), 1, a[1])
+		if !ok {
+			return z3.Void
+		}
+		obj.(fyne.CanvasObject).Move(pos)
+		return z3.Void
+	})
+
+	// (resize-object <obj> <pos>) attempts to resize a GUI object (polymorphic)
+	interp.Def(pre("resize-object"), 3, func(a []any) any {
+		obj := mustGet(pre("resize-object"), "GUI canvas object ID", a, 0)
+		w := float32(z3.ToFloat64(a[1]))
+		h := float32(z3.ToFloat64(a[2]))
+		obj.(fyne.CanvasObject).Resize(fyne.NewSize(w, h))
+		return z3.Void
+	})
+
+	// (get-object-size <obj>) => li
+	interp.Def(pre("get-object-size"), 1, func(a []any) any {
+		obj := mustGet(pre("get-object-size"), "GUI canvas object ID", a, 0)
+		size := obj.(fyne.CanvasObject).Size()
+		return &z3.Cell{Car: goarith.AsNumber(float64(size.Width)),
+			Cdr: &z3.Cell{Car: goarith.AsNumber(float64(size.Height)), Cdr: z3.Nil}}
+	})
+
+	// (get-object-min-size <obj>) => li
+	interp.Def(pre("get-min-size"), 1, func(a []any) any {
+		obj := mustGet(pre("get-object-min-size"), "GUI canvas object ID", a, 0)
+		size := obj.(fyne.CanvasObject).MinSize()
+		return &z3.Cell{Car: goarith.AsNumber(float64(size.Width)),
+			Cdr: &z3.Cell{Car: goarith.AsNumber(float64(size.Height)), Cdr: z3.Nil}}
+	})
+
+	// (get-object-position <obj>) => li
+	interp.Def(pre("get-object-position"), 1, func(a []any) any {
+		obj := mustGet(pre("get-object-position"), "GUI canvas object ID", a, 0)
+		pos := obj.(fyne.CanvasObject).Position()
+		return &z3.Cell{Car: goarith.AsNumber(float64(pos.X)),
+			Cdr: &z3.Cell{Car: goarith.AsNumber(float64(pos.Y)), Cdr: z3.Nil}}
+	})
+
+	// (hide-object <obj>)
+	interp.Def(pre("hide-object"), 1, func(a []any) any {
+		obj := mustGet(pre("hide-object"), "GUI canvas object ID", a, 0)
+		obj.(fyne.CanvasObject).Hide()
+		return z3.Void
+	})
+
+	// (show-object <obj>)
+	interp.Def(pre("show-object"), 1, func(a []any) any {
+		obj := mustGet(pre("show-object"), "GUI canvas object ID", a, 0)
+		obj.(fyne.CanvasObject).Show()
+		return z3.Void
+	})
+
+	// (object-visible? <obj>) => bool
+	interp.Def(pre("object-visible?"), 1, func(a []any) any {
+		obj := mustGet(pre("object-visible?"), "GUI canvas object ID", a, 0)
+		return z3.AsLispBool(obj.(fyne.CanvasObject).Visible())
+	})
+
+	// (refresh-object <obj>)
+	interp.Def(pre("refresh-object"), 1, func(a []any) any {
+		obj := mustGet(pre("refresh-object"), "GUI canvas object ID", a, 0)
+		obj.(fyne.CanvasObject).Refresh()
+		return z3.Void
+	})
+
 	// PROGRESSBAR
 
 	// (new-progress-bar)
