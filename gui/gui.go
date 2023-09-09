@@ -284,6 +284,46 @@ func DefUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	// (entry-accepts-tab? <entry>) => bool
+	interp.Def(pre("entry-accepts-tab?"), 1, func(a []any) any {
+		e := mustGet(pre("entry-accepts-tab"), "entry", a, 0).(*widget.Entry)
+		return z3.AsLispBool(e.AcceptsTab())
+	})
+
+	// (get-entry-cursor <entry>) => sym
+	interp.Def(pre("get-entry-cursor"), 1, func(a []any) any {
+		e := mustGet(pre("get-entry-cursor"), "entry", a, 0).(*widget.Entry)
+		return CursorToSym(e.Cursor())
+	})
+
+	// (get-entry-selected-text <entry>) => str
+	interp.Def(pre("get-entry-selected-text"), 1, func(a []any) any {
+		e := mustGet(pre("get-entry-selected-text"), "entry", a, 0).(*widget.Entry)
+		return e.SelectedText()
+	})
+
+	// (set-entry-min-rows-visible <entry> <row>)
+	interp.Def(pre("set-entry-min-rows-visible"), 2, func(a []any) any {
+		e := mustGet(pre("set-entry-min-rows-visible"), "entry", a, 0).(*widget.Entry)
+		n := z3.ToInt64(pre("set-entry-min-rows-visible"), a[1])
+		e.SetMinRowsVisible(int(n))
+		return z3.Void
+	})
+
+	// (set-entry-place-holder <entry> <str>)
+	interp.Def(pre("set-entry-place-holder"), 2, func(a []any) any {
+		e := mustGet(pre("set-entry-place-holder"), "entry", a, 0).(*widget.Entry)
+		e.SetPlaceHolder(a[1].(string))
+		return z3.Void
+	})
+
+	// (set-entry-text <entry> <str>)
+	interp.Def(pre("set-entry-text"), 2, func(a []any) any {
+		e := mustGet(pre("set-entry-text"), "entry", a, 0).(*widget.Entry)
+		e.SetText(a[1].(string))
+		return z3.Void
+	})
+
 	// TEXTGRID
 
 	// (new-text-grid [<string>] [show-line-numbers|show-whitespace|tab-width <int>])
@@ -715,9 +755,43 @@ func DefUI(interp *z3.Interp, config Config) {
 
 	// CANVAS OBJECT (polymorphic methods)
 
+	// (disable-object <obj>)
+	interp.Def(pre("disable-object"), 2, func(a []any) any {
+		obj := mustGet(pre("disable-object"), "GUI disableable object ID", a, 0)
+		obj.(fyne.Disableable).Disable()
+		return z3.Void
+	})
+
+	// (enable-object <obj>)
+	interp.Def(pre("enable-object"), 2, func(a []any) any {
+		obj := mustGet(pre("enable-object"), "GUI disableable object ID", a, 0)
+		obj.(fyne.Disableable).Enable()
+		return z3.Void
+	})
+
+	// (hide-object <obj>)
+	interp.Def(pre("hide-object"), 2, func(a []any) any {
+		obj := mustGet(pre("hide-object"), "GUI widget ID", a, 0)
+		obj.(fyne.Widget).Hide()
+		return z3.Void
+	})
+
+	// (show-object <obj>)
+	interp.Def(pre("show-object"), 2, func(a []any) any {
+		obj := mustGet(pre("show-object"), "GUI widget ID", a, 0)
+		obj.(fyne.Widget).Show()
+		return z3.Void
+	})
+
+	// (object-disabled? <obj>) => bool
+	interp.Def(pre("object-disabled?"), 2, func(a []any) any {
+		obj := mustGet(pre("object-disabled?"), "GUI disableable object ID", a, 0)
+		return z3.AsLispBool(obj.(fyne.Disableable).Disabled())
+	})
+
 	// (move-object <obj> <pos>) attempts to move a GUI object (polymorphic)
 	interp.Def(pre("move-object"), 2, func(a []any) any {
-		obj := mustGet(pre("move"), "GUI canvas object ID", a, 0)
+		obj := mustGet(pre("move-object"), "GUI canvas object ID", a, 0)
 		pos, ok := MustGetPosition(pre("gui-move"), 1, a[1])
 		if !ok {
 			return z3.Void
@@ -953,8 +1027,8 @@ func DefUI(interp *z3.Interp, config Config) {
 		return put(layout.NewCenterLayout())
 	})
 
-	interp.Def(pre("new-max-layout"), 0, func(a []any) any {
-		return put(layout.NewMaxLayout())
+	interp.Def(pre("new-stack-layout"), 0, func(a []any) any {
+		return put(layout.NewStackLayout())
 	})
 
 	// CONTAINER
@@ -1543,4 +1617,31 @@ func MustGetShortcut(caller string, li *z3.Cell) (fyne.KeyName, fyne.KeyModifier
 		li = li.CdrCell()
 	}
 	return key, mod
+}
+
+var DefaultCursorSym = z3.NewSym("default")
+var TextCursorSym = z3.NewSym("text")
+var CrosshairCursorSym = z3.NewSym("crosshair")
+var PointerCursorSym = z3.NewSym("pointer")
+var HResizeCursorSym = z3.NewSym("hresize")
+var VResizeCursorSym = z3.NewSym("vresize")
+
+// CursorToSym converts a Fyne desktop.Cursor to a symbol.
+func CursorToSym(c desktop.Cursor) *z3.Sym {
+	switch c {
+	case desktop.DefaultCursor:
+		return DefaultCursorSym
+	case desktop.TextCursor:
+		return TextCursorSym
+	case desktop.CrosshairCursor:
+		return CrosshairCursorSym
+	case desktop.PointerCursor:
+		return PointerCursorSym
+	case desktop.HResizeCursor:
+		return HResizeCursorSym
+	case desktop.VResizeCursor:
+		return VResizeCursorSym
+	default:
+		panic(fmt.Sprintf("unknown cursor value: %v", c))
+	}
 }
