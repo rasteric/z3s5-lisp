@@ -181,5 +181,55 @@
     (set-window-size win 600 400)
     (show-window win)))
 
-(out "Use (demo1) ... (demo15) to run GUI demos.\n")
+(defun demo16 ()
+  (letrec ((win (new-window "Demo16: Validation"))
+	   (form (new-form))
+	   (e1 (new-entry))
+	   (e2 (new-entry))
+	   (e3 (new-entry))
+	   (e4 (new-entry 'multi-line))
+	   (button (new-button "Validate All" (lambda ()
+						(set-entry-text
+						 e4
+						 (str+
+						  "Field 1: "
+						 (validate-object e1)
+						 "\nField 2: "
+						 (validate-object e2)
+						 "\nField 3: "
+						(validate-object e3)))))))
+    (set-entry-validator e1 (new-validator (lambda (s) (if (not (equal? s "schmoopie"))
+							   "This entry only accepts the string \"schmoopie\"."
+							   ""))))
+    (set-entry-validator e2 (new-time-validator "Mon Jan 2 15:04:05 -0700 MST 2006"))
+    (set-entry-validator
+     e3
+     (new-regexp-validator
+      "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
+      "This is not a valid email address."))
+    (append-form form "Field 1" e1)
+    (append-form form "Field 2" e2)
+    (append-form form "Field 3" e3)
+    (append-form form "Manual Validation" button)
+    (append-form form "Validation Result" e4)
+    (set-window-content win form)
+    (set-window-size win 800 400)
+    (show-window win)))
+
+(defun demo17 ()
+  (letrec ((win (new-window "Demo 17: Extended Text Grid"))
+	   (grid (new-text-grid)))
+    (set-window-content win grid)
+    (show-window win)
+    (void (future (letrec ((doit
+			    (lambda ()
+			      (let ((bw (rand 0 0 255)))
+				(set-text-grid-style
+				 grid (rand 0 0 19) (rand 0 0 99)
+				 (list (list 0 0 0 255)
+				       (list bw bw bw 255)))
+				(doit)))))
+		    (doit))))))
+
+(out "Use (demo1) ... (demo17) to run GUI demos.\n")
 

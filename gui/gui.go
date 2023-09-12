@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"errors"
 	"fmt"
 	"image/color"
 	"math"
@@ -12,6 +13,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/data/validation"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
@@ -25,6 +27,10 @@ var storage sync.Map
 var revstore sync.Map
 var apl fyne.App
 var mainWin fyne.Window
+
+type validatorWrapper struct {
+	fn fyne.StringValidator
+}
 
 // used for transforming hyperlink URLs
 type HyperlinkCheckFunc = func(url *url.URL) *url.URL
@@ -274,7 +280,7 @@ func DefUI(interp *z3.Interp, config Config) {
 
 	// (set-entry-on-change-callback <entry> (lambda (str) ...))
 	interp.Def(pre("set-entry-on-change-callback"), 2, func(a []any) any {
-		e := mustGet(pre("set-entry-on-change-callback"), "entry", a, 0)
+		e := mustGet(pre("set-entry-on-change-callback"), "GUI entry ID", a, 0)
 		proc := a[1].(*z3.Closure)
 		e.(*widget.Entry).OnChanged = func(s string) {
 			li2 := &z3.Cell{Car: s, Cdr: z3.Nil}
@@ -284,10 +290,52 @@ func DefUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	// (set-entry-validator <entry> <validator>))
+	interp.Def(pre("set-entry-validator"), 2, func(a []any) any {
+		e := mustGet(pre("set-entry-validator"), "GUI entry ID", a, 0).(*widget.Entry)
+		validator := mustGet(pre("set-entry-validator"), "GUI validator ID", a, 1).(*validatorWrapper)
+		e.Validator = validator.fn
+		return z3.Void
+	})
+
 	// (entry-accepts-tab? <entry>) => bool
 	interp.Def(pre("entry-accepts-tab?"), 1, func(a []any) any {
 		e := mustGet(pre("entry-accepts-tab"), "entry", a, 0).(*widget.Entry)
 		return z3.AsLispBool(e.AcceptsTab())
+	})
+
+	// (get-entry-cursor-pos <entry>) => li
+	interp.Def(pre("get-entry-cursor-pos"), 1, func(a []any) any {
+		e := mustGet(pre("get-entry-cursor-pos"), "GUI entry ID", a, 0).(*widget.Entry)
+		row := e.CursorRow
+		column := e.CursorColumn
+		return &z3.Cell{Car: goarith.AsNumber(row), Cdr: &z3.Cell{Car: goarith.AsNumber(column), Cdr: z3.Nil}}
+	})
+
+	// (set-entry-cursor-row <entry> <row>)
+	interp.Def(pre("set-entry-cursor-row"), 2, func(a []any) any {
+		e := mustGet(pre("set-entry-cursor-row"), "GUI entry ID", a, 0).(*widget.Entry)
+		n := z3.ToInt64(pre("set-entry-cursor-row"), a[1])
+		e.CursorRow = int(n)
+		return z3.Void
+	})
+
+	// (set-entry-cursor-column <entry> <column>)
+	interp.Def(pre("set-entry-cursor-column"), 2, func(a []any) any {
+		e := mustGet(pre("set-entry-cursor-column"), "GUI entry ID", a, 0).(*widget.Entry)
+		n := z3.ToInt64(pre("set-entry-cursor-column"), a[1])
+		e.CursorColumn = int(n)
+		return z3.Void
+	})
+
+	// (set-entry-on-cursor-change-callback <entry> <proc>) where <proc> takes an entry ID as argument
+	interp.Def(pre("set-entry-on-cursor-change-callback"), 2, func(a []any) any {
+		e := mustGet(pre("set-entry-on-cursor-change-callback"), "GUI entry ID", a, 0).(*widget.Entry)
+		proc := a[1].(*z3.Closure)
+		e.OnCursorChanged = func() {
+			interp.Eval(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: a[0], Cdr: z3.Nil}}, z3.Nil)
+		}
+		return z3.Void
 	})
 
 	// (get-entry-cursor <entry>) => sym
@@ -324,6 +372,79 @@ func DefUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	// VALIDATORS
+
+	// (new-combined-string-validators <validator> [<validators>...]) => validator ID
+	interp.Def(pre("new-combined-string-validator"), -1, func(a []any) any {
+		li := a[0].(*z3.Cell)
+		validators := make([]fyne.StringValidator, 0)
+		for li != z3.Nil {
+			validator := mustGet1(pre("new-combined-string-validator"), "GUI string validator ID", li.Car)
+			validators = append(validators, validator.(fyne.StringValidator))
+			li = li.CdrCell()
+		}
+		return put(&validatorWrapper{fn: validation.NewAllStrings(validators...)})
+	})
+
+	// (new-regexp-validator <regexp-str> <reason>) => validator ID
+	interp.Def(pre("new-regexp-validator"), 2, func(a []any) any {
+		return put(&validatorWrapper{validation.NewRegexp(a[0].(string), a[1].(string))})
+	})
+
+	// (new-time-validator <time-format-str>) => validator ID
+	interp.Def(pre("new-time-validator"), 1, func(a []any) any {
+		return put(&validatorWrapper{fn: validation.NewTime(a[0].(string))})
+	})
+
+	// (new-validator <proc>) => validator ID, where <proc> is a function that takes a string
+	// and returns a string. If the return string is not "", the validation fails with the reason
+	// given in the string. If <proc> panics, validation also fails.
+	interp.Def(pre("new-validator"), 1, func(a []any) any {
+		proc := a[0].(*z3.Closure)
+		fn := func(s string) error {
+			result, err := interp.SafeEval(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: s, Cdr: z3.Nil}}, z3.Nil)
+			if err != nil {
+				return err.(error)
+			}
+			str, ok := result.(string)
+			if !ok {
+				return nil
+			}
+			if str != "" {
+				return errors.New(str)
+			}
+			return nil
+		}
+		return put(&validatorWrapper{fn: fyne.StringValidator(fn)})
+	})
+
+	// (set-object-on-validation-change-callback <obj> <proc>) where <proc> takes a string as error message
+	// and this argument is Nil if validation succeeds.
+	interp.Def(pre("set-object-on-validation-change-callback"), 2, func(a []any) any {
+		e := mustGet(pre("set-object-on-validation-change-callback"), "GUI validatable ID", a, 0).(fyne.Validatable)
+		proc := a[1].(*z3.Closure)
+		e.SetOnValidationChanged(func(e error) {
+			var arg any
+			if e == nil {
+				arg = z3.Nil
+			} else {
+				arg = e.Error()
+			}
+			interp.Eval(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: arg, Cdr: z3.Nil}}, z3.Nil)
+		})
+		return z3.Void
+	})
+
+	// (validate-object <obj>) => error message string or ""
+	interp.Def(pre("validate-object"), 1, func(a []any) any {
+		e := mustGet(pre("validate-object"), "GUI validatable ID", a, 0).(fyne.Validatable)
+		err := e.Validate()
+		if err == nil {
+			return ""
+		}
+		return err.Error()
+	})
+
 	// TEXTGRID
 
 	// (new-text-grid [<string>] [show-line-numbers|show-whitespace|tab-width <int>])
@@ -357,7 +478,169 @@ func DefUI(interp *z3.Interp, config Config) {
 		return put(grid)
 	})
 
-	// CHECK
+	// (text-grid-show-line-numbers? <grid>) => bool
+	interp.Def(pre("text-grid-show-line-numbers?"), 1, func(a []any) any {
+		grid := mustGet(pre("text-grid-show-line-numbers?"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		return z3.AsLispBool(grid.ShowLineNumbers)
+	})
+
+	// (text-grid-show-whitespace? <grid>) => bool
+	interp.Def(pre("text-grid-show-whitespace?"), 1, func(a []any) any {
+		grid := mustGet(pre("text-grid-show-whitespace?"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		return z3.AsLispBool(grid.ShowWhitespace)
+	})
+
+	// (text-grid-tab-width <grid>) => num
+	interp.Def(pre("get-text-grid-tab-width"), 1, func(a []any) any {
+		grid := mustGet(pre("get-text-grid-tab-width"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		return goarith.AsNumber(grid.TabWidth)
+	})
+
+	// (set-text-grid-tab-width <grid> <n>)
+	interp.Def(pre("set-text-grid-tab-width"), 2, func(a []any) any {
+		grid := mustGet(pre("set-text-grid-tab-width"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		grid.TabWidth = int(z3.ToInt64(pre("set-text-grid-tab-width"), a[1]))
+		return z3.Void
+	})
+
+	// (set-text-grid-show-line-numbers <grid> <show?>)
+	interp.Def(pre("set-text-grid-show-line-numbers"), 2, func(a []any) any {
+		grid := mustGet(pre("set-text-grid-show-line-numbers"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		grid.ShowLineNumbers = z3.ToBool(a[1])
+		return z3.Void
+	})
+
+	// (set-text-grid-show-whitespace <grid> <show?>)
+	interp.Def(pre("set-text-grid-show-whitespace"), 2, func(a []any) any {
+		grid := mustGet(pre("set-text-grid-show-whitespace"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		grid.ShowWhitespace = z3.ToBool(a[1])
+		return z3.Void
+	})
+
+	// (get-text-grid-row <grid> <row>) => li
+	// The list consists of an array of cells and a style list. The array of cells contains lists
+	// consisting of a rune string and a style list. Style lists consist of a list of foreground color
+	// values and a list of background color values.
+	interp.Def(pre("get-text-grid-row"), 2, func(a []any) any {
+		grid := mustGet(pre("get-text-grid-row"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := grid.Row(int(z3.ToInt64(pre("get-text-grid-row"), a[1])))
+		cells := make([]any, 0)
+		for _, cell := range row.Cells {
+			elem := &z3.Cell{Car: string(cell.Rune), Cdr: &z3.Cell{Car: TextGridStyleToList(cell.Style),
+				Cdr: z3.Nil}}
+			cells = append(cells, elem)
+		}
+		return &z3.Cell{Car: cells, Cdr: &z3.Cell{Car: TextGridStyleToList(row.Style), Cdr: z3.Nil}}
+	})
+
+	// (get-text-grid-row-text <grid> <row>) => str
+	interp.Def(pre("get-text-grid-row-text"), 2, func(a []any) any {
+		grid := mustGet(pre("get-text-grid-row-text"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		s := grid.RowText(int(z3.ToInt64(pre("get-text-grid-row-text"), a[1])))
+		return s
+	})
+
+	// (set-text-grid-cell <grid> <row> <column> <cell>) where <cell> is a list consisting
+	// of a rune string and a text grid style list.
+	interp.Def(pre("set-text-grid-cell"), 4, func(a []any) any {
+		grid := mustGet(pre("set-text-grid-cell"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := int(z3.ToInt64(pre("set-text-grid-cell"), a[1]))
+		column := int(z3.ToInt64(pre("set-text-grid-cell"), a[2]))
+		li := a[3].(*z3.Cell)
+		r := []rune(li.Car.(string))[0]
+		li = li.CdrCell()
+		style := ListToTextGridStyle(li)
+		grid.SetCell(row, column, widget.TextGridCell{Rune: r, Style: style})
+		return z3.Void
+	})
+
+	// (get-text-grid-cell <grid> <row> <column>) => li
+	interp.Def(pre("get-text-grid-cell"), 3, func(a []any) any {
+		grid := mustGet(pre("get-text-grid-cell"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := int(z3.ToInt64(pre("get-text-grid-cell"), a[1]))
+		column := int(z3.ToInt64(pre("get-text-grid-cell"), a[2]))
+		cell := grid.Rows[row].Cells[column]
+		return &z3.Cell{Car: string(cell.Rune), Cdr: &z3.Cell{Car: TextGridStyleToList(cell.Style),
+			Cdr: z3.Nil}}
+	})
+
+	// (set-text-grid-row <grid> <row> <rowspec>) where <rowspec> has the same format as is returned
+	// by get-text-grid-row, i.e. it is an array of cell lists containing a rune string and a style list.
+	interp.Def(pre("set-text-grid-row"), 3, func(a []any) any {
+		grid := mustGet(pre("set-text-grid-row"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := int(z3.ToInt64(pre("set-text-grid-row"), a[1]))
+		li := a[2].(*z3.Cell)
+		columns := li.Car.([]any)
+		li = li.CdrCell()
+		style := ListToTextGridStyle(li.Car.(*z3.Cell))
+		cells := make([]widget.TextGridCell, 0, len(columns))
+		for i := range columns {
+			li = columns[i].(*z3.Cell)
+			r := []rune(li.Car.(string))[0]
+			li = li.CdrCell()
+			sty := ListToTextGridStyle(li.Car.(*z3.Cell))
+			cells = append(cells, widget.TextGridCell{Rune: r, Style: sty})
+		}
+		grid.SetRow(row, widget.TextGridRow{Cells: cells, Style: style})
+		return z3.Void
+	})
+
+	// (set-text-grid-row-style <grid> <row> <style-list>) sets the whole row to the style list,
+	// which contains a foreground color and a background color list.
+	interp.Def(pre("set-text-grid-row-style"), 3, func(a []any) any {
+		grid := mustGet(pre("set-text-grid-row-style"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := int(z3.ToInt64(pre("set-text-grid-row-style"), a[1]))
+		li := a[2].(*z3.Cell)
+		style := ListToTextGridStyle(li)
+		grid.SetRowStyle(row, style)
+		return z3.Void
+	})
+
+	// (set-text-grid-rune <grid> <row> <column> <str>)
+	interp.Def(pre("set-text-grid-rune"), 4, func(a []any) any {
+		grid := mustGet(pre("set-text-grid-rune"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := int(z3.ToInt64(pre("set-text-grid-rune"), a[1]))
+		column := int(z3.ToInt64(pre("set-text-grid-rune"), a[2]))
+		r := []rune(a[3].(string))[0]
+		grid.SetRune(row, column, r)
+		return z3.Void
+	})
+
+	// (set-text-grid-style <grid> <row> <column> <style-list>)
+	interp.Def(pre("set-text-grid-style"), 4, func(a []any) any {
+		grid := mustGet(pre("set-text-grid-style"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := int(z3.ToInt64(pre("set-text-grid-style"), a[1]))
+		column := int(z3.ToInt64(pre("set-text-grid-style"), a[2]))
+		style := ListToTextGridStyle(a[3].(*z3.Cell))
+		grid.SetStyle(row, column, style)
+		return z3.Void
+	})
+
+	// (set-text-grid-style-range <grid> <start-row> <start-column> <end-row> <end-column> <style-list>)
+	interp.Def(pre("set-text-grid-style-range"), 6, func(a []any) any {
+		grid := mustGet(pre("set-text-grid-style-range"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row1 := int(z3.ToInt64(pre("set-text-grid-style-range"), a[1]))
+		column1 := int(z3.ToInt64(pre("set-text-grid-style-range"), a[2]))
+		row2 := int(z3.ToInt64(pre("set-text-grid-style-range"), a[3]))
+		column2 := int(z3.ToInt64(pre("set-text-grid-style-range"), a[4]))
+		style := ListToTextGridStyle(a[5].(*z3.Cell))
+		grid.SetStyleRange(row1, column1, row2, column2, style)
+		return z3.Void
+	})
+
+	// (set-text-grid-text <grid> <str>)
+	interp.Def(pre("set-text-grid-text"), 2, func(a []any) any {
+		grid := mustGet(pre("set-text-grid-text"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		s := a[1].(string)
+		grid.SetText(s)
+		return z3.Void
+	})
+
+	// (get-text-grid-text <grid>) => str
+	interp.Def(pre("get-text-grid-text"), 1, func(a []any) any {
+		grid := mustGet(pre("get-text-grid-text"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		return grid.Text()
+	})
 
 	// (new-check <title-string> (lambda (bool) ...))
 	interp.Def(pre("new-check"), 2, func(a []any) any {
@@ -729,19 +1012,7 @@ func DefUI(interp *z3.Interp, config Config) {
 				Cdr: &z3.Cell{Car: goarith.AsNumber(w), Cdr: &z3.Cell{Car: goarith.AsNumber(h), Cdr: z3.Nil}}}}}
 			result := interp.Eval(li, z3.Nil)
 			li = result.(*z3.Cell)
-			r := z3.ToUInt8(li.Car)
-			li = li.CdrCell()
-			g := z3.ToUInt8(li.Car)
-			li = li.CdrCell()
-			b := z3.ToUInt8(li.Car)
-			li = li.CdrCell()
-			var alpha uint8
-			if li != z3.Nil {
-				alpha = z3.ToUInt8(li.Car)
-			} else {
-				alpha = 255
-			}
-			return color.NRGBA{R: r, G: g, B: b, A: alpha}
+			return ListToColor(li)
 		})
 		return put(raster)
 	})
@@ -1644,4 +1915,44 @@ func CursorToSym(c desktop.Cursor) *z3.Sym {
 	default:
 		panic(fmt.Sprintf("unknown cursor value: %v", c))
 	}
+}
+
+// ColorToList converts a Go color.Color to a Z3S5 Lisp list of numbers.
+func ColorToList(c color.Color) *z3.Cell {
+	r, g, b, alpha := c.RGBA()
+	return &z3.Cell{Car: goarith.AsNumber(int(r)), Cdr: &z3.Cell{Car: goarith.AsNumber(int(g)),
+		Cdr: &z3.Cell{Car: goarith.AsNumber(int(b)), Cdr: &z3.Cell{Car: goarith.AsNumber(int(alpha)),
+			Cdr: z3.Nil}}}}
+}
+
+// ListToColor converts a Z3S5 Lisp color list to a color.
+func ListToColor(li *z3.Cell) color.Color {
+	r := z3.ToUInt8(li.Car)
+	li = li.CdrCell()
+	g := z3.ToUInt8(li.Car)
+	li = li.CdrCell()
+	b := z3.ToUInt8(li.Car)
+	li = li.CdrCell()
+	var alpha uint8
+	if li != z3.Nil {
+		alpha = z3.ToUInt8(li.Car)
+	} else {
+		alpha = 255
+	}
+	return color.NRGBA{R: r, G: g, B: b, A: alpha}
+}
+
+// TextGridStyleToList converts a text grid style to a Z3S5 Lisp list.
+func TextGridStyleToList(s widget.TextGridStyle) *z3.Cell {
+	return &z3.Cell{Car: ColorToList(s.TextColor()), Cdr: &z3.Cell{Car: ColorToList(s.BackgroundColor()),
+		Cdr: z3.Nil}}
+}
+
+// ListToTextGridStyle converts a list in the format returned by TextGridStyleToList back to
+// a Fyne text grid style.
+func ListToTextGridStyle(li *z3.Cell) widget.TextGridStyle {
+	fg := ListToColor(li.Car.(*z3.Cell))
+	li = li.CdrCell()
+	bg := ListToColor(li.Car.(*z3.Cell))
+	return &widget.CustomTextGridStyle{FGColor: fg, BGColor: bg}
 }
