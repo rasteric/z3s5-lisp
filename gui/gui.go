@@ -28,6 +28,11 @@ var revstore sync.Map
 var apl fyne.App
 var mainWin fyne.Window
 
+var IsQuitSym = z3.NewSym("is-quit")
+var IsSeparatorSym = z3.NewSym("is-separator")
+var DisabledSym = z3.NewSym("disabled")
+var CheckedSym = z3.NewSym("checked")
+
 type validatorWrapper struct {
 	fn fyne.StringValidator
 }
@@ -188,6 +193,17 @@ func DefUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	// (get-window-content <win>) => content ID
+	interp.Def(pre("get-window-content"), 1, func(a []any) any {
+		win := mustGet(pre("get-window-content"), "GUI window ID", a, 0).(fyne.Window)
+		content := win.Content()
+		id, ok := getID(content)
+		if !ok {
+			return put(content)
+		}
+		return id
+	})
+
 	// (set-window-size <window> <width> <height>)
 	interp.Def(pre("set-window-size"), 3, func(a []any) any {
 		win := mustGet(pre("set-window-size"), "GUI window ID", a, 0).(fyne.Window)
@@ -197,7 +213,7 @@ func DefUI(interp *z3.Interp, config Config) {
 
 	// (close-window <window>)
 	interp.Def(pre("close-window"), 1, func(a []any) any {
-		win := mustGet(pre("close-window"), "window", a, 0)
+		win := mustGet(pre("close-window"), "GUI window ID", a, 0)
 		win.(fyne.Window).Close()
 		clear(win)
 		return z3.Void
@@ -205,14 +221,14 @@ func DefUI(interp *z3.Interp, config Config) {
 
 	// (show-window <window>)
 	interp.Def(pre("show-window"), 1, func(a []any) any {
-		win := mustGet(pre("show-window"), "window", a, 0)
+		win := mustGet(pre("show-window"), "GUI window ID", a, 0)
 		win.(fyne.Window).Show()
 		return z3.Void
 	})
 
 	// (resize-window <window> <width-float> <height-float>)
 	interp.Def(pre("resize-window"), 3, func(a []any) any {
-		win := mustGet(pre("resize-window"), "window", a, 0)
+		win := mustGet(pre("resize-window"), "GUI window ID", a, 0)
 		w := z3.ToFloat64(a[1])
 		h := z3.ToFloat64(a[2])
 		win.(fyne.Window).Resize(fyne.NewSize(float32(w), float32(h)))
@@ -221,14 +237,14 @@ func DefUI(interp *z3.Interp, config Config) {
 
 	// (hide-window <window>)
 	interp.Def(pre("hide-window"), 1, func(a []any) any {
-		win := mustGet(pre("hide-window"), "window", a, 0)
+		win := mustGet(pre("hide-window"), "GUI window ID", a, 0)
 		win.(fyne.Window).Hide()
 		return z3.Void
 	})
 
 	// (set-window-on-close-callback <window> <callback>)
 	interp.Def(pre("set-window-on-close-callback"), 2, func(a []any) any {
-		win := mustGet(pre("set-window-on-close-callback"), "window", a, 0)
+		win := mustGet(pre("set-window-on-close-callback"), "GUI window ID", a, 0)
 		proc := a[1].(*z3.Closure)
 		win.(fyne.Window).SetOnClosed(func() {
 			li2 := z3.Nil
@@ -236,6 +252,121 @@ func DefUI(interp *z3.Interp, config Config) {
 			interp.Eval(li, z3.Nil)
 		})
 		return z3.Void
+	})
+
+	// (get-window-canvas <win>) => canvas ID
+	interp.Def(pre("get-window-canvas"), 1, func(a []any) any {
+		win := mustGet(pre("get-window-canvas"), "GUI window ID", a, 0).(fyne.Window)
+		canvas := win.Canvas()
+		id, ok := getID(canvas)
+		if ok {
+			return id
+		}
+		return put(canvas)
+	})
+
+	// (get-window-title <win>) => str
+	interp.Def(pre("get-window-title"), 1, func(a []any) any {
+		win := mustGet(pre("get-window-title"), "GUI window ID", a, 0).(fyne.Window)
+		return win.Title()
+	})
+
+	// (set-window-title <win> <str>)
+	interp.Def(pre("set-window-title"), 2, func(a []any) any {
+		win := mustGet(pre("set-window-title"), "GUI window ID", a, 0).(fyne.Window)
+		win.SetTitle(a[1].(string))
+		return z3.Void
+	})
+
+	// (set-window-full-screen <win> <bool>)
+	interp.Def(pre("set-window-full-screen"), 2, func(a []any) any {
+		win := mustGet(pre("set-window-full-screen"), "GUI window ID", a, 0).(fyne.Window)
+		win.SetFullScreen(z3.ToBool(a[1]))
+		return z3.Void
+	})
+
+	// (window-full-screen? <win>) => bool
+	interp.Def(pre("window-full-screen?"), 1, func(a []any) any {
+		win := mustGet(pre("window-full-screen?"), "GUI window ID", a, 0).(fyne.Window)
+		return z3.AsLispBool(win.FullScreen())
+	})
+
+	// (request-window-focus <win>)
+	interp.Def(pre("request-window-focus"), 1, func(a []any) any {
+		win := mustGet(pre("request-window-focus"), "GUI window ID", a, 0).(fyne.Window)
+		win.RequestFocus()
+		return z3.Void
+	})
+
+	// (set-window-fixed-size <win> <bool>)
+	interp.Def(pre("set-window-fized-size"), 2, func(a []any) any {
+		win := mustGet(pre("set-window-fixed-size"), "GUI window ID", a, 0).(fyne.Window)
+		win.SetFixedSize(z3.ToBool(a[1]))
+		return z3.Void
+	})
+
+	// (window-fixed-size? <win>) => bool
+	interp.Def(pre("window-fixed-size?"), 1, func(a []any) any {
+		win := mustGet(pre("window-fixed-size?"), "GUI window ID", a, 0).(fyne.Window)
+		return z3.AsLispBool(win.FixedSize())
+	})
+
+	// (center-window-on-screen <win>)
+	interp.Def(pre("center-window-on-screen"), 1, func(a []any) any {
+		win := mustGet(pre("center-window-on-screen"), "GUI window ID", a, 0).(fyne.Window)
+		win.CenterOnScreen()
+		return z3.Void
+	})
+
+	// (set-window-padded <win> <bool>)
+	interp.Def(pre("set-window-padded"), 2, func(a []any) any {
+		win := mustGet(pre("set-window-padded"), "GUI window ID", a, 0).(fyne.Window)
+		win.SetPadded(z3.ToBool(a[1]))
+		return z3.Void
+	})
+
+	// (window-padded? <win>) => bool
+	interp.Def(pre("window-padded?"), 1, func(a []any) any {
+		win := mustGet(pre("window-padded?"), "GUI window ID", a, 0).(fyne.Window)
+		return z3.AsLispBool(win.Padded())
+	})
+
+	// (set-window-icon <win> <icon>)
+	interp.Def(pre("set-window-icon"), 2, func(a []any) any {
+		win := mustGet(pre("set-window-icon"), "GUI window ID", a, 0).(fyne.Window)
+		icon := mustGet(pre("set-window-icon"), "GUI window ID", a, 1).(fyne.Resource)
+		win.SetIcon(icon)
+		return z3.Void
+	})
+
+	// (get-window-icon <win>)
+	interp.Def(pre("get-window-icon"), 1, func(a []any) any {
+		win := mustGet(pre("get-window-icon"), "GUI window ID", a, 0).(fyne.Window)
+		icon := win.Icon()
+		id, ok := getID(icon)
+		if ok {
+			return id
+		}
+		return put(icon)
+	})
+
+	// (set-window-main-menu <win> <menu>)
+	interp.Def(pre("set-window-main-menu"), 2, func(a []any) any {
+		win := mustGet(pre("set-window-main-menu"), "GUI window ID", a, 0).(fyne.Window)
+		menu := mustGet(pre("set-window-main-menu"), "GUI main menu ID", a, 1).(*fyne.MainMenu)
+		win.SetMainMenu(menu)
+		return z3.Void
+	})
+
+	// (get-window-main-menu <win>) => main menu ID
+	interp.Def(pre("get-window-main-menu"), 1, func(a []any) any {
+		win := mustGet(pre("get-window-main-menu"), "GUI window ID", a, 0).(fyne.Window)
+		menu := win.MainMenu()
+		id, ok := getID(menu)
+		if ok {
+			return id
+		}
+		return put(menu)
 	})
 
 	// LABEL
@@ -760,7 +891,7 @@ func DefUI(interp *z3.Interp, config Config) {
 		updCB := func(i widget.ListItemID, o fyne.CanvasObject) {
 			n := int(i)
 			if id, ok := getID(o); ok {
-				interp.Eval(&z3.Cell{Car: uproc, Cdr: &z3.Cell{Car: goarith.AsNumber(id), Cdr: &z3.Cell{Car: goarith.AsNumber(n), Cdr: z3.Nil}}}, z3.Nil)
+				interp.Eval(&z3.Cell{Car: uproc, Cdr: &z3.Cell{Car: id, Cdr: &z3.Cell{Car: goarith.AsNumber(n), Cdr: z3.Nil}}}, z3.Nil)
 			}
 		}
 		return put(widget.NewList(lenCB, prepCB, updCB))
@@ -829,6 +960,171 @@ func DefUI(interp *z3.Interp, config Config) {
 			interp.Eval(&z3.Cell{Car: proc4, Cdr: &z3.Cell{Car: s, Cdr: &z3.Cell{Car: z3.AsLispBool(branch), Cdr: &z3.Cell{Car: objID, Cdr: z3.Nil}}}}, z3.Nil)
 		}
 		return put(widget.NewTree(fn1, fn2, fn3, fn4))
+	})
+
+	// MENU
+
+	// (new-menu-item <str> <proc> [<selector>...]) => menu item ID
+	interp.Def(pre("new-menu-item"), -1, func(a []any) any {
+		li := a[0].(*z3.Cell)
+		label := li.Car.(string)
+		li = li.CdrCell()
+		proc := li.Car.(*z3.Closure)
+		li = li.CdrCell()
+		item := fyne.NewMenuItem(label, func() {
+			interp.Eval(&z3.Cell{Car: proc, Cdr: z3.Nil}, z3.Nil)
+		})
+		for li != z3.Nil {
+			sym := li.Car.(*z3.Sym)
+			switch sym {
+			case IsQuitSym:
+				item.IsQuit = true
+			case IsSeparatorSym:
+				item.IsSeparator = true
+			case DisabledSym:
+				item.Disabled = true
+			case CheckedSym:
+				item.Checked = true
+			default:
+				panic(fmt.Sprintf(pre("new-menu-item: expected a symbol in '(is-quit is-separator disabled checked) but given %v"), z3.Str(li.Car)))
+			}
+			li = li.CdrCell()
+		}
+		return put(item)
+	})
+
+	// (set-menu-item-checked <item> <bool>)
+	interp.Def(pre("set-menu-item-checked"), 2, func(a []any) any {
+		item := mustGet(pre("set-menu-item-checked"), "GUI menu item ID", a, 0).(*fyne.MenuItem)
+		b := z3.ToBool(a[1])
+		item.Checked = b
+		return z3.Void
+	})
+
+	// (get-menu-item-checked <item>) => bool
+	interp.Def(pre("get-menu-item-checked"), 1, func(a []any) any {
+		item := mustGet(pre("get-menu-item-checked"), "GUI menu item ID", a, 0).(*fyne.MenuItem)
+		return z3.AsLispBool(item.Checked)
+	})
+
+	// (set-menu-item-disabled <item> <bool>)
+	interp.Def(pre("set-menu-item-disabled"), 2, func(a []any) any {
+		item := mustGet(pre("set-menu-item-disabled"), "GUI menu item ID", a, 0).(*fyne.MenuItem)
+		b := z3.ToBool(a[1])
+		item.Disabled = b
+		return z3.Void
+	})
+
+	// (get-menu-item-disabled <item>) => bool
+	interp.Def(pre("get-menu-item-disabled"), 1, func(a []any) any {
+		item := mustGet(pre("get-menu-item-disabled"), "GUI menu item ID", a, 0).(*fyne.MenuItem)
+		return z3.AsLispBool(item.Disabled)
+	})
+
+	// (get-menu-item-label <item>) => str
+	interp.Def(pre("get-menu-item-label"), 1, func(a []any) any {
+		item := mustGet(pre("get-menu-item-label"), "GUI menu item ID", a, 0).(*fyne.MenuItem)
+		return item.Label
+	})
+
+	// (set-menu-item-label <item> <str>)
+	interp.Def(pre("set-menu-item-label"), 2, func(a []any) any {
+		item := mustGet(pre("set-menu-item-label"), "GUI menu item ID", a, 0).(*fyne.MenuItem)
+		item.Label = a[1].(string)
+		return z3.Void
+	})
+
+	// (new-menu-item-separator) => menu item ID
+	interp.Def(pre("new-menu-item-separator"), 0, func(a []any) any {
+		return put(fyne.NewMenuItemSeparator())
+	})
+
+	// (new-menu* <str> [<item>...]) => menu* ID
+	interp.Def(pre("new-menu*"), -1, func(a []any) any {
+		li := a[0].(*z3.Cell)
+		label := li.Car.(string)
+		li = li.CdrCell()
+		items := make([]*fyne.MenuItem, 0)
+		fname := pre("new-menu*")
+		for li != z3.Nil {
+			item := mustGet1(fname, "GUI menu item ID", li.Car).(*fyne.MenuItem)
+			items = append(items, item)
+			li = li.CdrCell()
+		}
+		return put(fyne.NewMenu(label, items...))
+	})
+
+	// (refresh-menu* <menu>)
+	interp.Def(pre("refresh-menu*"), 1, func(a []any) any {
+		menu := mustGet(pre("refresh-menu"), "GUI menu item ID", a, 0).(*fyne.Menu)
+		menu.Refresh()
+		return z3.Void
+	})
+
+	// (new-menu <menu>) => menu ID
+	interp.Def(pre("new-menu"), 1, func(a []any) any {
+		m := mustGet(pre("new-menu"), "GUI menu* ID", a, 0).(*fyne.Menu)
+		return put(widget.NewMenu(m))
+	})
+
+	// (activate-menu-last-submenu <menu>) => bool
+	interp.Def(pre("activate-menu-last-submenu"), 1, func(a []any) any {
+		menu := mustGet(pre("activate-menu-last-submenu"), "GUI menu ID", a, 0).(*widget.Menu)
+		return z3.AsLispBool(menu.ActivateLastSubmenu())
+	})
+
+	// (activate-menu-next <menu>)
+	interp.Def(pre("activate-menu-next"), 1, func(a []any) any {
+		menu := mustGet(pre("activate-menu-next"), "GUI menu ID", a, 0).(*widget.Menu)
+		menu.ActivateNext()
+		return z3.Void
+	})
+
+	// (activate-menu-previous <menu>)
+	interp.Def(pre("activate-menu-previous"), 1, func(a []any) any {
+		menu := mustGet(pre("activate-menu-previous"), "GUI menu ID", a, 0).(*widget.Menu)
+		menu.ActivatePrevious()
+		return z3.Void
+	})
+
+	// (deactivate-menu-child <menu>)
+	interp.Def(pre("deactivate-menu-child"), 1, func(a []any) any {
+		menu := mustGet(pre("deactivate-menu-child"), "GUI menu ID", a, 0).(*widget.Menu)
+		menu.DeactivateChild()
+		return z3.Void
+	})
+
+	// (deactivate-menu-last-submenu <menu>)
+	interp.Def(pre("deactivate-menu-last-submenu"), 1, func(a []any) any {
+		menu := mustGet(pre("deactivate-menu-last-submenu"), "GUI menu ID", a, 0).(*widget.Menu)
+		menu.DeactivateLastSubmenu()
+		return z3.Void
+	})
+
+	// (trigger-menu-last <menu>)
+	interp.Def(pre("trigger-menu-last"), 1, func(a []any) any {
+		menu := mustGet(pre("trigger-menu-last"), "GUI menu ID", a, 0).(*widget.Menu)
+		menu.TriggerLast()
+		return z3.Void
+	})
+
+	// (new-main-menu <menu> ...) => main menu ID
+	interp.Def(pre("new-main-menu"), -1, func(a []any) any {
+		items := make([]*fyne.Menu, 0)
+		li := a[0].(*z3.Cell)
+		for li != z3.Nil {
+			menu := li.Car.(*fyne.Menu)
+			items = append(items, menu)
+			li = li.CdrCell()
+		}
+		return put(fyne.NewMainMenu(items...))
+	})
+
+	// (refresh-main-menu <menu>)
+	interp.Def(pre("refresh-main-menu"), 1, func(a []any) any {
+		menu := mustGet(pre("refresh-main-menu"), "GUI main menu ID", a, 0).(*fyne.MainMenu)
+		menu.Refresh()
+		return z3.Void
 	})
 
 	// IMAGE
@@ -1214,7 +1510,16 @@ func DefUI(interp *z3.Interp, config Config) {
 
 	// MISC
 
-	interp.Def(pre("close-ui"), 0, func(a []any) any {
+	// (forget-gui-object <id>) clears any internal association with the given GUI object
+	// but does not destroy resources associated with it. WARN: Internal use only, use with care!
+	interp.Def(pre("forget-gui-object"), 1, func(a []any) any {
+		clear(a[0])
+		return z3.Void
+	})
+
+	// (close-gui) closes the GUI, none of its elements can be used again and the application
+	// must shut down all GUI activity. Open windows are closed.
+	interp.Def(pre("close-gui"), 0, func(a []any) any {
 		CloseUI()
 		return z3.Void
 	})
