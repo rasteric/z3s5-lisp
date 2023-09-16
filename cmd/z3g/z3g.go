@@ -70,8 +70,8 @@ func run() int {
 		defer wg.Done()
 		interp.Run(nil, z3.NewInternalSource("repl", ""))
 	}()
-	z3ui.RunUI()
-	defer z3ui.ShutDownUI()
+	z3ui.RunGUI()
+	defer z3ui.ShutDownGUI()
 	wg.Wait()
 	return 0
 }

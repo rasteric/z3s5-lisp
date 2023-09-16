@@ -33,6 +33,7 @@ var revstore sync.Map
 var apl fyne.App
 var mainWin fyne.Window
 
+var GUISym = z3.NewSym("gui")
 var IsQuitSym = z3.NewSym("is-quit")
 var IsSeparatorSym = z3.NewSym("is-separator")
 var DisabledSym = z3.NewSym("disabled")
@@ -128,18 +129,18 @@ func clear(n any) {
 	}
 }
 
-// RunUI initializes the user interface and starts running it. The function blocks until the application
+// RunGUI initializes the user interface and starts running it. The function blocks until the application
 // is quit, e.g. via ShutDownUI. Since it blocks, the Lisp interpreter must be started in parallel.
-func RunUI() {
+func RunGUI() {
 	apl = app.New()
 	mainWin = apl.NewWindow("")
 	mainWin.SetMaster()
 	apl.Run()
 }
 
-// ShutdownUI shuts down the user interface. Any attempt to use it afterwards may result in a panic. This should
+// ShutdownGUI shuts down the user interface. Any attempt to use it afterwards may result in a panic. This should
 // be called before closing the application, e.g. in a defer statement.
-func ShutDownUI() {
+func ShutDownGUI() {
 	storage.Range(func(key interface{}, value interface{}) bool {
 		storage.Delete(key)
 		return true
@@ -174,6 +175,13 @@ func DefGUIHelp(interp *z3.Interp) error {
 // in the Config. If you set these, be sure to also restrict the language using Z3S5 Lisp standard security tools,
 // such as unbinding certain functions and then protecting them and disallowing unprotecting them again.
 func DefGUI(interp *z3.Interp, config Config) {
+
+	// register this module
+	reflect, ok := interp.GetGlobalVar(z3.ReflectSym)
+	if !ok {
+		reflect = z3.Nil
+	}
+	interp.SetGlobalVar(z3.ReflectSym, &z3.Cell{Car: GUISym, Cdr: reflect})
 
 	cfg := config
 

@@ -1,4 +1,4 @@
-all: cmd/z3/z3.go
+all: cmd/z3/z3.go cmd/z3g/z3g.go
 	cd cmd/z3 && make -s && make test && cd ../z3g && make -s && make test
 
 z3: cmd/z3/z3.go
