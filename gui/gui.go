@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"bytes"
+	_ "embed"
 	"errors"
 	"fmt"
 	"image/color"
@@ -21,6 +23,9 @@ import (
 	"github.com/nukata/goarith"
 	z3 "github.com/rasteric/z3s5-lisp"
 )
+
+//go:embed embed/gui-help.lisp
+var helpGUIFile []byte
 
 var counter uint64
 var storage sync.Map
@@ -143,9 +148,9 @@ func ShutDownUI() {
 	apl.Quit()
 }
 
-// CloseUI closes all existing windows and attempts to free existing resources but does not quit the
+// CloseGUI closes all existing windows and attempts to free existing resources but does not quit the
 // the internal main application, so new windows can be opened again.
-func CloseUI() {
+func CloseGUI() {
 	storage.Range(func(key interface{}, value interface{}) bool {
 		if win, ok := value.(fyne.Window); ok {
 			win.Hide()
@@ -154,12 +159,21 @@ func CloseUI() {
 	})
 }
 
-// DefUI defines the user interface functions. If you want to avoid polluting the namespace, use
+// DefGUIHelp defines the help definitions for the GUI functions.
+func DefGUIHelp(interp *z3.Interp) error {
+	help := bytes.NewReader(helpGUIFile)
+	if !interp.Run(help, z3.NewInternalSource("embed/gui-help.lisp", "")) {
+		return errors.New(`Z3S5 Lisp GUI help definitions failed`)
+	}
+	return nil
+}
+
+// DefGUI defines the user interface functions. If you want to avoid polluting the namespace, use
 // a config with a custom Prefix. Use DefaultConfig for a maximally permissive default configuration.
 // Various security-sensitive settings such as allowing or disallowing creation of new windows can be adjusted
 // in the Config. If you set these, be sure to also restrict the language using Z3S5 Lisp standard security tools,
 // such as unbinding certain functions and then protecting them and disallowing unprotecting them again.
-func DefUI(interp *z3.Interp, config Config) {
+func DefGUI(interp *z3.Interp, config Config) {
 
 	cfg := config
 
@@ -1520,7 +1534,7 @@ func DefUI(interp *z3.Interp, config Config) {
 	// (close-gui) closes the GUI, none of its elements can be used again and the application
 	// must shut down all GUI activity. Open windows are closed.
 	interp.Def(pre("close-gui"), 0, func(a []any) any {
-		CloseUI()
+		CloseGUI()
 		return z3.Void
 	})
 
