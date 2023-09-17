@@ -2,9 +2,9 @@
 title: Z3S5 Lisp Reference Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: Version 2.3.11+8ae47a8
+footer-left: Version 2.3.11+a3c274b
 author: by Erich Rast and all Help system contributors
-date: 2023-9-16 16:26
+date: 2023-9-17 14:41
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -13,7 +13,7 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
-For Z3S5 Lisp Version 2.3.11+8ae47a8 with installed modules (gui oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).
+For Z3S5 Lisp Version 2.3.11+a3c274b with installed modules (gui oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).
 
 # Introduction
 
@@ -24,7 +24,7 @@ Incorrect documentation strings are bugs. Please report bugs using the correspon
 
 # Index {#idx}
 
-[`%`](#link25) [`*`](#link2a) [`*colors*`](#link2a636f6c6f72732a) [`*error-handler*`](#link2a6572726f722d68616e646c65722a) [`*error-printer*`](#link2a6572726f722d7072696e7465722a) [`*help*`](#link2a68656c702a) [`*hooks*`](#link2a686f6f6b732a) [`*last-error*`](#link2a6c6173742d6572726f722a) [`*reflect*`](#link2a7265666c6563742a) [`+`](#link2b) [`-`](#link2d) [`/`](#link2f) [`/=`](#link2f3d) [`10th`](#link31307468) [`1st`](#link317374) [`2nd`](#link326e64) [`3rd`](#link337264) [`4th`](#link347468) [`5th`](#link357468) [`6th`](#link367468) [`7th`](#link377468) [`8th`](#link387468) [`9th`](#link397468) [`<`](#link3c) [`<=`](#link3c3d) [`=`](#link3d) [`>`](#link3e) [`>=`](#link3e3d) [`abs`](#link616273) [`action`](#link616374696f6e) [`action-start`](#link616374696f6e2d7374617274) [`action-stop`](#link616374696f6e2d73746f70) [`add-hook`](#link6164642d686f6f6b) [`add-hook-internal`](#link6164642d686f6f6b2d696e7465726e616c) [`add-hook-once`](#link6164642d686f6f6b2d6f6e6365) [`add1`](#link61646431) [`alist->dict`](#link616c6973742d3e64696374) [`alist?`](#link616c6973743f) [`and`](#link616e64) [`append`](#link617070656e64) [`apply`](#link6170706c79) [`apropos`](#link6170726f706f73) [`array`](#link6172726179) [`array->list`](#link61727261792d3e6c697374) [`array->str`](#link61727261792d3e737472) [`array-append`](#link61727261792d617070656e64) [`array-copy`](#link61727261792d636f7079) [`array-exists?`](#link61727261792d6578697374733f) [`array-forall?`](#link61727261792d666f72616c6c3f) [`array-foreach`](#link61727261792d666f7265616368) [`array-len`](#link61727261792d6c656e) [`array-map!`](#link61727261792d6d617021) [`array-pmap!`](#link61727261792d706d617021) [`array-ref`](#link61727261792d726566) [`array-reverse`](#link61727261792d72657665727365) [`array-set`](#link61727261792d736574) [`array-slice`](#link61727261792d736c696365) [`array-sort`](#link61727261792d736f7274) [`array-walk`](#link61727261792d77616c6b) [`array?`](#link61727261793f) [`ascii85->blob`](#link617363696938352d3e626c6f62) [`assoc`](#link6173736f63) [`assoc1`](#link6173736f6331) [`assq`](#link61737371) [`atom?`](#link61746f6d3f) [`base64->blob`](#link6261736536342d3e626c6f62) [`beep`](#link62656570) [`bind`](#link62696e64) [`bitand`](#link626974616e64) [`bitclear`](#link626974636c656172) [`bitor`](#link6269746f72) [`bitshl`](#link62697473686c) [`bitshr`](#link626974736872) [`bitxor`](#link626974786f72) [`blob->ascii85`](#link626c6f622d3e61736369693835) [`blob->base64`](#link626c6f622d3e626173653634) [`blob->hex`](#link626c6f622d3e686578) [`blob->str`](#link626c6f622d3e737472) [`blob-chksum`](#link626c6f622d63686b73756d) [`blob-equal?`](#link626c6f622d657175616c3f) [`blob-free`](#link626c6f622d66726565) [`blob?`](#link626c6f623f) [`bool?`](#link626f6f6c3f) [`bound?`](#link626f756e643f) [`boxed?`](#link626f7865643f) [`build-array`](#link6275696c642d6172726179) [`build-list`](#link6275696c642d6c697374) [`caaar`](#link6361616172) [`caadr`](#link6361616472) [`caar`](#link63616172) [`cadar`](#link6361646172) [`caddr`](#link6361646472) [`cadr`](#link63616472) [`call-method`](#link63616c6c2d6d6574686f64) [`call-super`](#link63616c6c2d7375706572) [`can-externalize?`](#link63616e2d65787465726e616c697a653f) [`car`](#link636172) [`case`](#link63617365) [`ccmp`](#link63636d70) [`cdaar`](#link6364616172) [`cdadr`](#link6364616472) [`cdar`](#link63646172) [`cddar`](#link6364646172) [`cdddr`](#link6364646472) [`cddr`](#link63646472) [`cdec!`](#link6364656321) [`cdr`](#link636472) [`change-action-prefix`](#link6368616e67652d616374696f6e2d707265666978) [`change-all-action-prefixes`](#link6368616e67652d616c6c2d616374696f6e2d7072656669786573) [`char->str`](#link636861722d3e737472) [`chars`](#link6368617273) [`chars->str`](#link63686172732d3e737472) [`cinc!`](#link63696e6321) [`class-name`](#link636c6173732d6e616d65) [`class-of`](#link636c6173732d6f66) [`class?`](#link636c6173733f) [`close`](#link636c6f7365) [`closure?`](#link636c6f737572653f) [`collect-garbage`](#link636f6c6c6563742d67617262616765) [`color`](#link636f6c6f72) [`cons`](#link636f6e73) [`cons?`](#link636f6e733f) [`copy-record`](#link636f70792d7265636f7264) [`count-partitions`](#link636f756e742d706172746974696f6e73) [`cpunum`](#link6370756e756d) [`cst!`](#link63737421) [`current-error-handler`](#link63757272656e742d6572726f722d68616e646c6572) [`current-zimage`](#link63757272656e742d7a696d616765) [`cwait`](#link6377616974) [`darken`](#link6461726b656e) [`date->epoch-ns`](#link646174652d3e65706f63682d6e73) [`datelist->epoch-ns`](#link646174656c6973742d3e65706f63682d6e73) [`datestr`](#link64617465737472) [`datestr*`](#link646174657374722a) [`datestr->datelist`](#link646174657374722d3e646174656c697374) [`day+`](#link6461792b) [`day-of-week`](#link6461792d6f662d7765656b) [`db.blob`](#link64622e626c6f62) [`db.close`](#link64622e636c6f7365) [`db.close-result`](#link64622e636c6f73652d726573756c74) [`db.exec`](#link64622e65786563) [`db.float`](#link64622e666c6f6174) [`db.int`](#link64622e696e74) [`db.open`](#link64622e6f70656e) [`db.open*`](#link64622e6f70656e2a) [`db.query`](#link64622e7175657279) [`db.result-column-count`](#link64622e726573756c742d636f6c756d6e2d636f756e74) [`db.result-columns`](#link64622e726573756c742d636f6c756d6e73) [`db.row`](#link64622e726f77) [`db.step`](#link64622e73746570) [`db.str`](#link64622e737472) [`declare-volatile`](#link6465636c6172652d766f6c6174696c65) [`def-custom-hook`](#link6465662d637573746f6d2d686f6f6b) [`default-error-handler`](#link64656661756c742d6572726f722d68616e646c6572) [`defclass`](#link646566636c617373) [`defmacro`](#link6465666d6163726f) [`defmethod`](#link6465666d6574686f64) [`defstruct`](#link646566737472756374) [`defun`](#link646566756e) [`delete`](#link64656c657465) [`dequeue!`](#link6465717565756521) [`dict`](#link64696374) [`dict->alist`](#link646963742d3e616c697374) [`dict->array`](#link646963742d3e6172726179) [`dict->keys`](#link646963742d3e6b657973) [`dict->list`](#link646963742d3e6c697374) [`dict->values`](#link646963742d3e76616c756573) [`dict-copy`](#link646963742d636f7079) [`dict-empty?`](#link646963742d656d7074793f) [`dict-foreach`](#link646963742d666f7265616368) [`dict-map`](#link646963742d6d6170) [`dict-map!`](#link646963742d6d617021) [`dict-merge`](#link646963742d6d65726765) [`dict-protect`](#link646963742d70726f74656374) [`dict-protected?`](#link646963742d70726f7465637465643f) [`dict-unprotect`](#link646963742d756e70726f74656374) [`dict?`](#link646963743f) [`dir`](#link646972) [`dir?`](#link6469723f) [`div`](#link646976) [`dolist`](#link646f6c697374) [`dotimes`](#link646f74696d6573) [`dump`](#link64756d70) [`dump-bindings`](#link64756d702d62696e64696e6773) [`enq`](#link656e71) [`enqueue!`](#link656e717565756521) [`epoch-ns->datelist`](#link65706f63682d6e732d3e646174656c697374) [`eq?`](#link65713f) [`eql?`](#link65716c3f) [`equal?`](#link657175616c3f) [`error`](#link6572726f72) [`error->str`](#link6572726f722d3e737472) [`error?`](#link6572726f723f) [`eval`](#link6576616c) [`even?`](#link6576656e3f) [`exists?`](#link6578697374733f) [`exit`](#link65786974) [`expand-macros`](#link657870616e642d6d6163726f73) [`expect`](#link657870656374) [`expect-err`](#link6578706563742d657272) [`expect-false`](#link6578706563742d66616c7365) [`expect-ok`](#link6578706563742d6f6b) [`expect-true`](#link6578706563742d74727565) [`expr->str`](#link657870722d3e737472) [`externalize`](#link65787465726e616c697a65) [`externalize0`](#link65787465726e616c697a6530) [`fdelete`](#link6664656c657465) [`feature?`](#link666561747572653f) [`file-port?`](#link66696c652d706f72743f) [`filter`](#link66696c746572) [`find-missing-help-entries`](#link66696e642d6d697373696e672d68656c702d656e7472696573) [`find-unneeded-help-entries`](#link66696e642d756e6e65656465642d68656c702d656e7472696573) [`fl.abs`](#link666c2e616273) [`fl.acos`](#link666c2e61636f73) [`fl.asin`](#link666c2e6173696e) [`fl.asinh`](#link666c2e6173696e68) [`fl.atan`](#link666c2e6174616e) [`fl.atan2`](#link666c2e6174616e32) [`fl.atanh`](#link666c2e6174616e68) [`fl.cbrt`](#link666c2e63627274) [`fl.ceil`](#link666c2e6365696c) [`fl.cos`](#link666c2e636f73) [`fl.cosh`](#link666c2e636f7368) [`fl.dim`](#link666c2e64696d) [`fl.erf`](#link666c2e657266) [`fl.erfc`](#link666c2e65726663) [`fl.erfcinv`](#link666c2e65726663696e76) [`fl.erfinv`](#link666c2e657266696e76) [`fl.exp`](#link666c2e657870) [`fl.exp2`](#link666c2e65787032) [`fl.expm1`](#link666c2e6578706d31) [`fl.floor`](#link666c2e666c6f6f72) [`fl.fma`](#link666c2e666d61) [`fl.frexp`](#link666c2e6672657870) [`fl.gamma`](#link666c2e67616d6d61) [`fl.hypot`](#link666c2e6879706f74) [`fl.ilogb`](#link666c2e696c6f6762) [`fl.inf`](#link666c2e696e66) [`fl.is-nan?`](#link666c2e69732d6e616e3f) [`fl.j0`](#link666c2e6a30) [`fl.j1`](#link666c2e6a31) [`fl.jn`](#link666c2e6a6e) [`fl.ldexp`](#link666c2e6c64657870) [`fl.lgamma`](#link666c2e6c67616d6d61) [`fl.log`](#link666c2e6c6f67) [`fl.log10`](#link666c2e6c6f673130) [`fl.log1p`](#link666c2e6c6f673170) [`fl.log2`](#link666c2e6c6f6732) [`fl.logb`](#link666c2e6c6f6762) [`fl.max`](#link666c2e6d6178) [`fl.min`](#link666c2e6d696e) [`fl.mod`](#link666c2e6d6f64) [`fl.modf`](#link666c2e6d6f6466) [`fl.nan`](#link666c2e6e616e) [`fl.next-after`](#link666c2e6e6578742d6166746572) [`fl.pow`](#link666c2e706f77) [`fl.pow10`](#link666c2e706f773130) [`fl.remainder`](#link666c2e72656d61696e646572) [`fl.round`](#link666c2e726f756e64) [`fl.round-to-even`](#link666c2e726f756e642d746f2d6576656e) [`fl.signbit`](#link666c2e7369676e626974) [`fl.sin`](#link666c2e73696e) [`fl.sinh`](#link666c2e73696e68) [`fl.sqrt`](#link666c2e73717274) [`fl.tan`](#link666c2e74616e) [`fl.tanh`](#link666c2e74616e68) [`fl.trunc`](#link666c2e7472756e63) [`fl.y0`](#link666c2e7930) [`fl.y1`](#link666c2e7931) [`fl.yn`](#link666c2e796e) [`flatten`](#link666c617474656e) [`float`](#link666c6f6174) [`fmt`](#link666d74) [`forall?`](#link666f72616c6c3f) [`force`](#link666f726365) [`foreach`](#link666f7265616368) [`forget`](#link666f72676574) [`functional-arity`](#link66756e6374696f6e616c2d6172697479) [`functional-has-rest?`](#link66756e6374696f6e616c2d6861732d726573743f) [`functional?`](#link66756e6374696f6e616c3f) [`gensym`](#link67656e73796d) [`get`](#link676574) [`get-action`](#link6765742d616374696f6e) [`get-or-set`](#link6765742d6f722d736574) [`get-partitions`](#link6765742d706172746974696f6e73) [`getstacked`](#link676574737461636b6564) [`glance`](#link676c616e6365) [`global-sym?`](#link676c6f62616c2d73796d3f) [`has`](#link686173) [`has-action-system?`](#link6861732d616374696f6e2d73797374656d3f) [`has-action?`](#link6861732d616374696f6e3f) [`has-key?`](#link6861732d6b65793f) [`has-method?`](#link6861732d6d6574686f643f) [`has-prop?`](#link6861732d70726f703f) [`help`](#link68656c70) [`help->manual-entry`](#link68656c702d3e6d616e75616c2d656e747279) [`help-about`](#link68656c702d61626f7574) [`help-entry`](#link68656c702d656e747279) [`help-strings`](#link68656c702d737472696e6773) [`help-topic-info`](#link68656c702d746f7069632d696e666f) [`help-topics`](#link68656c702d746f70696373) [`hex->blob`](#link6865782d3e626c6f62) [`hook`](#link686f6f6b) [`hour+`](#link686f75722b) [`identity`](#link6964656e74697479) [`if`](#link6966) [`inchars`](#link696e6368617273) [`include`](#link696e636c756465) [`index`](#link696e646578) [`init-actions`](#link696e69742d616374696f6e73) [`init-remember`](#link696e69742d72656d656d626572) [`instr`](#link696e737472) [`int`](#link696e74) [`intern`](#link696e7465726e) [`internalize`](#link696e7465726e616c697a65) [`intrinsic`](#link696e7472696e736963) [`intrinsic?`](#link696e7472696e7369633f) [`isa?`](#link6973613f) [`iterate`](#link69746572617465) [`kvdb.begin`](#link6b7664622e626567696e) [`kvdb.close`](#link6b7664622e636c6f7365) [`kvdb.commit`](#link6b7664622e636f6d6d6974) [`kvdb.db?`](#link6b7664622e64623f) [`kvdb.forget`](#link6b7664622e666f72676574) [`kvdb.forget-everything`](#link6b7664622e666f726765742d65766572797468696e67) [`kvdb.get`](#link6b7664622e676574) [`kvdb.info`](#link6b7664622e696e666f) [`kvdb.open`](#link6b7664622e6f70656e) [`kvdb.rollback`](#link6b7664622e726f6c6c6261636b) [`kvdb.search`](#link6b7664622e736561726368) [`kvdb.set`](#link6b7664622e736574) [`kvdb.when`](#link6b7664622e7768656e) [`last`](#link6c617374) [`lcons`](#link6c636f6e73) [`len`](#link6c656e) [`let`](#link6c6574) [`letrec`](#link6c6574726563) [`lighten`](#link6c69676874656e) [`ling.damerau-levenshtein`](#link6c696e672e64616d657261752d6c6576656e73687465696e) [`ling.hamming`](#link6c696e672e68616d6d696e67) [`ling.jaro`](#link6c696e672e6a61726f) [`ling.jaro-winkler`](#link6c696e672e6a61726f2d77696e6b6c6572) [`ling.levenshtein`](#link6c696e672e6c6576656e73687465696e) [`ling.match-rating-codex`](#link6c696e672e6d617463682d726174696e672d636f646578) [`ling.match-rating-compare`](#link6c696e672e6d617463682d726174696e672d636f6d70617265) [`ling.metaphone`](#link6c696e672e6d65746170686f6e65) [`ling.nysiis`](#link6c696e672e6e7973696973) [`ling.porter`](#link6c696e672e706f72746572) [`ling.soundex`](#link6c696e672e736f756e646578) [`list`](#link6c697374) [`list->array`](#link6c6973742d3e6172726179) [`list->set`](#link6c6973742d3e736574) [`list->str`](#link6c6973742d3e737472) [`list-exists?`](#link6c6973742d6578697374733f) [`list-forall?`](#link6c6973742d666f72616c6c3f) [`list-foreach`](#link6c6973742d666f7265616368) [`list-last`](#link6c6973742d6c617374) [`list-ref`](#link6c6973742d726566) [`list-reverse`](#link6c6973742d72657665727365) [`list-slice`](#link6c6973742d736c696365) [`list?`](#link6c6973743f) [`load`](#link6c6f6164) [`load-zimage`](#link6c6f61642d7a696d616765) [`macro?`](#link6d6163726f3f) [`make`](#link6d616b65) [`make*`](#link6d616b652a) [`make-blob`](#link6d616b652d626c6f62) [`make-mutex`](#link6d616b652d6d75746578) [`make-queue`](#link6d616b652d7175657565) [`make-set`](#link6d616b652d736574) [`make-stack`](#link6d616b652d737461636b) [`make-symbol`](#link6d616b652d73796d626f6c) [`map`](#link6d6170) [`map-pairwise`](#link6d61702d7061697277697365) [`mapcar`](#link6d6170636172) [`max`](#link6d6178) [`member`](#link6d656d626572) [`memq`](#link6d656d71) [`memstats`](#link6d656d7374617473) [`methods`](#link6d6574686f6473) [`min`](#link6d696e) [`minmax`](#link6d696e6d6178) [`minute+`](#link6d696e7574652b) [`mod`](#link6d6f64) [`month+`](#link6d6f6e74682b) [`mutex-lock`](#link6d757465782d6c6f636b) [`mutex-rlock`](#link6d757465782d726c6f636b) [`mutex-runlock`](#link6d757465782d72756e6c6f636b) [`mutex-unlock`](#link6d757465782d756e6c6f636b) [`nconc`](#link6e636f6e63) [`new`](#link6e6577) [`new-struct`](#link6e65772d737472756374) [`new-window`](#link6e65772d77696e646f77) [`nl`](#link6e6c) [`nonce`](#link6e6f6e6365) [`not`](#link6e6f74) [`now`](#link6e6f77) [`now-ms`](#link6e6f772d6d73) [`now-ns`](#link6e6f772d6e73) [`nreverse`](#link6e72657665727365) [`nth`](#link6e7468) [`nth-partition`](#link6e74682d706172746974696f6e) [`nthdef`](#link6e7468646566) [`null?`](#link6e756c6c3f) [`num?`](#link6e756d3f) [`object?`](#link6f626a6563743f) [`odd?`](#link6f64643f) [`on-feature`](#link6f6e2d66656174757265) [`open`](#link6f70656e) [`or`](#link6f72) [`out`](#link6f7574) [`outy`](#link6f757479) [`peek`](#link7065656b) [`permission?`](#link7065726d697373696f6e3f) [`permissions`](#link7065726d697373696f6e73) [`poke`](#link706f6b65) [`pop!`](#link706f7021) [`pop-error-handler`](#link706f702d6572726f722d68616e646c6572) [`pop-finalizer`](#link706f702d66696e616c697a6572) [`popstacked`](#link706f70737461636b6564) [`prin1`](#link7072696e31) [`princ`](#link7072696e63) [`print`](#link7072696e74) [`proc?`](#link70726f633f) [`prop`](#link70726f70) [`props`](#link70726f7073) [`protect`](#link70726f74656374) [`protect-toplevel-symbols`](#link70726f746563742d746f706c6576656c2d73796d626f6c73) [`protected?`](#link70726f7465637465643f) [`prune-task-table`](#link7072756e652d7461736b2d7461626c65) [`prune-unneeded-help-entries`](#link7072756e652d756e6e65656465642d68656c702d656e7472696573) [`push!`](#link7075736821) [`push-error-handler`](#link707573682d6572726f722d68616e646c6572) [`push-finalizer`](#link707573682d66696e616c697a6572) [`pushstacked`](#link70757368737461636b6564) [`queue-empty?`](#link71756575652d656d7074793f) [`queue-len`](#link71756575652d6c656e) [`queue?`](#link71756575653f) [`rand`](#link72616e64) [`random-color`](#link72616e646f6d2d636f6c6f72) [`read`](#link72656164) [`read-binary`](#link726561642d62696e617279) [`read-string`](#link726561642d737472696e67) [`read-zimage`](#link726561642d7a696d616765) [`readall`](#link72656164616c6c) [`readall-str`](#link72656164616c6c2d737472) [`recall`](#link726563616c6c) [`recall-info`](#link726563616c6c2d696e666f) [`recall-when`](#link726563616c6c2d7768656e) [`recollect`](#link7265636f6c6c656374) [`record?`](#link7265636f72643f) [`register-action`](#link72656769737465722d616374696f6e) [`remember`](#link72656d656d626572) [`remove-duplicates`](#link72656d6f76652d6475706c696361746573) [`remove-hook`](#link72656d6f76652d686f6f6b) [`remove-hook-internal`](#link72656d6f76652d686f6f6b2d696e7465726e616c) [`remove-hooks`](#link72656d6f76652d686f6f6b73) [`rename-action`](#link72656e616d652d616374696f6e) [`replace-hook`](#link7265706c6163652d686f6f6b) [`reset-color`](#link72657365742d636f6c6f72) [`reverse`](#link72657665727365) [`rnd`](#link726e64) [`rndseed`](#link726e6473656564) [`rplaca`](#link72706c616361) [`run-at`](#link72756e2d6174) [`run-hook`](#link72756e2d686f6f6b) [`run-hook-internal`](#link72756e2d686f6f6b2d696e7465726e616c) [`run-selftest`](#link72756e2d73656c6674657374) [`run-zimage`](#link72756e2d7a696d616765) [`save-zimage`](#link736176652d7a696d616765) [`sec+`](#link7365632b) [`semver.build`](#link73656d7665722e6275696c64) [`semver.canonical`](#link73656d7665722e63616e6f6e6963616c) [`semver.compare`](#link73656d7665722e636f6d70617265) [`semver.is-valid?`](#link73656d7665722e69732d76616c69643f) [`semver.major`](#link73656d7665722e6d616a6f72) [`semver.major-minor`](#link73656d7665722e6d616a6f722d6d696e6f72) [`semver.max`](#link73656d7665722e6d6178) [`semver.prerelease`](#link73656d7665722e70726572656c65617365) [`seq?`](#link7365713f) [`set`](#link736574) [`set*`](#link7365742a) [`set->list`](#link7365742d3e6c697374) [`set-color`](#link7365742d636f6c6f72) [`set-complement`](#link7365742d636f6d706c656d656e74) [`set-difference`](#link7365742d646966666572656e6365) [`set-element?`](#link7365742d656c656d656e743f) [`set-empty?`](#link7365742d656d7074793f) [`set-equal?`](#link7365742d657175616c3f) [`set-help-topic-info`](#link7365742d68656c702d746f7069632d696e666f) [`set-intersection`](#link7365742d696e74657273656374696f6e) [`set-permissions`](#link7365742d7065726d697373696f6e73) [`set-subset?`](#link7365742d7375627365743f) [`set-union`](#link7365742d756e696f6e) [`set-volume`](#link7365742d766f6c756d65) [`set?`](#link7365743f) [`setcar`](#link736574636172) [`setcdr`](#link736574636472) [`setprop`](#link73657470726f70) [`shorten`](#link73686f7274656e) [`sleep`](#link736c656570) [`sleep-ns`](#link736c6565702d6e73) [`slice`](#link736c696365) [`sort`](#link736f7274) [`sort-symbols`](#link736f72742d73796d626f6c73) [`spaces`](#link737061636573) [`stack-empty?`](#link737461636b2d656d7074793f) [`stack-len`](#link737461636b2d6c656e) [`stack?`](#link737461636b3f) [`str+`](#link7374722b) [`str->array`](#link7374722d3e6172726179) [`str->blob`](#link7374722d3e626c6f62) [`str->char`](#link7374722d3e63686172) [`str->chars`](#link7374722d3e6368617273) [`str->expr`](#link7374722d3e65787072) [`str->expr*`](#link7374722d3e657870722a) [`str->list`](#link7374722d3e6c697374) [`str->sym`](#link7374722d3e73796d) [`str-count-substr`](#link7374722d636f756e742d737562737472) [`str-empty?`](#link7374722d656d7074793f) [`str-exists?`](#link7374722d6578697374733f) [`str-forall?`](#link7374722d666f72616c6c3f) [`str-foreach`](#link7374722d666f7265616368) [`str-index`](#link7374722d696e646578) [`str-join`](#link7374722d6a6f696e) [`str-port?`](#link7374722d706f72743f) [`str-ref`](#link7374722d726566) [`str-remove-number`](#link7374722d72656d6f76652d6e756d626572) [`str-remove-prefix`](#link7374722d72656d6f76652d707265666978) [`str-remove-suffix`](#link7374722d72656d6f76652d737566666978) [`str-replace`](#link7374722d7265706c616365) [`str-replace*`](#link7374722d7265706c6163652a) [`str-reverse`](#link7374722d72657665727365) [`str-segment`](#link7374722d7365676d656e74) [`str-slice`](#link7374722d736c696365) [`str?`](#link7374723f) [`strbuild`](#link7374726275696c64) [`strcase`](#link73747263617365) [`strcenter`](#link73747263656e746572) [`strcnt`](#link737472636e74) [`strleft`](#link7374726c656674) [`strlen`](#link7374726c656e) [`strless`](#link7374726c657373) [`strlimit`](#link7374726c696d6974) [`strmap`](#link7374726d6170) [`stropen`](#link7374726f70656e) [`strright`](#link7374727269676874) [`strsplit`](#link73747273706c6974) [`struct-index`](#link7374727563742d696e646578) [`struct-instantiate`](#link7374727563742d696e7374616e7469617465) [`struct-name`](#link7374727563742d6e616d65) [`struct-props`](#link7374727563742d70726f7073) [`struct-size`](#link7374727563742d73697a65) [`struct?`](#link7374727563743f) [`sub1`](#link73756231) [`supers`](#link737570657273) [`sym->str`](#link73796d2d3e737472) [`sym?`](#link73796d3f) [`synout`](#link73796e6f7574) [`synouty`](#link73796e6f757479) [`sys-key?`](#link7379732d6b65793f) [`sysmsg`](#link7379736d7367) [`sysmsg*`](#link7379736d73672a) [`take`](#link74616b65) [`task`](#link7461736b) [`task-broadcast`](#link7461736b2d62726f616463617374) [`task-recv`](#link7461736b2d72656376) [`task-remove`](#link7461736b2d72656d6f7665) [`task-run`](#link7461736b2d72756e) [`task-schedule`](#link7461736b2d7363686564756c65) [`task-send`](#link7461736b2d73656e64) [`task-state`](#link7461736b2d7374617465) [`task?`](#link7461736b3f) [`terpri`](#link746572707269) [`testing`](#link74657374696e67) [`the-color`](#link7468652d636f6c6f72) [`the-color-names`](#link7468652d636f6c6f722d6e616d6573) [`time`](#link74696d65) [`truncate`](#link7472756e63617465) [`try`](#link747279) [`type-of`](#link747970652d6f66) [`type-of*`](#link747970652d6f662a) [`unless`](#link756e6c657373) [`unprotect`](#link756e70726f74656374) [`unprotect-toplevel-symbols`](#link756e70726f746563742d746f706c6576656c2d73796d626f6c73) [`valid?`](#link76616c69643f) [`void`](#link766f6964) [`void?`](#link766f69643f) [`wait-for`](#link776169742d666f72) [`wait-for*`](#link776169742d666f722a) [`wait-for-empty*`](#link776169742d666f722d656d7074792a) [`wait-until`](#link776169742d756e74696c) [`wait-until*`](#link776169742d756e74696c2a) [`warn`](#link7761726e) [`week+`](#link7765656b2b) [`week-of-date`](#link7765656b2d6f662d64617465) [`when`](#link7768656e) [`when-permission`](#link7768656e2d7065726d697373696f6e) [`while`](#link7768696c65) [`with-colors`](#link776974682d636f6c6f7273) [`with-error-handler`](#link776974682d6572726f722d68616e646c6572) [`with-final`](#link776974682d66696e616c) [`with-mutex-lock`](#link776974682d6d757465782d6c6f636b) [`with-mutex-rlock`](#link776974682d6d757465782d726c6f636b) [`write`](#link7772697465) [`write-binary`](#link77726974652d62696e617279) [`write-binary-at`](#link77726974652d62696e6172792d6174) [`write-string`](#link77726974652d737472696e67) [`write-zimage`](#link77726974652d7a696d616765) [`year+`](#link796561722b) [`zimage-header`](#link7a696d6167652d686561646572) [`zimage-loadable?`](#link7a696d6167652d6c6f616461626c653f) [`zimage-runable?`](#link7a696d6167652d72756e61626c653f) 
+[`%`](#link25) [`*`](#link2a) [`*colors*`](#link2a636f6c6f72732a) [`*error-handler*`](#link2a6572726f722d68616e646c65722a) [`*error-printer*`](#link2a6572726f722d7072696e7465722a) [`*help*`](#link2a68656c702a) [`*hooks*`](#link2a686f6f6b732a) [`*last-error*`](#link2a6c6173742d6572726f722a) [`*reflect*`](#link2a7265666c6563742a) [`+`](#link2b) [`-`](#link2d) [`/`](#link2f) [`/=`](#link2f3d) [`10th`](#link31307468) [`1st`](#link317374) [`2nd`](#link326e64) [`3rd`](#link337264) [`4th`](#link347468) [`5th`](#link357468) [`6th`](#link367468) [`7th`](#link377468) [`8th`](#link387468) [`9th`](#link397468) [`<`](#link3c) [`<=`](#link3c3d) [`=`](#link3d) [`>`](#link3e) [`>=`](#link3e3d) [`abs`](#link616273) [`action`](#link616374696f6e) [`action-start`](#link616374696f6e2d7374617274) [`action-stop`](#link616374696f6e2d73746f70) [`add-hook`](#link6164642d686f6f6b) [`add-hook-internal`](#link6164642d686f6f6b2d696e7465726e616c) [`add-hook-once`](#link6164642d686f6f6b2d6f6e6365) [`add1`](#link61646431) [`alist->dict`](#link616c6973742d3e64696374) [`alist?`](#link616c6973743f) [`and`](#link616e64) [`append`](#link617070656e64) [`apply`](#link6170706c79) [`apropos`](#link6170726f706f73) [`array`](#link6172726179) [`array->list`](#link61727261792d3e6c697374) [`array->str`](#link61727261792d3e737472) [`array-append`](#link61727261792d617070656e64) [`array-copy`](#link61727261792d636f7079) [`array-exists?`](#link61727261792d6578697374733f) [`array-forall?`](#link61727261792d666f72616c6c3f) [`array-foreach`](#link61727261792d666f7265616368) [`array-len`](#link61727261792d6c656e) [`array-map!`](#link61727261792d6d617021) [`array-pmap!`](#link61727261792d706d617021) [`array-ref`](#link61727261792d726566) [`array-reverse`](#link61727261792d72657665727365) [`array-set`](#link61727261792d736574) [`array-slice`](#link61727261792d736c696365) [`array-sort`](#link61727261792d736f7274) [`array-walk`](#link61727261792d77616c6b) [`array?`](#link61727261793f) [`ascii85->blob`](#link617363696938352d3e626c6f62) [`assoc`](#link6173736f63) [`assoc1`](#link6173736f6331) [`assq`](#link61737371) [`atom?`](#link61746f6d3f) [`base64->blob`](#link6261736536342d3e626c6f62) [`beep`](#link62656570) [`bind`](#link62696e64) [`bitand`](#link626974616e64) [`bitclear`](#link626974636c656172) [`bitor`](#link6269746f72) [`bitshl`](#link62697473686c) [`bitshr`](#link626974736872) [`bitxor`](#link626974786f72) [`blob->ascii85`](#link626c6f622d3e61736369693835) [`blob->base64`](#link626c6f622d3e626173653634) [`blob->hex`](#link626c6f622d3e686578) [`blob->str`](#link626c6f622d3e737472) [`blob-chksum`](#link626c6f622d63686b73756d) [`blob-equal?`](#link626c6f622d657175616c3f) [`blob-free`](#link626c6f622d66726565) [`blob?`](#link626c6f623f) [`bool?`](#link626f6f6c3f) [`bound?`](#link626f756e643f) [`boxed?`](#link626f7865643f) [`build-array`](#link6275696c642d6172726179) [`build-list`](#link6275696c642d6c697374) [`caaar`](#link6361616172) [`caadr`](#link6361616472) [`caar`](#link63616172) [`cadar`](#link6361646172) [`caddr`](#link6361646472) [`cadr`](#link63616472) [`call-method`](#link63616c6c2d6d6574686f64) [`call-super`](#link63616c6c2d7375706572) [`can-externalize?`](#link63616e2d65787465726e616c697a653f) [`car`](#link636172) [`case`](#link63617365) [`ccmp`](#link63636d70) [`cdaar`](#link6364616172) [`cdadr`](#link6364616472) [`cdar`](#link63646172) [`cddar`](#link6364646172) [`cdddr`](#link6364646472) [`cddr`](#link63646472) [`cdec!`](#link6364656321) [`cdr`](#link636472) [`center-window-on-screen`](#link63656e7465722d77696e646f772d6f6e2d73637265656e) [`change-action-prefix`](#link6368616e67652d616374696f6e2d707265666978) [`change-all-action-prefixes`](#link6368616e67652d616c6c2d616374696f6e2d7072656669786573) [`char->str`](#link636861722d3e737472) [`chars`](#link6368617273) [`chars->str`](#link63686172732d3e737472) [`cinc!`](#link63696e6321) [`class-name`](#link636c6173732d6e616d65) [`class-of`](#link636c6173732d6f66) [`class?`](#link636c6173733f) [`close`](#link636c6f7365) [`close-window`](#link636c6f73652d77696e646f77) [`closure?`](#link636c6f737572653f) [`collect-garbage`](#link636f6c6c6563742d67617262616765) [`color`](#link636f6c6f72) [`cons`](#link636f6e73) [`cons?`](#link636f6e733f) [`copy-record`](#link636f70792d7265636f7264) [`count-partitions`](#link636f756e742d706172746974696f6e73) [`cpunum`](#link6370756e756d) [`cst!`](#link63737421) [`current-error-handler`](#link63757272656e742d6572726f722d68616e646c6572) [`current-zimage`](#link63757272656e742d7a696d616765) [`cwait`](#link6377616974) [`darken`](#link6461726b656e) [`date->epoch-ns`](#link646174652d3e65706f63682d6e73) [`datelist->epoch-ns`](#link646174656c6973742d3e65706f63682d6e73) [`datestr`](#link64617465737472) [`datestr*`](#link646174657374722a) [`datestr->datelist`](#link646174657374722d3e646174656c697374) [`day+`](#link6461792b) [`day-of-week`](#link6461792d6f662d7765656b) [`db.blob`](#link64622e626c6f62) [`db.close`](#link64622e636c6f7365) [`db.close-result`](#link64622e636c6f73652d726573756c74) [`db.exec`](#link64622e65786563) [`db.float`](#link64622e666c6f6174) [`db.int`](#link64622e696e74) [`db.open`](#link64622e6f70656e) [`db.open*`](#link64622e6f70656e2a) [`db.query`](#link64622e7175657279) [`db.result-column-count`](#link64622e726573756c742d636f6c756d6e2d636f756e74) [`db.result-columns`](#link64622e726573756c742d636f6c756d6e73) [`db.row`](#link64622e726f77) [`db.step`](#link64622e73746570) [`db.str`](#link64622e737472) [`declare-volatile`](#link6465636c6172652d766f6c6174696c65) [`def-custom-hook`](#link6465662d637573746f6d2d686f6f6b) [`default-error-handler`](#link64656661756c742d6572726f722d68616e646c6572) [`defclass`](#link646566636c617373) [`defmacro`](#link6465666d6163726f) [`defmethod`](#link6465666d6574686f64) [`defstruct`](#link646566737472756374) [`defun`](#link646566756e) [`delete`](#link64656c657465) [`dequeue!`](#link6465717565756521) [`dict`](#link64696374) [`dict->alist`](#link646963742d3e616c697374) [`dict->array`](#link646963742d3e6172726179) [`dict->keys`](#link646963742d3e6b657973) [`dict->list`](#link646963742d3e6c697374) [`dict->values`](#link646963742d3e76616c756573) [`dict-copy`](#link646963742d636f7079) [`dict-empty?`](#link646963742d656d7074793f) [`dict-foreach`](#link646963742d666f7265616368) [`dict-map`](#link646963742d6d6170) [`dict-map!`](#link646963742d6d617021) [`dict-merge`](#link646963742d6d65726765) [`dict-protect`](#link646963742d70726f74656374) [`dict-protected?`](#link646963742d70726f7465637465643f) [`dict-unprotect`](#link646963742d756e70726f74656374) [`dict?`](#link646963743f) [`dir`](#link646972) [`dir?`](#link6469723f) [`div`](#link646976) [`dolist`](#link646f6c697374) [`dotimes`](#link646f74696d6573) [`dump`](#link64756d70) [`dump-bindings`](#link64756d702d62696e64696e6773) [`enq`](#link656e71) [`enqueue!`](#link656e717565756521) [`entry-accepts-tab?`](#link656e7472792d616363657074732d7461623f) [`epoch-ns->datelist`](#link65706f63682d6e732d3e646174656c697374) [`eq?`](#link65713f) [`eql?`](#link65716c3f) [`equal?`](#link657175616c3f) [`error`](#link6572726f72) [`error->str`](#link6572726f722d3e737472) [`error?`](#link6572726f723f) [`eval`](#link6576616c) [`even?`](#link6576656e3f) [`exists?`](#link6578697374733f) [`exit`](#link65786974) [`expand-macros`](#link657870616e642d6d6163726f73) [`expect`](#link657870656374) [`expect-err`](#link6578706563742d657272) [`expect-false`](#link6578706563742d66616c7365) [`expect-ok`](#link6578706563742d6f6b) [`expect-true`](#link6578706563742d74727565) [`expr->str`](#link657870722d3e737472) [`externalize`](#link65787465726e616c697a65) [`externalize0`](#link65787465726e616c697a6530) [`fdelete`](#link6664656c657465) [`feature?`](#link666561747572653f) [`file-port?`](#link66696c652d706f72743f) [`filter`](#link66696c746572) [`find-missing-help-entries`](#link66696e642d6d697373696e672d68656c702d656e7472696573) [`find-unneeded-help-entries`](#link66696e642d756e6e65656465642d68656c702d656e7472696573) [`fl.abs`](#link666c2e616273) [`fl.acos`](#link666c2e61636f73) [`fl.asin`](#link666c2e6173696e) [`fl.asinh`](#link666c2e6173696e68) [`fl.atan`](#link666c2e6174616e) [`fl.atan2`](#link666c2e6174616e32) [`fl.atanh`](#link666c2e6174616e68) [`fl.cbrt`](#link666c2e63627274) [`fl.ceil`](#link666c2e6365696c) [`fl.cos`](#link666c2e636f73) [`fl.cosh`](#link666c2e636f7368) [`fl.dim`](#link666c2e64696d) [`fl.erf`](#link666c2e657266) [`fl.erfc`](#link666c2e65726663) [`fl.erfcinv`](#link666c2e65726663696e76) [`fl.erfinv`](#link666c2e657266696e76) [`fl.exp`](#link666c2e657870) [`fl.exp2`](#link666c2e65787032) [`fl.expm1`](#link666c2e6578706d31) [`fl.floor`](#link666c2e666c6f6f72) [`fl.fma`](#link666c2e666d61) [`fl.frexp`](#link666c2e6672657870) [`fl.gamma`](#link666c2e67616d6d61) [`fl.hypot`](#link666c2e6879706f74) [`fl.ilogb`](#link666c2e696c6f6762) [`fl.inf`](#link666c2e696e66) [`fl.is-nan?`](#link666c2e69732d6e616e3f) [`fl.j0`](#link666c2e6a30) [`fl.j1`](#link666c2e6a31) [`fl.jn`](#link666c2e6a6e) [`fl.ldexp`](#link666c2e6c64657870) [`fl.lgamma`](#link666c2e6c67616d6d61) [`fl.log`](#link666c2e6c6f67) [`fl.log10`](#link666c2e6c6f673130) [`fl.log1p`](#link666c2e6c6f673170) [`fl.log2`](#link666c2e6c6f6732) [`fl.logb`](#link666c2e6c6f6762) [`fl.max`](#link666c2e6d6178) [`fl.min`](#link666c2e6d696e) [`fl.mod`](#link666c2e6d6f64) [`fl.modf`](#link666c2e6d6f6466) [`fl.nan`](#link666c2e6e616e) [`fl.next-after`](#link666c2e6e6578742d6166746572) [`fl.pow`](#link666c2e706f77) [`fl.pow10`](#link666c2e706f773130) [`fl.remainder`](#link666c2e72656d61696e646572) [`fl.round`](#link666c2e726f756e64) [`fl.round-to-even`](#link666c2e726f756e642d746f2d6576656e) [`fl.signbit`](#link666c2e7369676e626974) [`fl.sin`](#link666c2e73696e) [`fl.sinh`](#link666c2e73696e68) [`fl.sqrt`](#link666c2e73717274) [`fl.tan`](#link666c2e74616e) [`fl.tanh`](#link666c2e74616e68) [`fl.trunc`](#link666c2e7472756e63) [`fl.y0`](#link666c2e7930) [`fl.y1`](#link666c2e7931) [`fl.yn`](#link666c2e796e) [`flatten`](#link666c617474656e) [`float`](#link666c6f6174) [`fmt`](#link666d74) [`forall?`](#link666f72616c6c3f) [`force`](#link666f726365) [`foreach`](#link666f7265616368) [`forget`](#link666f72676574) [`functional-arity`](#link66756e6374696f6e616c2d6172697479) [`functional-has-rest?`](#link66756e6374696f6e616c2d6861732d726573743f) [`functional?`](#link66756e6374696f6e616c3f) [`gensym`](#link67656e73796d) [`get`](#link676574) [`get-action`](#link6765742d616374696f6e) [`get-entry-cursor`](#link6765742d656e7472792d637572736f72) [`get-entry-cursor-pos`](#link6765742d656e7472792d637572736f722d706f73) [`get-or-set`](#link6765742d6f722d736574) [`get-partitions`](#link6765742d706172746974696f6e73) [`get-window-canvas`](#link6765742d77696e646f772d63616e766173) [`get-window-content`](#link6765742d77696e646f772d636f6e74656e74) [`get-window-icon`](#link6765742d77696e646f772d69636f6e) [`get-window-main-menu`](#link6765742d77696e646f772d6d61696e2d6d656e75) [`get-window-title`](#link6765742d77696e646f772d7469746c65) [`getstacked`](#link676574737461636b6564) [`glance`](#link676c616e6365) [`global-sym?`](#link676c6f62616c2d73796d3f) [`has`](#link686173) [`has-action-system?`](#link6861732d616374696f6e2d73797374656d3f) [`has-action?`](#link6861732d616374696f6e3f) [`has-key?`](#link6861732d6b65793f) [`has-method?`](#link6861732d6d6574686f643f) [`has-prop?`](#link6861732d70726f703f) [`help`](#link68656c70) [`help->manual-entry`](#link68656c702d3e6d616e75616c2d656e747279) [`help-about`](#link68656c702d61626f7574) [`help-entry`](#link68656c702d656e747279) [`help-strings`](#link68656c702d737472696e6773) [`help-topic-info`](#link68656c702d746f7069632d696e666f) [`help-topics`](#link68656c702d746f70696373) [`hex->blob`](#link6865782d3e626c6f62) [`hide-window`](#link686964652d77696e646f77) [`hook`](#link686f6f6b) [`hour+`](#link686f75722b) [`identity`](#link6964656e74697479) [`if`](#link6966) [`inchars`](#link696e6368617273) [`include`](#link696e636c756465) [`index`](#link696e646578) [`init-actions`](#link696e69742d616374696f6e73) [`init-remember`](#link696e69742d72656d656d626572) [`instr`](#link696e737472) [`int`](#link696e74) [`intern`](#link696e7465726e) [`internalize`](#link696e7465726e616c697a65) [`intrinsic`](#link696e7472696e736963) [`intrinsic?`](#link696e7472696e7369633f) [`isa?`](#link6973613f) [`iterate`](#link69746572617465) [`kvdb.begin`](#link6b7664622e626567696e) [`kvdb.close`](#link6b7664622e636c6f7365) [`kvdb.commit`](#link6b7664622e636f6d6d6974) [`kvdb.db?`](#link6b7664622e64623f) [`kvdb.forget`](#link6b7664622e666f72676574) [`kvdb.forget-everything`](#link6b7664622e666f726765742d65766572797468696e67) [`kvdb.get`](#link6b7664622e676574) [`kvdb.info`](#link6b7664622e696e666f) [`kvdb.open`](#link6b7664622e6f70656e) [`kvdb.rollback`](#link6b7664622e726f6c6c6261636b) [`kvdb.search`](#link6b7664622e736561726368) [`kvdb.set`](#link6b7664622e736574) [`kvdb.when`](#link6b7664622e7768656e) [`last`](#link6c617374) [`lcons`](#link6c636f6e73) [`len`](#link6c656e) [`let`](#link6c6574) [`letrec`](#link6c6574726563) [`lighten`](#link6c69676874656e) [`ling.damerau-levenshtein`](#link6c696e672e64616d657261752d6c6576656e73687465696e) [`ling.hamming`](#link6c696e672e68616d6d696e67) [`ling.jaro`](#link6c696e672e6a61726f) [`ling.jaro-winkler`](#link6c696e672e6a61726f2d77696e6b6c6572) [`ling.levenshtein`](#link6c696e672e6c6576656e73687465696e) [`ling.match-rating-codex`](#link6c696e672e6d617463682d726174696e672d636f646578) [`ling.match-rating-compare`](#link6c696e672e6d617463682d726174696e672d636f6d70617265) [`ling.metaphone`](#link6c696e672e6d65746170686f6e65) [`ling.nysiis`](#link6c696e672e6e7973696973) [`ling.porter`](#link6c696e672e706f72746572) [`ling.soundex`](#link6c696e672e736f756e646578) [`list`](#link6c697374) [`list->array`](#link6c6973742d3e6172726179) [`list->set`](#link6c6973742d3e736574) [`list->str`](#link6c6973742d3e737472) [`list-exists?`](#link6c6973742d6578697374733f) [`list-forall?`](#link6c6973742d666f72616c6c3f) [`list-foreach`](#link6c6973742d666f7265616368) [`list-last`](#link6c6973742d6c617374) [`list-ref`](#link6c6973742d726566) [`list-reverse`](#link6c6973742d72657665727365) [`list-slice`](#link6c6973742d736c696365) [`list?`](#link6c6973743f) [`load`](#link6c6f6164) [`load-zimage`](#link6c6f61642d7a696d616765) [`macro?`](#link6d6163726f3f) [`make`](#link6d616b65) [`make*`](#link6d616b652a) [`make-blob`](#link6d616b652d626c6f62) [`make-mutex`](#link6d616b652d6d75746578) [`make-queue`](#link6d616b652d7175657565) [`make-set`](#link6d616b652d736574) [`make-stack`](#link6d616b652d737461636b) [`make-symbol`](#link6d616b652d73796d626f6c) [`map`](#link6d6170) [`map-pairwise`](#link6d61702d7061697277697365) [`mapcar`](#link6d6170636172) [`max`](#link6d6178) [`member`](#link6d656d626572) [`memq`](#link6d656d71) [`memstats`](#link6d656d7374617473) [`methods`](#link6d6574686f6473) [`min`](#link6d696e) [`minmax`](#link6d696e6d6178) [`minute+`](#link6d696e7574652b) [`mod`](#link6d6f64) [`month+`](#link6d6f6e74682b) [`mutex-lock`](#link6d757465782d6c6f636b) [`mutex-rlock`](#link6d757465782d726c6f636b) [`mutex-runlock`](#link6d757465782d72756e6c6f636b) [`mutex-unlock`](#link6d757465782d756e6c6f636b) [`nconc`](#link6e636f6e63) [`new`](#link6e6577) [`new-entry`](#link6e65772d656e747279) [`new-label`](#link6e65772d6c6162656c) [`new-struct`](#link6e65772d737472756374) [`new-window`](#link6e65772d77696e646f77) [`nl`](#link6e6c) [`nonce`](#link6e6f6e6365) [`not`](#link6e6f74) [`now`](#link6e6f77) [`now-ms`](#link6e6f772d6d73) [`now-ns`](#link6e6f772d6e73) [`nreverse`](#link6e72657665727365) [`nth`](#link6e7468) [`nth-partition`](#link6e74682d706172746974696f6e) [`nthdef`](#link6e7468646566) [`null?`](#link6e756c6c3f) [`num?`](#link6e756d3f) [`object?`](#link6f626a6563743f) [`odd?`](#link6f64643f) [`on-feature`](#link6f6e2d66656174757265) [`open`](#link6f70656e) [`or`](#link6f72) [`out`](#link6f7574) [`outy`](#link6f757479) [`peek`](#link7065656b) [`permission?`](#link7065726d697373696f6e3f) [`permissions`](#link7065726d697373696f6e73) [`poke`](#link706f6b65) [`pop!`](#link706f7021) [`pop-error-handler`](#link706f702d6572726f722d68616e646c6572) [`pop-finalizer`](#link706f702d66696e616c697a6572) [`popstacked`](#link706f70737461636b6564) [`prin1`](#link7072696e31) [`princ`](#link7072696e63) [`print`](#link7072696e74) [`proc?`](#link70726f633f) [`prop`](#link70726f70) [`props`](#link70726f7073) [`protect`](#link70726f74656374) [`protect-toplevel-symbols`](#link70726f746563742d746f706c6576656c2d73796d626f6c73) [`protected?`](#link70726f7465637465643f) [`prune-task-table`](#link7072756e652d7461736b2d7461626c65) [`prune-unneeded-help-entries`](#link7072756e652d756e6e65656465642d68656c702d656e7472696573) [`push!`](#link7075736821) [`push-error-handler`](#link707573682d6572726f722d68616e646c6572) [`push-finalizer`](#link707573682d66696e616c697a6572) [`pushstacked`](#link70757368737461636b6564) [`queue-empty?`](#link71756575652d656d7074793f) [`queue-len`](#link71756575652d6c656e) [`queue?`](#link71756575653f) [`rand`](#link72616e64) [`random-color`](#link72616e646f6d2d636f6c6f72) [`read`](#link72656164) [`read-binary`](#link726561642d62696e617279) [`read-string`](#link726561642d737472696e67) [`read-zimage`](#link726561642d7a696d616765) [`readall`](#link72656164616c6c) [`readall-str`](#link72656164616c6c2d737472) [`recall`](#link726563616c6c) [`recall-info`](#link726563616c6c2d696e666f) [`recall-when`](#link726563616c6c2d7768656e) [`recollect`](#link7265636f6c6c656374) [`record?`](#link7265636f72643f) [`register-action`](#link72656769737465722d616374696f6e) [`remember`](#link72656d656d626572) [`remove-duplicates`](#link72656d6f76652d6475706c696361746573) [`remove-hook`](#link72656d6f76652d686f6f6b) [`remove-hook-internal`](#link72656d6f76652d686f6f6b2d696e7465726e616c) [`remove-hooks`](#link72656d6f76652d686f6f6b73) [`rename-action`](#link72656e616d652d616374696f6e) [`replace-hook`](#link7265706c6163652d686f6f6b) [`reset-color`](#link72657365742d636f6c6f72) [`reverse`](#link72657665727365) [`rnd`](#link726e64) [`rndseed`](#link726e6473656564) [`rplaca`](#link72706c616361) [`run-at`](#link72756e2d6174) [`run-hook`](#link72756e2d686f6f6b) [`run-hook-internal`](#link72756e2d686f6f6b2d696e7465726e616c) [`run-selftest`](#link72756e2d73656c6674657374) [`run-zimage`](#link72756e2d7a696d616765) [`save-zimage`](#link736176652d7a696d616765) [`sec+`](#link7365632b) [`semver.build`](#link73656d7665722e6275696c64) [`semver.canonical`](#link73656d7665722e63616e6f6e6963616c) [`semver.compare`](#link73656d7665722e636f6d70617265) [`semver.is-valid?`](#link73656d7665722e69732d76616c69643f) [`semver.major`](#link73656d7665722e6d616a6f72) [`semver.major-minor`](#link73656d7665722e6d616a6f722d6d696e6f72) [`semver.max`](#link73656d7665722e6d6178) [`semver.prerelease`](#link73656d7665722e70726572656c65617365) [`seq?`](#link7365713f) [`set`](#link736574) [`set*`](#link7365742a) [`set->list`](#link7365742d3e6c697374) [`set-color`](#link7365742d636f6c6f72) [`set-complement`](#link7365742d636f6d706c656d656e74) [`set-difference`](#link7365742d646966666572656e6365) [`set-element?`](#link7365742d656c656d656e743f) [`set-empty?`](#link7365742d656d7074793f) [`set-entry-cursor-column`](#link7365742d656e7472792d637572736f722d636f6c756d6e) [`set-entry-cursor-row`](#link7365742d656e7472792d637572736f722d726f77) [`set-entry-min-rows-visible`](#link7365742d656e7472792d6d696e2d726f77732d76697369626c65) [`set-entry-on-change-callback`](#link7365742d656e7472792d6f6e2d6368616e67652d63616c6c6261636b) [`set-entry-on-cursor-change-callback`](#link7365742d656e7472792d6f6e2d637572736f722d6368616e67652d63616c6c6261636b) [`set-entry-place-holder`](#link7365742d656e7472792d706c6163652d686f6c646572) [`set-entry-text`](#link7365742d656e7472792d74657874) [`set-entry-validator`](#link7365742d656e7472792d76616c696461746f72) [`set-equal?`](#link7365742d657175616c3f) [`set-help-topic-info`](#link7365742d68656c702d746f7069632d696e666f) [`set-intersection`](#link7365742d696e74657273656374696f6e) [`set-label-text`](#link7365742d6c6162656c2d74657874) [`set-permissions`](#link7365742d7065726d697373696f6e73) [`set-subset?`](#link7365742d7375627365743f) [`set-union`](#link7365742d756e696f6e) [`set-volume`](#link7365742d766f6c756d65) [`set-window-content`](#link7365742d77696e646f772d636f6e74656e74) [`set-window-full-screen`](#link7365742d77696e646f772d66756c6c2d73637265656e) [`set-window-icon`](#link7365742d77696e646f772d69636f6e) [`set-window-main-menu`](#link7365742d77696e646f772d6d61696e2d6d656e75) [`set-window-on-close-callback`](#link7365742d77696e646f772d6f6e2d636c6f73652d63616c6c6261636b) [`set-window-padded`](#link7365742d77696e646f772d706164646564) [`set-window-size`](#link7365742d77696e646f772d73697a65) [`set-window-title`](#link7365742d77696e646f772d7469746c65) [`set?`](#link7365743f) [`setcar`](#link736574636172) [`setcdr`](#link736574636472) [`setprop`](#link73657470726f70) [`shorten`](#link73686f7274656e) [`sleep`](#link736c656570) [`sleep-ns`](#link736c6565702d6e73) [`slice`](#link736c696365) [`sort`](#link736f7274) [`sort-symbols`](#link736f72742d73796d626f6c73) [`spaces`](#link737061636573) [`stack-empty?`](#link737461636b2d656d7074793f) [`stack-len`](#link737461636b2d6c656e) [`stack?`](#link737461636b3f) [`str+`](#link7374722b) [`str->array`](#link7374722d3e6172726179) [`str->blob`](#link7374722d3e626c6f62) [`str->char`](#link7374722d3e63686172) [`str->chars`](#link7374722d3e6368617273) [`str->expr`](#link7374722d3e65787072) [`str->expr*`](#link7374722d3e657870722a) [`str->list`](#link7374722d3e6c697374) [`str->sym`](#link7374722d3e73796d) [`str-count-substr`](#link7374722d636f756e742d737562737472) [`str-empty?`](#link7374722d656d7074793f) [`str-exists?`](#link7374722d6578697374733f) [`str-forall?`](#link7374722d666f72616c6c3f) [`str-foreach`](#link7374722d666f7265616368) [`str-index`](#link7374722d696e646578) [`str-join`](#link7374722d6a6f696e) [`str-port?`](#link7374722d706f72743f) [`str-ref`](#link7374722d726566) [`str-remove-number`](#link7374722d72656d6f76652d6e756d626572) [`str-remove-prefix`](#link7374722d72656d6f76652d707265666978) [`str-remove-suffix`](#link7374722d72656d6f76652d737566666978) [`str-replace`](#link7374722d7265706c616365) [`str-replace*`](#link7374722d7265706c6163652a) [`str-reverse`](#link7374722d72657665727365) [`str-segment`](#link7374722d7365676d656e74) [`str-slice`](#link7374722d736c696365) [`str?`](#link7374723f) [`strbuild`](#link7374726275696c64) [`strcase`](#link73747263617365) [`strcenter`](#link73747263656e746572) [`strcnt`](#link737472636e74) [`strleft`](#link7374726c656674) [`strlen`](#link7374726c656e) [`strless`](#link7374726c657373) [`strlimit`](#link7374726c696d6974) [`strmap`](#link7374726d6170) [`stropen`](#link7374726f70656e) [`strright`](#link7374727269676874) [`strsplit`](#link73747273706c6974) [`struct-index`](#link7374727563742d696e646578) [`struct-instantiate`](#link7374727563742d696e7374616e7469617465) [`struct-name`](#link7374727563742d6e616d65) [`struct-props`](#link7374727563742d70726f7073) [`struct-size`](#link7374727563742d73697a65) [`struct?`](#link7374727563743f) [`sub1`](#link73756231) [`supers`](#link737570657273) [`sym->str`](#link73796d2d3e737472) [`sym?`](#link73796d3f) [`synout`](#link73796e6f7574) [`synouty`](#link73796e6f757479) [`sys-key?`](#link7379732d6b65793f) [`sysmsg`](#link7379736d7367) [`sysmsg*`](#link7379736d73672a) [`take`](#link74616b65) [`task`](#link7461736b) [`task-broadcast`](#link7461736b2d62726f616463617374) [`task-recv`](#link7461736b2d72656376) [`task-remove`](#link7461736b2d72656d6f7665) [`task-run`](#link7461736b2d72756e) [`task-schedule`](#link7461736b2d7363686564756c65) [`task-send`](#link7461736b2d73656e64) [`task-state`](#link7461736b2d7374617465) [`task?`](#link7461736b3f) [`terpri`](#link746572707269) [`testing`](#link74657374696e67) [`the-color`](#link7468652d636f6c6f72) [`the-color-names`](#link7468652d636f6c6f722d6e616d6573) [`time`](#link74696d65) [`truncate`](#link7472756e63617465) [`try`](#link747279) [`type-of`](#link747970652d6f66) [`type-of*`](#link747970652d6f662a) [`unless`](#link756e6c657373) [`unprotect`](#link756e70726f74656374) [`unprotect-toplevel-symbols`](#link756e70726f746563742d746f706c6576656c2d73796d626f6c73) [`valid?`](#link76616c69643f) [`void`](#link766f6964) [`void?`](#link766f69643f) [`wait-for`](#link776169742d666f72) [`wait-for*`](#link776169742d666f722a) [`wait-for-empty*`](#link776169742d666f722d656d7074792a) [`wait-until`](#link776169742d756e74696c) [`wait-until*`](#link776169742d756e74696c2a) [`warn`](#link7761726e) [`week+`](#link7765656b2b) [`week-of-date`](#link7765656b2d6f662d64617465) [`when`](#link7768656e) [`when-permission`](#link7768656e2d7065726d697373696f6e) [`while`](#link7768696c65) [`window-fixed-size?`](#link77696e646f772d66697865642d73697a653f) [`window-full-screen?`](#link77696e646f772d66756c6c2d73637265656e3f) [`window-padded?`](#link77696e646f772d7061646465643f) [`with-colors`](#link776974682d636f6c6f7273) [`with-error-handler`](#link776974682d6572726f722d68616e646c6572) [`with-final`](#link776974682d66696e616c) [`with-mutex-lock`](#link776974682d6d757465782d6c6f636b) [`with-mutex-rlock`](#link776974682d6d757465782d726c6f636b) [`write`](#link7772697465) [`write-binary`](#link77726974652d62696e617279) [`write-binary-at`](#link77726974652d62696e6172792d6174) [`write-string`](#link77726974652d737472696e67) [`write-zimage`](#link77726974652d7a696d616765) [`year+`](#link796561722b) [`zimage-header`](#link7a696d6167652d686561646572) [`zimage-loadable?`](#link7a696d6167652d6c6f616461626c653f) [`zimage-runable?`](#link7a696d6167652d72756e61626c653f) 
 
 # By Topics {#topics}
 
@@ -2251,6 +2251,110 @@ Fyne objects are represented by integer numbers. The system internally translate
 
 When importing the GUI with `DefGUI`, a `Config` structure is provided that allows for restricted security. This makes it possible to use the GUI functions in a restricted environment that e.g. does not allow the creation of new windows.
 
+### `center-window-on-screen` : procedure/1
+
+Usage: `(center-window-on-screen window)`
+
+As the name implies, this function centers the window on the screen.
+
+See also: [`set-window-full-screen`](#link7365742d77696e646f772d66756c6c2d73637265656e), [`window-full-screen?`](#link77696e646f772d66756c6c2d73637265656e3f).	 [→index](#idx)
+
+### `close-window` : procedure/1
+
+Usage: `(close-window window)`
+
+Closes `window` and delete it from internal storage. This frees window resources. It cannot be re-used after this operation. Use window-hide if you want to close/hide a window only temporarily. Notice that unlike in Fyne, there is no mechanism to close an application automatically after its main window has been closed.
+
+See also: [`hide-window`](#link686964652d77696e646f77).	 [→index](#idx)
+
+### `entry-accepts-tab?` : procedure/1
+
+Usage: `(entry-accepts-tab? entry) => bool`
+
+Return `nil` when the entry does not accept tabs, `t` otherwise.
+
+See also: [`new-entry`](#link6e65772d656e747279).	 [→index](#idx)
+
+### `get-entry-cursor` : procedure/1
+
+Usage: `(get-entry-cursor entry) => sym`
+
+Return a symbol that represents the current cursor of `entry`. Possible values are in '(default text crosshair pointer hresize vresize). Curiously, there is no way to set the cursor yet.
+
+See also: [`new-entry`](#link6e65772d656e747279).	 [→index](#idx)
+
+### `get-entry-cursor-pos` : procedure/1
+
+Usage: `(get-entry-cursor-pos entry) => li`
+
+Return a list consisting of row number and column number of the current cursor position of the cursor in `entry.`
+
+See also: [`set-entry-cursor-row`](#link7365742d656e7472792d637572736f722d726f77), [`set-entry-cursor-column`](#link7365742d656e7472792d637572736f722d636f6c756d6e).	 [→index](#idx)
+
+### `get-window-canvas` : procedure/1
+
+Usage: `(get-window-canvas window) => int`
+
+Get the canvas object of `window`, which is the area on which window elements are drawn. This is not the same as the window-content, which is a widget or other user interface element. The canvas is used for raw-drawing commands, for example for drawing circles and boxes. With a suitable layout that doesn't re-arrange objects, it can e.g. be used to draw overlays.
+
+See also: [`get-window-content`](#link6765742d77696e646f772d636f6e74656e74), [`set-window-content`](#link7365742d77696e646f772d636f6e74656e74).	 [→index](#idx)
+
+### `get-window-content` : procedure/2
+
+Usage: `(get-window-content window) => int`
+
+Get the canvas object ID that represents the main content of the window. This is usually a widget or a container with layout.
+
+See also: [`set-window-content`](#link7365742d77696e646f772d636f6e74656e74), [`get-window-canvas`](#link6765742d77696e646f772d63616e766173).	 [→index](#idx)
+
+### `get-window-icon` : procedure/1
+
+Usage: `(get-window-icon window) => int`
+
+Obtain the icon ID of the icon of `window`. The resource obtained is not guaranteed to be a visible icon or might be a dummy, as not all windows have icons on all platforms.
+
+See also: [`set-window-icon`](#link7365742d77696e646f772d69636f6e), [`new-icon`](#link6e65772d69636f6e), [`theme-icon`](#link7468656d652d69636f6e).	 [→index](#idx)
+
+### `get-window-main-menu` : procedure/2
+
+Usage: `(get-window-main-menu window) => int`
+
+Get the main menu ID of `window.`
+
+See also: [`set-window-main-menu`](#link7365742d77696e646f772d6d61696e2d6d656e75), [`new-main-menu`](#link6e65772d6d61696e2d6d656e75).	 [→index](#idx)
+
+### `get-window-title` : procedure/1
+
+Usage: `(get-window-title window) => str`
+
+Return the title of `window` as string.
+
+See also: [`set-window-title`](#link7365742d77696e646f772d7469746c65).	 [→index](#idx)
+
+### `hide-window` : procedure/1
+
+Usage: `(hide-window window)`
+
+Hides `window`. It can be shown again using show-window.
+
+See also: [`show-window`](#link73686f772d77696e646f77), [`close-window`](#link636c6f73652d77696e646f77).	 [→index](#idx)
+
+### `new-entry` : procedure/1
+
+Usage: `(new-entry [selector]) => int`
+
+Create a new text entry field based on the optional `selector` symbol. `selector` can be a symbol in '(single-line multi-line password). The default is 'single-line.
+
+See also: [`set-entry-on-change-callback`](#link7365742d656e7472792d6f6e2d6368616e67652d63616c6c6261636b), [`set-entry-validator`](#link7365742d656e7472792d76616c696461746f72), [`entry-accepts-tab?`](#link656e7472792d616363657074732d7461623f), [`get-entry-cursor-pos`](#link6765742d656e7472792d637572736f722d706f73), [`set-entry-cursor-row`](#link7365742d656e7472792d637572736f722d726f77), [`set-entry-cursor-column`](#link7365742d656e7472792d637572736f722d636f6c756d6e), [`set-entry-on-cursor-change-callback`](#link7365742d656e7472792d6f6e2d637572736f722d6368616e67652d63616c6c6261636b), [`get-entry-cursor`](#link6765742d656e7472792d637572736f72), [`get-entry-selected-text`](#link6765742d656e7472792d73656c65637465642d74657874), [`set-entry-min-rows-visible`](#link7365742d656e7472792d6d696e2d726f77732d76697369626c65), [`set-entry-place-holder`](#link7365742d656e7472792d706c6163652d686f6c646572), [`set-entry-text`](#link7365742d656e7472792d74657874).	 [→index](#idx)
+
+### `new-label` : procedure/1
+
+Usage: `(new-label str) => int`
+
+Creates a new text label with string `str.`
+
+See also: [`set-label-text`](#link7365742d6c6162656c2d74657874).	 [→index](#idx)
+
 ### `new-window` : procedure/1
 
 Usage: `(new-window title) => int`
@@ -2258,6 +2362,174 @@ Usage: `(new-window title) => int`
 Create a new window with `title` string and return the window ID.
 
 See also: [`set-window-content`](#link7365742d77696e646f772d636f6e74656e74), [`close-window`](#link636c6f73652d77696e646f77), [`show-window`](#link73686f772d77696e646f77).	 [→index](#idx)
+
+### `set-entry-cursor-column` : procedure/2
+
+Usage: `(set-entry-cursor-column entry column)`
+
+Set the column position of the cursor in `entry` to integer `column.`
+
+See also: [`get-entry-cursor-pos`](#link6765742d656e7472792d637572736f722d706f73), [`set-entry-cursor-row`](#link7365742d656e7472792d637572736f722d726f77).	 [→index](#idx)
+
+### `set-entry-cursor-row` : procedure/2
+
+Usage: `(set-entry-cursor-row entry row)`
+
+Set the row position of the cursor in `entry` to integer `row.`
+
+See also: [`get-entry-cursor-pos`](#link6765742d656e7472792d637572736f722d706f73), [`set-entry-cursor-column`](#link7365742d656e7472792d637572736f722d636f6c756d6e).	 [→index](#idx)
+
+### `set-entry-min-rows-visible` : procedure/2
+
+Usage: `(set-entry-min-rows-visible entry rows)`
+
+Set the minimum number of rows of `entry` that are visible. This ensures that `rows` text rows are visible and is a way of setting the entry's minimum size. Curiously, there is no corresponding set-entry-min-columns-visible function yet.
+
+See also: [`new-entry`](#link6e65772d656e747279).	 [→index](#idx)
+
+### `set-entry-on-change-callback` : procedure/2
+
+Usage: `(set-entry-on-change-callback entry proc)`
+
+Set the callback of `entry` that is triggered when the entry text changes. `proc` must be a procedure that takes the entry text as string.
+
+See also: [`new-entry`](#link6e65772d656e747279), [`set-entry-cursor-change-callback`](#link7365742d656e7472792d637572736f722d6368616e67652d63616c6c6261636b).	 [→index](#idx)
+
+### `set-entry-on-cursor-change-callback` : procedure/2
+
+Usage: `(set-entry-cursor-change-callback entry proc)`
+
+Set the cursor change callback of `entry` to `proc`, which is a procedure that takes the entry ID as argument.
+
+See also: [`new-entry`](#link6e65772d656e747279), [`set-entry-on-change-callback`](#link7365742d656e7472792d6f6e2d6368616e67652d63616c6c6261636b).	 [→index](#idx)
+
+### `set-entry-place-holder` : procedure/2
+
+Usage: `(set-entry-place-holder entry str)`
+
+Set the place holder string of `entry` to `str`. This is displayed as a prompt when no text is entered.
+
+See also: [`new-entry`](#link6e65772d656e747279), [`set-entry-text`](#link7365742d656e7472792d74657874).	 [→index](#idx)
+
+### `set-entry-text` : procedure/2
+
+Usage: `(set-entry-text entry str)`
+
+Set the text of `entry` to string `str.`
+
+See also: [`new-entry`](#link6e65772d656e747279), [`set-entry-place-holder`](#link7365742d656e7472792d706c6163652d686f6c646572).	 [→index](#idx)
+
+### `set-entry-validator` : procedure/2
+
+Usage: `(set-entry-validator entry validator)`
+
+Set the `validator` of `entry`. A validator must be created first from a special procedure or a regular expression.
+
+See also: [`new-entry`](#link6e65772d656e747279), [`new-validator`](#link6e65772d76616c696461746f72), [`new-combined-string-validator`](#link6e65772d636f6d62696e65642d737472696e672d76616c696461746f72), [`new-time-validator`](#link6e65772d74696d652d76616c696461746f72), [`new-regexp-validator`](#link6e65772d7265676578702d76616c696461746f72), [`validate-object`](#link76616c69646174652d6f626a656374).	 [→index](#idx)
+
+### `set-label-text` : procedure/2
+
+Usage: `(set-label-text label str)`
+
+Sets the text of `label` to string `str`. This might resize the label depending on the layout in which the label is put.
+
+See also: [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx)
+
+### `set-window-content` : procedure/2
+
+Usage: `(set-window-content window canvas-object)`
+
+Set the main content of the window, which must be an existing canvas object such as a widget or container with layout.
+
+See also: [`get-window-content`](#link6765742d77696e646f772d636f6e74656e74), [`get-window-canvas`](#link6765742d77696e646f772d63616e766173), [`new-window`](#link6e65772d77696e646f77).	 [→index](#idx)
+
+### `set-window-fixed-size` : procedure/2
+
+Usage: `(set-window-fixed-size window fixed-size?)`
+
+If `fixed-size?` is not nil, then `window` is set to fixed size, i.e., it has no resize button and cannot be resized by the user; otherwise, the window is set to being resizable.
+
+See also: [`window-fixed-size?`](#link77696e646f772d66697865642d73697a653f).	 [→index](#idx)
+
+### `set-window-full-screen` : procedure/2
+
+Usage: `(set-window-full-screen window full-screen?)`
+
+If `full-screen?` is not nil, then `window` is set to full screen mode, otherwise the window is set to normal mode. In full screen mode the window is centered and fills the whole screen of the main monitor (multiple monitors are currently not supported).
+
+See also: [`window-full-screen?`](#link77696e646f772d66756c6c2d73637265656e3f), [`center-window-on-screen`](#link63656e7465722d77696e646f772d6f6e2d73637265656e).	 [→index](#idx)
+
+### `set-window-icon` : procedure/1
+
+Usage: `(set-window-icon window resource)`
+
+Set the icon of `window` to the given icon `resource`. Setting the icon does not guarantee that it is displayed, since this is platform-dependent.
+
+See also: [`get-window-icon`](#link6765742d77696e646f772d69636f6e), [`new-icon`](#link6e65772d69636f6e), [`theme-icon`](#link7468656d652d69636f6e).	 [→index](#idx)
+
+### `set-window-main-menu` : procedure/2
+
+Usage: `(set-window-main-menu window main-menu)`
+
+Set the main menu of `window` to `main-menu.`
+
+See also: [`new-main-menu`](#link6e65772d6d61696e2d6d656e75), [`new-menu`](#link6e65772d6d656e75), [`new-menu*`](#link6e65772d6d656e752a).	 [→index](#idx)
+
+### `set-window-on-close-callback` : procedure/2
+
+Usage: `(set-window-on-close-callback window proc)`
+
+Sets the close callback of `window`. `proc` must be a function that takes no arguments and is evaluated when the window is closed.
+
+See also: [`show-window`](#link73686f772d77696e646f77), [`close-window`](#link636c6f73652d77696e646f77), [`hide-window`](#link686964652d77696e646f77).	 [→index](#idx)
+
+### `set-window-padded` : procedure/2
+
+Usage: `(set-window-padded window padded?)`
+
+If `padded?` is not nil, then `window` is set to being padded. This is the default of new window. If `padded?` is nil, then the window's padding is removed, which means that the whole content area of the window can be filled with user interface elements and draw commands. This would be used for a game display, for instance.
+
+See also: [`window-padded?`](#link77696e646f772d7061646465643f), [`set-window-full-screen`](#link7365742d77696e646f772d66756c6c2d73637265656e), [`window-full-screen?`](#link77696e646f772d66756c6c2d73637265656e3f), [`center-window-on-screen`](#link63656e7465722d77696e646f772d6f6e2d73637265656e).	 [→index](#idx)
+
+### `set-window-size` : procedure/2
+
+Usage: `(set-window-size window width height)`
+
+Set the size of `window` to `width` and `height` as floats. Sizes and positions are generally given as floats whose accuracy is only guaranteed to 32 bit.
+
+See also: [`new-window`](#link6e65772d77696e646f77), [`show-window`](#link73686f772d77696e646f77), [`hide-window`](#link686964652d77696e646f77).	 [→index](#idx)
+
+### `set-window-title` : procedure/2
+
+Usage: `(set-window-title window title)`
+
+Set the title of `window` to string `title.`
+
+See also: [`get-window-title`](#link6765742d77696e646f772d7469746c65).	 [→index](#idx)
+
+### `window-fixed-size?` : procedure/1
+
+Usage: `(window-fixed-size? window) => bool`
+
+Return nil if `window` is fixed size, true otherwise.
+
+See also: [`set-window-fixed-size`](#link7365742d77696e646f772d66697865642d73697a65).	 [→index](#idx)
+
+### `window-full-screen?` : procedure/1
+
+Usage: `(window-full-screen? window) => bool`
+
+Return nil if `window` is full screen, true otherwise.
+
+See also: [`set-window-full-screen`](#link7365742d77696e646f772d66756c6c2d73637265656e), [`center-window-on-screen`](#link63656e7465722d77696e646f772d6f6e2d73637265656e).	 [→index](#idx)
+
+### `window-padded?` : procedure/1
+
+Usage: `(window-padded? window) => bool`
+
+Return nil if `window` is padded, true otherwise.
+
+See also: [`set-window-padded`](#link7365742d77696e646f772d706164646564), [`set-window-full-screen`](#link7365742d77696e646f772d66756c6c2d73637265656e), [`center-window-on-screen`](#link63656e7465722d77696e646f772d6f6e2d73637265656e).	 [→index](#idx)
 
 
 
@@ -6099,6 +6371,14 @@ Get the rest of a list `li`. If the list is proper, the cdr is a list. If it is 
 
 See also: [`car`](#link636172), [`list`](#link6c697374), [`list?`](#link6c6973743f), [`pair?`](#link706169723f).	 [→index](#idx) [→topic](#lisp)
 
+## `center-window-on-screen` : procedure/1 {#link63656e7465722d77696e646f772d6f6e2d73637265656e}
+
+Usage: `(center-window-on-screen window)`
+
+As the name implies, this function centers the window on the screen.
+
+See also: [`set-window-full-screen`](#link7365742d77696e646f772d66756c6c2d73637265656e), [`window-full-screen?`](#link77696e646f772d66756c6c2d73637265656e3f).	 [→index](#idx) [→topic](#gui)
+
 ## `change-action-prefix` : procedure/2 {#link6368616e67652d616374696f6e2d707265666978}
 
 Usage: `(change-action-prefix id new-prefix) => bool`
@@ -6178,6 +6458,14 @@ Usage: `(close p)`
 Close the port `p`. Calling close twice on the same port should be avoided.
 
 See also: [`open`](#link6f70656e), [`stropen`](#link7374726f70656e).	 [→index](#idx) [→topic](#fileio)
+
+## `close-window` : procedure/1 {#link636c6f73652d77696e646f77}
+
+Usage: `(close-window window)`
+
+Closes `window` and delete it from internal storage. This frees window resources. It cannot be re-used after this operation. Use window-hide if you want to close/hide a window only temporarily. Notice that unlike in Fyne, there is no mechanism to close an application automatically after its main window has been closed.
+
+See also: [`hide-window`](#link686964652d77696e646f77).	 [→index](#idx) [→topic](#gui)
 
 ## `closure?` : procedure/1 {#link636c6f737572653f}
 
@@ -6738,6 +7026,14 @@ Usage: `(enqueue! sym elem)`
 Put `elem` in queue `sym`, where `sym` is the unquoted name of a variable.
 
 See also: [`make-queue`](#link6d616b652d7175657565), [`queue?`](#link71756575653f), [`dequeue!`](#link6465717565756521), [`glance`](#link676c616e6365), [`queue-empty?`](#link71756575652d656d7074793f), [`queue-len`](#link71756575652d6c656e).	 [→index](#idx) [→topic](#data)
+
+## `entry-accepts-tab?` : procedure/1 {#link656e7472792d616363657074732d7461623f}
+
+Usage: `(entry-accepts-tab? entry) => bool`
+
+Return `nil` when the entry does not accept tabs, `t` otherwise.
+
+See also: [`new-entry`](#link6e65772d656e747279).	 [→index](#idx) [→topic](#gui)
 
 ## `epoch-ns->datelist` : procedure/1 {#link65706f63682d6e732d3e646174656c697374}
 
@@ -7521,6 +7817,22 @@ Return a cloned action based on `id` from the action registry. This action can b
 
 See also: [`action`](#link616374696f6e), [`has-action-system?`](#link6861732d616374696f6e2d73797374656d3f), [`action-start`](#link616374696f6e2d7374617274), [`action-stop`](#link616374696f6e2d73746f70), [`register-action`](#link72656769737465722d616374696f6e).	 [→index](#idx) [→topic](#action)
 
+## `get-entry-cursor` : procedure/1 {#link6765742d656e7472792d637572736f72}
+
+Usage: `(get-entry-cursor entry) => sym`
+
+Return a symbol that represents the current cursor of `entry`. Possible values are in '(default text crosshair pointer hresize vresize). Curiously, there is no way to set the cursor yet.
+
+See also: [`new-entry`](#link6e65772d656e747279).	 [→index](#idx) [→topic](#gui)
+
+## `get-entry-cursor-pos` : procedure/1 {#link6765742d656e7472792d637572736f722d706f73}
+
+Usage: `(get-entry-cursor-pos entry) => li`
+
+Return a list consisting of row number and column number of the current cursor position of the cursor in `entry.`
+
+See also: [`set-entry-cursor-row`](#link7365742d656e7472792d637572736f722d726f77), [`set-entry-cursor-column`](#link7365742d656e7472792d637572736f722d636f6c756d6e).	 [→index](#idx) [→topic](#gui)
+
 ## `get-or-set` : procedure/3 {#link6765742d6f722d736574}
 
 Usage: `(get-or-set d key value)`
@@ -7536,6 +7848,46 @@ Usage: `(get-partitions x n) => proc/1*`
 Return an iterator procedure that returns lists of the form (start-offset end-offset bytes) with 0-index offsets for a given index `k`, or nil if there is no corresponding part, such that the sizes of the partitions returned in `bytes` summed up are `x` and and each partition is `n` or lower in size. The last partition will be the smallest partition with a `bytes` value smaller than `n` if `x` is not dividable without rest by `n`. If no argument is provided for the returned iterator, then it returns the number of partitions.
 
 See also: [`nth-partition`](#link6e74682d706172746974696f6e), [`count-partitions`](#link636f756e742d706172746974696f6e73), [`get-file-partitions`](#link6765742d66696c652d706172746974696f6e73), [`iterate`](#link69746572617465).	 [→index](#idx) [→topic](#lisp)
+
+## `get-window-canvas` : procedure/1 {#link6765742d77696e646f772d63616e766173}
+
+Usage: `(get-window-canvas window) => int`
+
+Get the canvas object of `window`, which is the area on which window elements are drawn. This is not the same as the window-content, which is a widget or other user interface element. The canvas is used for raw-drawing commands, for example for drawing circles and boxes. With a suitable layout that doesn't re-arrange objects, it can e.g. be used to draw overlays.
+
+See also: [`get-window-content`](#link6765742d77696e646f772d636f6e74656e74), [`set-window-content`](#link7365742d77696e646f772d636f6e74656e74).	 [→index](#idx) [→topic](#gui)
+
+## `get-window-content` : procedure/2 {#link6765742d77696e646f772d636f6e74656e74}
+
+Usage: `(get-window-content window) => int`
+
+Get the canvas object ID that represents the main content of the window. This is usually a widget or a container with layout.
+
+See also: [`set-window-content`](#link7365742d77696e646f772d636f6e74656e74), [`get-window-canvas`](#link6765742d77696e646f772d63616e766173).	 [→index](#idx) [→topic](#gui)
+
+## `get-window-icon` : procedure/1 {#link6765742d77696e646f772d69636f6e}
+
+Usage: `(get-window-icon window) => int`
+
+Obtain the icon ID of the icon of `window`. The resource obtained is not guaranteed to be a visible icon or might be a dummy, as not all windows have icons on all platforms.
+
+See also: [`set-window-icon`](#link7365742d77696e646f772d69636f6e), [`new-icon`](#link6e65772d69636f6e), [`theme-icon`](#link7468656d652d69636f6e).	 [→index](#idx) [→topic](#gui)
+
+## `get-window-main-menu` : procedure/2 {#link6765742d77696e646f772d6d61696e2d6d656e75}
+
+Usage: `(get-window-main-menu window) => int`
+
+Get the main menu ID of `window.`
+
+See also: [`set-window-main-menu`](#link7365742d77696e646f772d6d61696e2d6d656e75), [`new-main-menu`](#link6e65772d6d61696e2d6d656e75).	 [→index](#idx) [→topic](#gui)
+
+## `get-window-title` : procedure/1 {#link6765742d77696e646f772d7469746c65}
+
+Usage: `(get-window-title window) => str`
+
+Return the title of `window` as string.
+
+See also: [`set-window-title`](#link7365742d77696e646f772d7469746c65).	 [→index](#idx) [→topic](#gui)
 
 ## `getstacked` : procedure/3 {#link676574737461636b6564}
 
@@ -7672,6 +8024,14 @@ Usage: `(hex->blob str) => blob`
 Convert hex string `str` to a blob. This will raise an error if `str` is not a valid hex string.
 
 See also: [`blob->hex`](#link626c6f622d3e686578), [`base64->blob`](#link6261736536342d3e626c6f62), [`ascii85->blob`](#link617363696938352d3e626c6f62), [`str->blob`](#link7374722d3e626c6f62).	 [→index](#idx) [→topic](#conversion)
+
+## `hide-window` : procedure/1 {#link686964652d77696e646f77}
+
+Usage: `(hide-window window)`
+
+Hides `window`. It can be shown again using show-window.
+
+See also: [`show-window`](#link73686f772d77696e646f77), [`close-window`](#link636c6f73652d77696e646f77).	 [→index](#idx) [→topic](#gui)
 
 ## `hook` : procedure/1 {#link686f6f6b}
 
@@ -8398,6 +8758,22 @@ Usage: `(new class [props] ...)`
 Create a new object of class `class` with initial property bindings `props` clauses as remaining arguments. Each `props` clause must be a list of the form (sym value), where `sym` is a symbol and `value` is evaluated first before it is assigned to `sym.`
 
 See also: [`defclass`](#link646566636c617373).	 [→index](#idx) [→topic](#oop)
+
+## `new-entry` : procedure/1 {#link6e65772d656e747279}
+
+Usage: `(new-entry [selector]) => int`
+
+Create a new text entry field based on the optional `selector` symbol. `selector` can be a symbol in '(single-line multi-line password). The default is 'single-line.
+
+See also: [`set-entry-on-change-callback`](#link7365742d656e7472792d6f6e2d6368616e67652d63616c6c6261636b), [`set-entry-validator`](#link7365742d656e7472792d76616c696461746f72), [`entry-accepts-tab?`](#link656e7472792d616363657074732d7461623f), [`get-entry-cursor-pos`](#link6765742d656e7472792d637572736f722d706f73), [`set-entry-cursor-row`](#link7365742d656e7472792d637572736f722d726f77), [`set-entry-cursor-column`](#link7365742d656e7472792d637572736f722d636f6c756d6e), [`set-entry-on-cursor-change-callback`](#link7365742d656e7472792d6f6e2d637572736f722d6368616e67652d63616c6c6261636b), [`get-entry-cursor`](#link6765742d656e7472792d637572736f72), [`get-entry-selected-text`](#link6765742d656e7472792d73656c65637465642d74657874), [`set-entry-min-rows-visible`](#link7365742d656e7472792d6d696e2d726f77732d76697369626c65), [`set-entry-place-holder`](#link7365742d656e7472792d706c6163652d686f6c646572), [`set-entry-text`](#link7365742d656e7472792d74657874).	 [→index](#idx) [→topic](#gui)
+
+## `new-label` : procedure/1 {#link6e65772d6c6162656c}
+
+Usage: `(new-label str) => int`
+
+Creates a new text label with string `str.`
+
+See also: [`set-label-text`](#link7365742d6c6162656c2d74657874).	 [→index](#idx) [→topic](#gui)
 
 ## `new-struct` : procedure/2 {#link6e65772d737472756374}
 
@@ -9183,6 +9559,70 @@ Return true if set `s` is empty, nil otherwise.
 
 See also: [`make-set`](#link6d616b652d736574), [`list->set`](#link6c6973742d3e736574), [`set->list`](#link7365742d3e6c697374), [`set-union`](#link7365742d756e696f6e), [`set-intersection`](#link7365742d696e74657273656374696f6e), [`set-complement`](#link7365742d636f6d706c656d656e74), [`set-difference`](#link7365742d646966666572656e6365), [`set?`](#link7365743f).	 [→index](#idx) [→topic](#data)
 
+## `set-entry-cursor-column` : procedure/2 {#link7365742d656e7472792d637572736f722d636f6c756d6e}
+
+Usage: `(set-entry-cursor-column entry column)`
+
+Set the column position of the cursor in `entry` to integer `column.`
+
+See also: [`get-entry-cursor-pos`](#link6765742d656e7472792d637572736f722d706f73), [`set-entry-cursor-row`](#link7365742d656e7472792d637572736f722d726f77).	 [→index](#idx) [→topic](#gui)
+
+## `set-entry-cursor-row` : procedure/2 {#link7365742d656e7472792d637572736f722d726f77}
+
+Usage: `(set-entry-cursor-row entry row)`
+
+Set the row position of the cursor in `entry` to integer `row.`
+
+See also: [`get-entry-cursor-pos`](#link6765742d656e7472792d637572736f722d706f73), [`set-entry-cursor-column`](#link7365742d656e7472792d637572736f722d636f6c756d6e).	 [→index](#idx) [→topic](#gui)
+
+## `set-entry-min-rows-visible` : procedure/2 {#link7365742d656e7472792d6d696e2d726f77732d76697369626c65}
+
+Usage: `(set-entry-min-rows-visible entry rows)`
+
+Set the minimum number of rows of `entry` that are visible. This ensures that `rows` text rows are visible and is a way of setting the entry's minimum size. Curiously, there is no corresponding set-entry-min-columns-visible function yet.
+
+See also: [`new-entry`](#link6e65772d656e747279).	 [→index](#idx) [→topic](#gui)
+
+## `set-entry-on-change-callback` : procedure/2 {#link7365742d656e7472792d6f6e2d6368616e67652d63616c6c6261636b}
+
+Usage: `(set-entry-on-change-callback entry proc)`
+
+Set the callback of `entry` that is triggered when the entry text changes. `proc` must be a procedure that takes the entry text as string.
+
+See also: [`new-entry`](#link6e65772d656e747279), [`set-entry-cursor-change-callback`](#link7365742d656e7472792d637572736f722d6368616e67652d63616c6c6261636b).	 [→index](#idx) [→topic](#gui)
+
+## `set-entry-on-cursor-change-callback` : procedure/2 {#link7365742d656e7472792d6f6e2d637572736f722d6368616e67652d63616c6c6261636b}
+
+Usage: `(set-entry-cursor-change-callback entry proc)`
+
+Set the cursor change callback of `entry` to `proc`, which is a procedure that takes the entry ID as argument.
+
+See also: [`new-entry`](#link6e65772d656e747279), [`set-entry-on-change-callback`](#link7365742d656e7472792d6f6e2d6368616e67652d63616c6c6261636b).	 [→index](#idx) [→topic](#gui)
+
+## `set-entry-place-holder` : procedure/2 {#link7365742d656e7472792d706c6163652d686f6c646572}
+
+Usage: `(set-entry-place-holder entry str)`
+
+Set the place holder string of `entry` to `str`. This is displayed as a prompt when no text is entered.
+
+See also: [`new-entry`](#link6e65772d656e747279), [`set-entry-text`](#link7365742d656e7472792d74657874).	 [→index](#idx) [→topic](#gui)
+
+## `set-entry-text` : procedure/2 {#link7365742d656e7472792d74657874}
+
+Usage: `(set-entry-text entry str)`
+
+Set the text of `entry` to string `str.`
+
+See also: [`new-entry`](#link6e65772d656e747279), [`set-entry-place-holder`](#link7365742d656e7472792d706c6163652d686f6c646572).	 [→index](#idx) [→topic](#gui)
+
+## `set-entry-validator` : procedure/2 {#link7365742d656e7472792d76616c696461746f72}
+
+Usage: `(set-entry-validator entry validator)`
+
+Set the `validator` of `entry`. A validator must be created first from a special procedure or a regular expression.
+
+See also: [`new-entry`](#link6e65772d656e747279), [`new-validator`](#link6e65772d76616c696461746f72), [`new-combined-string-validator`](#link6e65772d636f6d62696e65642d737472696e672d76616c696461746f72), [`new-time-validator`](#link6e65772d74696d652d76616c696461746f72), [`new-regexp-validator`](#link6e65772d7265676578702d76616c696461746f72), [`validate-object`](#link76616c69646174652d6f626a656374).	 [→index](#idx) [→topic](#gui)
+
 ## `set-equal?` : procedure/2 {#link7365742d657175616c3f}
 
 Usage: `(set-equal? a b) => bool`
@@ -9206,6 +9646,14 @@ Usage: `(set-intersection a b) => set`
 Return the intersection of sets `a` and `b`, i.e., the set of elements that are both in `a` and in `b.`
 
 See also: [`list->set`](#link6c6973742d3e736574), [`set->list`](#link7365742d3e6c697374), [`make-set`](#link6d616b652d736574), [`set-element?`](#link7365742d656c656d656e743f), [`set-union`](#link7365742d756e696f6e), [`set-complement`](#link7365742d636f6d706c656d656e74), [`set-difference`](#link7365742d646966666572656e6365), [`set?`](#link7365743f), [`set-empty?`](#link7365742d656d7074793f), [`set-subset?`](#link7365742d7375627365743f), [`set-equal?`](#link7365742d657175616c3f).	 [→index](#idx) [→topic](#data)
+
+## `set-label-text` : procedure/2 {#link7365742d6c6162656c2d74657874}
+
+Usage: `(set-label-text label str)`
+
+Sets the text of `label` to string `str`. This might resize the label depending on the layout in which the label is put.
+
+See also: [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx) [→topic](#gui)
 
 ## set-permissions : nil {#link7365742d7065726d697373696f6e73}
 
@@ -9238,6 +9686,70 @@ Usage: `(set-volume fl)`
 Set the master volume for all sound to `fl`, a value between 0.0 and 1.0.
 
 See also: [`beep`](#link62656570).	 [→index](#idx) [→topic](#sound)
+
+## `set-window-content` : procedure/2 {#link7365742d77696e646f772d636f6e74656e74}
+
+Usage: `(set-window-content window canvas-object)`
+
+Set the main content of the window, which must be an existing canvas object such as a widget or container with layout.
+
+See also: [`get-window-content`](#link6765742d77696e646f772d636f6e74656e74), [`get-window-canvas`](#link6765742d77696e646f772d63616e766173), [`new-window`](#link6e65772d77696e646f77).	 [→index](#idx) [→topic](#gui)
+
+## `set-window-full-screen` : procedure/2 {#link7365742d77696e646f772d66756c6c2d73637265656e}
+
+Usage: `(set-window-full-screen window full-screen?)`
+
+If `full-screen?` is not nil, then `window` is set to full screen mode, otherwise the window is set to normal mode. In full screen mode the window is centered and fills the whole screen of the main monitor (multiple monitors are currently not supported).
+
+See also: [`window-full-screen?`](#link77696e646f772d66756c6c2d73637265656e3f), [`center-window-on-screen`](#link63656e7465722d77696e646f772d6f6e2d73637265656e).	 [→index](#idx) [→topic](#gui)
+
+## `set-window-icon` : procedure/1 {#link7365742d77696e646f772d69636f6e}
+
+Usage: `(set-window-icon window resource)`
+
+Set the icon of `window` to the given icon `resource`. Setting the icon does not guarantee that it is displayed, since this is platform-dependent.
+
+See also: [`get-window-icon`](#link6765742d77696e646f772d69636f6e), [`new-icon`](#link6e65772d69636f6e), [`theme-icon`](#link7468656d652d69636f6e).	 [→index](#idx) [→topic](#gui)
+
+## `set-window-main-menu` : procedure/2 {#link7365742d77696e646f772d6d61696e2d6d656e75}
+
+Usage: `(set-window-main-menu window main-menu)`
+
+Set the main menu of `window` to `main-menu.`
+
+See also: [`new-main-menu`](#link6e65772d6d61696e2d6d656e75), [`new-menu`](#link6e65772d6d656e75), [`new-menu*`](#link6e65772d6d656e752a).	 [→index](#idx) [→topic](#gui)
+
+## `set-window-on-close-callback` : procedure/2 {#link7365742d77696e646f772d6f6e2d636c6f73652d63616c6c6261636b}
+
+Usage: `(set-window-on-close-callback window proc)`
+
+Sets the close callback of `window`. `proc` must be a function that takes no arguments and is evaluated when the window is closed.
+
+See also: [`show-window`](#link73686f772d77696e646f77), [`close-window`](#link636c6f73652d77696e646f77), [`hide-window`](#link686964652d77696e646f77).	 [→index](#idx) [→topic](#gui)
+
+## `set-window-padded` : procedure/2 {#link7365742d77696e646f772d706164646564}
+
+Usage: `(set-window-padded window padded?)`
+
+If `padded?` is not nil, then `window` is set to being padded. This is the default of new window. If `padded?` is nil, then the window's padding is removed, which means that the whole content area of the window can be filled with user interface elements and draw commands. This would be used for a game display, for instance.
+
+See also: [`window-padded?`](#link77696e646f772d7061646465643f), [`set-window-full-screen`](#link7365742d77696e646f772d66756c6c2d73637265656e), [`window-full-screen?`](#link77696e646f772d66756c6c2d73637265656e3f), [`center-window-on-screen`](#link63656e7465722d77696e646f772d6f6e2d73637265656e).	 [→index](#idx) [→topic](#gui)
+
+## `set-window-size` : procedure/2 {#link7365742d77696e646f772d73697a65}
+
+Usage: `(set-window-size window width height)`
+
+Set the size of `window` to `width` and `height` as floats. Sizes and positions are generally given as floats whose accuracy is only guaranteed to 32 bit.
+
+See also: [`new-window`](#link6e65772d77696e646f77), [`show-window`](#link73686f772d77696e646f77), [`hide-window`](#link686964652d77696e646f77).	 [→index](#idx) [→topic](#gui)
+
+## `set-window-title` : procedure/2 {#link7365742d77696e646f772d7469746c65}
+
+Usage: `(set-window-title window title)`
+
+Set the title of `window` to string `title.`
+
+See also: [`get-window-title`](#link6765742d77696e646f772d7469746c65).	 [→index](#idx) [→topic](#gui)
 
 ## `set?` : procedure/1 {#link7365743f}
 
@@ -10088,6 +10600,30 @@ Usage: `(while test body ...) => any`
 Evaluate the expressions in `body` while `test` is not nil.
 
 See also: [`letrec`](#link6c6574726563), [`dotimes`](#link646f74696d6573), [`dolist`](#link646f6c697374).	 [→index](#idx) [→topic](#lisp)
+
+## `window-fixed-size?` : procedure/1 {#link77696e646f772d66697865642d73697a653f}
+
+Usage: `(window-fixed-size? window) => bool`
+
+Return nil if `window` is fixed size, true otherwise.
+
+See also: [`set-window-fixed-size`](#link7365742d77696e646f772d66697865642d73697a65).	 [→index](#idx) [→topic](#gui)
+
+## `window-full-screen?` : procedure/1 {#link77696e646f772d66756c6c2d73637265656e3f}
+
+Usage: `(window-full-screen? window) => bool`
+
+Return nil if `window` is full screen, true otherwise.
+
+See also: [`set-window-full-screen`](#link7365742d77696e646f772d66756c6c2d73637265656e), [`center-window-on-screen`](#link63656e7465722d77696e646f772d6f6e2d73637265656e).	 [→index](#idx) [→topic](#gui)
+
+## `window-padded?` : procedure/1 {#link77696e646f772d7061646465643f}
+
+Usage: `(window-padded? window) => bool`
+
+Return nil if `window` is padded, true otherwise.
+
+See also: [`set-window-padded`](#link7365742d77696e646f772d706164646564), [`set-window-full-screen`](#link7365742d77696e646f772d66756c6c2d73637265656e), [`center-window-on-screen`](#link63656e7465722d77696e646f772d6f6e2d73637265656e).	 [→index](#idx) [→topic](#gui)
 
 ## `with-colors` : procedure/3 {#link776974682d636f6c6f7273}
 

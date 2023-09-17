@@ -248,15 +248,6 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
-	// (resize-window <window> <width-float> <height-float>)
-	interp.Def(pre("resize-window"), 3, func(a []any) any {
-		win := mustGet(pre("resize-window"), "GUI window ID", a, 0)
-		w := z3.ToFloat64(a[1])
-		h := z3.ToFloat64(a[2])
-		win.(fyne.Window).Resize(fyne.NewSize(float32(w), float32(h)))
-		return z3.Void
-	})
-
 	// (hide-window <window>)
 	interp.Def(pre("hide-window"), 1, func(a []any) any {
 		win := mustGet(pre("hide-window"), "GUI window ID", a, 0)
