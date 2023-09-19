@@ -591,7 +591,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 
 	// TEXTGRID
 
-	// (new-text-grid [<string>] [show-line-numbers|show-whitespace|tab-width <int>])
+	// (new-text-grid [<string>] [show-line-numbers|show-whitespace|tab-width <int>]) => int
 	interp.Def(pre("new-text-grid"), -1, func(a []any) any {
 		grid := widget.NewTextGrid()
 		li := a[0].(*z3.Cell)
@@ -786,6 +786,8 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return grid.Text()
 	})
 
+	// CHECK
+
 	// (new-check <title-string> (lambda (bool) ...))
 	interp.Def(pre("new-check"), 2, func(a []any) any {
 		title := a[0].(string)
@@ -797,6 +799,8 @@ func DefGUI(interp *z3.Interp, config Config) {
 		}
 		return put(widget.NewCheck(title, changed))
 	})
+
+	// CHOICE
 
 	// (new-choice <selector> <string-list> (lambda (str) ...))
 	interp.Def(pre("new-choice"), 3, func(a []any) any {
@@ -845,6 +849,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 
 	// HYPERLINK
 
+	// (new-hyperlink label url) => int
 	interp.Def(pre("new-hyperlink"), 2, func(a []any) any {
 		if !cfg.HyperlinksAllowed {
 			panic(pre("new-hyperlink: hyperlinks are not permitted!"))
@@ -864,6 +869,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 
 	// BUTTON
 
+	// (new-button str proc) => int
 	interp.Def(pre("new-button"), 2, func(a []any) any {
 		proc := a[1].(*z3.Closure)
 		b := widget.NewButton(a[0].(string), func() {
@@ -1014,9 +1020,9 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
-	// (get-menu-item-checked <item>) => bool
-	interp.Def(pre("get-menu-item-checked"), 1, func(a []any) any {
-		item := mustGet(pre("get-menu-item-checked"), "GUI menu item ID", a, 0).(*fyne.MenuItem)
+	// (menu-item-checked? <item>) => bool
+	interp.Def(pre("menu-item-checked?"), 1, func(a []any) any {
+		item := mustGet(pre("menu-item-checked?"), "GUI menu item ID", a, 0).(*fyne.MenuItem)
 		return z3.AsLispBool(item.Checked)
 	})
 
@@ -1028,9 +1034,9 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
-	// (get-menu-item-disabled <item>) => bool
-	interp.Def(pre("get-menu-item-disabled"), 1, func(a []any) any {
-		item := mustGet(pre("get-menu-item-disabled"), "GUI menu item ID", a, 0).(*fyne.MenuItem)
+	// (menu-item-disabled? <item>) => bool
+	interp.Def(pre("menu-item-disabled?"), 1, func(a []any) any {
+		item := mustGet(pre("menu-item-disabled?"), "GUI menu item ID", a, 0).(*fyne.MenuItem)
 		return z3.AsLispBool(item.Disabled)
 	})
 

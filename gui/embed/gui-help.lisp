@@ -7,10 +7,10 @@
 
 (defhelp new-window
     (use "(new-window title) => int")
-  (info "Create a new window with #title string and return the window ID.")
+  (info "Create a new window with #title string and return the window ID. This function raises an error if the host configuration WindowsAllowed is not true. In certain embedded uses, creating new windows is not allowed and you should check the documentation how to find a pre-configured window and add user interface elements to it.")
   (type proc)
   (arity 1)
-  (topic (gui))
+  (topic (gui window))
   (see (set-window-content close-window show-window)))
 
 (defhelp set-window-content
@@ -18,7 +18,7 @@
   (info "Set the main content of the window, which must be an existing canvas object such as a widget or container with layout.")
   (type proc)
   (arity 2)
-  (topic (gui))
+  (topic (gui window))
   (see (get-window-content get-window-canvas new-window)))
 
 (defhelp get-window-content
@@ -26,7 +26,7 @@
   (info "Get the canvas object ID that represents the main content of the window. This is usually a widget or a container with layout.")
   (type proc)
   (arity 2)
-  (topic (gui))
+  (topic (gui window))
   (see (set-window-content get-window-canvas)))
 
 (defhelp set-window-size
@@ -34,7 +34,7 @@
   (info "Set the size of #window to #width and #height as floats. Sizes and positions are generally given as floats whose accuracy is only guaranteed to 32 bit.")
   (type proc)
   (arity 2)
-  (topic (gui))
+  (topic (gui window))
   (see (new-window show-window hide-window)))
 
 (defhelp close-window
@@ -42,7 +42,7 @@
   (info "Closes #window and delete it from internal storage. This frees window resources. It cannot be re-used after this operation. Use window-hide if you want to close/hide a window only temporarily. Notice that unlike in Fyne, there is no mechanism to close an application automatically after its main window has been closed.")
   (type proc)
   (arity 1)
-  (topic (gui))
+  (topic (gui window))
   (see (hide-window)))
 
 (defhelp hide-window
@@ -50,7 +50,7 @@
   (info "Hides #window. It can be shown again using show-window.")
   (type proc)
   (arity 1)
-  (topic (gui))
+  (topic (gui window))
   (see (show-window close-window)))
 
 (defhelp set-window-on-close-callback
@@ -58,7 +58,7 @@
   (info "Sets the close callback of #window. #proc must be a function that takes no arguments and is evaluated when the window is closed.")
   (type proc)
   (arity 2)
-  (topic (gui))
+  (topic (gui window))
   (see (show-window close-window hide-window)))
 
 (defhelp get-window-canvas
@@ -66,7 +66,7 @@
   (info "Get the canvas object of #window, which is the area on which window elements are drawn. This is not the same as the window-content, which is a widget or other user interface element. The canvas is used for raw-drawing commands, for example for drawing circles and boxes. With a suitable layout that doesn't re-arrange objects, it can e.g. be used to draw overlays.")
   (type proc)
   (arity 1)
-  (topic (gui))
+  (topic (gui window drawing))
   (see (get-window-content set-window-content)))
 
 (defhelp get-window-title
@@ -74,7 +74,7 @@
   (info "Return the title of #window as string.")
   (type proc)
   (arity 1)
-  (topic (gui))
+  (topic (gui window))
   (see (set-window-title)))
 
 (defhelp set-window-title
@@ -82,7 +82,7 @@
   (info "Set the title of #window to string #title.")
   (type proc)
   (arity 2)
-  (topic (gui))
+  (topic (gui window))
   (see (get-window-title)))
 
 (defhelp set-window-full-screen
@@ -90,7 +90,7 @@
   (info "If #full-screen? is not nil, then #window is set to full screen mode, otherwise the window is set to normal mode. In full screen mode the window is centered and fills the whole screen of the main monitor (multiple monitors are currently not supported).")
   (type proc)
   (arity 2)
-  (topic (gui))
+  (topic (gui window drawing))
   (see (window-full-screen? center-window-on-screen)))
 
 (defhelp window-full-screen?
@@ -98,7 +98,7 @@
   (info "Return nil if #window is full screen, true otherwise.")
   (type proc)
   (arity 1)
-  (topic (gui))
+  (topic (gui window drawing))
   (see (set-window-full-screen center-window-on-screen)))
 
 (defhelp set-window-fixed-size
@@ -106,7 +106,7 @@
   (info "If #fixed-size? is not nil, then #window is set to fixed size, i.e., it has no resize button and cannot be resized by the user; otherwise, the window is set to being resizable.")
   (type proc)
   (arity 2)
-  (topic (gui))
+  (topic (gui window))
   (see (window-fixed-size?)))
 
 (defhelp window-fixed-size?
@@ -114,7 +114,7 @@
   (info "Return nil if #window is fixed size, true otherwise.")
   (type proc)
   (arity 1)
-  (topic (gui))
+  (topic (gui window))
   (see (set-window-fixed-size)))
 
 (defhelp center-window-on-screen
@@ -122,15 +122,15 @@
   (info "As the name implies, this function centers the window on the screen.")
   (type proc)
   (arity 1)
-  (topic (gui))
+  (topic (gui window))
   (see (set-window-full-screen window-full-screen?)))
-  
+
 (defhelp set-window-padded
     (use "(set-window-padded window padded?)")
   (info "If #padded? is not nil, then #window is set to being padded. This is the default of new window. If #padded? is nil, then the window's padding is removed, which means that the whole content area of the window can be filled with user interface elements and draw commands. This would be used for a game display, for instance.")
   (type proc)
   (arity 2)
-  (topic (gui))
+  (topic (gui window drawing))
   (see (window-padded? set-window-full-screen window-full-screen? center-window-on-screen)))
 
 (defhelp window-padded?
@@ -138,7 +138,7 @@
   (info "Return nil if #window is padded, true otherwise.")
   (type proc)
   (arity 1)
-  (topic (gui))
+  (topic (gui window drawing))
   (see (set-window-padded set-window-full-screen center-window-on-screen)))
 
 (defhelp set-window-icon
@@ -146,7 +146,7 @@
   (info "Set the icon of #window to the given icon #resource. Setting the icon does not guarantee that it is displayed, since this is platform-dependent.")
   (type proc)
   (arity 1)
-  (topic (gui))
+  (topic (gui window))
   (see (get-window-icon new-icon theme-icon)))
 
 (defhelp get-window-icon
@@ -154,7 +154,7 @@
   (info "Obtain the icon ID of the icon of #window. The resource obtained is not guaranteed to be a visible icon or might be a dummy, as not all windows have icons on all platforms.")
   (type proc)
   (arity 1)
-  (topic (gui))
+  (topic (gui window))
   (see (set-window-icon new-icon theme-icon)))
 
 (defhelp set-window-main-menu
@@ -170,7 +170,7 @@
   (info "Get the main menu ID of #window.")
   (type proc)
   (arity 2)
-  (topic (gui))
+  (topic (gui window menu))
   (see (set-window-main-menu new-main-menu)))
 
 (defhelp new-label
@@ -178,7 +178,7 @@
   (info "Creates a new text label with string #str.")
   (type proc)
   (arity 1)
-  (topic (gui))
+  (topic (gui label))
   (see (set-label-text)))
 
 (defhelp set-label-text
@@ -186,7 +186,7 @@
   (info "Sets the text of #label to string #str. This might resize the label depending on the layout in which the label is put.")
   (type proc)
   (arity 2)
-  (topic (gui))
+  (topic (gui label))
   (see (new-label)))
 
 (defhelp new-entry
@@ -194,7 +194,7 @@
   (info "Create a new text entry field based on the optional #selector symbol. #selector can be a symbol in '(single-line multi-line password). The default is 'single-line.")
   (type proc)
   (arity 1)
-  (topic (gui))
+  (topic (gui entry))
   (see (set-entry-on-change-callback set-entry-validator entry-accepts-tab? get-entry-cursor-pos set-entry-cursor-row set-entry-cursor-column
 				     set-entry-on-cursor-change-callback get-entry-cursor get-entry-selected-text set-entry-min-rows-visible
 				     set-entry-place-holder set-entry-text)))
@@ -204,7 +204,7 @@
   (info "Set the callback of #entry that is triggered when the entry text changes. #proc must be a procedure that takes the entry text as string.")
   (type proc)
   (arity 2)
-  (topic (gui))w
+  (topic (gui entry))
   (see (new-entry set-entry-cursor-change-callback)))
 
 (defhelp set-entry-validator
@@ -212,7 +212,7 @@
   (info "Set the #validator of #entry. A validator must be created first from a special procedure or a regular expression.")
   (type proc)
   (arity 2)
-  (topic (gui))
+  (topic (gui entry validation))
   (see (new-entry new-validator new-combined-string-validator new-time-validator new-regexp-validator validate-object)))
 
 (defhelp entry-accepts-tab?
@@ -220,7 +220,7 @@
   (info "Return #nil when the entry does not accept tabs, #t otherwise.")
   (type proc)
   (arity 1)
-  (topic (gui))
+  (topic (gui entry))
   (see (new-entry)))
 
 (defhelp get-entry-cursor-pos
@@ -236,7 +236,7 @@
   (info "Set the row position of the cursor in #entry to integer #row.")
   (type proc)
   (arity 2)
-  (topic (gui))
+  (topic (gui entry))
   (see (get-entry-cursor-pos set-entry-cursor-column)))
 
 (defhelp set-entry-cursor-column
@@ -244,7 +244,7 @@
   (info "Set the column position of the cursor in #entry to integer #column.")
   (type proc)
   (arity 2)
-  (topic (gui))
+  (topic (gui entry))
   (see (get-entry-cursor-pos set-entry-cursor-row)))
 
 (defhelp set-entry-on-cursor-change-callback
@@ -252,7 +252,7 @@
   (info "Set the cursor change callback of #entry to #proc, which is a procedure that takes the entry ID as argument.")
   (type proc)
   (arity 2)
-  (topic (gui))
+  (topic (gui entry))
   (see (new-entry set-entry-on-change-callback)))
 
 (defhelp get-entry-cursor
@@ -260,7 +260,7 @@
   (info "Return a symbol that represents the current cursor of #entry. Possible values are in '(default text crosshair pointer hresize vresize). Curiously, there is no way to set the cursor yet.")
   (type proc)
   (arity 1)
-  (topic (gui))
+  (topic (gui entry))
   (see (new-entry)))
 
 (defhelp set-entry-min-rows-visible
@@ -268,7 +268,7 @@
   (info "Set the minimum number of rows of #entry that are visible. This ensures that #rows text rows are visible and is a way of setting the entry's minimum size. Curiously, there is no corresponding set-entry-min-columns-visible function yet.")
   (type proc)
   (arity 2)
-  (topic (gui))
+  (topic (gui entry))
   (see (new-entry)))
 
 (defhelp set-entry-place-holder
@@ -276,7 +276,7 @@
   (info "Set the place holder string of #entry to #str. This is displayed as a prompt when no text is entered.")
   (type proc)
   (arity 2)
-  (topic (gui))
+  (topic (gui entry))
   (see (new-entry set-entry-text)))
 
 (defhelp set-entry-text
@@ -284,5 +284,380 @@
   (info "Set the text of #entry to string #str.")
   (type proc)
   (arity 2)
-  (topic (gui))
+  (topic (gui entry))
   (see (new-entry set-entry-place-holder)))
+
+(defhelp new-combined-string-validator
+    (use "(new-combined-string-validator validator-1 [...validator-n]) => int")
+  (info "Combine validators #validator-1 to #validator-n into a combined string validator and return it.")
+  (type proc)
+  (arity -2)
+  (topic (gui validation))
+  (see (set-entry-validator new-validator new-regexp-validator new-time-validator set-object-on-validation-change-callback validate-object)))
+
+(defhelp new-regexp-validator
+    (use "(new-regexp-validator regexp reason) => int")
+  (info "Create a new string validator from the #regexp string, which must be a valid regular expression in Go's regexp syntax. The #reason string is displayed to the user by widgets like #entry when the validation fails.")
+  (type proc)
+  (arity 2)
+  (topic (gui validation))
+  (see (set-entry-validator new-validator new-combined-string-validator new-time-validator set-object-on-validation-change-callback validate-object)))
+
+(defhelp new-time-validator
+    (use "(new-time-validator format-str) => int")
+  (info "Create a new string validator for time and date based on the given template #format-str. This validator uses Go's data parsing function and therefore is quite restrictive. Only datetimes entered in exactly the format given (including timezones) validate successfully. To obtain a more relaxed date and time validator, use #new-validator to create a custom validator with your own parsing or try a #new-regexp-validator.")
+  (type proc)
+  (arity 1)
+  (topic (gui validation))
+  (see (set-entry-validator new-validator new-combined-string-validator new-time-validator new-regexp-validator set-object-on-validation-change-callback validate-object)))
+
+(defhelp new-validator
+    (use "(new-validator proc) => int")
+  (info "Create a new string validator based on validation procedure #proc. The procedure #proc takes a string as argument and returns a string. If the string returned is not the empty string \"\", then validation fails and the returned string is given as a reason for validation failure. If the empty string is returned, then validation succeeds. If an error occurs in #proc, then validation fails with the error's error message as reason. Notice that validators are fairly limited and can only be attached to a few validatable objects such as text entry fields. For a more general approach, it might make sense to implement your own validation system based on key press, focus change, and change callbacks of various GUI objects.")
+  (type proc)
+  (arity 1)
+  (topic (gui validation))
+  (see (set-entry-validator new-combined-string-validator new-regexp-validator new-time-validator set-object-on-validation-change-callback validate-object)))
+
+(defhelp set-object-on-validation-change-callback
+    (use "(set-object-on-validation-change-callback obj proc)")
+  (info "Set a validatable object's #obj validation change callback, which is called when the object's validation changes. The callback #proc takes a string or nil as argument. When it is nil, the validation was successful. When it is a string, then the validation failed with the string as reason. This can be used to track validation changes of any validatable object (such as a text entry) to e.g. display custom messages or icons when the validation fails or succeeds.")
+  (type proc)
+  (arity 2)
+  (topic (gui validation))
+  (see (validate-object new-validator set-entry-validator)))
+
+(defhelp validate-object
+    (use "(validate-object obj) => str")
+  (info "Validate the validatable object #obj programmatically and return the validation failure as string, or the empty string if validation succeeded. It sometimes makes sense to call this explicitly in order to force the object to display its validation state.")
+  (type proc)
+  (arity 2)
+  (topic (gui validation))
+  (see (set-object-on-validation-change-callback new-validator set-entry-validator)))
+
+(defhelp new-text-grid
+    (use "(new-text-grid [<string>] [show-line-numbers|show-whitespace|tab-width <int>]) => int")
+  (info "Create a new text grid widget, which displays multiline text with custom background and foreground colors. The optional #string argument is the initial text of the grid without formatting. The following symbols might be #'show-line-numbers to turn the line number display on and #'show-whitespace to display white space characters by special unicode symbols. If the selector #'tab-width occurs, then it must be immediately followed by an integer for the tabulator width of the text grid in space characters.")
+  (type proc)
+  (arity -1)
+  (topic (gui text-grid))
+  (see (text-grid-show-line-numbers? text-grid-show-whitespace? get-text-grid-tab-width set-text-grid-tab-width set-text-grid-show-line-numbers set-text-grid-show-whitespace get-text-grid-row get-text-grid-row-text
+				     set-text-grid-cell get-text-grid-cell set-text-grid-row set-text-grid-row-style set-text-grid-rune set-text-grid-style set-text-grid-style-range set-text-grid-text
+				     get-text-grid-text)))
+
+(defhelp text-grid-show-line-numbers?
+    (use "(text-grid-show-line-numbers? grid) => bool")
+  (info "Return true if the text #grid shows line numbers, nil otherwise.")
+  (type proc)
+  (arity 1)
+  (topic (gui text-grid))
+  (see (new-text-grid text-grid-show-whitespace? get-text-grid-tab-width set-text-grid-tab-width set-text-grid-show-line-numbers set-text-grid-show-whitespace get-text-grid-row get-text-grid-row-text
+		      set-text-grid-cell get-text-grid-cell set-text-grid-row set-text-grid-row-style set-text-grid-rune set-text-grid-style set-text-grid-style-range set-text-grid-text
+		      get-text-grid-text)))
+
+(defhelp text-grid-show-whitespace?
+    (use "(text-grid-show-whitespace? grid) => bool")
+  (info "Return true if the text #grid shows whitespace glyphs, nil otherwise.")
+  (type proc)
+  (arity 1)
+  (topic (gui text-grid))
+  (see (new-text-grid text-grid-show-line-numbers? get-text-grid-tab-width set-text-grid-tab-width set-text-grid-show-line-numbers set-text-grid-show-whitespace get-text-grid-row get-text-grid-row-text
+		      set-text-grid-cell get-text-grid-cell set-text-grid-row set-text-grid-row-style set-text-grid-rune set-text-grid-style set-text-grid-style-range set-text-grid-text
+		      get-text-grid-text)))
+
+(defhelp get-text-grid-tab-width
+    (use "(get-text-grid-tab-width grid) => int")
+  (info "Return the current tabulator width of #grid in space characters.")
+  (type proc)
+  (arity 1)
+  (topic (gui text-grid))
+  (see (new-text-grid text-grid-show-line-numbers? text-grid-show-whitespace? set-text-grid-tab-width set-text-grid-show-line-numbers set-text-grid-show-whitespace get-text-grid-row get-text-grid-row-text
+		      set-text-grid-cell get-text-grid-cell set-text-grid-row set-text-grid-row-style set-text-grid-rune set-text-grid-style set-text-grid-style-range set-text-grid-text
+		      get-text-grid-text)))
+
+(defhelp set-text-grid-tab-width
+    (use "(set-text-grid-tab-width grid width)")
+  (info "Set the tabulator width of #grid to integer #width space characters.")
+  (type proc)
+  (arity 2)
+  (topic (gui text-grid))
+  (see (new-text-grid text-grid-show-line-numbers? text-grid-show-whitespace? get-text-grid-tab-width set-text-grid-show-line-numbers set-text-grid-show-whitespace get-text-grid-row get-text-grid-row-text
+		      set-text-grid-cell get-text-grid-cell set-text-grid-row set-text-grid-row-style set-text-grid-rune set-text-grid-style set-text-grid-style-range set-text-grid-text
+		      get-text-grid-text)))
+
+(defhelp set-text-grid-show-line-numbers
+    (use "(set-text-grid-show-line-numbers grid show?)")
+  (info "Set whether #grid shows line numbers. If #show? is not nil, then line numbers are shown, otherwise they are not shown.")
+  (type proc)
+  (arity 2)
+  (topic (gui text-grid))
+  (see (new-text-grid text-grid-show-line-numbers? text-grid-show-whitespace? get-text-grid-tab-width set-text-grid-tab-width set-text-grid-show-whitespace get-text-grid-row get-text-grid-row-text
+		      set-text-grid-cell get-text-grid-cell set-text-grid-row set-text-grid-row-style set-text-grid-rune set-text-grid-style set-text-grid-style-range set-text-grid-text
+		      get-text-grid-text)))
+
+(defhelp set-text-grid-show-whitespace
+    (use "(set-text-grid-show-whitespace grid show?)")
+  (info "Set whether #grid shows whitespace characters. If #show? is not nil, then whitespace characters are shown, otherwise they are not shown.")
+  (type proc)
+  (arity 2)
+  (topic (gui text-grid))
+  (see (new-text-grid text-grid-show-line-numbers? text-grid-show-whitespace? get-text-grid-tab-width set-text-grid-tab-width set-text-grid-show-line-numbers get-text-grid-row get-text-grid-row-text
+		      set-text-grid-cell get-text-grid-cell set-text-grid-row set-text-grid-row-style set-text-grid-rune set-text-grid-style set-text-grid-style-range set-text-grid-text
+		      get-text-grid-text)))
+
+(defhelp get-text-grid-row
+    (use "(get-text-grid-row grid row) => li")
+  (info "Obtain a #row of a text #grid, where #row is a 0-based index. This function returns a list of the form '(row style), where #style is a grid style list and #row is an array of lists consisting each of a unicode string containing one rune and a grid style list. Each entry of the #row array represents an individual unicode glyph with a style, whereas the #style list in the return argument represents an optional style of the whole row.")
+  (type proc)
+  (arity 2)
+  (topic (gui text-grid))
+  (see  (set-text-grid-row get-text-grid-row-text get-text-grid-cell new-text-grid text-grid-show-line-numbers? text-grid-show-whitespace?
+				get-text-grid-tab-width set-text-grid-tab-width set-text-grid-show-line-numbers set-text-grid-show-whitespace  
+				set-text-grid-cell  set-text-grid-row-style set-text-grid-rune set-text-grid-style set-text-grid-style-range set-text-grid-text
+				get-text-grid-text)))
+
+(defhelp get-text-grid-row-text
+    (use "(get-text-grid-row-text grid row) => str")
+  (info "Return the text of #row in #grid as a string without any style information.")
+  (type proc)
+  (arity 2)
+  (topic (gui text-grid))
+  (see  (set-text-grid-rune  get-text-grid-row get-text-grid-cell set-text-grid-row new-text-grid text-grid-show-line-numbers? text-grid-show-whitespace?
+			   get-text-grid-tab-width set-text-grid-tab-width set-text-grid-show-line-numbers set-text-grid-show-whitespace  
+			   set-text-grid-cell  set-text-grid-row-style set-text-grid-rune set-text-grid-style set-text-grid-style-range set-text-grid-text
+			   get-text-grid-text)))
+
+(defhelp set-text-grid-cell
+    (use "(set-text-grid-cell grid row column li)")
+  (info "Set the text #grid cell at #row and #column (both 0-indexed) to the list #li, where #li must consist of a unicode string containing one rune and a valid grid style list.")
+  (type proc)
+  (arity 4)
+  (topic (gui text-grid))
+  (see (get-text-grid-cell set-text-grid-rune get-text-grid-row set-text-grid-row)))
+
+
+(defhelp get-text-grid-cell
+    (use "(get-text-grid-cell grid row column) => li")
+  (info "Return the cell of #grid at #row and #column. The result is a list consisting of a string containing one unicode rune and a grid style list.")
+  (type proc)
+  (arity 3)
+  (topic (gui text-grid))
+  (see (set-text-grid-cell get-text-grid-row set-text-grid-rune set-text-grid-style-range)))
+
+(defhelp set-text-grid-row
+    (use "(set-text-grid-row grid row row-spec)")
+  (info "Set the #row of #grid to the given #row-spec, which is a list containing an array of grid cells like in the return value of #get-text-grid-row and a grid style for the row as a whole.")
+  (type proc)
+  (arity 3)
+  (topic (gui text-grid))
+  (see (get-text-grid-row set-text-grid-row-style set-text-grid-cell set-text-grid-rune set-text-grid-style-range)))
+
+(defhelp set-text-grid-row-style
+    (use "(set-text-grid-row-style grid row style)")
+  (info "Set the style of text #grid at #row to the given grid #style.")
+  (type proc)
+  (arity 3)
+  (topic (gui text-grid))
+  (see (set-text-grid-row set-text-grid-cell get-text-grid-row set-text-grid-rune set-text-grid-style-range)))
+
+(defhelp set-text-grid-rune
+    (use "(set-text-grid-rune grid row column str)")
+  (info "Set the rune of #grid at #row and #column to the unicode glyph in string #str.")
+  (type proc)
+  (arity 4)
+  (topic (gui text-grid))
+  (see (set-text-grid-style set-text-grid-cell get-text-grid-cell)))
+
+(defhelp set-text-grid-style
+    (use "(set-text-grid-style grid row column style)")
+  (info "Set the grid style of #grid at #row and #column to the list #style.")
+  (type proc)
+  (arity 4)
+  (topic (gui text-grid))
+  (see (set-text-grid-cell set-text-grid-rune set-text-grid-style-range)))
+
+(defhelp set-text-grid-style-range
+    (use "(set-text-grid-style-range grid start-row start-column end-row end-column style)")
+  (info "Set the grid style of #grid starting at #start-row and #start-column and ending at #end-row and #end-column (all inclusive) to the grid #style.")
+  (type proc)
+  (arity 6)
+  (topic (gui text-grid))
+  (see (set-text-grid-style set-text-grid-cell set-text-grid-row-style)))
+
+(defhelp set-text-grid-text
+    (use "(set-text-grid-text grid str)")
+  (info "Set the text of the text #grid to the given #str.")
+  (type proc)
+  (arity 2)
+  (topic (gui text-grid))
+  (see (get-text-grid-text new-text-grid set-text-grid-rune set-text-grid-row)))
+
+(defhelp get-text-grid-text
+    (use "(get-text-grid-text grid) => str")
+  (info "Return the text of #grid as a string without style information.")
+  (type proc)
+  (arity 1)
+  (topic (gui text-grid))
+  (see (set-text-grid-text new-text-grid get-text-grid-row get-text-grid-rune get-text-grid-cell)))
+
+(defhelp new-check
+    (use "(new-check title proc) => int")
+  (info "Create and return a new check box with the given #title string and a callback procedure #proc. The callback #proc is called with the new state of the check box as bool when it has changed.")
+  (type proc)
+  (arity 2)
+  (topic (gui check))
+  (see (new-choice)))
+
+(defhelp new-choice
+    (use "(new-choice selector string-list proc) => int")
+  (info "Create and return a new choice representing choices in #string-list. If #selector is 'radio-group, a group of radio buttons is created with options in #string-list. If #selector is 'select, a more compact selection menu is created with the options in #string-list. The callback #proc takes a string that represents the choice that has been selected.")
+  (type proc)
+  (arity 3)
+  (topic (gui choice))
+  (see (new-check)))
+
+(defhelp new-form
+    (use "(new-form)")
+  (info "Return a new form container, which orders widgets in rows, where each row has a label and a widget whose columns are aligned with the other rows. Use append-form to add label and widgets.")
+  (type proc)
+  (arity 0)
+  (topic (gui form))
+  (see (append-form)))
+
+(defhelp append-form
+    (use "(append-form form str canvas-object)")
+  (info "Append a new row to the bottom #form consisting of a label #str aligned with a #canvas-object, which may be an entry, button, etc.")
+  (type proc)
+  (arity 0)
+  (topic (gui form))
+  (see (new-form)))
+
+(defhelp new-hyperlink
+    (use "(new-hyperlink label url) => int")
+  (info "Create a new hyperlink with given #label string and an #url string as embedded link. A hyperlink looks like a label with link style; when it is clicked, the #url is called by the default operating system mechanism for opening urls. Using hyperlinks might be disallowed by the host system configuration HyperlinksAllowed and may be re-written by the host system using the CheckHyperlinks function. If HyperlinksAllowed is false in the active GUI config of the host, this function raises an error. It also parses the given #url and will raise an error if it does not represent a valid URL.")
+  (type proc)
+  (arity 2)
+  (topic (gui hyperlink))
+  (see (new-button new-label))
+  (warn "Allowing the host to open hyperlinks usually launches a web browser and the details depend on the operating system. There is an added security risk!"))
+
+(defhelp new-button
+    (use "(new-button label proc) => int")
+  (info "Return a new button with the given #label and without an icon. The callback #proc is called without arguments when the button is pressed or tapped.")
+  (type proc)
+  (arity 2)
+  (topic (gui button))
+  (see (new-button-with-icon new-hyperlink new-label)))
+
+(defhelp new-button-with-icon
+    (use "(new-button-with-icon label icon proc) => int")
+  (info "Return a new button the given #label and #icon. The callback #proc is called without arguments when the button is pressed.")
+  (type proc)
+  (arity 3)
+  (topic (gui button))
+  (see (new-button new-icon theme-icon)))
+
+(defhelp new-list
+    (use "(new-list len-proc prep-proc update-proc) => int")
+  (info "Create a new list display. A list consists of rows of simple items like labels. The #len-proc must be a procedure without arguments returning the length of the list as integer. The #prep-proc must be a procedure without arguments that returns a canvas object (i.e. a label or other widgets) representing a template for a single list item. The #update-proc must be a procedure that receives the ID of a canvas object (given by the template) and the 0-based list index as arguments. This procedure then should modify the canvas object with #ID to display the given list item at the index. See the GUI examples on how to use this function.")
+  (type proc)
+  (arity 3)
+  (topic (gui list))
+  (see (new-table new-tree)))
+
+(defhelp new-table
+    (use "(new-table len-proc prep-proc update-proc) => int")
+  (info "Create a new table display. A table consists of a number of rows, each of which has a fixed number of columns such as labels. The #len-proc must be a procedure without arguments returning the length of the table as integer. The #prep-proc must be a procedure without arguments that returns a canvas object that represents the table row with updatable columns. The #update-proc takes the row, column, and ID of a canvas object and updates a table template with the right display for the table cell at #row and #column.")
+  (type proc)
+  (arity 3)
+  (topic (gui table))
+  (see (new-list new-tree)))
+
+(defhelp new-tree
+    (use "(new-tree child-uid-proc is-branch-proc create-node-proc update-node-proc) => int")
+  (info "Create a new tree display. A tree displays nested branches and leaf nodes. The #child-uid-proc is a procedure that takes an id string as argument. If the string is empty, it should return a list of top-level branch uid strings. If the string is not empty, it represents an uid; the procedure should then return a list of all child id strings of that branch. This defines the tree's structure. All id strings must be unique to the tree. The #is-branch-proc takes an id string as argument and should return non-nil if the id represents a branch, nil if it has no children. The #create-node-proc takes a bool #b as argument and should return a branch template if #b is non-nil and a leaf template object if #b is nil. Finally, the #update-node-proc is a procedure that takes a node id string, a boolean that is true if the node is a branch, and a node template canvas-object as it is returned by #create-node-proc. The procedure should fill the template with the display values for the respective node id.")
+  (type proc)
+  (arity 4)
+  (topic (gui tree))
+  (see (new-list new-table)))
+
+(defhelp new-menu-item
+    (use "(new-menu-item str proc [selector...]) => int")
+  (info "Create a new menu item with given label #str and callback #proc, which takes no arguments. The optional #selector symbol may be one of: 'is-quit - the item is the application Quit menu item (this is dealt with differently by operating system requirements), 'is-separator - the item is a menu item separator and the label string is ignored (redundent, use #new-menu-item-separator instead), 'disabled - the menu item is disabled, or 'checked - the menu item is checked.")
+  (type proc)
+  (arity -3)
+  (topic (gui menu-item))
+  (see (set-menu-item-checked menu-item-checked? set-menu-item-disabled menu-item-disabled? get-menu-item-label set-menu-item-label new-menu* new-menu new-menu-item-separator)))
+
+(defhelp set-menu-item-checked
+    (use "(set-menu-item-checked item checked?)")
+  (info "Set the menu item check mark display if #checked? is non-nil, remove it otherwise.")
+  (type proc)
+  (arity 2)
+  (topic (gui menu-item))
+  (see (menu-item-checked? set-menu-item-disabled menu-item-disabled? get-menu-item-label set-menu-item-label new-menu* new-menu new-menu-item new-menu-item-separator)))
+
+(defhelp menu-item-checked?
+    (use "(menu-item-checked? item) => bool")
+  (info "Return true if #item is currently checked, nil otherwise.")
+  (type proc)
+  (arity 1)
+  (topic (gui menu-item))
+  (see (set-menu-item-checked set-menu-item-disabled menu-item-disabled? get-menu-item-label set-menu-item-label new-menu* new-menu new-menu-item new-menu-item-separator)))
+
+(defhelp set-menu-item-disabled
+    (use "(set-menu-item-disabled item disabled?)")
+  (info "Disable the menu item if #disabled? is non-nil, enable it otherwise.")
+  (type proc)
+  (arity 2)
+  (topic (gui menu-item))
+  (see (menu-item-disabled? set-menu-item-checked menu-item-checked? get-menu-item-label set-menu-item-label new-menu* new-menu new-menu-item new-menu-item-separator)))
+
+(defhelp menu-item-disabled?
+    (use "(menu-item-disabled? item) => bool")
+  (info "Return true if #item is currently disabled, nil otherwise.")
+  (type proc)
+  (arity 1)
+  (topic (gui menu-item))
+  (see (set-menu-item-disabled set-menu-item-checked menu-item-checked? get-menu-item-label set-menu-item-label new-menu* new-menu new-menu-item new-menu-item-separator)))
+
+(defhelp get-menu-item-label
+    (use "(get-menu-item-label item) => str")
+  (info "Return the current label of the given menu #item.")
+  (type proc)
+  (arity 1)
+  (topic (gui menu-item))
+  (see (set-menu-item-label set-menu-item-disabled menu-item-disabled set-menu-item-checked menu-item-checked? new-menu* new-menu new-menu-item new-menu-item-separator)))
+
+(defhelp set-menu-item-label
+    (use "(set-menu-item-label item str)")
+  (info "Set the label of menu #item to #str.")
+  (type proc)
+  (arity 2)
+  (topic (gui menu-item))
+  (see (get-menu-item-label set-menu-item-disabled menu-item-disabled set-menu-item-checked menu-item-checked? new-menu* new-menu new-menu-item new-menu-item-separator)))
+
+(defhelp new-menu-item-separator
+    (use "(new-menu-item-separator) => int")
+  (info "Return a new menu item separator, which is a menu item without callback and label that displays a separator between menu items in menus.")
+  (type proc)
+  (arity 0)
+  (topic (gui menu-item))
+  (see (new-menu-item)))
+
+(defhelp new-menu*
+    (use "(new-menu* label [item...]) => int")
+  (info "Make a new abstract menu with given #label and arbitary menu items #item ... following. The starred function is used to define a menu but is not bound to any particular way of displaying it (popup-menu, normal menu, main menu). Use #new-menu and #new-main-menu to create visible menus and menu bars based on such abstract menus.")
+  (type proc)
+  (arity -2)
+  (topic (gui menu))
+  (see (refresh-menu* new-menu new-main-menu)))
+
+(defhelp refresh-menu*
+    (use "(refresh-menu* menu)")
+  (info "Refresh the given #menu after a change was made that has a visual impact. This will refresh the menu widget in which this abstract menu occurs.")
+  (type proc)
+  (arity 1)
+  (topic (gui menu))
+  (see (new-menu*)))
+
