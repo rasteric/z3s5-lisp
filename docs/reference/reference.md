@@ -2,9 +2,9 @@
 title: Z3S5 Lisp Reference Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: Version 2.3.11+a3c274b
+footer-left: Version 2.3.11+d0330ab
 author: by Erich Rast and all Help system contributors
-date: 2023-9-17 14:41
+date: 2023-9-21 15:30
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -13,7 +13,7 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
-For Z3S5 Lisp Version 2.3.11+a3c274b with installed modules (gui oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).
+For Z3S5 Lisp Version 2.3.11+d0330ab with installed modules (gui oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).
 
 # Introduction
 
@@ -24,7 +24,7 @@ Incorrect documentation strings are bugs. Please report bugs using the correspon
 
 # Index {#idx}
 
-[`%`](#link25) [`*`](#link2a) [`*colors*`](#link2a636f6c6f72732a) [`*error-handler*`](#link2a6572726f722d68616e646c65722a) [`*error-printer*`](#link2a6572726f722d7072696e7465722a) [`*help*`](#link2a68656c702a) [`*hooks*`](#link2a686f6f6b732a) [`*last-error*`](#link2a6c6173742d6572726f722a) [`*reflect*`](#link2a7265666c6563742a) [`+`](#link2b) [`-`](#link2d) [`/`](#link2f) [`/=`](#link2f3d) [`10th`](#link31307468) [`1st`](#link317374) [`2nd`](#link326e64) [`3rd`](#link337264) [`4th`](#link347468) [`5th`](#link357468) [`6th`](#link367468) [`7th`](#link377468) [`8th`](#link387468) [`9th`](#link397468) [`<`](#link3c) [`<=`](#link3c3d) [`=`](#link3d) [`>`](#link3e) [`>=`](#link3e3d) [`abs`](#link616273) [`action`](#link616374696f6e) [`action-start`](#link616374696f6e2d7374617274) [`action-stop`](#link616374696f6e2d73746f70) [`add-hook`](#link6164642d686f6f6b) [`add-hook-internal`](#link6164642d686f6f6b2d696e7465726e616c) [`add-hook-once`](#link6164642d686f6f6b2d6f6e6365) [`add1`](#link61646431) [`alist->dict`](#link616c6973742d3e64696374) [`alist?`](#link616c6973743f) [`and`](#link616e64) [`append`](#link617070656e64) [`apply`](#link6170706c79) [`apropos`](#link6170726f706f73) [`array`](#link6172726179) [`array->list`](#link61727261792d3e6c697374) [`array->str`](#link61727261792d3e737472) [`array-append`](#link61727261792d617070656e64) [`array-copy`](#link61727261792d636f7079) [`array-exists?`](#link61727261792d6578697374733f) [`array-forall?`](#link61727261792d666f72616c6c3f) [`array-foreach`](#link61727261792d666f7265616368) [`array-len`](#link61727261792d6c656e) [`array-map!`](#link61727261792d6d617021) [`array-pmap!`](#link61727261792d706d617021) [`array-ref`](#link61727261792d726566) [`array-reverse`](#link61727261792d72657665727365) [`array-set`](#link61727261792d736574) [`array-slice`](#link61727261792d736c696365) [`array-sort`](#link61727261792d736f7274) [`array-walk`](#link61727261792d77616c6b) [`array?`](#link61727261793f) [`ascii85->blob`](#link617363696938352d3e626c6f62) [`assoc`](#link6173736f63) [`assoc1`](#link6173736f6331) [`assq`](#link61737371) [`atom?`](#link61746f6d3f) [`base64->blob`](#link6261736536342d3e626c6f62) [`beep`](#link62656570) [`bind`](#link62696e64) [`bitand`](#link626974616e64) [`bitclear`](#link626974636c656172) [`bitor`](#link6269746f72) [`bitshl`](#link62697473686c) [`bitshr`](#link626974736872) [`bitxor`](#link626974786f72) [`blob->ascii85`](#link626c6f622d3e61736369693835) [`blob->base64`](#link626c6f622d3e626173653634) [`blob->hex`](#link626c6f622d3e686578) [`blob->str`](#link626c6f622d3e737472) [`blob-chksum`](#link626c6f622d63686b73756d) [`blob-equal?`](#link626c6f622d657175616c3f) [`blob-free`](#link626c6f622d66726565) [`blob?`](#link626c6f623f) [`bool?`](#link626f6f6c3f) [`bound?`](#link626f756e643f) [`boxed?`](#link626f7865643f) [`build-array`](#link6275696c642d6172726179) [`build-list`](#link6275696c642d6c697374) [`caaar`](#link6361616172) [`caadr`](#link6361616472) [`caar`](#link63616172) [`cadar`](#link6361646172) [`caddr`](#link6361646472) [`cadr`](#link63616472) [`call-method`](#link63616c6c2d6d6574686f64) [`call-super`](#link63616c6c2d7375706572) [`can-externalize?`](#link63616e2d65787465726e616c697a653f) [`car`](#link636172) [`case`](#link63617365) [`ccmp`](#link63636d70) [`cdaar`](#link6364616172) [`cdadr`](#link6364616472) [`cdar`](#link63646172) [`cddar`](#link6364646172) [`cdddr`](#link6364646472) [`cddr`](#link63646472) [`cdec!`](#link6364656321) [`cdr`](#link636472) [`center-window-on-screen`](#link63656e7465722d77696e646f772d6f6e2d73637265656e) [`change-action-prefix`](#link6368616e67652d616374696f6e2d707265666978) [`change-all-action-prefixes`](#link6368616e67652d616c6c2d616374696f6e2d7072656669786573) [`char->str`](#link636861722d3e737472) [`chars`](#link6368617273) [`chars->str`](#link63686172732d3e737472) [`cinc!`](#link63696e6321) [`class-name`](#link636c6173732d6e616d65) [`class-of`](#link636c6173732d6f66) [`class?`](#link636c6173733f) [`close`](#link636c6f7365) [`close-window`](#link636c6f73652d77696e646f77) [`closure?`](#link636c6f737572653f) [`collect-garbage`](#link636f6c6c6563742d67617262616765) [`color`](#link636f6c6f72) [`cons`](#link636f6e73) [`cons?`](#link636f6e733f) [`copy-record`](#link636f70792d7265636f7264) [`count-partitions`](#link636f756e742d706172746974696f6e73) [`cpunum`](#link6370756e756d) [`cst!`](#link63737421) [`current-error-handler`](#link63757272656e742d6572726f722d68616e646c6572) [`current-zimage`](#link63757272656e742d7a696d616765) [`cwait`](#link6377616974) [`darken`](#link6461726b656e) [`date->epoch-ns`](#link646174652d3e65706f63682d6e73) [`datelist->epoch-ns`](#link646174656c6973742d3e65706f63682d6e73) [`datestr`](#link64617465737472) [`datestr*`](#link646174657374722a) [`datestr->datelist`](#link646174657374722d3e646174656c697374) [`day+`](#link6461792b) [`day-of-week`](#link6461792d6f662d7765656b) [`db.blob`](#link64622e626c6f62) [`db.close`](#link64622e636c6f7365) [`db.close-result`](#link64622e636c6f73652d726573756c74) [`db.exec`](#link64622e65786563) [`db.float`](#link64622e666c6f6174) [`db.int`](#link64622e696e74) [`db.open`](#link64622e6f70656e) [`db.open*`](#link64622e6f70656e2a) [`db.query`](#link64622e7175657279) [`db.result-column-count`](#link64622e726573756c742d636f6c756d6e2d636f756e74) [`db.result-columns`](#link64622e726573756c742d636f6c756d6e73) [`db.row`](#link64622e726f77) [`db.step`](#link64622e73746570) [`db.str`](#link64622e737472) [`declare-volatile`](#link6465636c6172652d766f6c6174696c65) [`def-custom-hook`](#link6465662d637573746f6d2d686f6f6b) [`default-error-handler`](#link64656661756c742d6572726f722d68616e646c6572) [`defclass`](#link646566636c617373) [`defmacro`](#link6465666d6163726f) [`defmethod`](#link6465666d6574686f64) [`defstruct`](#link646566737472756374) [`defun`](#link646566756e) [`delete`](#link64656c657465) [`dequeue!`](#link6465717565756521) [`dict`](#link64696374) [`dict->alist`](#link646963742d3e616c697374) [`dict->array`](#link646963742d3e6172726179) [`dict->keys`](#link646963742d3e6b657973) [`dict->list`](#link646963742d3e6c697374) [`dict->values`](#link646963742d3e76616c756573) [`dict-copy`](#link646963742d636f7079) [`dict-empty?`](#link646963742d656d7074793f) [`dict-foreach`](#link646963742d666f7265616368) [`dict-map`](#link646963742d6d6170) [`dict-map!`](#link646963742d6d617021) [`dict-merge`](#link646963742d6d65726765) [`dict-protect`](#link646963742d70726f74656374) [`dict-protected?`](#link646963742d70726f7465637465643f) [`dict-unprotect`](#link646963742d756e70726f74656374) [`dict?`](#link646963743f) [`dir`](#link646972) [`dir?`](#link6469723f) [`div`](#link646976) [`dolist`](#link646f6c697374) [`dotimes`](#link646f74696d6573) [`dump`](#link64756d70) [`dump-bindings`](#link64756d702d62696e64696e6773) [`enq`](#link656e71) [`enqueue!`](#link656e717565756521) [`entry-accepts-tab?`](#link656e7472792d616363657074732d7461623f) [`epoch-ns->datelist`](#link65706f63682d6e732d3e646174656c697374) [`eq?`](#link65713f) [`eql?`](#link65716c3f) [`equal?`](#link657175616c3f) [`error`](#link6572726f72) [`error->str`](#link6572726f722d3e737472) [`error?`](#link6572726f723f) [`eval`](#link6576616c) [`even?`](#link6576656e3f) [`exists?`](#link6578697374733f) [`exit`](#link65786974) [`expand-macros`](#link657870616e642d6d6163726f73) [`expect`](#link657870656374) [`expect-err`](#link6578706563742d657272) [`expect-false`](#link6578706563742d66616c7365) [`expect-ok`](#link6578706563742d6f6b) [`expect-true`](#link6578706563742d74727565) [`expr->str`](#link657870722d3e737472) [`externalize`](#link65787465726e616c697a65) [`externalize0`](#link65787465726e616c697a6530) [`fdelete`](#link6664656c657465) [`feature?`](#link666561747572653f) [`file-port?`](#link66696c652d706f72743f) [`filter`](#link66696c746572) [`find-missing-help-entries`](#link66696e642d6d697373696e672d68656c702d656e7472696573) [`find-unneeded-help-entries`](#link66696e642d756e6e65656465642d68656c702d656e7472696573) [`fl.abs`](#link666c2e616273) [`fl.acos`](#link666c2e61636f73) [`fl.asin`](#link666c2e6173696e) [`fl.asinh`](#link666c2e6173696e68) [`fl.atan`](#link666c2e6174616e) [`fl.atan2`](#link666c2e6174616e32) [`fl.atanh`](#link666c2e6174616e68) [`fl.cbrt`](#link666c2e63627274) [`fl.ceil`](#link666c2e6365696c) [`fl.cos`](#link666c2e636f73) [`fl.cosh`](#link666c2e636f7368) [`fl.dim`](#link666c2e64696d) [`fl.erf`](#link666c2e657266) [`fl.erfc`](#link666c2e65726663) [`fl.erfcinv`](#link666c2e65726663696e76) [`fl.erfinv`](#link666c2e657266696e76) [`fl.exp`](#link666c2e657870) [`fl.exp2`](#link666c2e65787032) [`fl.expm1`](#link666c2e6578706d31) [`fl.floor`](#link666c2e666c6f6f72) [`fl.fma`](#link666c2e666d61) [`fl.frexp`](#link666c2e6672657870) [`fl.gamma`](#link666c2e67616d6d61) [`fl.hypot`](#link666c2e6879706f74) [`fl.ilogb`](#link666c2e696c6f6762) [`fl.inf`](#link666c2e696e66) [`fl.is-nan?`](#link666c2e69732d6e616e3f) [`fl.j0`](#link666c2e6a30) [`fl.j1`](#link666c2e6a31) [`fl.jn`](#link666c2e6a6e) [`fl.ldexp`](#link666c2e6c64657870) [`fl.lgamma`](#link666c2e6c67616d6d61) [`fl.log`](#link666c2e6c6f67) [`fl.log10`](#link666c2e6c6f673130) [`fl.log1p`](#link666c2e6c6f673170) [`fl.log2`](#link666c2e6c6f6732) [`fl.logb`](#link666c2e6c6f6762) [`fl.max`](#link666c2e6d6178) [`fl.min`](#link666c2e6d696e) [`fl.mod`](#link666c2e6d6f64) [`fl.modf`](#link666c2e6d6f6466) [`fl.nan`](#link666c2e6e616e) [`fl.next-after`](#link666c2e6e6578742d6166746572) [`fl.pow`](#link666c2e706f77) [`fl.pow10`](#link666c2e706f773130) [`fl.remainder`](#link666c2e72656d61696e646572) [`fl.round`](#link666c2e726f756e64) [`fl.round-to-even`](#link666c2e726f756e642d746f2d6576656e) [`fl.signbit`](#link666c2e7369676e626974) [`fl.sin`](#link666c2e73696e) [`fl.sinh`](#link666c2e73696e68) [`fl.sqrt`](#link666c2e73717274) [`fl.tan`](#link666c2e74616e) [`fl.tanh`](#link666c2e74616e68) [`fl.trunc`](#link666c2e7472756e63) [`fl.y0`](#link666c2e7930) [`fl.y1`](#link666c2e7931) [`fl.yn`](#link666c2e796e) [`flatten`](#link666c617474656e) [`float`](#link666c6f6174) [`fmt`](#link666d74) [`forall?`](#link666f72616c6c3f) [`force`](#link666f726365) [`foreach`](#link666f7265616368) [`forget`](#link666f72676574) [`functional-arity`](#link66756e6374696f6e616c2d6172697479) [`functional-has-rest?`](#link66756e6374696f6e616c2d6861732d726573743f) [`functional?`](#link66756e6374696f6e616c3f) [`gensym`](#link67656e73796d) [`get`](#link676574) [`get-action`](#link6765742d616374696f6e) [`get-entry-cursor`](#link6765742d656e7472792d637572736f72) [`get-entry-cursor-pos`](#link6765742d656e7472792d637572736f722d706f73) [`get-or-set`](#link6765742d6f722d736574) [`get-partitions`](#link6765742d706172746974696f6e73) [`get-window-canvas`](#link6765742d77696e646f772d63616e766173) [`get-window-content`](#link6765742d77696e646f772d636f6e74656e74) [`get-window-icon`](#link6765742d77696e646f772d69636f6e) [`get-window-main-menu`](#link6765742d77696e646f772d6d61696e2d6d656e75) [`get-window-title`](#link6765742d77696e646f772d7469746c65) [`getstacked`](#link676574737461636b6564) [`glance`](#link676c616e6365) [`global-sym?`](#link676c6f62616c2d73796d3f) [`has`](#link686173) [`has-action-system?`](#link6861732d616374696f6e2d73797374656d3f) [`has-action?`](#link6861732d616374696f6e3f) [`has-key?`](#link6861732d6b65793f) [`has-method?`](#link6861732d6d6574686f643f) [`has-prop?`](#link6861732d70726f703f) [`help`](#link68656c70) [`help->manual-entry`](#link68656c702d3e6d616e75616c2d656e747279) [`help-about`](#link68656c702d61626f7574) [`help-entry`](#link68656c702d656e747279) [`help-strings`](#link68656c702d737472696e6773) [`help-topic-info`](#link68656c702d746f7069632d696e666f) [`help-topics`](#link68656c702d746f70696373) [`hex->blob`](#link6865782d3e626c6f62) [`hide-window`](#link686964652d77696e646f77) [`hook`](#link686f6f6b) [`hour+`](#link686f75722b) [`identity`](#link6964656e74697479) [`if`](#link6966) [`inchars`](#link696e6368617273) [`include`](#link696e636c756465) [`index`](#link696e646578) [`init-actions`](#link696e69742d616374696f6e73) [`init-remember`](#link696e69742d72656d656d626572) [`instr`](#link696e737472) [`int`](#link696e74) [`intern`](#link696e7465726e) [`internalize`](#link696e7465726e616c697a65) [`intrinsic`](#link696e7472696e736963) [`intrinsic?`](#link696e7472696e7369633f) [`isa?`](#link6973613f) [`iterate`](#link69746572617465) [`kvdb.begin`](#link6b7664622e626567696e) [`kvdb.close`](#link6b7664622e636c6f7365) [`kvdb.commit`](#link6b7664622e636f6d6d6974) [`kvdb.db?`](#link6b7664622e64623f) [`kvdb.forget`](#link6b7664622e666f72676574) [`kvdb.forget-everything`](#link6b7664622e666f726765742d65766572797468696e67) [`kvdb.get`](#link6b7664622e676574) [`kvdb.info`](#link6b7664622e696e666f) [`kvdb.open`](#link6b7664622e6f70656e) [`kvdb.rollback`](#link6b7664622e726f6c6c6261636b) [`kvdb.search`](#link6b7664622e736561726368) [`kvdb.set`](#link6b7664622e736574) [`kvdb.when`](#link6b7664622e7768656e) [`last`](#link6c617374) [`lcons`](#link6c636f6e73) [`len`](#link6c656e) [`let`](#link6c6574) [`letrec`](#link6c6574726563) [`lighten`](#link6c69676874656e) [`ling.damerau-levenshtein`](#link6c696e672e64616d657261752d6c6576656e73687465696e) [`ling.hamming`](#link6c696e672e68616d6d696e67) [`ling.jaro`](#link6c696e672e6a61726f) [`ling.jaro-winkler`](#link6c696e672e6a61726f2d77696e6b6c6572) [`ling.levenshtein`](#link6c696e672e6c6576656e73687465696e) [`ling.match-rating-codex`](#link6c696e672e6d617463682d726174696e672d636f646578) [`ling.match-rating-compare`](#link6c696e672e6d617463682d726174696e672d636f6d70617265) [`ling.metaphone`](#link6c696e672e6d65746170686f6e65) [`ling.nysiis`](#link6c696e672e6e7973696973) [`ling.porter`](#link6c696e672e706f72746572) [`ling.soundex`](#link6c696e672e736f756e646578) [`list`](#link6c697374) [`list->array`](#link6c6973742d3e6172726179) [`list->set`](#link6c6973742d3e736574) [`list->str`](#link6c6973742d3e737472) [`list-exists?`](#link6c6973742d6578697374733f) [`list-forall?`](#link6c6973742d666f72616c6c3f) [`list-foreach`](#link6c6973742d666f7265616368) [`list-last`](#link6c6973742d6c617374) [`list-ref`](#link6c6973742d726566) [`list-reverse`](#link6c6973742d72657665727365) [`list-slice`](#link6c6973742d736c696365) [`list?`](#link6c6973743f) [`load`](#link6c6f6164) [`load-zimage`](#link6c6f61642d7a696d616765) [`macro?`](#link6d6163726f3f) [`make`](#link6d616b65) [`make*`](#link6d616b652a) [`make-blob`](#link6d616b652d626c6f62) [`make-mutex`](#link6d616b652d6d75746578) [`make-queue`](#link6d616b652d7175657565) [`make-set`](#link6d616b652d736574) [`make-stack`](#link6d616b652d737461636b) [`make-symbol`](#link6d616b652d73796d626f6c) [`map`](#link6d6170) [`map-pairwise`](#link6d61702d7061697277697365) [`mapcar`](#link6d6170636172) [`max`](#link6d6178) [`member`](#link6d656d626572) [`memq`](#link6d656d71) [`memstats`](#link6d656d7374617473) [`methods`](#link6d6574686f6473) [`min`](#link6d696e) [`minmax`](#link6d696e6d6178) [`minute+`](#link6d696e7574652b) [`mod`](#link6d6f64) [`month+`](#link6d6f6e74682b) [`mutex-lock`](#link6d757465782d6c6f636b) [`mutex-rlock`](#link6d757465782d726c6f636b) [`mutex-runlock`](#link6d757465782d72756e6c6f636b) [`mutex-unlock`](#link6d757465782d756e6c6f636b) [`nconc`](#link6e636f6e63) [`new`](#link6e6577) [`new-entry`](#link6e65772d656e747279) [`new-label`](#link6e65772d6c6162656c) [`new-struct`](#link6e65772d737472756374) [`new-window`](#link6e65772d77696e646f77) [`nl`](#link6e6c) [`nonce`](#link6e6f6e6365) [`not`](#link6e6f74) [`now`](#link6e6f77) [`now-ms`](#link6e6f772d6d73) [`now-ns`](#link6e6f772d6e73) [`nreverse`](#link6e72657665727365) [`nth`](#link6e7468) [`nth-partition`](#link6e74682d706172746974696f6e) [`nthdef`](#link6e7468646566) [`null?`](#link6e756c6c3f) [`num?`](#link6e756d3f) [`object?`](#link6f626a6563743f) [`odd?`](#link6f64643f) [`on-feature`](#link6f6e2d66656174757265) [`open`](#link6f70656e) [`or`](#link6f72) [`out`](#link6f7574) [`outy`](#link6f757479) [`peek`](#link7065656b) [`permission?`](#link7065726d697373696f6e3f) [`permissions`](#link7065726d697373696f6e73) [`poke`](#link706f6b65) [`pop!`](#link706f7021) [`pop-error-handler`](#link706f702d6572726f722d68616e646c6572) [`pop-finalizer`](#link706f702d66696e616c697a6572) [`popstacked`](#link706f70737461636b6564) [`prin1`](#link7072696e31) [`princ`](#link7072696e63) [`print`](#link7072696e74) [`proc?`](#link70726f633f) [`prop`](#link70726f70) [`props`](#link70726f7073) [`protect`](#link70726f74656374) [`protect-toplevel-symbols`](#link70726f746563742d746f706c6576656c2d73796d626f6c73) [`protected?`](#link70726f7465637465643f) [`prune-task-table`](#link7072756e652d7461736b2d7461626c65) [`prune-unneeded-help-entries`](#link7072756e652d756e6e65656465642d68656c702d656e7472696573) [`push!`](#link7075736821) [`push-error-handler`](#link707573682d6572726f722d68616e646c6572) [`push-finalizer`](#link707573682d66696e616c697a6572) [`pushstacked`](#link70757368737461636b6564) [`queue-empty?`](#link71756575652d656d7074793f) [`queue-len`](#link71756575652d6c656e) [`queue?`](#link71756575653f) [`rand`](#link72616e64) [`random-color`](#link72616e646f6d2d636f6c6f72) [`read`](#link72656164) [`read-binary`](#link726561642d62696e617279) [`read-string`](#link726561642d737472696e67) [`read-zimage`](#link726561642d7a696d616765) [`readall`](#link72656164616c6c) [`readall-str`](#link72656164616c6c2d737472) [`recall`](#link726563616c6c) [`recall-info`](#link726563616c6c2d696e666f) [`recall-when`](#link726563616c6c2d7768656e) [`recollect`](#link7265636f6c6c656374) [`record?`](#link7265636f72643f) [`register-action`](#link72656769737465722d616374696f6e) [`remember`](#link72656d656d626572) [`remove-duplicates`](#link72656d6f76652d6475706c696361746573) [`remove-hook`](#link72656d6f76652d686f6f6b) [`remove-hook-internal`](#link72656d6f76652d686f6f6b2d696e7465726e616c) [`remove-hooks`](#link72656d6f76652d686f6f6b73) [`rename-action`](#link72656e616d652d616374696f6e) [`replace-hook`](#link7265706c6163652d686f6f6b) [`reset-color`](#link72657365742d636f6c6f72) [`reverse`](#link72657665727365) [`rnd`](#link726e64) [`rndseed`](#link726e6473656564) [`rplaca`](#link72706c616361) [`run-at`](#link72756e2d6174) [`run-hook`](#link72756e2d686f6f6b) [`run-hook-internal`](#link72756e2d686f6f6b2d696e7465726e616c) [`run-selftest`](#link72756e2d73656c6674657374) [`run-zimage`](#link72756e2d7a696d616765) [`save-zimage`](#link736176652d7a696d616765) [`sec+`](#link7365632b) [`semver.build`](#link73656d7665722e6275696c64) [`semver.canonical`](#link73656d7665722e63616e6f6e6963616c) [`semver.compare`](#link73656d7665722e636f6d70617265) [`semver.is-valid?`](#link73656d7665722e69732d76616c69643f) [`semver.major`](#link73656d7665722e6d616a6f72) [`semver.major-minor`](#link73656d7665722e6d616a6f722d6d696e6f72) [`semver.max`](#link73656d7665722e6d6178) [`semver.prerelease`](#link73656d7665722e70726572656c65617365) [`seq?`](#link7365713f) [`set`](#link736574) [`set*`](#link7365742a) [`set->list`](#link7365742d3e6c697374) [`set-color`](#link7365742d636f6c6f72) [`set-complement`](#link7365742d636f6d706c656d656e74) [`set-difference`](#link7365742d646966666572656e6365) [`set-element?`](#link7365742d656c656d656e743f) [`set-empty?`](#link7365742d656d7074793f) [`set-entry-cursor-column`](#link7365742d656e7472792d637572736f722d636f6c756d6e) [`set-entry-cursor-row`](#link7365742d656e7472792d637572736f722d726f77) [`set-entry-min-rows-visible`](#link7365742d656e7472792d6d696e2d726f77732d76697369626c65) [`set-entry-on-change-callback`](#link7365742d656e7472792d6f6e2d6368616e67652d63616c6c6261636b) [`set-entry-on-cursor-change-callback`](#link7365742d656e7472792d6f6e2d637572736f722d6368616e67652d63616c6c6261636b) [`set-entry-place-holder`](#link7365742d656e7472792d706c6163652d686f6c646572) [`set-entry-text`](#link7365742d656e7472792d74657874) [`set-entry-validator`](#link7365742d656e7472792d76616c696461746f72) [`set-equal?`](#link7365742d657175616c3f) [`set-help-topic-info`](#link7365742d68656c702d746f7069632d696e666f) [`set-intersection`](#link7365742d696e74657273656374696f6e) [`set-label-text`](#link7365742d6c6162656c2d74657874) [`set-permissions`](#link7365742d7065726d697373696f6e73) [`set-subset?`](#link7365742d7375627365743f) [`set-union`](#link7365742d756e696f6e) [`set-volume`](#link7365742d766f6c756d65) [`set-window-content`](#link7365742d77696e646f772d636f6e74656e74) [`set-window-full-screen`](#link7365742d77696e646f772d66756c6c2d73637265656e) [`set-window-icon`](#link7365742d77696e646f772d69636f6e) [`set-window-main-menu`](#link7365742d77696e646f772d6d61696e2d6d656e75) [`set-window-on-close-callback`](#link7365742d77696e646f772d6f6e2d636c6f73652d63616c6c6261636b) [`set-window-padded`](#link7365742d77696e646f772d706164646564) [`set-window-size`](#link7365742d77696e646f772d73697a65) [`set-window-title`](#link7365742d77696e646f772d7469746c65) [`set?`](#link7365743f) [`setcar`](#link736574636172) [`setcdr`](#link736574636472) [`setprop`](#link73657470726f70) [`shorten`](#link73686f7274656e) [`sleep`](#link736c656570) [`sleep-ns`](#link736c6565702d6e73) [`slice`](#link736c696365) [`sort`](#link736f7274) [`sort-symbols`](#link736f72742d73796d626f6c73) [`spaces`](#link737061636573) [`stack-empty?`](#link737461636b2d656d7074793f) [`stack-len`](#link737461636b2d6c656e) [`stack?`](#link737461636b3f) [`str+`](#link7374722b) [`str->array`](#link7374722d3e6172726179) [`str->blob`](#link7374722d3e626c6f62) [`str->char`](#link7374722d3e63686172) [`str->chars`](#link7374722d3e6368617273) [`str->expr`](#link7374722d3e65787072) [`str->expr*`](#link7374722d3e657870722a) [`str->list`](#link7374722d3e6c697374) [`str->sym`](#link7374722d3e73796d) [`str-count-substr`](#link7374722d636f756e742d737562737472) [`str-empty?`](#link7374722d656d7074793f) [`str-exists?`](#link7374722d6578697374733f) [`str-forall?`](#link7374722d666f72616c6c3f) [`str-foreach`](#link7374722d666f7265616368) [`str-index`](#link7374722d696e646578) [`str-join`](#link7374722d6a6f696e) [`str-port?`](#link7374722d706f72743f) [`str-ref`](#link7374722d726566) [`str-remove-number`](#link7374722d72656d6f76652d6e756d626572) [`str-remove-prefix`](#link7374722d72656d6f76652d707265666978) [`str-remove-suffix`](#link7374722d72656d6f76652d737566666978) [`str-replace`](#link7374722d7265706c616365) [`str-replace*`](#link7374722d7265706c6163652a) [`str-reverse`](#link7374722d72657665727365) [`str-segment`](#link7374722d7365676d656e74) [`str-slice`](#link7374722d736c696365) [`str?`](#link7374723f) [`strbuild`](#link7374726275696c64) [`strcase`](#link73747263617365) [`strcenter`](#link73747263656e746572) [`strcnt`](#link737472636e74) [`strleft`](#link7374726c656674) [`strlen`](#link7374726c656e) [`strless`](#link7374726c657373) [`strlimit`](#link7374726c696d6974) [`strmap`](#link7374726d6170) [`stropen`](#link7374726f70656e) [`strright`](#link7374727269676874) [`strsplit`](#link73747273706c6974) [`struct-index`](#link7374727563742d696e646578) [`struct-instantiate`](#link7374727563742d696e7374616e7469617465) [`struct-name`](#link7374727563742d6e616d65) [`struct-props`](#link7374727563742d70726f7073) [`struct-size`](#link7374727563742d73697a65) [`struct?`](#link7374727563743f) [`sub1`](#link73756231) [`supers`](#link737570657273) [`sym->str`](#link73796d2d3e737472) [`sym?`](#link73796d3f) [`synout`](#link73796e6f7574) [`synouty`](#link73796e6f757479) [`sys-key?`](#link7379732d6b65793f) [`sysmsg`](#link7379736d7367) [`sysmsg*`](#link7379736d73672a) [`take`](#link74616b65) [`task`](#link7461736b) [`task-broadcast`](#link7461736b2d62726f616463617374) [`task-recv`](#link7461736b2d72656376) [`task-remove`](#link7461736b2d72656d6f7665) [`task-run`](#link7461736b2d72756e) [`task-schedule`](#link7461736b2d7363686564756c65) [`task-send`](#link7461736b2d73656e64) [`task-state`](#link7461736b2d7374617465) [`task?`](#link7461736b3f) [`terpri`](#link746572707269) [`testing`](#link74657374696e67) [`the-color`](#link7468652d636f6c6f72) [`the-color-names`](#link7468652d636f6c6f722d6e616d6573) [`time`](#link74696d65) [`truncate`](#link7472756e63617465) [`try`](#link747279) [`type-of`](#link747970652d6f66) [`type-of*`](#link747970652d6f662a) [`unless`](#link756e6c657373) [`unprotect`](#link756e70726f74656374) [`unprotect-toplevel-symbols`](#link756e70726f746563742d746f706c6576656c2d73796d626f6c73) [`valid?`](#link76616c69643f) [`void`](#link766f6964) [`void?`](#link766f69643f) [`wait-for`](#link776169742d666f72) [`wait-for*`](#link776169742d666f722a) [`wait-for-empty*`](#link776169742d666f722d656d7074792a) [`wait-until`](#link776169742d756e74696c) [`wait-until*`](#link776169742d756e74696c2a) [`warn`](#link7761726e) [`week+`](#link7765656b2b) [`week-of-date`](#link7765656b2d6f662d64617465) [`when`](#link7768656e) [`when-permission`](#link7768656e2d7065726d697373696f6e) [`while`](#link7768696c65) [`window-fixed-size?`](#link77696e646f772d66697865642d73697a653f) [`window-full-screen?`](#link77696e646f772d66756c6c2d73637265656e3f) [`window-padded?`](#link77696e646f772d7061646465643f) [`with-colors`](#link776974682d636f6c6f7273) [`with-error-handler`](#link776974682d6572726f722d68616e646c6572) [`with-final`](#link776974682d66696e616c) [`with-mutex-lock`](#link776974682d6d757465782d6c6f636b) [`with-mutex-rlock`](#link776974682d6d757465782d726c6f636b) [`write`](#link7772697465) [`write-binary`](#link77726974652d62696e617279) [`write-binary-at`](#link77726974652d62696e6172792d6174) [`write-string`](#link77726974652d737472696e67) [`write-zimage`](#link77726974652d7a696d616765) [`year+`](#link796561722b) [`zimage-header`](#link7a696d6167652d686561646572) [`zimage-loadable?`](#link7a696d6167652d6c6f616461626c653f) [`zimage-runable?`](#link7a696d6167652d72756e61626c653f) 
+[`%`](#link25) [`*`](#link2a) [`*colors*`](#link2a636f6c6f72732a) [`*error-handler*`](#link2a6572726f722d68616e646c65722a) [`*error-printer*`](#link2a6572726f722d7072696e7465722a) [`*help*`](#link2a68656c702a) [`*hooks*`](#link2a686f6f6b732a) [`*last-error*`](#link2a6c6173742d6572726f722a) [`*reflect*`](#link2a7265666c6563742a) [`+`](#link2b) [`-`](#link2d) [`/`](#link2f) [`/=`](#link2f3d) [`10th`](#link31307468) [`1st`](#link317374) [`2nd`](#link326e64) [`3rd`](#link337264) [`4th`](#link347468) [`5th`](#link357468) [`6th`](#link367468) [`7th`](#link377468) [`8th`](#link387468) [`9th`](#link397468) [`<`](#link3c) [`<=`](#link3c3d) [`=`](#link3d) [`>`](#link3e) [`>=`](#link3e3d) [`abs`](#link616273) [`action`](#link616374696f6e) [`action-start`](#link616374696f6e2d7374617274) [`action-stop`](#link616374696f6e2d73746f70) [`activate-menu-last-submenu`](#link61637469766174652d6d656e752d6c6173742d7375626d656e75) [`activate-menu-next`](#link61637469766174652d6d656e752d6e657874) [`activate-menu-previous`](#link61637469766174652d6d656e752d70726576696f7573) [`add-hook`](#link6164642d686f6f6b) [`add-hook-internal`](#link6164642d686f6f6b2d696e7465726e616c) [`add-hook-once`](#link6164642d686f6f6b2d6f6e6365) [`add1`](#link61646431) [`alist->dict`](#link616c6973742d3e64696374) [`alist?`](#link616c6973743f) [`and`](#link616e64) [`append`](#link617070656e64) [`append-form`](#link617070656e642d666f726d) [`apply`](#link6170706c79) [`apropos`](#link6170726f706f73) [`array`](#link6172726179) [`array->list`](#link61727261792d3e6c697374) [`array->str`](#link61727261792d3e737472) [`array-append`](#link61727261792d617070656e64) [`array-copy`](#link61727261792d636f7079) [`array-exists?`](#link61727261792d6578697374733f) [`array-forall?`](#link61727261792d666f72616c6c3f) [`array-foreach`](#link61727261792d666f7265616368) [`array-len`](#link61727261792d6c656e) [`array-map!`](#link61727261792d6d617021) [`array-pmap!`](#link61727261792d706d617021) [`array-ref`](#link61727261792d726566) [`array-reverse`](#link61727261792d72657665727365) [`array-set`](#link61727261792d736574) [`array-slice`](#link61727261792d736c696365) [`array-sort`](#link61727261792d736f7274) [`array-walk`](#link61727261792d77616c6b) [`array?`](#link61727261793f) [`ascii85->blob`](#link617363696938352d3e626c6f62) [`assoc`](#link6173736f63) [`assoc1`](#link6173736f6331) [`assq`](#link61737371) [`atom?`](#link61746f6d3f) [`base64->blob`](#link6261736536342d3e626c6f62) [`beep`](#link62656570) [`bind`](#link62696e64) [`bitand`](#link626974616e64) [`bitclear`](#link626974636c656172) [`bitor`](#link6269746f72) [`bitshl`](#link62697473686c) [`bitshr`](#link626974736872) [`bitxor`](#link626974786f72) [`blob->ascii85`](#link626c6f622d3e61736369693835) [`blob->base64`](#link626c6f622d3e626173653634) [`blob->hex`](#link626c6f622d3e686578) [`blob->str`](#link626c6f622d3e737472) [`blob-chksum`](#link626c6f622d63686b73756d) [`blob-equal?`](#link626c6f622d657175616c3f) [`blob-free`](#link626c6f622d66726565) [`blob?`](#link626c6f623f) [`bool?`](#link626f6f6c3f) [`bound?`](#link626f756e643f) [`boxed?`](#link626f7865643f) [`build-array`](#link6275696c642d6172726179) [`build-list`](#link6275696c642d6c697374) [`caaar`](#link6361616172) [`caadr`](#link6361616472) [`caar`](#link63616172) [`cadar`](#link6361646172) [`caddr`](#link6361646472) [`cadr`](#link63616472) [`call-method`](#link63616c6c2d6d6574686f64) [`call-super`](#link63616c6c2d7375706572) [`can-externalize?`](#link63616e2d65787465726e616c697a653f) [`car`](#link636172) [`case`](#link63617365) [`ccmp`](#link63636d70) [`cdaar`](#link6364616172) [`cdadr`](#link6364616472) [`cdar`](#link63646172) [`cddar`](#link6364646172) [`cdddr`](#link6364646472) [`cddr`](#link63646472) [`cdec!`](#link6364656321) [`cdr`](#link636472) [`center-window-on-screen`](#link63656e7465722d77696e646f772d6f6e2d73637265656e) [`change-action-prefix`](#link6368616e67652d616374696f6e2d707265666978) [`change-all-action-prefixes`](#link6368616e67652d616c6c2d616374696f6e2d7072656669786573) [`char->str`](#link636861722d3e737472) [`chars`](#link6368617273) [`chars->str`](#link63686172732d3e737472) [`cinc!`](#link63696e6321) [`class-name`](#link636c6173732d6e616d65) [`class-of`](#link636c6173732d6f66) [`class?`](#link636c6173733f) [`close`](#link636c6f7365) [`close-gui`](#link636c6f73652d677569) [`close-window`](#link636c6f73652d77696e646f77) [`closure?`](#link636c6f737572653f) [`collect-garbage`](#link636f6c6c6563742d67617262616765) [`color`](#link636f6c6f72) [`cons`](#link636f6e73) [`cons?`](#link636f6e733f) [`copy-record`](#link636f70792d7265636f7264) [`count-partitions`](#link636f756e742d706172746974696f6e73) [`cpunum`](#link6370756e756d) [`cst!`](#link63737421) [`current-error-handler`](#link63757272656e742d6572726f722d68616e646c6572) [`current-zimage`](#link63757272656e742d7a696d616765) [`cwait`](#link6377616974) [`darken`](#link6461726b656e) [`date->epoch-ns`](#link646174652d3e65706f63682d6e73) [`datelist->epoch-ns`](#link646174656c6973742d3e65706f63682d6e73) [`datestr`](#link64617465737472) [`datestr*`](#link646174657374722a) [`datestr->datelist`](#link646174657374722d3e646174656c697374) [`day+`](#link6461792b) [`day-of-week`](#link6461792d6f662d7765656b) [`db.blob`](#link64622e626c6f62) [`db.close`](#link64622e636c6f7365) [`db.close-result`](#link64622e636c6f73652d726573756c74) [`db.exec`](#link64622e65786563) [`db.float`](#link64622e666c6f6174) [`db.int`](#link64622e696e74) [`db.open`](#link64622e6f70656e) [`db.open*`](#link64622e6f70656e2a) [`db.query`](#link64622e7175657279) [`db.result-column-count`](#link64622e726573756c742d636f6c756d6e2d636f756e74) [`db.result-columns`](#link64622e726573756c742d636f6c756d6e73) [`db.row`](#link64622e726f77) [`db.step`](#link64622e73746570) [`db.str`](#link64622e737472) [`deactivate-menu-child`](#link646561637469766174652d6d656e752d6368696c64) [`deactivate-menu-last-submenu`](#link646561637469766174652d6d656e752d6c6173742d7375626d656e75) [`declare-volatile`](#link6465636c6172652d766f6c6174696c65) [`def-custom-hook`](#link6465662d637573746f6d2d686f6f6b) [`default-error-handler`](#link64656661756c742d6572726f722d68616e646c6572) [`defclass`](#link646566636c617373) [`defmacro`](#link6465666d6163726f) [`defmethod`](#link6465666d6574686f64) [`defstruct`](#link646566737472756374) [`defun`](#link646566756e) [`delete`](#link64656c657465) [`dequeue!`](#link6465717565756521) [`dict`](#link64696374) [`dict->alist`](#link646963742d3e616c697374) [`dict->array`](#link646963742d3e6172726179) [`dict->keys`](#link646963742d3e6b657973) [`dict->list`](#link646963742d3e6c697374) [`dict->values`](#link646963742d3e76616c756573) [`dict-copy`](#link646963742d636f7079) [`dict-empty?`](#link646963742d656d7074793f) [`dict-foreach`](#link646963742d666f7265616368) [`dict-map`](#link646963742d6d6170) [`dict-map!`](#link646963742d6d617021) [`dict-merge`](#link646963742d6d65726765) [`dict-protect`](#link646963742d70726f74656374) [`dict-protected?`](#link646963742d70726f7465637465643f) [`dict-unprotect`](#link646963742d756e70726f74656374) [`dict?`](#link646963743f) [`dir`](#link646972) [`dir?`](#link6469723f) [`disable-object`](#link64697361626c652d6f626a656374) [`div`](#link646976) [`dolist`](#link646f6c697374) [`dotimes`](#link646f74696d6573) [`dump`](#link64756d70) [`dump-bindings`](#link64756d702d62696e64696e6773) [`enable-object`](#link656e61626c652d6f626a656374) [`enq`](#link656e71) [`enqueue!`](#link656e717565756521) [`entry-accepts-tab?`](#link656e7472792d616363657074732d7461623f) [`epoch-ns->datelist`](#link65706f63682d6e732d3e646174656c697374) [`eq?`](#link65713f) [`eql?`](#link65716c3f) [`equal?`](#link657175616c3f) [`error`](#link6572726f72) [`error->str`](#link6572726f722d3e737472) [`error?`](#link6572726f723f) [`eval`](#link6576616c) [`even?`](#link6576656e3f) [`exists?`](#link6578697374733f) [`exit`](#link65786974) [`expand-macros`](#link657870616e642d6d6163726f73) [`expect`](#link657870656374) [`expect-err`](#link6578706563742d657272) [`expect-false`](#link6578706563742d66616c7365) [`expect-ok`](#link6578706563742d6f6b) [`expect-true`](#link6578706563742d74727565) [`expr->str`](#link657870722d3e737472) [`externalize`](#link65787465726e616c697a65) [`externalize0`](#link65787465726e616c697a6530) [`fdelete`](#link6664656c657465) [`feature?`](#link666561747572653f) [`file-port?`](#link66696c652d706f72743f) [`filter`](#link66696c746572) [`find-missing-help-entries`](#link66696e642d6d697373696e672d68656c702d656e7472696573) [`find-unneeded-help-entries`](#link66696e642d756e6e65656465642d68656c702d656e7472696573) [`fl.abs`](#link666c2e616273) [`fl.acos`](#link666c2e61636f73) [`fl.asin`](#link666c2e6173696e) [`fl.asinh`](#link666c2e6173696e68) [`fl.atan`](#link666c2e6174616e) [`fl.atan2`](#link666c2e6174616e32) [`fl.atanh`](#link666c2e6174616e68) [`fl.cbrt`](#link666c2e63627274) [`fl.ceil`](#link666c2e6365696c) [`fl.cos`](#link666c2e636f73) [`fl.cosh`](#link666c2e636f7368) [`fl.dim`](#link666c2e64696d) [`fl.erf`](#link666c2e657266) [`fl.erfc`](#link666c2e65726663) [`fl.erfcinv`](#link666c2e65726663696e76) [`fl.erfinv`](#link666c2e657266696e76) [`fl.exp`](#link666c2e657870) [`fl.exp2`](#link666c2e65787032) [`fl.expm1`](#link666c2e6578706d31) [`fl.floor`](#link666c2e666c6f6f72) [`fl.fma`](#link666c2e666d61) [`fl.frexp`](#link666c2e6672657870) [`fl.gamma`](#link666c2e67616d6d61) [`fl.hypot`](#link666c2e6879706f74) [`fl.ilogb`](#link666c2e696c6f6762) [`fl.inf`](#link666c2e696e66) [`fl.is-nan?`](#link666c2e69732d6e616e3f) [`fl.j0`](#link666c2e6a30) [`fl.j1`](#link666c2e6a31) [`fl.jn`](#link666c2e6a6e) [`fl.ldexp`](#link666c2e6c64657870) [`fl.lgamma`](#link666c2e6c67616d6d61) [`fl.log`](#link666c2e6c6f67) [`fl.log10`](#link666c2e6c6f673130) [`fl.log1p`](#link666c2e6c6f673170) [`fl.log2`](#link666c2e6c6f6732) [`fl.logb`](#link666c2e6c6f6762) [`fl.max`](#link666c2e6d6178) [`fl.min`](#link666c2e6d696e) [`fl.mod`](#link666c2e6d6f64) [`fl.modf`](#link666c2e6d6f6466) [`fl.nan`](#link666c2e6e616e) [`fl.next-after`](#link666c2e6e6578742d6166746572) [`fl.pow`](#link666c2e706f77) [`fl.pow10`](#link666c2e706f773130) [`fl.remainder`](#link666c2e72656d61696e646572) [`fl.round`](#link666c2e726f756e64) [`fl.round-to-even`](#link666c2e726f756e642d746f2d6576656e) [`fl.signbit`](#link666c2e7369676e626974) [`fl.sin`](#link666c2e73696e) [`fl.sinh`](#link666c2e73696e68) [`fl.sqrt`](#link666c2e73717274) [`fl.tan`](#link666c2e74616e) [`fl.tanh`](#link666c2e74616e68) [`fl.trunc`](#link666c2e7472756e63) [`fl.y0`](#link666c2e7930) [`fl.y1`](#link666c2e7931) [`fl.yn`](#link666c2e796e) [`flatten`](#link666c617474656e) [`float`](#link666c6f6174) [`fmt`](#link666d74) [`forall?`](#link666f72616c6c3f) [`force`](#link666f726365) [`foreach`](#link666f7265616368) [`forget`](#link666f72676574) [`forget-gui-object`](#link666f726765742d6775692d6f626a656374) [`functional-arity`](#link66756e6374696f6e616c2d6172697479) [`functional-has-rest?`](#link66756e6374696f6e616c2d6861732d726573743f) [`functional?`](#link66756e6374696f6e616c3f) [`gensym`](#link67656e73796d) [`get`](#link676574) [`get-action`](#link6765742d616374696f6e) [`get-clipboard-content`](#link6765742d636c6970626f6172642d636f6e74656e74) [`get-device-info`](#link6765742d6465766963652d696e666f) [`get-entry-cursor`](#link6765742d656e7472792d637572736f72) [`get-entry-cursor-pos`](#link6765742d656e7472792d637572736f722d706f73) [`get-menu-item-label`](#link6765742d6d656e752d6974656d2d6c6162656c) [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65) [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e) [`get-object-size`](#link6765742d6f626a6563742d73697a65) [`get-or-set`](#link6765742d6f722d736574) [`get-partitions`](#link6765742d706172746974696f6e73) [`get-progress-bar-value`](#link6765742d70726f67726573732d6261722d76616c7565) [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c) [`get-text-grid-row`](#link6765742d746578742d677269642d726f77) [`get-text-grid-row-text`](#link6765742d746578742d677269642d726f772d74657874) [`get-text-grid-tab-width`](#link6765742d746578742d677269642d7461622d7769647468) [`get-text-grid-text`](#link6765742d746578742d677269642d74657874) [`get-window-canvas`](#link6765742d77696e646f772d63616e766173) [`get-window-content`](#link6765742d77696e646f772d636f6e74656e74) [`get-window-icon`](#link6765742d77696e646f772d69636f6e) [`get-window-main-menu`](#link6765742d77696e646f772d6d61696e2d6d656e75) [`get-window-title`](#link6765742d77696e646f772d7469746c65) [`getstacked`](#link676574737461636b6564) [`glance`](#link676c616e6365) [`global-sym?`](#link676c6f62616c2d73796d3f) [`has`](#link686173) [`has-action-system?`](#link6861732d616374696f6e2d73797374656d3f) [`has-action?`](#link6861732d616374696f6e3f) [`has-key?`](#link6861732d6b65793f) [`has-method?`](#link6861732d6d6574686f643f) [`has-prop?`](#link6861732d70726f703f) [`help`](#link68656c70) [`help->manual-entry`](#link68656c702d3e6d616e75616c2d656e747279) [`help-about`](#link68656c702d61626f7574) [`help-entry`](#link68656c702d656e747279) [`help-strings`](#link68656c702d737472696e6773) [`help-topic-info`](#link68656c702d746f7069632d696e666f) [`help-topics`](#link68656c702d746f70696373) [`hex->blob`](#link6865782d3e626c6f62) [`hide-object`](#link686964652d6f626a656374) [`hide-window`](#link686964652d77696e646f77) [`hook`](#link686f6f6b) [`hour+`](#link686f75722b) [`identity`](#link6964656e74697479) [`if`](#link6966) [`inchars`](#link696e6368617273) [`include`](#link696e636c756465) [`index`](#link696e646578) [`init-actions`](#link696e69742d616374696f6e73) [`init-remember`](#link696e69742d72656d656d626572) [`instr`](#link696e737472) [`int`](#link696e74) [`intern`](#link696e7465726e) [`internalize`](#link696e7465726e616c697a65) [`intrinsic`](#link696e7472696e736963) [`intrinsic?`](#link696e7472696e7369633f) [`isa?`](#link6973613f) [`iterate`](#link69746572617465) [`kvdb.begin`](#link6b7664622e626567696e) [`kvdb.close`](#link6b7664622e636c6f7365) [`kvdb.commit`](#link6b7664622e636f6d6d6974) [`kvdb.db?`](#link6b7664622e64623f) [`kvdb.forget`](#link6b7664622e666f72676574) [`kvdb.forget-everything`](#link6b7664622e666f726765742d65766572797468696e67) [`kvdb.get`](#link6b7664622e676574) [`kvdb.info`](#link6b7664622e696e666f) [`kvdb.open`](#link6b7664622e6f70656e) [`kvdb.rollback`](#link6b7664622e726f6c6c6261636b) [`kvdb.search`](#link6b7664622e736561726368) [`kvdb.set`](#link6b7664622e736574) [`kvdb.when`](#link6b7664622e7768656e) [`last`](#link6c617374) [`lcons`](#link6c636f6e73) [`len`](#link6c656e) [`let`](#link6c6574) [`letrec`](#link6c6574726563) [`lighten`](#link6c69676874656e) [`ling.damerau-levenshtein`](#link6c696e672e64616d657261752d6c6576656e73687465696e) [`ling.hamming`](#link6c696e672e68616d6d696e67) [`ling.jaro`](#link6c696e672e6a61726f) [`ling.jaro-winkler`](#link6c696e672e6a61726f2d77696e6b6c6572) [`ling.levenshtein`](#link6c696e672e6c6576656e73687465696e) [`ling.match-rating-codex`](#link6c696e672e6d617463682d726174696e672d636f646578) [`ling.match-rating-compare`](#link6c696e672e6d617463682d726174696e672d636f6d70617265) [`ling.metaphone`](#link6c696e672e6d65746170686f6e65) [`ling.nysiis`](#link6c696e672e6e7973696973) [`ling.porter`](#link6c696e672e706f72746572) [`ling.soundex`](#link6c696e672e736f756e646578) [`list`](#link6c697374) [`list->array`](#link6c6973742d3e6172726179) [`list->set`](#link6c6973742d3e736574) [`list->str`](#link6c6973742d3e737472) [`list-exists?`](#link6c6973742d6578697374733f) [`list-forall?`](#link6c6973742d666f72616c6c3f) [`list-foreach`](#link6c6973742d666f7265616368) [`list-last`](#link6c6973742d6c617374) [`list-ref`](#link6c6973742d726566) [`list-reverse`](#link6c6973742d72657665727365) [`list-slice`](#link6c6973742d736c696365) [`list?`](#link6c6973743f) [`load`](#link6c6f6164) [`load-zimage`](#link6c6f61642d7a696d616765) [`macro?`](#link6d6163726f3f) [`make`](#link6d616b65) [`make*`](#link6d616b652a) [`make-blob`](#link6d616b652d626c6f62) [`make-mutex`](#link6d616b652d6d75746578) [`make-queue`](#link6d616b652d7175657565) [`make-set`](#link6d616b652d736574) [`make-stack`](#link6d616b652d737461636b) [`make-symbol`](#link6d616b652d73796d626f6c) [`map`](#link6d6170) [`map-pairwise`](#link6d61702d7061697277697365) [`mapcar`](#link6d6170636172) [`max`](#link6d6178) [`member`](#link6d656d626572) [`memq`](#link6d656d71) [`memstats`](#link6d656d7374617473) [`menu-item-checked?`](#link6d656e752d6974656d2d636865636b65643f) [`menu-item-disabled?`](#link6d656e752d6974656d2d64697361626c65643f) [`methods`](#link6d6574686f6473) [`min`](#link6d696e) [`minmax`](#link6d696e6d6178) [`minute+`](#link6d696e7574652b) [`mod`](#link6d6f64) [`month+`](#link6d6f6e74682b) [`move-object`](#link6d6f76652d6f626a656374) [`mutex-lock`](#link6d757465782d6c6f636b) [`mutex-rlock`](#link6d757465782d726c6f636b) [`mutex-runlock`](#link6d757465782d72756e6c6f636b) [`mutex-unlock`](#link6d757465782d756e6c6f636b) [`nconc`](#link6e636f6e63) [`new`](#link6e6577) [`new-app-tabs`](#link6e65772d6170702d74616273) [`new-border`](#link6e65772d626f72646572) [`new-button`](#link6e65772d627574746f6e) [`new-button-with-icon`](#link6e65772d627574746f6e2d776974682d69636f6e) [`new-center-layout`](#link6e65772d63656e7465722d6c61796f7574) [`new-check`](#link6e65772d636865636b) [`new-choice`](#link6e65772d63686f696365) [`new-circle`](#link6e65772d636972636c65) [`new-combined-string-validator`](#link6e65772d636f6d62696e65642d737472696e672d76616c696461746f72) [`new-container`](#link6e65772d636f6e7461696e6572) [`new-container-without-layout`](#link6e65772d636f6e7461696e65722d776974686f75742d6c61796f7574) [`new-doc-tabs`](#link6e65772d646f632d74616273) [`new-entry`](#link6e65772d656e747279) [`new-form`](#link6e65772d666f726d) [`new-form-layout`](#link6e65772d666f726d2d6c61796f7574) [`new-grid-layout`](#link6e65772d677269642d6c61796f7574) [`new-grid-wrap-layout`](#link6e65772d677269642d777261702d6c61796f7574) [`new-hbox-layout`](#link6e65772d68626f782d6c61796f7574) [`new-hyperlink`](#link6e65772d68797065726c696e6b) [`new-icon`](#link6e65772d69636f6e) [`new-image-from-file`](#link6e65772d696d6167652d66726f6d2d66696c65) [`new-image-from-resource`](#link6e65772d696d6167652d66726f6d2d7265736f75726365) [`new-label`](#link6e65772d6c6162656c) [`new-line`](#link6e65772d6c696e65) [`new-list`](#link6e65772d6c697374) [`new-main-menu`](#link6e65772d6d61696e2d6d656e75) [`new-menu`](#link6e65772d6d656e75) [`new-menu*`](#link6e65772d6d656e752a) [`new-menu-item`](#link6e65772d6d656e752d6974656d) [`new-menu-item-separator`](#link6e65772d6d656e752d6974656d2d736570617261746f72) [`new-progress-bar`](#link6e65772d70726f67726573732d626172) [`new-raster-with-pixels`](#link6e65772d7261737465722d776974682d706978656c73) [`new-rectangle`](#link6e65772d72656374616e676c65) [`new-regexp-validator`](#link6e65772d7265676578702d76616c696461746f72) [`new-shortcut`](#link6e65772d73686f7274637574) [`new-slider`](#link6e65772d736c69646572) [`new-spacer`](#link6e65772d737061636572) [`new-stack-layout`](#link6e65772d737461636b2d6c61796f7574) [`new-struct`](#link6e65772d737472756374) [`new-tabitem`](#link6e65772d7461626974656d) [`new-tabitem-with-icon`](#link6e65772d7461626974656d2d776974682d69636f6e) [`new-table`](#link6e65772d7461626c65) [`new-text`](#link6e65772d74657874) [`new-text-grid`](#link6e65772d746578742d67726964) [`new-time-validator`](#link6e65772d74696d652d76616c696461746f72) [`new-tree`](#link6e65772d74726565) [`new-validator`](#link6e65772d76616c696461746f72) [`new-vbox-layout`](#link6e65772d76626f782d6c61796f7574) [`new-window`](#link6e65772d77696e646f77) [`nl`](#link6e6c) [`nonce`](#link6e6f6e6365) [`not`](#link6e6f74) [`now`](#link6e6f77) [`now-ms`](#link6e6f772d6d73) [`now-ns`](#link6e6f772d6e73) [`nreverse`](#link6e72657665727365) [`nrgba`](#link6e72676261) [`nth`](#link6e7468) [`nth-partition`](#link6e74682d706172746974696f6e) [`nthdef`](#link6e7468646566) [`null?`](#link6e756c6c3f) [`num?`](#link6e756d3f) [`object-disabled?`](#link6f626a6563742d64697361626c65643f) [`object?`](#link6f626a6563743f) [`odd?`](#link6f64643f) [`on-feature`](#link6f6e2d66656174757265) [`open`](#link6f70656e) [`or`](#link6f72) [`out`](#link6f7574) [`outy`](#link6f757479) [`peek`](#link7065656b) [`permission?`](#link7065726d697373696f6e3f) [`permissions`](#link7065726d697373696f6e73) [`poke`](#link706f6b65) [`pop!`](#link706f7021) [`pop-error-handler`](#link706f702d6572726f722d68616e646c6572) [`pop-finalizer`](#link706f702d66696e616c697a6572) [`popstacked`](#link706f70737461636b6564) [`prin1`](#link7072696e31) [`princ`](#link7072696e63) [`print`](#link7072696e74) [`proc?`](#link70726f633f) [`prop`](#link70726f70) [`props`](#link70726f7073) [`protect`](#link70726f74656374) [`protect-toplevel-symbols`](#link70726f746563742d746f706c6576656c2d73796d626f6c73) [`protected?`](#link70726f7465637465643f) [`prune-task-table`](#link7072756e652d7461736b2d7461626c65) [`prune-unneeded-help-entries`](#link7072756e652d756e6e65656465642d68656c702d656e7472696573) [`push!`](#link7075736821) [`push-error-handler`](#link707573682d6572726f722d68616e646c6572) [`push-finalizer`](#link707573682d66696e616c697a6572) [`pushstacked`](#link70757368737461636b6564) [`queue-empty?`](#link71756575652d656d7074793f) [`queue-len`](#link71756575652d6c656e) [`queue?`](#link71756575653f) [`rand`](#link72616e64) [`random-color`](#link72616e646f6d2d636f6c6f72) [`read`](#link72656164) [`read-binary`](#link726561642d62696e617279) [`read-string`](#link726561642d737472696e67) [`read-zimage`](#link726561642d7a696d616765) [`readall`](#link72656164616c6c) [`readall-str`](#link72656164616c6c2d737472) [`recall`](#link726563616c6c) [`recall-info`](#link726563616c6c2d696e666f) [`recall-when`](#link726563616c6c2d7768656e) [`recollect`](#link7265636f6c6c656374) [`record?`](#link7265636f72643f) [`refresh-main-menu`](#link726566726573682d6d61696e2d6d656e75) [`refresh-menu*`](#link726566726573682d6d656e752a) [`refresh-object`](#link726566726573682d6f626a656374) [`register-action`](#link72656769737465722d616374696f6e) [`remember`](#link72656d656d626572) [`remove-duplicates`](#link72656d6f76652d6475706c696361746573) [`remove-hook`](#link72656d6f76652d686f6f6b) [`remove-hook-internal`](#link72656d6f76652d686f6f6b2d696e7465726e616c) [`remove-hooks`](#link72656d6f76652d686f6f6b73) [`rename-action`](#link72656e616d652d616374696f6e) [`replace-hook`](#link7265706c6163652d686f6f6b) [`reset-color`](#link72657365742d636f6c6f72) [`resize-object`](#link726573697a652d6f626a656374) [`reverse`](#link72657665727365) [`rnd`](#link726e64) [`rndseed`](#link726e6473656564) [`rplaca`](#link72706c616361) [`run-at`](#link72756e2d6174) [`run-hook`](#link72756e2d686f6f6b) [`run-hook-internal`](#link72756e2d686f6f6b2d696e7465726e616c) [`run-selftest`](#link72756e2d73656c6674657374) [`run-zimage`](#link72756e2d7a696d616765) [`save-zimage`](#link736176652d7a696d616765) [`sec+`](#link7365632b) [`semver.build`](#link73656d7665722e6275696c64) [`semver.canonical`](#link73656d7665722e63616e6f6e6963616c) [`semver.compare`](#link73656d7665722e636f6d70617265) [`semver.is-valid?`](#link73656d7665722e69732d76616c69643f) [`semver.major`](#link73656d7665722e6d616a6f72) [`semver.major-minor`](#link73656d7665722e6d616a6f722d6d696e6f72) [`semver.max`](#link73656d7665722e6d6178) [`semver.prerelease`](#link73656d7665722e70726572656c65617365) [`seq?`](#link7365713f) [`set`](#link736574) [`set*`](#link7365742a) [`set->list`](#link7365742d3e6c697374) [`set-clipboard-content`](#link7365742d636c6970626f6172642d636f6e74656e74) [`set-color`](#link7365742d636f6c6f72) [`set-complement`](#link7365742d636f6d706c656d656e74) [`set-difference`](#link7365742d646966666572656e6365) [`set-element?`](#link7365742d656c656d656e743f) [`set-empty?`](#link7365742d656d7074793f) [`set-entry-cursor-column`](#link7365742d656e7472792d637572736f722d636f6c756d6e) [`set-entry-cursor-row`](#link7365742d656e7472792d637572736f722d726f77) [`set-entry-min-rows-visible`](#link7365742d656e7472792d6d696e2d726f77732d76697369626c65) [`set-entry-on-change-callback`](#link7365742d656e7472792d6f6e2d6368616e67652d63616c6c6261636b) [`set-entry-on-cursor-change-callback`](#link7365742d656e7472792d6f6e2d637572736f722d6368616e67652d63616c6c6261636b) [`set-entry-place-holder`](#link7365742d656e7472792d706c6163652d686f6c646572) [`set-entry-text`](#link7365742d656e7472792d74657874) [`set-entry-validator`](#link7365742d656e7472792d76616c696461746f72) [`set-equal?`](#link7365742d657175616c3f) [`set-help-topic-info`](#link7365742d68656c702d746f7069632d696e666f) [`set-intersection`](#link7365742d696e74657273656374696f6e) [`set-label-text`](#link7365742d6c6162656c2d74657874) [`set-menu-item-checked`](#link7365742d6d656e752d6974656d2d636865636b6564) [`set-menu-item-disabled`](#link7365742d6d656e752d6974656d2d64697361626c6564) [`set-menu-item-label`](#link7365742d6d656e752d6974656d2d6c6162656c) [`set-object-on-validation-change-callback`](#link7365742d6f626a6563742d6f6e2d76616c69646174696f6e2d6368616e67652d63616c6c6261636b) [`set-permissions`](#link7365742d7065726d697373696f6e73) [`set-progress-bar`](#link7365742d70726f67726573732d626172) [`set-slider-value`](#link7365742d736c696465722d76616c7565) [`set-subset?`](#link7365742d7375627365743f) [`set-text-alignment`](#link7365742d746578742d616c69676e6d656e74) [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c) [`set-text-grid-row`](#link7365742d746578742d677269642d726f77) [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65) [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65) [`set-text-grid-show-line-numbers`](#link7365742d746578742d677269642d73686f772d6c696e652d6e756d62657273) [`set-text-grid-show-whitespace`](#link7365742d746578742d677269642d73686f772d77686974657370616365) [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65) [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765) [`set-text-grid-tab-width`](#link7365742d746578742d677269642d7461622d7769647468) [`set-text-grid-text`](#link7365742d746578742d677269642d74657874) [`set-text-size`](#link7365742d746578742d73697a65) [`set-text-style`](#link7365742d746578742d7374796c65) [`set-union`](#link7365742d756e696f6e) [`set-volume`](#link7365742d766f6c756d65) [`set-window-content`](#link7365742d77696e646f772d636f6e74656e74) [`set-window-full-screen`](#link7365742d77696e646f772d66756c6c2d73637265656e) [`set-window-icon`](#link7365742d77696e646f772d69636f6e) [`set-window-main-menu`](#link7365742d77696e646f772d6d61696e2d6d656e75) [`set-window-on-close-callback`](#link7365742d77696e646f772d6f6e2d636c6f73652d63616c6c6261636b) [`set-window-padded`](#link7365742d77696e646f772d706164646564) [`set-window-size`](#link7365742d77696e646f772d73697a65) [`set-window-title`](#link7365742d77696e646f772d7469746c65) [`set?`](#link7365743f) [`setcar`](#link736574636172) [`setcdr`](#link736574636472) [`setprop`](#link73657470726f70) [`shorten`](#link73686f7274656e) [`show-object`](#link73686f772d6f626a656374) [`sleep`](#link736c656570) [`sleep-ns`](#link736c6565702d6e73) [`slice`](#link736c696365) [`sort`](#link736f7274) [`sort-symbols`](#link736f72742d73796d626f6c73) [`spaces`](#link737061636573) [`stack-empty?`](#link737461636b2d656d7074793f) [`stack-len`](#link737461636b2d6c656e) [`stack?`](#link737461636b3f) [`str+`](#link7374722b) [`str->array`](#link7374722d3e6172726179) [`str->blob`](#link7374722d3e626c6f62) [`str->char`](#link7374722d3e63686172) [`str->chars`](#link7374722d3e6368617273) [`str->expr`](#link7374722d3e65787072) [`str->expr*`](#link7374722d3e657870722a) [`str->list`](#link7374722d3e6c697374) [`str->sym`](#link7374722d3e73796d) [`str-count-substr`](#link7374722d636f756e742d737562737472) [`str-empty?`](#link7374722d656d7074793f) [`str-exists?`](#link7374722d6578697374733f) [`str-forall?`](#link7374722d666f72616c6c3f) [`str-foreach`](#link7374722d666f7265616368) [`str-index`](#link7374722d696e646578) [`str-join`](#link7374722d6a6f696e) [`str-port?`](#link7374722d706f72743f) [`str-ref`](#link7374722d726566) [`str-remove-number`](#link7374722d72656d6f76652d6e756d626572) [`str-remove-prefix`](#link7374722d72656d6f76652d707265666978) [`str-remove-suffix`](#link7374722d72656d6f76652d737566666978) [`str-replace`](#link7374722d7265706c616365) [`str-replace*`](#link7374722d7265706c6163652a) [`str-reverse`](#link7374722d72657665727365) [`str-segment`](#link7374722d7365676d656e74) [`str-slice`](#link7374722d736c696365) [`str?`](#link7374723f) [`strbuild`](#link7374726275696c64) [`strcase`](#link73747263617365) [`strcenter`](#link73747263656e746572) [`strcnt`](#link737472636e74) [`strleft`](#link7374726c656674) [`strlen`](#link7374726c656e) [`strless`](#link7374726c657373) [`strlimit`](#link7374726c696d6974) [`strmap`](#link7374726d6170) [`stropen`](#link7374726f70656e) [`strright`](#link7374727269676874) [`strsplit`](#link73747273706c6974) [`struct-index`](#link7374727563742d696e646578) [`struct-instantiate`](#link7374727563742d696e7374616e7469617465) [`struct-name`](#link7374727563742d6e616d65) [`struct-props`](#link7374727563742d70726f7073) [`struct-size`](#link7374727563742d73697a65) [`struct?`](#link7374727563743f) [`sub1`](#link73756231) [`supers`](#link737570657273) [`sym->str`](#link73796d2d3e737472) [`sym?`](#link73796d3f) [`synout`](#link73796e6f7574) [`synouty`](#link73796e6f757479) [`sys-key?`](#link7379732d6b65793f) [`sysmsg`](#link7379736d7367) [`sysmsg*`](#link7379736d73672a) [`take`](#link74616b65) [`task`](#link7461736b) [`task-broadcast`](#link7461736b2d62726f616463617374) [`task-recv`](#link7461736b2d72656376) [`task-remove`](#link7461736b2d72656d6f7665) [`task-run`](#link7461736b2d72756e) [`task-schedule`](#link7461736b2d7363686564756c65) [`task-send`](#link7461736b2d73656e64) [`task-state`](#link7461736b2d7374617465) [`task?`](#link7461736b3f) [`terpri`](#link746572707269) [`testing`](#link74657374696e67) [`text-grid-show-line-numbers?`](#link746578742d677269642d73686f772d6c696e652d6e756d626572733f) [`text-grid-show-whitespace?`](#link746578742d677269642d73686f772d776869746573706163653f) [`the-color`](#link7468652d636f6c6f72) [`the-color-names`](#link7468652d636f6c6f722d6e616d6573) [`theme-icon`](#link7468656d652d69636f6e) [`time`](#link74696d65) [`trigger-menu-last`](#link747269676765722d6d656e752d6c617374) [`truncate`](#link7472756e63617465) [`try`](#link747279) [`type-of`](#link747970652d6f66) [`type-of*`](#link747970652d6f662a) [`unless`](#link756e6c657373) [`unprotect`](#link756e70726f74656374) [`unprotect-toplevel-symbols`](#link756e70726f746563742d746f706c6576656c2d73796d626f6c73) [`valid?`](#link76616c69643f) [`validate-object`](#link76616c69646174652d6f626a656374) [`void`](#link766f6964) [`void?`](#link766f69643f) [`wait-for`](#link776169742d666f72) [`wait-for*`](#link776169742d666f722a) [`wait-for-empty*`](#link776169742d666f722d656d7074792a) [`wait-until`](#link776169742d756e74696c) [`wait-until*`](#link776169742d756e74696c2a) [`warn`](#link7761726e) [`week+`](#link7765656b2b) [`week-of-date`](#link7765656b2d6f662d64617465) [`when`](#link7768656e) [`when-permission`](#link7768656e2d7065726d697373696f6e) [`while`](#link7768696c65) [`window-fixed-size?`](#link77696e646f772d66697865642d73697a653f) [`window-full-screen?`](#link77696e646f772d66756c6c2d73637265656e3f) [`window-padded?`](#link77696e646f772d7061646465643f) [`with-colors`](#link776974682d636f6c6f7273) [`with-error-handler`](#link776974682d6572726f722d68616e646c6572) [`with-final`](#link776974682d66696e616c) [`with-mutex-lock`](#link776974682d6d757465782d6c6f636b) [`with-mutex-rlock`](#link776974682d6d757465782d726c6f636b) [`write`](#link7772697465) [`write-binary`](#link77726974652d62696e617279) [`write-binary-at`](#link77726974652d62696e6172792d6174) [`write-string`](#link77726974652d737472696e67) [`write-zimage`](#link77726974652d7a696d616765) [`year+`](#link796561722b) [`zimage-header`](#link7a696d6167652d686561646572) [`zimage-loadable?`](#link7a696d6167652d6c6f616461626c653f) [`zimage-runable?`](#link7a696d6167652d72756e61626c653f) 
 
 # By Topics {#topics}
 
@@ -422,6 +422,14 @@ See also: [`blob?`](#link626c6f623f).	 [→index](#idx)
 
 
 
+
+
+
+
+
+
+
+
 ## Concurrency and Parallel Programming {#concurrency}
 
 There are several mechanisms for doing parallel and concurrent programming in Z3S5 Lisp. Synchronization primitives are also listed in this section. Generally, users are advised to remain vigilant about potential race conditions.
@@ -745,6 +753,8 @@ Usage: `(terpri)`
 Advance the host OS terminal to the next line.
 
 See also: [`princ`](#link7072696e63), [`out`](#link6f7574), [`outy`](#link6f757479).	 [→index](#idx)
+
+
 
 
 
@@ -1648,6 +1658,10 @@ See also: [`dict`](#link64696374), [`set`](#link736574).	 [→index](#idx)
 
 
 
+
+
+
+
 ## File Input & Output {#fileio}
 
 These functions allow direct access for reading and writing to files. This module requires the `fileio` build tag.
@@ -2238,6 +2252,8 @@ See also: [`fl.y0`](#link666c2e7930), [`fl.y1`](#link666c2e7931), [`fl.j0`](#lin
 
 
 
+
+
 ## Graphical User Interface {#gui}
 
 This section describes the GUI-related functions. These functions are only available when Z3S5 Lisp has been compiled with the embedded GUI package. See the `z3g` executable defined in `cmd/z3g/z3g.go` for an example of how to include the GUI and start it up. The key is that the interpreter must run in its own goroutine because the GUI is blocking once it has been called. GUI functions are threadsafe, or at least as threadsafe as the underlying GUI framework. Functions defined in Lisp are derived from corresponding functions of the `Fyne` framework and listed under the 'gui label in this help system. The naming conventions for translation between Go and Lisp functions are as follows:
@@ -2251,6 +2267,38 @@ Fyne objects are represented by integer numbers. The system internally translate
 
 When importing the GUI with `DefGUI`, a `Config` structure is provided that allows for restricted security. This makes it possible to use the GUI functions in a restricted environment that e.g. does not allow the creation of new windows.
 
+### `activate-menu-last-submenu` : procedure/1
+
+Usage: `(activate-menu-last-submenu menu) => bool`
+
+Find the last active menu item traversing through open submenus, and activate its submenu if one is found. Return true if a submenu was activated, nil otherwise.
+
+See also: [`deactivate-menu-last-submenu`](#link646561637469766174652d6d656e752d6c6173742d7375626d656e75), [`new-menu`](#link6e65772d6d656e75), [`activate-menu-next`](#link61637469766174652d6d656e752d6e657874), [`activate-menu-previous`](#link61637469766174652d6d656e752d70726576696f7573).	 [→index](#idx)
+
+### `activate-menu-next` : procedure/1
+
+Usage: `(activate-menu-next menu)`
+
+Activate the menu item following the currently active menu item, if there is any.
+
+See also: [`activate-menu-previous`](#link61637469766174652d6d656e752d70726576696f7573), [`new-menu`](#link6e65772d6d656e75), [`activate-menu-last-submenu`](#link61637469766174652d6d656e752d6c6173742d7375626d656e75).	 [→index](#idx)
+
+### `activate-menu-previous` : procedure/1
+
+Usage: `(activate-menu-previous menu)`
+
+Activate the menu item before the currently active menu item, if there is any.
+
+See also: [`activate-menu-next`](#link61637469766174652d6d656e752d6e657874), [`new-menu`](#link6e65772d6d656e75), [`activate-menu-last-submenu`](#link61637469766174652d6d656e752d6c6173742d7375626d656e75).	 [→index](#idx)
+
+### `append-form` : procedure/0
+
+Usage: `(append-form form str canvas-object)`
+
+Append a new row to the bottom `form` consisting of a label `str` aligned with a `canvas-object`, which may be an entry, button, etc.
+
+See also: [`new-form`](#link6e65772d666f726d).	 [→index](#idx)
+
 ### `center-window-on-screen` : procedure/1
 
 Usage: `(center-window-on-screen window)`
@@ -2258,6 +2306,14 @@ Usage: `(center-window-on-screen window)`
 As the name implies, this function centers the window on the screen.
 
 See also: [`set-window-full-screen`](#link7365742d77696e646f772d66756c6c2d73637265656e), [`window-full-screen?`](#link77696e646f772d66756c6c2d73637265656e3f).	 [→index](#idx)
+
+### `close-gui` : procedure/0
+
+Usage: `(close-gui)`
+
+Close the GUI, freeing all resources associated with it. After this function has been called, no further GUI functions can be used.
+
+See also: [`forget-gui-object`](#link666f726765742d6775692d6f626a656374), [`close-window`](#link636c6f73652d77696e646f77).	 [→index](#idx)
 
 ### `close-window` : procedure/1
 
@@ -2267,6 +2323,38 @@ Closes `window` and delete it from internal storage. This frees window resources
 
 See also: [`hide-window`](#link686964652d77696e646f77).	 [→index](#idx)
 
+### `deactivate-menu-child` : procedure/1
+
+Usage: `(deactivate-menu-child menu)`
+
+Deactivate the currently active menu item and close its submenu if there is one.
+
+See also: [`activate-menu-last-submenu`](#link61637469766174652d6d656e752d6c6173742d7375626d656e75), [`activate-menu-next`](#link61637469766174652d6d656e752d6e657874), [`activate-menu-previous`](#link61637469766174652d6d656e752d70726576696f7573), [`new-menu`](#link6e65772d6d656e75).	 [→index](#idx)
+
+### `deactivate-menu-last-submenu` : procedure/1
+
+Usage: `(deactivate-menu-last-submenu menu)`
+
+Traverse the menu and deactivate the last open submenu found.
+
+See also: [`activate-menu-last-submenu`](#link61637469766174652d6d656e752d6c6173742d7375626d656e75), [`activate-menu-next`](#link61637469766174652d6d656e752d6e657874), [`activate-menu-previous`](#link61637469766174652d6d656e752d70726576696f7573), [`new-menu`](#link6e65772d6d656e75).	 [→index](#idx)
+
+### `disable-object` : procedure/1
+
+Usage: `(disable-object obj)`
+
+Disable the canvas object `obj.`
+
+See also: [`enable-object`](#link656e61626c652d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`move-object`](#link6d6f76652d6f626a656374), [`resize-object`](#link726573697a652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx)
+
+### `enable-object` : procedure/1
+
+Usage: `(enable-object obj)`
+
+Enable the canvas object `obj.`
+
+See also: [`disable-object`](#link64697361626c652d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`move-object`](#link6d6f76652d6f626a656374), [`resize-object`](#link726573697a652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx)
+
 ### `entry-accepts-tab?` : procedure/1
 
 Usage: `(entry-accepts-tab? entry) => bool`
@@ -2274,6 +2362,30 @@ Usage: `(entry-accepts-tab? entry) => bool`
 Return `nil` when the entry does not accept tabs, `t` otherwise.
 
 See also: [`new-entry`](#link6e65772d656e747279).	 [→index](#idx)
+
+### `forget-gui-object` : procedure/1
+
+Usage: `(forget-gui-object int)`
+
+Forget the GUI object `int`. This removes any association with the object but does not free internal resources if the object still exists. Internal use only.
+
+See also: [`close-window`](#link636c6f73652d77696e646f77), [`close-gui`](#link636c6f73652d677569).	 [→index](#idx)
+
+### `get-clipboard-content` : procedure/0
+
+Usage: `(get-clipboard-content) => str`
+
+Return the current content of the operating system clipboard as string. This function might raise an error if clipboard access is prohibited by host security settings.
+
+See also: [`set-clipboard-content`](#link7365742d636c6970626f6172642d636f6e74656e74).	 [→index](#idx)
+
+### `get-device-info` : procedure/0
+
+Usage: `(get-device-info) => li`
+
+Return a list with information about the current host device. This returns an association list where 'orientation might be one of '(vertical vertical-upside-down left right unknown), self-explanatory boolean keys 'is-mobile?, 'is-browser, 'has-keyboard?, and 'system-scale with the current scaling factor for graphics as float. The system scale is used to dynamically scale user interface elements to remain legible on hi res displays.
+
+See also: [`close-gui`](#link636c6f73652d677569).	 [→index](#idx)
 
 ### `get-entry-cursor` : procedure/1
 
@@ -2290,6 +2402,86 @@ Usage: `(get-entry-cursor-pos entry) => li`
 Return a list consisting of row number and column number of the current cursor position of the cursor in `entry.`
 
 See also: [`set-entry-cursor-row`](#link7365742d656e7472792d637572736f722d726f77), [`set-entry-cursor-column`](#link7365742d656e7472792d637572736f722d636f6c756d6e).	 [→index](#idx)
+
+### `get-menu-item-label` : procedure/1
+
+Usage: `(get-menu-item-label item) => str`
+
+Return the current label of the given menu `item.`
+
+See also: [`set-menu-item-label`](#link7365742d6d656e752d6974656d2d6c6162656c), [`set-menu-item-disabled`](#link7365742d6d656e752d6974656d2d64697361626c6564), [`menu-item-disabled`](#link6d656e752d6974656d2d64697361626c6564), [`set-menu-item-checked`](#link7365742d6d656e752d6974656d2d636865636b6564), [`menu-item-checked?`](#link6d656e752d6974656d2d636865636b65643f), [`new-menu*`](#link6e65772d6d656e752a), [`new-menu`](#link6e65772d6d656e75), [`new-menu-item`](#link6e65772d6d656e752d6974656d), [`new-menu-item-separator`](#link6e65772d6d656e752d6974656d2d736570617261746f72).	 [→index](#idx)
+
+### `get-object-min-size` : procedure/1
+
+Usage: `(get-object-min-size obj) => li`
+
+Return the minimum size of canvas object `obj` as a list containing the width and height as floats. The minimum size is computed based on various internal criteria and can only be changed for some special widgets.
+
+See also: [`disable-object`](#link64697361626c652d6f626a656374), [`enable-object`](#link656e61626c652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`move-object`](#link6d6f76652d6f626a656374), [`resize-object`](#link726573697a652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx)
+
+### `get-object-position` : procedure/1
+
+Usage: `(get-object-position obj) => li`
+
+Return the position of canvas object `obj` as a list containing the x and y coordinates as floats.
+
+See also: [`disable-object`](#link64697361626c652d6f626a656374), [`enable-object`](#link656e61626c652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`move-object`](#link6d6f76652d6f626a656374), [`resize-object`](#link726573697a652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx)
+
+### `get-object-size` : procedure/1
+
+Usage: `(get-object-size obj) => li`
+
+Return the size of canvas object `obj` as a list containing the width and height as floats.
+
+See also: [`disable-object`](#link64697361626c652d6f626a656374), [`enable-object`](#link656e61626c652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`move-object`](#link6d6f76652d6f626a656374), [`resize-object`](#link726573697a652d6f626a656374), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx)
+
+### `get-progress-bar-value` : procedure/1
+
+Usage: `(get-progress-bar-value bar) => num`
+
+Return the current value of progress-bar `bar.`
+
+See also: [`set-progress-bar`](#link7365742d70726f67726573732d626172), [`new-progress-bar`](#link6e65772d70726f67726573732d626172), [`new-infinite-progress-bar`](#link6e65772d696e66696e6974652d70726f67726573732d626172).	 [→index](#idx)
+
+### `get-text-grid-cell` : procedure/3
+
+Usage: `(get-text-grid-cell grid row column) => li`
+
+Return the cell of `grid` at `row` and `column`. The result is a list consisting of a string containing one unicode rune and a grid style list.
+
+See also: [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765).	 [→index](#idx)
+
+### `get-text-grid-row` : procedure/2
+
+Usage: `(get-text-grid-row grid row) => li`
+
+Obtain a `row` of a text `grid`, where `row` is a 0-based index. This function returns a list of the form '(row style), where `style` is a grid style list and `row` is an array of lists consisting each of a unicode string containing one rune and a grid style list. Each entry of the `row` array represents an individual unicode glyph with a style, whereas the `style` list in the return argument represents an optional style of the whole row.
+
+See also: [`set-text-grid-row`](#link7365742d746578742d677269642d726f77), [`get-text-grid-row-text`](#link6765742d746578742d677269642d726f772d74657874), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`new-text-grid`](#link6e65772d746578742d67726964), [`text-grid-show-line-numbers?`](#link746578742d677269642d73686f772d6c696e652d6e756d626572733f), [`text-grid-show-whitespace?`](#link746578742d677269642d73686f772d776869746573706163653f), [`get-text-grid-tab-width`](#link6765742d746578742d677269642d7461622d7769647468), [`set-text-grid-tab-width`](#link7365742d746578742d677269642d7461622d7769647468), [`set-text-grid-show-line-numbers`](#link7365742d746578742d677269642d73686f772d6c696e652d6e756d62657273), [`set-text-grid-show-whitespace`](#link7365742d746578742d677269642d73686f772d77686974657370616365), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765), [`set-text-grid-text`](#link7365742d746578742d677269642d74657874), [`get-text-grid-text`](#link6765742d746578742d677269642d74657874).	 [→index](#idx)
+
+### `get-text-grid-row-text` : procedure/2
+
+Usage: `(get-text-grid-row-text grid row) => str`
+
+Return the text of `row` in `grid` as a string without any style information.
+
+See also: [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`set-text-grid-row`](#link7365742d746578742d677269642d726f77), [`new-text-grid`](#link6e65772d746578742d67726964), [`text-grid-show-line-numbers?`](#link746578742d677269642d73686f772d6c696e652d6e756d626572733f), [`text-grid-show-whitespace?`](#link746578742d677269642d73686f772d776869746573706163653f), [`get-text-grid-tab-width`](#link6765742d746578742d677269642d7461622d7769647468), [`set-text-grid-tab-width`](#link7365742d746578742d677269642d7461622d7769647468), [`set-text-grid-show-line-numbers`](#link7365742d746578742d677269642d73686f772d6c696e652d6e756d62657273), [`set-text-grid-show-whitespace`](#link7365742d746578742d677269642d73686f772d77686974657370616365), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765), [`set-text-grid-text`](#link7365742d746578742d677269642d74657874), [`get-text-grid-text`](#link6765742d746578742d677269642d74657874).	 [→index](#idx)
+
+### `get-text-grid-tab-width` : procedure/1
+
+Usage: `(get-text-grid-tab-width grid) => int`
+
+Return the current tabulator width of `grid` in space characters.
+
+See also: [`new-text-grid`](#link6e65772d746578742d67726964), [`text-grid-show-line-numbers?`](#link746578742d677269642d73686f772d6c696e652d6e756d626572733f), [`text-grid-show-whitespace?`](#link746578742d677269642d73686f772d776869746573706163653f), [`set-text-grid-tab-width`](#link7365742d746578742d677269642d7461622d7769647468), [`set-text-grid-show-line-numbers`](#link7365742d746578742d677269642d73686f772d6c696e652d6e756d62657273), [`set-text-grid-show-whitespace`](#link7365742d746578742d677269642d73686f772d77686974657370616365), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`get-text-grid-row-text`](#link6765742d746578742d677269642d726f772d74657874), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`set-text-grid-row`](#link7365742d746578742d677269642d726f77), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765), [`set-text-grid-text`](#link7365742d746578742d677269642d74657874), [`get-text-grid-text`](#link6765742d746578742d677269642d74657874).	 [→index](#idx)
+
+### `get-text-grid-text` : procedure/1
+
+Usage: `(get-text-grid-text grid) => str`
+
+Return the text of `grid` as a string without style information.
+
+See also: [`set-text-grid-text`](#link7365742d746578742d677269642d74657874), [`new-text-grid`](#link6e65772d746578742d67726964), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`get-text-grid-rune`](#link6765742d746578742d677269642d72756e65), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c).	 [→index](#idx)
 
 ### `get-window-canvas` : procedure/1
 
@@ -2331,6 +2523,14 @@ Return the title of `window` as string.
 
 See also: [`set-window-title`](#link7365742d77696e646f772d7469746c65).	 [→index](#idx)
 
+### `hide-object` : procedure/1
+
+Usage: `(hide-object obj)`
+
+Hide the canvas object `obj.`
+
+See also: [`disable-object`](#link64697361626c652d6f626a656374), [`enable-object`](#link656e61626c652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`move-object`](#link6d6f76652d6f626a656374), [`resize-object`](#link726573697a652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx)
+
 ### `hide-window` : procedure/1
 
 Usage: `(hide-window window)`
@@ -2338,6 +2538,126 @@ Usage: `(hide-window window)`
 Hides `window`. It can be shown again using show-window.
 
 See also: [`show-window`](#link73686f772d77696e646f77), [`close-window`](#link636c6f73652d77696e646f77).	 [→index](#idx)
+
+### `menu-item-checked?` : procedure/1
+
+Usage: `(menu-item-checked? item) => bool`
+
+Return true if `item` is currently checked, nil otherwise.
+
+See also: [`set-menu-item-checked`](#link7365742d6d656e752d6974656d2d636865636b6564), [`set-menu-item-disabled`](#link7365742d6d656e752d6974656d2d64697361626c6564), [`menu-item-disabled?`](#link6d656e752d6974656d2d64697361626c65643f), [`get-menu-item-label`](#link6765742d6d656e752d6974656d2d6c6162656c), [`set-menu-item-label`](#link7365742d6d656e752d6974656d2d6c6162656c), [`new-menu*`](#link6e65772d6d656e752a), [`new-menu`](#link6e65772d6d656e75), [`new-menu-item`](#link6e65772d6d656e752d6974656d), [`new-menu-item-separator`](#link6e65772d6d656e752d6974656d2d736570617261746f72).	 [→index](#idx)
+
+### `menu-item-disabled?` : procedure/1
+
+Usage: `(menu-item-disabled? item) => bool`
+
+Return true if `item` is currently disabled, nil otherwise.
+
+See also: [`set-menu-item-disabled`](#link7365742d6d656e752d6974656d2d64697361626c6564), [`set-menu-item-checked`](#link7365742d6d656e752d6974656d2d636865636b6564), [`menu-item-checked?`](#link6d656e752d6974656d2d636865636b65643f), [`get-menu-item-label`](#link6765742d6d656e752d6974656d2d6c6162656c), [`set-menu-item-label`](#link7365742d6d656e752d6974656d2d6c6162656c), [`new-menu*`](#link6e65772d6d656e752a), [`new-menu`](#link6e65772d6d656e75), [`new-menu-item`](#link6e65772d6d656e752d6974656d), [`new-menu-item-separator`](#link6e65772d6d656e752d6974656d2d736570617261746f72).	 [→index](#idx)
+
+### `move-object` : procedure/2
+
+Usage: `(move-object obj position)`
+
+Move the canvas object `obj` to the given `position` list, containing its `x` and `y` coordinates as floats.
+
+See also: [`disable-object`](#link64697361626c652d6f626a656374), [`enable-object`](#link656e61626c652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`resize-object`](#link726573697a652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx)
+
+### `new-app-tabs` : procedure/0 or more
+
+Usage: `(new-app-tabs tab-item ...) => int`
+
+Create a new application tabs, which allow users to choose different items within an application.
+
+See also: [`new-doc-tabs`](#link6e65772d646f632d74616273), [`new-tabitem`](#link6e65772d7461626974656d), [`new-tabitem-with-icon`](#link6e65772d7461626974656d2d776974682d69636f6e).	 [→index](#idx)
+
+### `new-border` : procedure/4 or more
+
+Usage: `(new-border top bottom left right [obj ...]) => int`
+
+Create a new border layout, which is one of the most useful layouts. Any of `top`, `bottom`, `left`, and `right` is put in the respective place (with minimum size) and might also be `nil` for no widget. The remaining canvas objects `obj` are arranged in the center and take maximum size. This allows you e.g. to put a list on the left side of a window, a panel of buttons on the top, and the main content in another container in the center.
+
+See also: [`new-container`](#link6e65772d636f6e7461696e6572), [`new-container-without-layout`](#link6e65772d636f6e7461696e65722d776974686f75742d6c61796f7574).	 [→index](#idx)
+
+### `new-button` : procedure/2
+
+Usage: `(new-button label proc) => int`
+
+Return a new button with the given `label` and without an icon. The callback `proc` is called without arguments when the button is pressed or tapped.
+
+See also: [`new-button-with-icon`](#link6e65772d627574746f6e2d776974682d69636f6e), [`new-hyperlink`](#link6e65772d68797065726c696e6b), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx)
+
+### `new-button-with-icon` : procedure/3
+
+Usage: `(new-button-with-icon label icon proc) => int`
+
+Return a new button the given `label` and `icon`. The callback `proc` is called without arguments when the button is pressed.
+
+See also: [`new-button`](#link6e65772d627574746f6e), [`new-icon`](#link6e65772d69636f6e), [`theme-icon`](#link7468656d652d69636f6e).	 [→index](#idx)
+
+### `new-center-layout` : procedure/0
+
+Usage: `(new-center-layout) => int`
+
+Create a new center layout, which centers container elements (possibly overlapping). This may be used for drawing centered on the window, for example.
+
+See also: [`new-form`](#link6e65772d666f726d), [`append-form`](#link617070656e642d666f726d), [`new-spacer`](#link6e65772d737061636572), [`new-hbox-layout`](#link6e65772d68626f782d6c61796f7574), [`new-vbox-layout`](#link6e65772d76626f782d6c61796f7574), [`new-grid-layout`](#link6e65772d677269642d6c61796f7574), [`new-grid-wrap-layout`](#link6e65772d677269642d777261702d6c61796f7574), [`new-form-layout`](#link6e65772d666f726d2d6c61796f7574), [`new-stack-layout`](#link6e65772d737461636b2d6c61796f7574), [`new-container`](#link6e65772d636f6e7461696e6572).	 [→index](#idx)
+
+### `new-check` : procedure/2
+
+Usage: `(new-check title proc) => int`
+
+Create and return a new check box with the given `title` string and a callback procedure `proc`. The callback `proc` is called with the new state of the check box as bool when it has changed.
+
+See also: [`new-choice`](#link6e65772d63686f696365).	 [→index](#idx)
+
+### `new-choice` : procedure/3
+
+Usage: `(new-choice selector string-list proc) => int`
+
+Create and return a new choice representing choices in `string-list`. If `selector` is 'radio-group, a group of radio buttons is created with options in `string-list`. If `selector` is 'select, a more compact selection menu is created with the options in `string-list`. The callback `proc` takes a string that represents the choice that has been selected.
+
+See also: [`new-check`](#link6e65772d636865636b).	 [→index](#idx)
+
+### `new-circle` : procedure/1 or more
+
+Usage: `(new-circle fill-color [pos1] [pos2] [stroke-color] [stroke-width]) => int`
+
+Draw and return a circle with the given NRGBA `fill-color`. If the optional `pos1` and `pos2` position lists of `x` and `y` coordinates in floats are given , then the circle is drawn inside the rectangle defined by these positions. The optional `stroke-color` and `stroke-width` arguments determine the outline of the circle. Notice that circle's size and position may be set by the layout of the container, so to set these manually using `pos1` and `pos2` you need to make sure the underlying container has no such layout.
+
+See also: [`new-rectangle`](#link6e65772d72656374616e676c65), [`new-line-new-text`](#link6e65772d6c696e652d6e65772d74657874).	 [→index](#idx)
+
+### `new-combined-string-validator` : procedure/1 or more
+
+Usage: `(new-combined-string-validator validator-1 [...validator-n]) => int`
+
+Combine validators `validator-1` to `validator-n` into a combined string validator and return it.
+
+See also: [`set-entry-validator`](#link7365742d656e7472792d76616c696461746f72), [`new-validator`](#link6e65772d76616c696461746f72), [`new-regexp-validator`](#link6e65772d7265676578702d76616c696461746f72), [`new-time-validator`](#link6e65772d74696d652d76616c696461746f72), [`set-object-on-validation-change-callback`](#link7365742d6f626a6563742d6f6e2d76616c69646174696f6e2d6368616e67652d63616c6c6261636b), [`validate-object`](#link76616c69646174652d6f626a656374).	 [→index](#idx)
+
+### `new-container` : procedure/1 or more
+
+Usage: `(new-container layout obj ...) => int`
+
+Create a new container with the given `layout` and various canvas objects `obj` arranged by the layout.
+
+See also: [`new-container-without-layout`](#link6e65772d636f6e7461696e65722d776974686f75742d6c61796f7574), [`new-border`](#link6e65772d626f72646572).	 [→index](#idx)
+
+### `new-container-without-layout` : procedure/0 or more
+
+Usage: `(new-container-without-layout obj ...) => int`
+
+Create a new container without a layout (overlapping objects) with the given canvas objects `obj.`
+
+See also: [`new-container`](#link6e65772d636f6e7461696e6572), [`new-border`](#link6e65772d626f72646572).	 [→index](#idx)
+
+### `new-doc-tabs` : procedure/0 or more
+
+Usage: `(new-doc-tabs tab-item ...) => int`
+
+Create new document tabs, which allow users to choose different items in a window (not the application as a whole like app-tabs).
+
+See also: [`new-app-tabs`](#link6e65772d6170702d74616273), [`new-tabitem`](#link6e65772d7461626974656d), [`new-tabitem-with-icon`](#link6e65772d7461626974656d2d776974682d69636f6e).	 [→index](#idx)
 
 ### `new-entry` : procedure/1
 
@@ -2347,6 +2667,80 @@ Create a new text entry field based on the optional `selector` symbol. `selector
 
 See also: [`set-entry-on-change-callback`](#link7365742d656e7472792d6f6e2d6368616e67652d63616c6c6261636b), [`set-entry-validator`](#link7365742d656e7472792d76616c696461746f72), [`entry-accepts-tab?`](#link656e7472792d616363657074732d7461623f), [`get-entry-cursor-pos`](#link6765742d656e7472792d637572736f722d706f73), [`set-entry-cursor-row`](#link7365742d656e7472792d637572736f722d726f77), [`set-entry-cursor-column`](#link7365742d656e7472792d637572736f722d636f6c756d6e), [`set-entry-on-cursor-change-callback`](#link7365742d656e7472792d6f6e2d637572736f722d6368616e67652d63616c6c6261636b), [`get-entry-cursor`](#link6765742d656e7472792d637572736f72), [`get-entry-selected-text`](#link6765742d656e7472792d73656c65637465642d74657874), [`set-entry-min-rows-visible`](#link7365742d656e7472792d6d696e2d726f77732d76697369626c65), [`set-entry-place-holder`](#link7365742d656e7472792d706c6163652d686f6c646572), [`set-entry-text`](#link7365742d656e7472792d74657874).	 [→index](#idx)
 
+### `new-form` : procedure/0
+
+Usage: `(new-form)`
+
+Return a new form container, which orders widgets in rows, where each row has a label and a widget whose columns are aligned with the other rows. Use append-form to add label and widgets.
+
+See also: [`append-form`](#link617070656e642d666f726d).	 [→index](#idx)
+
+### `new-form-layout` : procedure/0
+
+Usage: `(new-form-layout) => int`
+
+Create a form layout, which arranges elements in two columns per row, where the columns are aligned.
+
+See also: [`new-form`](#link6e65772d666f726d), [`append-form`](#link617070656e642d666f726d), [`new-spacer`](#link6e65772d737061636572), [`new-hbox-layout`](#link6e65772d68626f782d6c61796f7574), [`new-vbox-layout`](#link6e65772d76626f782d6c61796f7574), [`new-grid-layout`](#link6e65772d677269642d6c61796f7574), [`new-grid-wrap-layout`](#link6e65772d677269642d777261702d6c61796f7574), [`new-center-layout`](#link6e65772d63656e7465722d6c61796f7574), [`new-stack-layout`](#link6e65772d737461636b2d6c61796f7574), [`new-container`](#link6e65772d636f6e7461696e6572).	 [→index](#idx)
+
+### `new-grid-layout` : procedure/1
+
+Usage: `(new-grid-layout n) => int`
+
+Create a new grid layout, which arranges elements in `n` columns.
+
+See also: [`new-spacer`](#link6e65772d737061636572), [`new-hbox-layout`](#link6e65772d68626f782d6c61796f7574), [`new-vbox-layout`](#link6e65772d76626f782d6c61796f7574), [`new-grid-wrap-layout`](#link6e65772d677269642d777261702d6c61796f7574), [`new-form-layout`](#link6e65772d666f726d2d6c61796f7574), [`new-center-layout`](#link6e65772d63656e7465722d6c61796f7574), [`new-stack-layout`](#link6e65772d737461636b2d6c61796f7574), [`new-container`](#link6e65772d636f6e7461696e6572).	 [→index](#idx)
+
+### `new-grid-wrap-layout` : procedure/2
+
+Usage: `(new-grid-wrap-layout width height) => int`
+
+Create a new grid wrap layout, which arranges elements such that each element has the given `width` and `height`, and wraps lines based on the size of the parent container.
+
+See also: [`new-spacer`](#link6e65772d737061636572), [`new-hbox-layout`](#link6e65772d68626f782d6c61796f7574), [`new-vbox-layout`](#link6e65772d76626f782d6c61796f7574), [`new-grid-layout`](#link6e65772d677269642d6c61796f7574), [`new-form-layout`](#link6e65772d666f726d2d6c61796f7574), [`new-center-layout`](#link6e65772d63656e7465722d6c61796f7574), [`new-stack-layout`](#link6e65772d737461636b2d6c61796f7574), [`new-container`](#link6e65772d636f6e7461696e6572).	 [→index](#idx)
+
+### `new-hbox-layout` : procedure/0
+
+Usage: `(new-hbox-layout) => int`
+
+Create a new horizontal box layout, which lays out container elements horizontally.
+
+See also: [`new-spacer`](#link6e65772d737061636572), [`new-vbox-layout`](#link6e65772d76626f782d6c61796f7574), [`new-grid-layout`](#link6e65772d677269642d6c61796f7574), [`new-grid-wrap-layout`](#link6e65772d677269642d777261702d6c61796f7574), [`new-form-layout`](#link6e65772d666f726d2d6c61796f7574), [`new-center-layout`](#link6e65772d63656e7465722d6c61796f7574), [`new-stack-layout`](#link6e65772d737461636b2d6c61796f7574), [`new-container`](#link6e65772d636f6e7461696e6572).	 [→index](#idx)
+
+### `new-hyperlink` : procedure/2
+
+Usage: `(new-hyperlink label url) => int`
+
+Create a new hyperlink with given `label` string and an `url` string as embedded link. A hyperlink looks like a label with link style; when it is clicked, the `url` is called by the default operating system mechanism for opening urls. Using hyperlinks might be disallowed by the host system configuration HyperlinksAllowed and may be re-written by the host system using the CheckHyperlinks function. If HyperlinksAllowed is false in the active GUI config of the host, this function raises an error. It also parses the given `url` and will raise an error if it does not represent a valid URL.
+
+See also: [`new-button`](#link6e65772d627574746f6e), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx)
+
+**Warning: Allowing the host to open hyperlinks usually launches a web browser and the details depend on the operating system. There is an added security risk!**
+
+### `new-icon` : procedure/1
+
+Usage: `(new-icon resource) => int`
+
+Create a new icon from `resource`, which must be suitable to create an image.
+
+See also: [`theme-icon`](#link7468656d652d69636f6e).	 [→index](#idx)
+
+### `new-image-from-file` : procedure/1
+
+Usage: `(new-image-from-file path) => int`
+
+Create and return a new image from the image file at `path`, which must be a PNG file.
+
+See also: [`new-image-from-resource`](#link6e65772d696d6167652d66726f6d2d7265736f75726365).	 [→index](#idx)
+
+### `new-image-from-resource` : procedure/1
+
+Usage: `(new-image-from-resource resource) => int`
+
+Create and return a new image from the given `resource.`
+
+See also: [`new-image-from-file`](#link6e65772d696d6167652d66726f6d2d66696c65), [`theme-icon`](#link7468656d652d69636f6e).	 [→index](#idx)
+
 ### `new-label` : procedure/1
 
 Usage: `(new-label str) => int`
@@ -2355,13 +2749,261 @@ Creates a new text label with string `str.`
 
 See also: [`set-label-text`](#link7365742d6c6162656c2d74657874).	 [→index](#idx)
 
+### `new-line` : procedure/1 or more
+
+Usage: `(new-line fill-color [pos1] [pos2] [stroke-color] [stroke-width]) => int`
+
+Draw and return a line with the given NRGBA `fill-color` from optional position `pos1` to position `pos2`, where these are lists of `x` and `y` coordinates as floats. The optional `stroke-color` and `stroke-width` determines the outer edges of the line.
+
+See also: [`new-cirlce`](#link6e65772d6369726c6365), [`new-rectangle`](#link6e65772d72656374616e676c65), [`new-text`](#link6e65772d74657874).	 [→index](#idx)
+
+### `new-list` : procedure/3
+
+Usage: `(new-list len-proc prep-proc update-proc) => int`
+
+Create a new list display. A list consists of rows of simple items like labels. The `len-proc` must be a procedure without arguments returning the length of the list as integer. The `prep-proc` must be a procedure without arguments that returns a canvas object (i.e. a label or other widgets) representing a template for a single list item. The `update-proc` must be a procedure that receives the ID of a canvas object (given by the template) and the 0-based list index as arguments. This procedure then should modify the canvas object with `ID` to display the given list item at the index. See the GUI examples on how to use this function.
+
+See also: [`new-table`](#link6e65772d7461626c65), [`new-tree`](#link6e65772d74726565).	 [→index](#idx)
+
+### `new-main-menu` : procedure/1 or more
+
+Usage: `(new-main-menu menu ...) => int`
+
+Return a new main menu with the given menus. A main menu displays a menubar for a window on some desktop platforms but it may also be displayed in other ways.
+
+See also: [`new-menu`](#link6e65772d6d656e75), [`new-menu*`](#link6e65772d6d656e752a).	 [→index](#idx)
+
+### `new-menu` : procedure/1
+
+Usage: `(new-menu menu*) => int`
+
+Create a new visible menu widget from the abstract `menu*` created by new-menu*.
+
+See also: [`new-menu*`](#link6e65772d6d656e752a), [`new-main-menu`](#link6e65772d6d61696e2d6d656e75).	 [→index](#idx)
+
+### `new-menu*` : procedure/1 or more
+
+Usage: `(new-menu* label [item...]) => int`
+
+Make a new abstract menu with given `label` and arbitary menu items `item` ... following. The starred function is used to define a menu but is not bound to any particular way of displaying it (popup-menu, normal menu, main menu). Use `new-menu` and `new-main-menu` to create visible menus and menu bars based on such abstract menus.
+
+See also: [`refresh-menu*`](#link726566726573682d6d656e752a), [`new-menu`](#link6e65772d6d656e75), [`new-main-menu`](#link6e65772d6d61696e2d6d656e75).	 [→index](#idx)
+
+### `new-menu-item` : procedure/2 or more
+
+Usage: `(new-menu-item str proc [selector...]) => int`
+
+Create a new menu item with given label `str` and callback `proc`, which takes no arguments. The optional `selector` symbol may be one of: 'is-quit - the item is the application Quit menu item (this is dealt with differently by operating system requirements), 'is-separator - the item is a menu item separator and the label string is ignored (redundent, use `new-menu-item-separator` instead), 'disabled - the menu item is disabled, or 'checked - the menu item is checked.
+
+See also: [`set-menu-item-checked`](#link7365742d6d656e752d6974656d2d636865636b6564), [`menu-item-checked?`](#link6d656e752d6974656d2d636865636b65643f), [`set-menu-item-disabled`](#link7365742d6d656e752d6974656d2d64697361626c6564), [`menu-item-disabled?`](#link6d656e752d6974656d2d64697361626c65643f), [`get-menu-item-label`](#link6765742d6d656e752d6974656d2d6c6162656c), [`set-menu-item-label`](#link7365742d6d656e752d6974656d2d6c6162656c), [`new-menu*`](#link6e65772d6d656e752a), [`new-menu`](#link6e65772d6d656e75), [`new-menu-item-separator`](#link6e65772d6d656e752d6974656d2d736570617261746f72).	 [→index](#idx)
+
+### `new-menu-item-separator` : procedure/0
+
+Usage: `(new-menu-item-separator) => int`
+
+Return a new menu item separator, which is a menu item without callback and label that displays a separator between menu items in menus.
+
+See also: [`new-menu-item`](#link6e65772d6d656e752d6974656d).	 [→index](#idx)
+
+### `new-progress-bar` : procedure/0
+
+Usage: `(new-progress-bar) => int`
+
+Create a new progress bar whose default minimum is 0.0 and maximum is 1.0.
+
+See also: [`set-progress-bar`](#link7365742d70726f67726573732d626172), [`new-infinite-progress-bar`](#link6e65772d696e66696e6974652d70726f67726573732d626172), [`get-progress-bar-value`](#link6765742d70726f67726573732d6261722d76616c7565).	 [→index](#idx)
+
+### `new-raster-with-pixels` : procedure/1
+
+Usage: `(new-raster-with-pixels pixel-proc) => int`
+
+Create a new raster image generated dynamically by the given `pixel-proc`. The `pixel-proc` takes `x` and `y` pixel coordinates and the `width` and `height` of the image in pixels, and returns the color of the pixel `x`, `y` as a color list of the form '(red green blue [alpha]) where `alpha` is optional. Notice that specifying the color of each pixel can be very CPU-intensive for larger images, so optimizations might be necessary.
+
+See also: [`new-image-from-file`](#link6e65772d696d6167652d66726f6d2d66696c65).	 [→index](#idx)
+
+### `new-rectangle` : procedure/1 or more
+
+Usage: `(new-rectangle fill-color [width height] [position] [stroke-color] [stroke-width] [corner-radius]) => int`
+
+Draw and return a rectangle with the given NRGBA `fill-color`. The optional int `width` and `height` arguments set the width and height of the rectangle explicitly (otherwise they are 1). The optional `position` argument must be a list of `x` and `y` coordinates as floats. The optional `stroke-color` and `stroke-width` arguments determine the color and width of the outline of the rectangle, and the optional `corner-radious` defines how rounded the rectangle is. Notice that the rectangle's size and position can be set by the layout of the container, so to set it manually you need to make sure the underlying container has no layout that positions or resizes the rectangle.
+
+See also: [`new-circle`](#link6e65772d636972636c65), [`new-line`](#link6e65772d6c696e65), [`new-text`](#link6e65772d74657874).	 [→index](#idx)
+
+### `new-regexp-validator` : procedure/2
+
+Usage: `(new-regexp-validator regexp reason) => int`
+
+Create a new string validator from the `regexp` string, which must be a valid regular expression in Go's regexp syntax. The `reason` string is displayed to the user by widgets like `entry` when the validation fails.
+
+See also: [`set-entry-validator`](#link7365742d656e7472792d76616c696461746f72), [`new-validator`](#link6e65772d76616c696461746f72), [`new-combined-string-validator`](#link6e65772d636f6d62696e65642d737472696e672d76616c696461746f72), [`new-time-validator`](#link6e65772d74696d652d76616c696461746f72), [`set-object-on-validation-change-callback`](#link7365742d6f626a6563742d6f6e2d76616c69646174696f6e2d6368616e67652d63616c6c6261636b), [`validate-object`](#link76616c69646174652d6f626a656374).	 [→index](#idx)
+
+### `new-shortcut` : procedure/1 or more
+
+Usage: `(new-shortcut key [mod...]) => int`
+
+Create a new keyboard shortcut based on symbol or string `key` and a number of modifier keys `mod`. If multiple non-modifier keys are present, only the last one is taken. However, multiple modifier keys are possible. Possible modifiers are symbols or corresponding strings in '(shift control alt suprt). Possible keys are in '(escape return tab backspace insert delete right left down up page-up page-down home end f1 f2 f3 f4 f5 f6 f7 f8 f9 f10 f11 f12 enter 0 1 2 3 4 5 6 7 8 9 key0 key1 key2 key3 key4 key5 key6 key7 key8 key9 a b c d e f g h i j k l m n o p q r s t u v w x y z space tick comma minus period slash backslash left-bracket right-bracket semicolon equal asterisk plus back-tick) and their string variants.
+
+See also: [`new-window`](#link6e65772d77696e646f77).	 [→index](#idx)
+
+### `new-slider` : procedure/3
+
+Usage: `(new-slider min max proc) => int`
+
+Create a new slider that allows users to adjust numerical values. The `min` and `max` arguments must be floats. The procedure `proc` takes the current slider float value as argument and is called when the slider changes.
+
+See also: [`set-slider-value`](#link7365742d736c696465722d76616c7565).	 [→index](#idx)
+
+### `new-spacer` : procedure/0
+
+Usage: `(new-spacer) => int`
+
+Create a new spacer, which adjusts size dynamically by taking up space and displaying nothing. Use this to fill containers e.g. to right align a widget.
+
+See also: [`new-hbox-layout`](#link6e65772d68626f782d6c61796f7574), [`new-vbox-layout`](#link6e65772d76626f782d6c61796f7574), [`new-grid-layout`](#link6e65772d677269642d6c61796f7574), [`new-grid-wrap-layout`](#link6e65772d677269642d777261702d6c61796f7574), [`new-form-layout`](#link6e65772d666f726d2d6c61796f7574), [`new-center-layout`](#link6e65772d63656e7465722d6c61796f7574), [`new-stack-layout`](#link6e65772d737461636b2d6c61796f7574), [`new-container`](#link6e65772d636f6e7461696e6572).	 [→index](#idx)
+
+### `new-stack-layout` : procedure/0
+
+Usage: `(new-stack-layout) => int`
+
+Create a new stack layout that stacks container elements on top of each other, overlapping. This may be used for drawing, for example.
+
+See also: [`new-form`](#link6e65772d666f726d), [`append-form`](#link617070656e642d666f726d), [`new-spacer`](#link6e65772d737061636572), [`new-hbox-layout`](#link6e65772d68626f782d6c61796f7574), [`new-vbox-layout`](#link6e65772d76626f782d6c61796f7574), [`new-grid-layout`](#link6e65772d677269642d6c61796f7574), [`new-grid-wrap-layout`](#link6e65772d677269642d777261702d6c61796f7574), [`new-form-layout`](#link6e65772d666f726d2d6c61796f7574), [`new-center-layout`](#link6e65772d63656e7465722d6c61796f7574), [`new-container`](#link6e65772d636f6e7461696e6572).	 [→index](#idx)
+
+### `new-tabitem` : procedure/2
+
+Usage: `(new-tabitem title obj) => int`
+
+Create a new tab item for use in app-tabs and doc-tabs with a `title` and an embedded canvas object `obj` shown when the tab item is selected in the tabs.
+
+See also: [`new-tabitem-with-icon`](#link6e65772d7461626974656d2d776974682d69636f6e), [`new-app-tabs`](#link6e65772d6170702d74616273), [`new-doc-tabs`](#link6e65772d646f632d74616273).	 [→index](#idx)
+
+### `new-tabitem-with-icon` : procedure/3
+
+Usage: `(new-tabitem-with-icon title icon obj) => int`
+
+Create a new tab item for use in app-tabs and doc-tabs with given `title` string, `icon` resource, and embedded canvas object `obj` that shwon when the tab item is selected in the tabs.
+
+See also: [`new-tabitem`](#link6e65772d7461626974656d), [`new-app-tabs`](#link6e65772d6170702d74616273), [`new-doc-tabs`](#link6e65772d646f632d74616273).	 [→index](#idx)
+
+### `new-table` : procedure/3
+
+Usage: `(new-table len-proc prep-proc update-proc) => int`
+
+Create a new table display. A table consists of a number of rows, each of which has a fixed number of columns such as labels. The `len-proc` must be a procedure without arguments returning the length of the table as integer. The `prep-proc` must be a procedure without arguments that returns a canvas object that represents the table row with updatable columns. The `update-proc` takes the row, column, and ID of a canvas object and updates a table template with the right display for the table cell at `row` and `column.`
+
+See also: [`new-list`](#link6e65772d6c697374), [`new-tree`](#link6e65772d74726565).	 [→index](#idx)
+
+### `new-text` : procedure/2
+
+Usage: `(new-text str color) => int`
+
+Draw and return text with the given string `str` and foreground NRGBA `color.`
+
+See also: [`set-text-alignment`](#link7365742d746578742d616c69676e6d656e74), [`set-text-size`](#link7365742d746578742d73697a65), [`set-text-style`](#link7365742d746578742d7374796c65), [`new-line`](#link6e65772d6c696e65), [`new-cirle`](#link6e65772d6369726c65), [`new-rectangle`](#link6e65772d72656374616e676c65).	 [→index](#idx)
+
+### `new-text-grid` : procedure/0 or more
+
+Usage: `(new-text-grid [<string>] [show-line-numbers|show-whitespace|tab-width <int>]) => int`
+
+Create a new text grid widget, which displays multiline text with custom background and foreground colors. The optional `string` argument is the initial text of the grid without formatting. The following symbols might be `'show-line-numbers` to turn the line number display on and `'show-whitespace` to display white space characters by special unicode symbols. If the selector `'tab-width` occurs, then it must be immediately followed by an integer for the tabulator width of the text grid in space characters.
+
+See also: [`text-grid-show-line-numbers?`](#link746578742d677269642d73686f772d6c696e652d6e756d626572733f), [`text-grid-show-whitespace?`](#link746578742d677269642d73686f772d776869746573706163653f), [`get-text-grid-tab-width`](#link6765742d746578742d677269642d7461622d7769647468), [`set-text-grid-tab-width`](#link7365742d746578742d677269642d7461622d7769647468), [`set-text-grid-show-line-numbers`](#link7365742d746578742d677269642d73686f772d6c696e652d6e756d62657273), [`set-text-grid-show-whitespace`](#link7365742d746578742d677269642d73686f772d77686974657370616365), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`get-text-grid-row-text`](#link6765742d746578742d677269642d726f772d74657874), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`set-text-grid-row`](#link7365742d746578742d677269642d726f77), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765), [`set-text-grid-text`](#link7365742d746578742d677269642d74657874), [`get-text-grid-text`](#link6765742d746578742d677269642d74657874).	 [→index](#idx)
+
+### `new-time-validator` : procedure/1
+
+Usage: `(new-time-validator format-str) => int`
+
+Create a new string validator for time and date based on the given template `format-str`. This validator uses Go's data parsing function and therefore is quite restrictive. Only datetimes entered in exactly the format given (including timezones) validate successfully. To obtain a more relaxed date and time validator, use `new-validator` to create a custom validator with your own parsing or try a `new-regexp-validator.`
+
+See also: [`set-entry-validator`](#link7365742d656e7472792d76616c696461746f72), [`new-validator`](#link6e65772d76616c696461746f72), [`new-combined-string-validator`](#link6e65772d636f6d62696e65642d737472696e672d76616c696461746f72), [`new-time-validator`](#link6e65772d74696d652d76616c696461746f72), [`new-regexp-validator`](#link6e65772d7265676578702d76616c696461746f72), [`set-object-on-validation-change-callback`](#link7365742d6f626a6563742d6f6e2d76616c69646174696f6e2d6368616e67652d63616c6c6261636b), [`validate-object`](#link76616c69646174652d6f626a656374).	 [→index](#idx)
+
+### `new-tree` : procedure/4
+
+Usage: `(new-tree child-uid-proc is-branch-proc create-node-proc update-node-proc) => int`
+
+Create a new tree display. A tree displays nested branches and leaf nodes. The `child-uid-proc` is a procedure that takes an id string as argument. If the string is empty, it should return a list of top-level branch uid strings. If the string is not empty, it represents an uid; the procedure should then return a list of all child id strings of that branch. This defines the tree's structure. All id strings must be unique to the tree. The `is-branch-proc` takes an id string as argument and should return non-nil if the id represents a branch, nil if it has no children. The `create-node-proc` takes a bool `b` as argument and should return a branch template if `b` is non-nil and a leaf template object if `b` is nil. Finally, the `update-node-proc` is a procedure that takes a node id string, a boolean that is true if the node is a branch, and a node template canvas-object as it is returned by `create-node-proc`. The procedure should fill the template with the display values for the respective node id.
+
+See also: [`new-list`](#link6e65772d6c697374), [`new-table`](#link6e65772d7461626c65).	 [→index](#idx)
+
+### `new-validator` : procedure/1
+
+Usage: `(new-validator proc) => int`
+
+Create a new string validator based on validation procedure `proc`. The procedure `proc` takes a string as argument and returns a string. If the string returned is not the empty string "", then validation fails and the returned string is given as a reason for validation failure. If the empty string is returned, then validation succeeds. If an error occurs in `proc`, then validation fails with the error's error message as reason. Notice that validators are fairly limited and can only be attached to a few validatable objects such as text entry fields. For a more general approach, it might make sense to implement your own validation system based on key press, focus change, and change callbacks of various GUI objects.
+
+See also: [`set-entry-validator`](#link7365742d656e7472792d76616c696461746f72), [`new-combined-string-validator`](#link6e65772d636f6d62696e65642d737472696e672d76616c696461746f72), [`new-regexp-validator`](#link6e65772d7265676578702d76616c696461746f72), [`new-time-validator`](#link6e65772d74696d652d76616c696461746f72), [`set-object-on-validation-change-callback`](#link7365742d6f626a6563742d6f6e2d76616c69646174696f6e2d6368616e67652d63616c6c6261636b), [`validate-object`](#link76616c69646174652d6f626a656374).	 [→index](#idx)
+
+### `new-vbox-layout` : procedure/0
+
+Usage: `(new-vbox-layout) => int`
+
+Create a new vertical box layout, which lays out container elements vertically.
+
+See also: [`new-spacer`](#link6e65772d737061636572), [`new-hbox-layout`](#link6e65772d68626f782d6c61796f7574), [`new-grid-layout`](#link6e65772d677269642d6c61796f7574), [`new-grid-wrap-layout`](#link6e65772d677269642d777261702d6c61796f7574), [`new-form-layout`](#link6e65772d666f726d2d6c61796f7574), [`new-center-layout`](#link6e65772d63656e7465722d6c61796f7574), [`new-stack-layout`](#link6e65772d737461636b2d6c61796f7574), [`new-container`](#link6e65772d636f6e7461696e6572).	 [→index](#idx)
+
 ### `new-window` : procedure/1
 
 Usage: `(new-window title) => int`
 
-Create a new window with `title` string and return the window ID.
+Create a new window with `title` string and return the window ID. This function raises an error if the host configuration WindowsAllowed is not true. In certain embedded uses, creating new windows is not allowed and you should check the documentation how to find a pre-configured window and add user interface elements to it.
 
 See also: [`set-window-content`](#link7365742d77696e646f772d636f6e74656e74), [`close-window`](#link636c6f73652d77696e646f77), [`show-window`](#link73686f772d77696e646f77).	 [→index](#idx)
+
+### `nrgba` : procedure/4
+
+Usage: `(nrgba red green blue alpha) => int`
+
+Create an RGBA color where `red`, `green`, `blue`, and `alpha` are 8-bit uint integers, i.e., values between 0 and 255 (inclusive). Notice that some GUI functions require NRGBA color returned by this function, whereas others require a color list of int values '(red green blue alpha). This is for performance reasons, since it sometimes faster to convert a list to a color on-the-fly and sometimes more convenient to store pre-defined colors for later re-use.
+
+See also: [`new-rectangle`](#link6e65772d72656374616e676c65), [`new-circle`](#link6e65772d636972636c65), [`new-line`](#link6e65772d6c696e65), [`new-text`](#link6e65772d74657874).	 [→index](#idx)
+
+### `object-disabled?` : procedure/1
+
+Usage: `(object-disabled? obj) => bool`
+
+Return true if the canvas object `obj` is disabled, nil otherwise.
+
+See also: [`disable-object`](#link64697361626c652d6f626a656374), [`enable-object`](#link656e61626c652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`move-object`](#link6d6f76652d6f626a656374), [`resize-object`](#link726573697a652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx)
+
+### `refresh-main-menu` : procedure/1
+
+Usage: `(refresh-main-menu main-menu)`
+
+Refresh the given `main-menu` display. This should be called after some submenus or menu items in the main menu have changed.
+
+See also: [`new-main-menu`](#link6e65772d6d61696e2d6d656e75), [`refresh-menu*`](#link726566726573682d6d656e752a).	 [→index](#idx)
+
+### `refresh-menu*` : procedure/1
+
+Usage: `(refresh-menu* menu)`
+
+Refresh the given `menu` after a change was made that has a visual impact. This will refresh the menu widget in which this abstract menu occurs.
+
+See also: [`refresh-main-menu`](#link726566726573682d6d61696e2d6d656e75), [`new-menu*`](#link6e65772d6d656e752a).	 [→index](#idx)
+
+### `refresh-object` : procedure/1
+
+Usage: `(refresh-object obj)`
+
+Refresh the canvas object `obj`, causing the graphical display to be re-drawn as soon as possible. This may be needed if the object's state has changed.
+
+See also: [`disable-object`](#link64697361626c652d6f626a656374), [`enable-object`](#link656e61626c652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`move-object`](#link6d6f76652d6f626a656374), [`resize-object`](#link726573697a652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx)
+
+### `resize-object` : procedure/2
+
+Usage: `(resize-object obj width height)`
+
+Resize canvas object `obj` to the given `width` and `height` as floats.
+
+See also: [`disable-object`](#link64697361626c652d6f626a656374), [`enable-object`](#link656e61626c652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`move-object`](#link6d6f76652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx)
+
+### `set-clipboard-content` : procedure/1
+
+Usage: `(set-clipboard-content str)`
+
+Set the operating system clipboard content to string `str`. This function might raise an error if clipboard access is prohibited by host security settings.
+
+See also: [`get-clipboard-content`](#link6765742d636c6970626f6172642d636f6e74656e74).	 [→index](#idx)
 
 ### `set-entry-cursor-column` : procedure/2
 
@@ -2435,6 +3077,158 @@ Sets the text of `label` to string `str`. This might resize the label depending 
 
 See also: [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx)
 
+### `set-menu-item-checked` : procedure/2
+
+Usage: `(set-menu-item-checked item checked?)`
+
+Set the menu item check mark display if `checked?` is non-nil, remove it otherwise.
+
+See also: [`menu-item-checked?`](#link6d656e752d6974656d2d636865636b65643f), [`set-menu-item-disabled`](#link7365742d6d656e752d6974656d2d64697361626c6564), [`menu-item-disabled?`](#link6d656e752d6974656d2d64697361626c65643f), [`get-menu-item-label`](#link6765742d6d656e752d6974656d2d6c6162656c), [`set-menu-item-label`](#link7365742d6d656e752d6974656d2d6c6162656c), [`new-menu*`](#link6e65772d6d656e752a), [`new-menu`](#link6e65772d6d656e75), [`new-menu-item`](#link6e65772d6d656e752d6974656d), [`new-menu-item-separator`](#link6e65772d6d656e752d6974656d2d736570617261746f72).	 [→index](#idx)
+
+### `set-menu-item-disabled` : procedure/2
+
+Usage: `(set-menu-item-disabled item disabled?)`
+
+Disable the menu item if `disabled?` is non-nil, enable it otherwise.
+
+See also: [`menu-item-disabled?`](#link6d656e752d6974656d2d64697361626c65643f), [`set-menu-item-checked`](#link7365742d6d656e752d6974656d2d636865636b6564), [`menu-item-checked?`](#link6d656e752d6974656d2d636865636b65643f), [`get-menu-item-label`](#link6765742d6d656e752d6974656d2d6c6162656c), [`set-menu-item-label`](#link7365742d6d656e752d6974656d2d6c6162656c), [`new-menu*`](#link6e65772d6d656e752a), [`new-menu`](#link6e65772d6d656e75), [`new-menu-item`](#link6e65772d6d656e752d6974656d), [`new-menu-item-separator`](#link6e65772d6d656e752d6974656d2d736570617261746f72).	 [→index](#idx)
+
+### `set-menu-item-label` : procedure/2
+
+Usage: `(set-menu-item-label item str)`
+
+Set the label of menu `item` to `str.`
+
+See also: [`get-menu-item-label`](#link6765742d6d656e752d6974656d2d6c6162656c), [`set-menu-item-disabled`](#link7365742d6d656e752d6974656d2d64697361626c6564), [`menu-item-disabled`](#link6d656e752d6974656d2d64697361626c6564), [`set-menu-item-checked`](#link7365742d6d656e752d6974656d2d636865636b6564), [`menu-item-checked?`](#link6d656e752d6974656d2d636865636b65643f), [`new-menu*`](#link6e65772d6d656e752a), [`new-menu`](#link6e65772d6d656e75), [`new-menu-item`](#link6e65772d6d656e752d6974656d), [`new-menu-item-separator`](#link6e65772d6d656e752d6974656d2d736570617261746f72).	 [→index](#idx)
+
+### `set-object-on-validation-change-callback` : procedure/2
+
+Usage: `(set-object-on-validation-change-callback obj proc)`
+
+Set a validatable object's `obj` validation change callback, which is called when the object's validation changes. The callback `proc` takes a string or nil as argument. When it is nil, the validation was successful. When it is a string, then the validation failed with the string as reason. This can be used to track validation changes of any validatable object (such as a text entry) to e.g. display custom messages or icons when the validation fails or succeeds.
+
+See also: [`validate-object`](#link76616c69646174652d6f626a656374), [`new-validator`](#link6e65772d76616c696461746f72), [`set-entry-validator`](#link7365742d656e7472792d76616c696461746f72).	 [→index](#idx)
+
+### `set-progress-bar` : procedure/1 or more
+
+Usage: `(set-progress-bar bar value [selector value])`
+
+Set the value of progress-bar `bar` as follows. If a single number is provided, then the current value of the progress-bar is set to this number. If a selector symbol is provided, then if it is 'value, the progress-bar value is set to the following number, if it is 'max or 'min, then the progress-bar maximum or minimum values are set to the respective following number. If it is 'formatter, then the following value must be a procedure that takes the progress-bar ID as argument and returns a string that represents the display of the progress-bar at the given time.
+
+See also: [`get-progress-bar-value`](#link6765742d70726f67726573732d6261722d76616c7565), [`new-progress-bar`](#link6e65772d70726f67726573732d626172), [`new-infinite-progress-bar`](#link6e65772d696e66696e6974652d70726f67726573732d626172).	 [→index](#idx)
+
+### `set-slider-value` : procedure/2
+
+Usage: `(set-slider-value slider fl)`
+
+Set the value of `slider` to float `fl.`
+
+See also: [`new-slider`](#link6e65772d736c69646572).	 [→index](#idx)
+
+### `set-text-alignment` : procedure/2
+
+Usage: `(set-text-alignment text sym)`
+
+Set the alignment of `text` to `sym`, which must be one of '(leading center trailing).
+
+See also: [`new-text`](#link6e65772d74657874), [`set-text-size`](#link7365742d746578742d73697a65), [`set-text-style`](#link7365742d746578742d7374796c65).	 [→index](#idx)
+
+### `set-text-grid-cell` : procedure/4
+
+Usage: `(set-text-grid-cell grid row column li)`
+
+Set the text `grid` cell at `row` and `column` (both 0-indexed) to the list `li`, where `li` must consist of a unicode string containing one rune and a valid grid style list.
+
+See also: [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`set-text-grid-row`](#link7365742d746578742d677269642d726f77).	 [→index](#idx)
+
+### `set-text-grid-row` : procedure/3
+
+Usage: `(set-text-grid-row grid row row-spec)`
+
+Set the `row` of `grid` to the given `row-spec`, which is a list containing an array of grid cells like in the return value of `get-text-grid-row` and a grid style for the row as a whole.
+
+See also: [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765).	 [→index](#idx)
+
+### `set-text-grid-row-style` : procedure/3
+
+Usage: `(set-text-grid-row-style grid row style)`
+
+Set the style of text `grid` at `row` to the given grid `style.`
+
+See also: [`set-text-grid-row`](#link7365742d746578742d677269642d726f77), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765).	 [→index](#idx)
+
+### `set-text-grid-rune` : procedure/4
+
+Usage: `(set-text-grid-rune grid row column str)`
+
+Set the rune of `grid` at `row` and `column` to the unicode glyph in string `str.`
+
+See also: [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c).	 [→index](#idx)
+
+### `set-text-grid-show-line-numbers` : procedure/2
+
+Usage: `(set-text-grid-show-line-numbers grid show?)`
+
+Set whether `grid` shows line numbers. If `show?` is not nil, then line numbers are shown, otherwise they are not shown.
+
+See also: [`new-text-grid`](#link6e65772d746578742d67726964), [`text-grid-show-line-numbers?`](#link746578742d677269642d73686f772d6c696e652d6e756d626572733f), [`text-grid-show-whitespace?`](#link746578742d677269642d73686f772d776869746573706163653f), [`get-text-grid-tab-width`](#link6765742d746578742d677269642d7461622d7769647468), [`set-text-grid-tab-width`](#link7365742d746578742d677269642d7461622d7769647468), [`set-text-grid-show-whitespace`](#link7365742d746578742d677269642d73686f772d77686974657370616365), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`get-text-grid-row-text`](#link6765742d746578742d677269642d726f772d74657874), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`set-text-grid-row`](#link7365742d746578742d677269642d726f77), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765), [`set-text-grid-text`](#link7365742d746578742d677269642d74657874), [`get-text-grid-text`](#link6765742d746578742d677269642d74657874).	 [→index](#idx)
+
+### `set-text-grid-show-whitespace` : procedure/2
+
+Usage: `(set-text-grid-show-whitespace grid show?)`
+
+Set whether `grid` shows whitespace characters. If `show?` is not nil, then whitespace characters are shown, otherwise they are not shown.
+
+See also: [`new-text-grid`](#link6e65772d746578742d67726964), [`text-grid-show-line-numbers?`](#link746578742d677269642d73686f772d6c696e652d6e756d626572733f), [`text-grid-show-whitespace?`](#link746578742d677269642d73686f772d776869746573706163653f), [`get-text-grid-tab-width`](#link6765742d746578742d677269642d7461622d7769647468), [`set-text-grid-tab-width`](#link7365742d746578742d677269642d7461622d7769647468), [`set-text-grid-show-line-numbers`](#link7365742d746578742d677269642d73686f772d6c696e652d6e756d62657273), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`get-text-grid-row-text`](#link6765742d746578742d677269642d726f772d74657874), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`set-text-grid-row`](#link7365742d746578742d677269642d726f77), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765), [`set-text-grid-text`](#link7365742d746578742d677269642d74657874), [`get-text-grid-text`](#link6765742d746578742d677269642d74657874).	 [→index](#idx)
+
+### `set-text-grid-style` : procedure/4
+
+Usage: `(set-text-grid-style grid row column style)`
+
+Set the grid style of `grid` at `row` and `column` to the list `style.`
+
+See also: [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765).	 [→index](#idx)
+
+### `set-text-grid-style-range` : procedure/6
+
+Usage: `(set-text-grid-style-range grid start-row start-column end-row end-column style)`
+
+Set the grid style of `grid` starting at `start-row` and `start-column` and ending at `end-row` and `end-column` (all inclusive) to the grid `style.`
+
+See also: [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65).	 [→index](#idx)
+
+### `set-text-grid-tab-width` : procedure/2
+
+Usage: `(set-text-grid-tab-width grid width)`
+
+Set the tabulator width of `grid` to integer `width` space characters.
+
+See also: [`new-text-grid`](#link6e65772d746578742d67726964), [`text-grid-show-line-numbers?`](#link746578742d677269642d73686f772d6c696e652d6e756d626572733f), [`text-grid-show-whitespace?`](#link746578742d677269642d73686f772d776869746573706163653f), [`get-text-grid-tab-width`](#link6765742d746578742d677269642d7461622d7769647468), [`set-text-grid-show-line-numbers`](#link7365742d746578742d677269642d73686f772d6c696e652d6e756d62657273), [`set-text-grid-show-whitespace`](#link7365742d746578742d677269642d73686f772d77686974657370616365), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`get-text-grid-row-text`](#link6765742d746578742d677269642d726f772d74657874), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`set-text-grid-row`](#link7365742d746578742d677269642d726f77), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765), [`set-text-grid-text`](#link7365742d746578742d677269642d74657874), [`get-text-grid-text`](#link6765742d746578742d677269642d74657874).	 [→index](#idx)
+
+### `set-text-grid-text` : procedure/2
+
+Usage: `(set-text-grid-text grid str)`
+
+Set the text of the text `grid` to the given `str.`
+
+See also: [`get-text-grid-text`](#link6765742d746578742d677269642d74657874), [`new-text-grid`](#link6e65772d746578742d67726964), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-row`](#link7365742d746578742d677269642d726f77).	 [→index](#idx)
+
+### `set-text-size` : procedure/2
+
+Usage: `(set-text-size text size)`
+
+Set the size of `text` to float `size.`
+
+See also: [`new-text`](#link6e65772d74657874), [`set-text-alignment`](#link7365742d746578742d616c69676e6d656e74), [`set-text-style`](#link7365742d746578742d7374796c65).	 [→index](#idx)
+
+### `set-text-style` : procedure/2
+
+Usage: `(set-text-style text li`
+
+Set the style of `text` to the specification in list `li`, which must contain symbols in '(bold italic monospace symbol tab-width). If a symbol in the list is `tab-width`, it must be followed by an integer. `bold` sets boldface, `italic` makes the style italic, `monospace` selects the monospace/typewriter font, and `symbol` selects the `symbol` font. `tab-width` followed by an integer sets the width of tabulator in terms of the number of space characters.
+
+See also: [`new-text`](#link6e65772d74657874), [`set-text-alignment`](#link7365742d746578742d616c69676e6d656e74), [`set-text-size`](#link7365742d746578742d73697a65).	 [→index](#idx)
+
 ### `set-window-content` : procedure/2
 
 Usage: `(set-window-content window canvas-object)`
@@ -2506,6 +3300,54 @@ Usage: `(set-window-title window title)`
 Set the title of `window` to string `title.`
 
 See also: [`get-window-title`](#link6765742d77696e646f772d7469746c65).	 [→index](#idx)
+
+### `show-object` : procedure/1
+
+Usage: `(show-object obj)`
+
+Show the canvas object `obj.`
+
+See also: [`disable-object`](#link64697361626c652d6f626a656374), [`enable-object`](#link656e61626c652d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`move-object`](#link6d6f76652d6f626a656374), [`resize-object`](#link726573697a652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx)
+
+### `text-grid-show-line-numbers?` : procedure/1
+
+Usage: `(text-grid-show-line-numbers? grid) => bool`
+
+Return true if the text `grid` shows line numbers, nil otherwise.
+
+See also: [`new-text-grid`](#link6e65772d746578742d67726964), [`text-grid-show-whitespace?`](#link746578742d677269642d73686f772d776869746573706163653f), [`get-text-grid-tab-width`](#link6765742d746578742d677269642d7461622d7769647468), [`set-text-grid-tab-width`](#link7365742d746578742d677269642d7461622d7769647468), [`set-text-grid-show-line-numbers`](#link7365742d746578742d677269642d73686f772d6c696e652d6e756d62657273), [`set-text-grid-show-whitespace`](#link7365742d746578742d677269642d73686f772d77686974657370616365), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`get-text-grid-row-text`](#link6765742d746578742d677269642d726f772d74657874), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`set-text-grid-row`](#link7365742d746578742d677269642d726f77), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765), [`set-text-grid-text`](#link7365742d746578742d677269642d74657874), [`get-text-grid-text`](#link6765742d746578742d677269642d74657874).	 [→index](#idx)
+
+### `text-grid-show-whitespace?` : procedure/1
+
+Usage: `(text-grid-show-whitespace? grid) => bool`
+
+Return true if the text `grid` shows whitespace glyphs, nil otherwise.
+
+See also: [`new-text-grid`](#link6e65772d746578742d67726964), [`text-grid-show-line-numbers?`](#link746578742d677269642d73686f772d6c696e652d6e756d626572733f), [`get-text-grid-tab-width`](#link6765742d746578742d677269642d7461622d7769647468), [`set-text-grid-tab-width`](#link7365742d746578742d677269642d7461622d7769647468), [`set-text-grid-show-line-numbers`](#link7365742d746578742d677269642d73686f772d6c696e652d6e756d62657273), [`set-text-grid-show-whitespace`](#link7365742d746578742d677269642d73686f772d77686974657370616365), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`get-text-grid-row-text`](#link6765742d746578742d677269642d726f772d74657874), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`set-text-grid-row`](#link7365742d746578742d677269642d726f77), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765), [`set-text-grid-text`](#link7365742d746578742d677269642d74657874), [`get-text-grid-text`](#link6765742d746578742d677269642d74657874).	 [→index](#idx)
+
+### `theme-icon` : procedure/1
+
+Usage: `(theme-icon selector) => int`
+
+Obtain a pre-defined icon from the application's theme based on the symbol `selector`, which may be one of '(cancel check-button check-button-checked color-achromatic color-chromatic color-palette computer confirm content-add content-clear content-copy content-cut content-paste content-redo content-remove content-undo delete document-create document-print document download error file-application file-audio file-image file-text file-video file folder-new folder-open folder grid help history home info list login logout mail-attachment mail-compose mail-forward mail-reply-all mail-reply mail-send media-fast-forward media-fast-rewind media-music media-pause media-photo media-play media-record media-replay media-skip-next media-skip-previous media-stop media-video media-expand menu more-horizontal more-vertical move-down move-up navigate-back navigate-next question radio-button radio-button-checked search-replace search settings storage upload view-full-screen view-refresh view-restore visibility-off visibility volume-down volume-mute volume-up warning).
+
+See also: [`new-icon`](#link6e65772d69636f6e), [`new-image-from-`](#link6e65772d696d6167652d66726f6d2d), [`new-image-from-resource`](#link6e65772d696d6167652d66726f6d2d7265736f75726365).	 [→index](#idx)
+
+### `trigger-menu-last` : procedure/1
+
+Usage: `(trigger-menu-last menu)`
+
+Find the last active menu or submenu item and trigger it.
+
+See also: [`activate-menu-last-submenu`](#link61637469766174652d6d656e752d6c6173742d7375626d656e75), [`activate-menu-next`](#link61637469766174652d6d656e752d6e657874), [`activate-menu-previous`](#link61637469766174652d6d656e752d70726576696f7573), [`new-menu`](#link6e65772d6d656e75).	 [→index](#idx)
+
+### `validate-object` : procedure/2
+
+Usage: `(validate-object obj) => str`
+
+Validate the validatable object `obj` programmatically and return the validation failure as string, or the empty string if validation succeeded. It sometimes makes sense to call this explicitly in order to force the object to display its validation state.
+
+See also: [`set-object-on-validation-change-callback`](#link7365742d6f626a6563742d6f6e2d76616c69646174696f6e2d6368616e67652d63616c6c6261636b), [`new-validator`](#link6e65772d76616c696461746f72), [`set-entry-validator`](#link7365742d656e7472792d76616c696461746f72).	 [→index](#idx)
 
 ### `window-fixed-size?` : procedure/1
 
@@ -2624,6 +3466,18 @@ Usage: `(set-help-topic-info topic header info)`
 Set a human-readable information entry for help `topic` with human-readable `header` and `info` strings.
 
 See also: [`defhelp`](#link64656668656c70), [`help-topic-info`](#link68656c702d746f7069632d696e666f).	 [→index](#idx)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3425,6 +4279,14 @@ See also: [`letrec`](#link6c6574726563), [`dotimes`](#link646f74696d6573), [`dol
 
 
 
+
+
+
+
+
+
+
+
 ## Numeric Functions {#numeric}
 
 This section describes functions that provide standard arithmetics for non-floating point numbers such as integers. Notice that Z3S5 Lisp uses automatic bignum support but only for select standard operations like multiplication, addition, and subtraction.
@@ -3887,6 +4749,8 @@ See also: [`class?`](#link636c6173733f), [`isa?`](#link6973613f), [`class-name`]
 
 
 
+
+
 ## Semver Semantic Versioning {#semver}
 
 The `semver` package provides functions to deal with the validation and parsing of semantic versioning strings.
@@ -4160,6 +5024,8 @@ Usage: `(take seq n) => seq`
 Return the sequence consisting of the `n` first elements of `seq.`
 
 See also: [`list`](#link6c697374), [`array`](#link6172726179), [`string`](#link737472696e67), [`nth`](#link6e7468), [`seq?`](#link7365713f).	 [→index](#idx)
+
+
 
 
 
@@ -5161,6 +6027,14 @@ See also: [`with-error-handler`](#link776974682d6572726f722d68616e646c6572).	 [�
 
 
 
+
+
+
+
+
+
+
+
 ## Time & Date {#time}
 
 This section lists functions that are time and date-related. Most of them use `(now)` and turn it into more human-readable form.
@@ -5319,6 +6193,8 @@ See also: [`sec+`](#link7365632b), [`minute+`](#link6d696e7574652b), [`hour+`](#
 
 
 
+
+
 ## User Interface {#ui}
 
 This section lists miscellaneous user interface commands such as color for terminals.
@@ -5420,6 +6296,10 @@ Usage: `(the-color-names) => li`
 Return the list of color names in *colors*.
 
 See also: [`*colors*`](#link2a636f6c6f72732a), [`the-color`](#link7468652d636f6c6f72).	 [→index](#idx)
+
+
+
+
 
 
 
@@ -5769,6 +6649,30 @@ The stop method sends a 'stop signal to the action's running `proc`. It is up to
 
 See also: [`action`](#link616374696f6e), [`action-stop`](#link616374696f6e2d73746f70), [`action-start`](#link616374696f6e2d7374617274), [`action.progress`](#link616374696f6e2e70726f6772657373), [`action.get-args`](#link616374696f6e2e6765742d61726773), [`action.result`](#link616374696f6e2e726573756c74).	 [→index](#idx) [→topic](#action)
 
+## `activate-menu-last-submenu` : procedure/1 {#link61637469766174652d6d656e752d6c6173742d7375626d656e75}
+
+Usage: `(activate-menu-last-submenu menu) => bool`
+
+Find the last active menu item traversing through open submenus, and activate its submenu if one is found. Return true if a submenu was activated, nil otherwise.
+
+See also: [`deactivate-menu-last-submenu`](#link646561637469766174652d6d656e752d6c6173742d7375626d656e75), [`new-menu`](#link6e65772d6d656e75), [`activate-menu-next`](#link61637469766174652d6d656e752d6e657874), [`activate-menu-previous`](#link61637469766174652d6d656e752d70726576696f7573).	 [→index](#idx) [→topic](#gui)
+
+## `activate-menu-next` : procedure/1 {#link61637469766174652d6d656e752d6e657874}
+
+Usage: `(activate-menu-next menu)`
+
+Activate the menu item following the currently active menu item, if there is any.
+
+See also: [`activate-menu-previous`](#link61637469766174652d6d656e752d70726576696f7573), [`new-menu`](#link6e65772d6d656e75), [`activate-menu-last-submenu`](#link61637469766174652d6d656e752d6c6173742d7375626d656e75).	 [→index](#idx) [→topic](#gui)
+
+## `activate-menu-previous` : procedure/1 {#link61637469766174652d6d656e752d70726576696f7573}
+
+Usage: `(activate-menu-previous menu)`
+
+Activate the menu item before the currently active menu item, if there is any.
+
+See also: [`activate-menu-next`](#link61637469766174652d6d656e752d6e657874), [`new-menu`](#link6e65772d6d656e75), [`activate-menu-last-submenu`](#link61637469766174652d6d656e752d6c6173742d7375626d656e75).	 [→index](#idx) [→topic](#gui)
+
 ## `add-hook` : procedure/2 {#link6164642d686f6f6b}
 
 Usage: `(add-hook hook proc) => id`
@@ -5834,6 +6738,14 @@ Usage: `(append li1 li2 ...) => li`
 Concatenate the lists given as arguments.
 
 See also: [`cons`](#link636f6e73).	 [→index](#idx) [→topic](#lisp)
+
+## `append-form` : procedure/0 {#link617070656e642d666f726d}
+
+Usage: `(append-form form str canvas-object)`
+
+Append a new row to the bottom `form` consisting of a label `str` aligned with a `canvas-object`, which may be an entry, button, etc.
+
+See also: [`new-form`](#link6e65772d666f726d).	 [→index](#idx) [→topic](#gui)
 
 ## `apply` : procedure/2 {#link6170706c79}
 
@@ -6459,6 +7371,14 @@ Close the port `p`. Calling close twice on the same port should be avoided.
 
 See also: [`open`](#link6f70656e), [`stropen`](#link7374726f70656e).	 [→index](#idx) [→topic](#fileio)
 
+## `close-gui` : procedure/0 {#link636c6f73652d677569}
+
+Usage: `(close-gui)`
+
+Close the GUI, freeing all resources associated with it. After this function has been called, no further GUI functions can be used.
+
+See also: [`forget-gui-object`](#link666f726765742d6775692d6f626a656374), [`close-window`](#link636c6f73652d77696e646f77).	 [→index](#idx) [→topic](#gui)
+
 ## `close-window` : procedure/1 {#link636c6f73652d77696e646f77}
 
 Usage: `(close-window window)`
@@ -6743,6 +7663,22 @@ Get the content of column `n` in `db-result` as string.
 
 See also: [`db.blob`](#link64622e626c6f62), [`db.int`](#link64622e696e74), [`db.float`](#link64622e666c6f6174).	 [→index](#idx) [→topic](#db)
 
+## `deactivate-menu-child` : procedure/1 {#link646561637469766174652d6d656e752d6368696c64}
+
+Usage: `(deactivate-menu-child menu)`
+
+Deactivate the currently active menu item and close its submenu if there is one.
+
+See also: [`activate-menu-last-submenu`](#link61637469766174652d6d656e752d6c6173742d7375626d656e75), [`activate-menu-next`](#link61637469766174652d6d656e752d6e657874), [`activate-menu-previous`](#link61637469766174652d6d656e752d70726576696f7573), [`new-menu`](#link6e65772d6d656e75).	 [→index](#idx) [→topic](#gui)
+
+## `deactivate-menu-last-submenu` : procedure/1 {#link646561637469766174652d6d656e752d6c6173742d7375626d656e75}
+
+Usage: `(deactivate-menu-last-submenu menu)`
+
+Traverse the menu and deactivate the last open submenu found.
+
+See also: [`activate-menu-last-submenu`](#link61637469766174652d6d656e752d6c6173742d7375626d656e75), [`activate-menu-next`](#link61637469766174652d6d656e752d6e657874), [`activate-menu-previous`](#link61637469766174652d6d656e752d70726576696f7573), [`new-menu`](#link6e65772d6d656e75).	 [→index](#idx) [→topic](#gui)
+
 ## `declare-volatile` : procedure/1 {#link6465636c6172652d766f6c6174696c65}
 
 Usage: `(declare-volatile sym)`
@@ -6969,6 +7905,14 @@ Check if the file at `path` is a directory and return true, nil if the file does
 
 See also: [`file-exists?`](#link66696c652d6578697374733f), [`dir`](#link646972), [`open`](#link6f70656e), [`close`](#link636c6f7365), [`read`](#link72656164), [`write`](#link7772697465).	 [→index](#idx) [→topic](#fileio)
 
+## `disable-object` : procedure/1 {#link64697361626c652d6f626a656374}
+
+Usage: `(disable-object obj)`
+
+Disable the canvas object `obj.`
+
+See also: [`enable-object`](#link656e61626c652d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`move-object`](#link6d6f76652d6f626a656374), [`resize-object`](#link726573697a652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx) [→topic](#gui)
+
 ## `div` : procedure/2 {#link646976}
 
 Usage: `(div n k) => int`
@@ -7008,6 +7952,14 @@ Usage: `(dump-bindings) => li`
 Return a list of all top-level symbols with bound values, including those intended for internal use.
 
 See also: [`dump`](#link64756d70).	 [→index](#idx) [→topic](#system)
+
+## `enable-object` : procedure/1 {#link656e61626c652d6f626a656374}
+
+Usage: `(enable-object obj)`
+
+Enable the canvas object `obj.`
+
+See also: [`disable-object`](#link64697361626c652d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`move-object`](#link6d6f76652d6f626a656374), [`resize-object`](#link726573697a652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx) [→topic](#gui)
 
 ## `enq` : procedure/1 {#link656e71}
 
@@ -7769,6 +8721,14 @@ Forget the value associated with `key`. This permanently deletes the value from 
 
 See also: [`remember`](#link72656d656d626572), [`recall`](#link726563616c6c), [`recollect`](#link7265636f6c6c656374), [`recall-when`](#link726563616c6c2d7768656e), [`recall-info`](#link726563616c6c2d696e666f).	 [→index](#idx) [→topic](#db)
 
+## `forget-gui-object` : procedure/1 {#link666f726765742d6775692d6f626a656374}
+
+Usage: `(forget-gui-object int)`
+
+Forget the GUI object `int`. This removes any association with the object but does not free internal resources if the object still exists. Internal use only.
+
+See also: [`close-window`](#link636c6f73652d77696e646f77), [`close-gui`](#link636c6f73652d677569).	 [→index](#idx) [→topic](#gui)
+
 ## `functional-arity` : procedure/1 {#link66756e6374696f6e616c2d6172697479}
 
 Usage: `(functional-arity proc) => int`
@@ -7817,6 +8777,22 @@ Return a cloned action based on `id` from the action registry. This action can b
 
 See also: [`action`](#link616374696f6e), [`has-action-system?`](#link6861732d616374696f6e2d73797374656d3f), [`action-start`](#link616374696f6e2d7374617274), [`action-stop`](#link616374696f6e2d73746f70), [`register-action`](#link72656769737465722d616374696f6e).	 [→index](#idx) [→topic](#action)
 
+## `get-clipboard-content` : procedure/0 {#link6765742d636c6970626f6172642d636f6e74656e74}
+
+Usage: `(get-clipboard-content) => str`
+
+Return the current content of the operating system clipboard as string. This function might raise an error if clipboard access is prohibited by host security settings.
+
+See also: [`set-clipboard-content`](#link7365742d636c6970626f6172642d636f6e74656e74).	 [→index](#idx) [→topic](#gui)
+
+## `get-device-info` : procedure/0 {#link6765742d6465766963652d696e666f}
+
+Usage: `(get-device-info) => li`
+
+Return a list with information about the current host device. This returns an association list where 'orientation might be one of '(vertical vertical-upside-down left right unknown), self-explanatory boolean keys 'is-mobile?, 'is-browser, 'has-keyboard?, and 'system-scale with the current scaling factor for graphics as float. The system scale is used to dynamically scale user interface elements to remain legible on hi res displays.
+
+See also: [`close-gui`](#link636c6f73652d677569).	 [→index](#idx) [→topic](#gui)
+
 ## `get-entry-cursor` : procedure/1 {#link6765742d656e7472792d637572736f72}
 
 Usage: `(get-entry-cursor entry) => sym`
@@ -7833,6 +8809,38 @@ Return a list consisting of row number and column number of the current cursor p
 
 See also: [`set-entry-cursor-row`](#link7365742d656e7472792d637572736f722d726f77), [`set-entry-cursor-column`](#link7365742d656e7472792d637572736f722d636f6c756d6e).	 [→index](#idx) [→topic](#gui)
 
+## `get-menu-item-label` : procedure/1 {#link6765742d6d656e752d6974656d2d6c6162656c}
+
+Usage: `(get-menu-item-label item) => str`
+
+Return the current label of the given menu `item.`
+
+See also: [`set-menu-item-label`](#link7365742d6d656e752d6974656d2d6c6162656c), [`set-menu-item-disabled`](#link7365742d6d656e752d6974656d2d64697361626c6564), [`menu-item-disabled`](#link6d656e752d6974656d2d64697361626c6564), [`set-menu-item-checked`](#link7365742d6d656e752d6974656d2d636865636b6564), [`menu-item-checked?`](#link6d656e752d6974656d2d636865636b65643f), [`new-menu*`](#link6e65772d6d656e752a), [`new-menu`](#link6e65772d6d656e75), [`new-menu-item`](#link6e65772d6d656e752d6974656d), [`new-menu-item-separator`](#link6e65772d6d656e752d6974656d2d736570617261746f72).	 [→index](#idx) [→topic](#gui)
+
+## `get-object-min-size` : procedure/1 {#link6765742d6f626a6563742d6d696e2d73697a65}
+
+Usage: `(get-object-min-size obj) => li`
+
+Return the minimum size of canvas object `obj` as a list containing the width and height as floats. The minimum size is computed based on various internal criteria and can only be changed for some special widgets.
+
+See also: [`disable-object`](#link64697361626c652d6f626a656374), [`enable-object`](#link656e61626c652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`move-object`](#link6d6f76652d6f626a656374), [`resize-object`](#link726573697a652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx) [→topic](#gui)
+
+## `get-object-position` : procedure/1 {#link6765742d6f626a6563742d706f736974696f6e}
+
+Usage: `(get-object-position obj) => li`
+
+Return the position of canvas object `obj` as a list containing the x and y coordinates as floats.
+
+See also: [`disable-object`](#link64697361626c652d6f626a656374), [`enable-object`](#link656e61626c652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`move-object`](#link6d6f76652d6f626a656374), [`resize-object`](#link726573697a652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx) [→topic](#gui)
+
+## `get-object-size` : procedure/1 {#link6765742d6f626a6563742d73697a65}
+
+Usage: `(get-object-size obj) => li`
+
+Return the size of canvas object `obj` as a list containing the width and height as floats.
+
+See also: [`disable-object`](#link64697361626c652d6f626a656374), [`enable-object`](#link656e61626c652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`move-object`](#link6d6f76652d6f626a656374), [`resize-object`](#link726573697a652d6f626a656374), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx) [→topic](#gui)
+
 ## `get-or-set` : procedure/3 {#link6765742d6f722d736574}
 
 Usage: `(get-or-set d key value)`
@@ -7848,6 +8856,54 @@ Usage: `(get-partitions x n) => proc/1*`
 Return an iterator procedure that returns lists of the form (start-offset end-offset bytes) with 0-index offsets for a given index `k`, or nil if there is no corresponding part, such that the sizes of the partitions returned in `bytes` summed up are `x` and and each partition is `n` or lower in size. The last partition will be the smallest partition with a `bytes` value smaller than `n` if `x` is not dividable without rest by `n`. If no argument is provided for the returned iterator, then it returns the number of partitions.
 
 See also: [`nth-partition`](#link6e74682d706172746974696f6e), [`count-partitions`](#link636f756e742d706172746974696f6e73), [`get-file-partitions`](#link6765742d66696c652d706172746974696f6e73), [`iterate`](#link69746572617465).	 [→index](#idx) [→topic](#lisp)
+
+## `get-progress-bar-value` : procedure/1 {#link6765742d70726f67726573732d6261722d76616c7565}
+
+Usage: `(get-progress-bar-value bar) => num`
+
+Return the current value of progress-bar `bar.`
+
+See also: [`set-progress-bar`](#link7365742d70726f67726573732d626172), [`new-progress-bar`](#link6e65772d70726f67726573732d626172), [`new-infinite-progress-bar`](#link6e65772d696e66696e6974652d70726f67726573732d626172).	 [→index](#idx) [→topic](#gui)
+
+## `get-text-grid-cell` : procedure/3 {#link6765742d746578742d677269642d63656c6c}
+
+Usage: `(get-text-grid-cell grid row column) => li`
+
+Return the cell of `grid` at `row` and `column`. The result is a list consisting of a string containing one unicode rune and a grid style list.
+
+See also: [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765).	 [→index](#idx) [→topic](#gui)
+
+## `get-text-grid-row` : procedure/2 {#link6765742d746578742d677269642d726f77}
+
+Usage: `(get-text-grid-row grid row) => li`
+
+Obtain a `row` of a text `grid`, where `row` is a 0-based index. This function returns a list of the form '(row style), where `style` is a grid style list and `row` is an array of lists consisting each of a unicode string containing one rune and a grid style list. Each entry of the `row` array represents an individual unicode glyph with a style, whereas the `style` list in the return argument represents an optional style of the whole row.
+
+See also: [`set-text-grid-row`](#link7365742d746578742d677269642d726f77), [`get-text-grid-row-text`](#link6765742d746578742d677269642d726f772d74657874), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`new-text-grid`](#link6e65772d746578742d67726964), [`text-grid-show-line-numbers?`](#link746578742d677269642d73686f772d6c696e652d6e756d626572733f), [`text-grid-show-whitespace?`](#link746578742d677269642d73686f772d776869746573706163653f), [`get-text-grid-tab-width`](#link6765742d746578742d677269642d7461622d7769647468), [`set-text-grid-tab-width`](#link7365742d746578742d677269642d7461622d7769647468), [`set-text-grid-show-line-numbers`](#link7365742d746578742d677269642d73686f772d6c696e652d6e756d62657273), [`set-text-grid-show-whitespace`](#link7365742d746578742d677269642d73686f772d77686974657370616365), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765), [`set-text-grid-text`](#link7365742d746578742d677269642d74657874), [`get-text-grid-text`](#link6765742d746578742d677269642d74657874).	 [→index](#idx) [→topic](#gui)
+
+## `get-text-grid-row-text` : procedure/2 {#link6765742d746578742d677269642d726f772d74657874}
+
+Usage: `(get-text-grid-row-text grid row) => str`
+
+Return the text of `row` in `grid` as a string without any style information.
+
+See also: [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`set-text-grid-row`](#link7365742d746578742d677269642d726f77), [`new-text-grid`](#link6e65772d746578742d67726964), [`text-grid-show-line-numbers?`](#link746578742d677269642d73686f772d6c696e652d6e756d626572733f), [`text-grid-show-whitespace?`](#link746578742d677269642d73686f772d776869746573706163653f), [`get-text-grid-tab-width`](#link6765742d746578742d677269642d7461622d7769647468), [`set-text-grid-tab-width`](#link7365742d746578742d677269642d7461622d7769647468), [`set-text-grid-show-line-numbers`](#link7365742d746578742d677269642d73686f772d6c696e652d6e756d62657273), [`set-text-grid-show-whitespace`](#link7365742d746578742d677269642d73686f772d77686974657370616365), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765), [`set-text-grid-text`](#link7365742d746578742d677269642d74657874), [`get-text-grid-text`](#link6765742d746578742d677269642d74657874).	 [→index](#idx) [→topic](#gui)
+
+## `get-text-grid-tab-width` : procedure/1 {#link6765742d746578742d677269642d7461622d7769647468}
+
+Usage: `(get-text-grid-tab-width grid) => int`
+
+Return the current tabulator width of `grid` in space characters.
+
+See also: [`new-text-grid`](#link6e65772d746578742d67726964), [`text-grid-show-line-numbers?`](#link746578742d677269642d73686f772d6c696e652d6e756d626572733f), [`text-grid-show-whitespace?`](#link746578742d677269642d73686f772d776869746573706163653f), [`set-text-grid-tab-width`](#link7365742d746578742d677269642d7461622d7769647468), [`set-text-grid-show-line-numbers`](#link7365742d746578742d677269642d73686f772d6c696e652d6e756d62657273), [`set-text-grid-show-whitespace`](#link7365742d746578742d677269642d73686f772d77686974657370616365), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`get-text-grid-row-text`](#link6765742d746578742d677269642d726f772d74657874), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`set-text-grid-row`](#link7365742d746578742d677269642d726f77), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765), [`set-text-grid-text`](#link7365742d746578742d677269642d74657874), [`get-text-grid-text`](#link6765742d746578742d677269642d74657874).	 [→index](#idx) [→topic](#gui)
+
+## `get-text-grid-text` : procedure/1 {#link6765742d746578742d677269642d74657874}
+
+Usage: `(get-text-grid-text grid) => str`
+
+Return the text of `grid` as a string without style information.
+
+See also: [`set-text-grid-text`](#link7365742d746578742d677269642d74657874), [`new-text-grid`](#link6e65772d746578742d67726964), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`get-text-grid-rune`](#link6765742d746578742d677269642d72756e65), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c).	 [→index](#idx) [→topic](#gui)
 
 ## `get-window-canvas` : procedure/1 {#link6765742d77696e646f772d63616e766173}
 
@@ -8024,6 +9080,14 @@ Usage: `(hex->blob str) => blob`
 Convert hex string `str` to a blob. This will raise an error if `str` is not a valid hex string.
 
 See also: [`blob->hex`](#link626c6f622d3e686578), [`base64->blob`](#link6261736536342d3e626c6f62), [`ascii85->blob`](#link617363696938352d3e626c6f62), [`str->blob`](#link7374722d3e626c6f62).	 [→index](#idx) [→topic](#conversion)
+
+## `hide-object` : procedure/1 {#link686964652d6f626a656374}
+
+Usage: `(hide-object obj)`
+
+Hide the canvas object `obj.`
+
+See also: [`disable-object`](#link64697361626c652d6f626a656374), [`enable-object`](#link656e61626c652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`move-object`](#link6d6f76652d6f626a656374), [`resize-object`](#link726573697a652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx) [→topic](#gui)
 
 ## `hide-window` : procedure/1 {#link686964652d77696e646f77}
 
@@ -8663,6 +9727,22 @@ Return a dict with detailed memory statistics for the system.
 
 See also: [`collect-garbage`](#link636f6c6c6563742d67617262616765).	 [→index](#idx) [→topic](#system)
 
+## `menu-item-checked?` : procedure/1 {#link6d656e752d6974656d2d636865636b65643f}
+
+Usage: `(menu-item-checked? item) => bool`
+
+Return true if `item` is currently checked, nil otherwise.
+
+See also: [`set-menu-item-checked`](#link7365742d6d656e752d6974656d2d636865636b6564), [`set-menu-item-disabled`](#link7365742d6d656e752d6974656d2d64697361626c6564), [`menu-item-disabled?`](#link6d656e752d6974656d2d64697361626c65643f), [`get-menu-item-label`](#link6765742d6d656e752d6974656d2d6c6162656c), [`set-menu-item-label`](#link7365742d6d656e752d6974656d2d6c6162656c), [`new-menu*`](#link6e65772d6d656e752a), [`new-menu`](#link6e65772d6d656e75), [`new-menu-item`](#link6e65772d6d656e752d6974656d), [`new-menu-item-separator`](#link6e65772d6d656e752d6974656d2d736570617261746f72).	 [→index](#idx) [→topic](#gui)
+
+## `menu-item-disabled?` : procedure/1 {#link6d656e752d6974656d2d64697361626c65643f}
+
+Usage: `(menu-item-disabled? item) => bool`
+
+Return true if `item` is currently disabled, nil otherwise.
+
+See also: [`set-menu-item-disabled`](#link7365742d6d656e752d6974656d2d64697361626c6564), [`set-menu-item-checked`](#link7365742d6d656e752d6974656d2d636865636b6564), [`menu-item-checked?`](#link6d656e752d6974656d2d636865636b65643f), [`get-menu-item-label`](#link6765742d6d656e752d6974656d2d6c6162656c), [`set-menu-item-label`](#link7365742d6d656e752d6974656d2d6c6162656c), [`new-menu*`](#link6e65772d6d656e752a), [`new-menu`](#link6e65772d6d656e75), [`new-menu-item`](#link6e65772d6d656e752d6974656d), [`new-menu-item-separator`](#link6e65772d6d656e752d6974656d2d736570617261746f72).	 [→index](#idx) [→topic](#gui)
+
 ## `methods` : procedure/1 {#link6d6574686f6473}
 
 Usage: `(methods obj) => li`
@@ -8710,6 +9790,14 @@ Usage: `(month+ dateli n) => dateli`
 Adds `n` months to the given date `dateli` in datelist format and returns the new datelist.
 
 See also: [`sec+`](#link7365632b), [`minute+`](#link6d696e7574652b), [`hour+`](#link686f75722b), [`day+`](#link6461792b), [`week+`](#link7765656b2b), [`year+`](#link796561722b), [`now`](#link6e6f77).	 [→index](#idx) [→topic](#time)
+
+## `move-object` : procedure/2 {#link6d6f76652d6f626a656374}
+
+Usage: `(move-object obj position)`
+
+Move the canvas object `obj` to the given `position` list, containing its `x` and `y` coordinates as floats.
+
+See also: [`disable-object`](#link64697361626c652d6f626a656374), [`enable-object`](#link656e61626c652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`resize-object`](#link726573697a652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx) [→topic](#gui)
 
 ## `mutex-lock` : procedure/1 {#link6d757465782d6c6f636b}
 
@@ -8759,6 +9847,102 @@ Create a new object of class `class` with initial property bindings `props` clau
 
 See also: [`defclass`](#link646566636c617373).	 [→index](#idx) [→topic](#oop)
 
+## `new-app-tabs` : procedure/0 or more {#link6e65772d6170702d74616273}
+
+Usage: `(new-app-tabs tab-item ...) => int`
+
+Create a new application tabs, which allow users to choose different items within an application.
+
+See also: [`new-doc-tabs`](#link6e65772d646f632d74616273), [`new-tabitem`](#link6e65772d7461626974656d), [`new-tabitem-with-icon`](#link6e65772d7461626974656d2d776974682d69636f6e).	 [→index](#idx) [→topic](#gui)
+
+## `new-border` : procedure/4 or more {#link6e65772d626f72646572}
+
+Usage: `(new-border top bottom left right [obj ...]) => int`
+
+Create a new border layout, which is one of the most useful layouts. Any of `top`, `bottom`, `left`, and `right` is put in the respective place (with minimum size) and might also be `nil` for no widget. The remaining canvas objects `obj` are arranged in the center and take maximum size. This allows you e.g. to put a list on the left side of a window, a panel of buttons on the top, and the main content in another container in the center.
+
+See also: [`new-container`](#link6e65772d636f6e7461696e6572), [`new-container-without-layout`](#link6e65772d636f6e7461696e65722d776974686f75742d6c61796f7574).	 [→index](#idx) [→topic](#gui)
+
+## `new-button` : procedure/2 {#link6e65772d627574746f6e}
+
+Usage: `(new-button label proc) => int`
+
+Return a new button with the given `label` and without an icon. The callback `proc` is called without arguments when the button is pressed or tapped.
+
+See also: [`new-button-with-icon`](#link6e65772d627574746f6e2d776974682d69636f6e), [`new-hyperlink`](#link6e65772d68797065726c696e6b), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx) [→topic](#gui)
+
+## `new-button-with-icon` : procedure/3 {#link6e65772d627574746f6e2d776974682d69636f6e}
+
+Usage: `(new-button-with-icon label icon proc) => int`
+
+Return a new button the given `label` and `icon`. The callback `proc` is called without arguments when the button is pressed.
+
+See also: [`new-button`](#link6e65772d627574746f6e), [`new-icon`](#link6e65772d69636f6e), [`theme-icon`](#link7468656d652d69636f6e).	 [→index](#idx) [→topic](#gui)
+
+## `new-center-layout` : procedure/0 {#link6e65772d63656e7465722d6c61796f7574}
+
+Usage: `(new-center-layout) => int`
+
+Create a new center layout, which centers container elements (possibly overlapping). This may be used for drawing centered on the window, for example.
+
+See also: [`new-form`](#link6e65772d666f726d), [`append-form`](#link617070656e642d666f726d), [`new-spacer`](#link6e65772d737061636572), [`new-hbox-layout`](#link6e65772d68626f782d6c61796f7574), [`new-vbox-layout`](#link6e65772d76626f782d6c61796f7574), [`new-grid-layout`](#link6e65772d677269642d6c61796f7574), [`new-grid-wrap-layout`](#link6e65772d677269642d777261702d6c61796f7574), [`new-form-layout`](#link6e65772d666f726d2d6c61796f7574), [`new-stack-layout`](#link6e65772d737461636b2d6c61796f7574), [`new-container`](#link6e65772d636f6e7461696e6572).	 [→index](#idx) [→topic](#gui)
+
+## `new-check` : procedure/2 {#link6e65772d636865636b}
+
+Usage: `(new-check title proc) => int`
+
+Create and return a new check box with the given `title` string and a callback procedure `proc`. The callback `proc` is called with the new state of the check box as bool when it has changed.
+
+See also: [`new-choice`](#link6e65772d63686f696365).	 [→index](#idx) [→topic](#gui)
+
+## `new-choice` : procedure/3 {#link6e65772d63686f696365}
+
+Usage: `(new-choice selector string-list proc) => int`
+
+Create and return a new choice representing choices in `string-list`. If `selector` is 'radio-group, a group of radio buttons is created with options in `string-list`. If `selector` is 'select, a more compact selection menu is created with the options in `string-list`. The callback `proc` takes a string that represents the choice that has been selected.
+
+See also: [`new-check`](#link6e65772d636865636b).	 [→index](#idx) [→topic](#gui)
+
+## `new-circle` : procedure/1 or more {#link6e65772d636972636c65}
+
+Usage: `(new-circle fill-color [pos1] [pos2] [stroke-color] [stroke-width]) => int`
+
+Draw and return a circle with the given NRGBA `fill-color`. If the optional `pos1` and `pos2` position lists of `x` and `y` coordinates in floats are given , then the circle is drawn inside the rectangle defined by these positions. The optional `stroke-color` and `stroke-width` arguments determine the outline of the circle. Notice that circle's size and position may be set by the layout of the container, so to set these manually using `pos1` and `pos2` you need to make sure the underlying container has no such layout.
+
+See also: [`new-rectangle`](#link6e65772d72656374616e676c65), [`new-line-new-text`](#link6e65772d6c696e652d6e65772d74657874).	 [→index](#idx) [→topic](#gui)
+
+## `new-combined-string-validator` : procedure/1 or more {#link6e65772d636f6d62696e65642d737472696e672d76616c696461746f72}
+
+Usage: `(new-combined-string-validator validator-1 [...validator-n]) => int`
+
+Combine validators `validator-1` to `validator-n` into a combined string validator and return it.
+
+See also: [`set-entry-validator`](#link7365742d656e7472792d76616c696461746f72), [`new-validator`](#link6e65772d76616c696461746f72), [`new-regexp-validator`](#link6e65772d7265676578702d76616c696461746f72), [`new-time-validator`](#link6e65772d74696d652d76616c696461746f72), [`set-object-on-validation-change-callback`](#link7365742d6f626a6563742d6f6e2d76616c69646174696f6e2d6368616e67652d63616c6c6261636b), [`validate-object`](#link76616c69646174652d6f626a656374).	 [→index](#idx) [→topic](#gui)
+
+## `new-container` : procedure/1 or more {#link6e65772d636f6e7461696e6572}
+
+Usage: `(new-container layout obj ...) => int`
+
+Create a new container with the given `layout` and various canvas objects `obj` arranged by the layout.
+
+See also: [`new-container-without-layout`](#link6e65772d636f6e7461696e65722d776974686f75742d6c61796f7574), [`new-border`](#link6e65772d626f72646572).	 [→index](#idx) [→topic](#gui)
+
+## `new-container-without-layout` : procedure/0 or more {#link6e65772d636f6e7461696e65722d776974686f75742d6c61796f7574}
+
+Usage: `(new-container-without-layout obj ...) => int`
+
+Create a new container without a layout (overlapping objects) with the given canvas objects `obj.`
+
+See also: [`new-container`](#link6e65772d636f6e7461696e6572), [`new-border`](#link6e65772d626f72646572).	 [→index](#idx) [→topic](#gui)
+
+## `new-doc-tabs` : procedure/0 or more {#link6e65772d646f632d74616273}
+
+Usage: `(new-doc-tabs tab-item ...) => int`
+
+Create new document tabs, which allow users to choose different items in a window (not the application as a whole like app-tabs).
+
+See also: [`new-app-tabs`](#link6e65772d6170702d74616273), [`new-tabitem`](#link6e65772d7461626974656d), [`new-tabitem-with-icon`](#link6e65772d7461626974656d2d776974682d69636f6e).	 [→index](#idx) [→topic](#gui)
+
 ## `new-entry` : procedure/1 {#link6e65772d656e747279}
 
 Usage: `(new-entry [selector]) => int`
@@ -8766,6 +9950,80 @@ Usage: `(new-entry [selector]) => int`
 Create a new text entry field based on the optional `selector` symbol. `selector` can be a symbol in '(single-line multi-line password). The default is 'single-line.
 
 See also: [`set-entry-on-change-callback`](#link7365742d656e7472792d6f6e2d6368616e67652d63616c6c6261636b), [`set-entry-validator`](#link7365742d656e7472792d76616c696461746f72), [`entry-accepts-tab?`](#link656e7472792d616363657074732d7461623f), [`get-entry-cursor-pos`](#link6765742d656e7472792d637572736f722d706f73), [`set-entry-cursor-row`](#link7365742d656e7472792d637572736f722d726f77), [`set-entry-cursor-column`](#link7365742d656e7472792d637572736f722d636f6c756d6e), [`set-entry-on-cursor-change-callback`](#link7365742d656e7472792d6f6e2d637572736f722d6368616e67652d63616c6c6261636b), [`get-entry-cursor`](#link6765742d656e7472792d637572736f72), [`get-entry-selected-text`](#link6765742d656e7472792d73656c65637465642d74657874), [`set-entry-min-rows-visible`](#link7365742d656e7472792d6d696e2d726f77732d76697369626c65), [`set-entry-place-holder`](#link7365742d656e7472792d706c6163652d686f6c646572), [`set-entry-text`](#link7365742d656e7472792d74657874).	 [→index](#idx) [→topic](#gui)
+
+## `new-form` : procedure/0 {#link6e65772d666f726d}
+
+Usage: `(new-form)`
+
+Return a new form container, which orders widgets in rows, where each row has a label and a widget whose columns are aligned with the other rows. Use append-form to add label and widgets.
+
+See also: [`append-form`](#link617070656e642d666f726d).	 [→index](#idx) [→topic](#gui)
+
+## `new-form-layout` : procedure/0 {#link6e65772d666f726d2d6c61796f7574}
+
+Usage: `(new-form-layout) => int`
+
+Create a form layout, which arranges elements in two columns per row, where the columns are aligned.
+
+See also: [`new-form`](#link6e65772d666f726d), [`append-form`](#link617070656e642d666f726d), [`new-spacer`](#link6e65772d737061636572), [`new-hbox-layout`](#link6e65772d68626f782d6c61796f7574), [`new-vbox-layout`](#link6e65772d76626f782d6c61796f7574), [`new-grid-layout`](#link6e65772d677269642d6c61796f7574), [`new-grid-wrap-layout`](#link6e65772d677269642d777261702d6c61796f7574), [`new-center-layout`](#link6e65772d63656e7465722d6c61796f7574), [`new-stack-layout`](#link6e65772d737461636b2d6c61796f7574), [`new-container`](#link6e65772d636f6e7461696e6572).	 [→index](#idx) [→topic](#gui)
+
+## `new-grid-layout` : procedure/1 {#link6e65772d677269642d6c61796f7574}
+
+Usage: `(new-grid-layout n) => int`
+
+Create a new grid layout, which arranges elements in `n` columns.
+
+See also: [`new-spacer`](#link6e65772d737061636572), [`new-hbox-layout`](#link6e65772d68626f782d6c61796f7574), [`new-vbox-layout`](#link6e65772d76626f782d6c61796f7574), [`new-grid-wrap-layout`](#link6e65772d677269642d777261702d6c61796f7574), [`new-form-layout`](#link6e65772d666f726d2d6c61796f7574), [`new-center-layout`](#link6e65772d63656e7465722d6c61796f7574), [`new-stack-layout`](#link6e65772d737461636b2d6c61796f7574), [`new-container`](#link6e65772d636f6e7461696e6572).	 [→index](#idx) [→topic](#gui)
+
+## `new-grid-wrap-layout` : procedure/2 {#link6e65772d677269642d777261702d6c61796f7574}
+
+Usage: `(new-grid-wrap-layout width height) => int`
+
+Create a new grid wrap layout, which arranges elements such that each element has the given `width` and `height`, and wraps lines based on the size of the parent container.
+
+See also: [`new-spacer`](#link6e65772d737061636572), [`new-hbox-layout`](#link6e65772d68626f782d6c61796f7574), [`new-vbox-layout`](#link6e65772d76626f782d6c61796f7574), [`new-grid-layout`](#link6e65772d677269642d6c61796f7574), [`new-form-layout`](#link6e65772d666f726d2d6c61796f7574), [`new-center-layout`](#link6e65772d63656e7465722d6c61796f7574), [`new-stack-layout`](#link6e65772d737461636b2d6c61796f7574), [`new-container`](#link6e65772d636f6e7461696e6572).	 [→index](#idx) [→topic](#gui)
+
+## `new-hbox-layout` : procedure/0 {#link6e65772d68626f782d6c61796f7574}
+
+Usage: `(new-hbox-layout) => int`
+
+Create a new horizontal box layout, which lays out container elements horizontally.
+
+See also: [`new-spacer`](#link6e65772d737061636572), [`new-vbox-layout`](#link6e65772d76626f782d6c61796f7574), [`new-grid-layout`](#link6e65772d677269642d6c61796f7574), [`new-grid-wrap-layout`](#link6e65772d677269642d777261702d6c61796f7574), [`new-form-layout`](#link6e65772d666f726d2d6c61796f7574), [`new-center-layout`](#link6e65772d63656e7465722d6c61796f7574), [`new-stack-layout`](#link6e65772d737461636b2d6c61796f7574), [`new-container`](#link6e65772d636f6e7461696e6572).	 [→index](#idx) [→topic](#gui)
+
+## `new-hyperlink` : procedure/2 {#link6e65772d68797065726c696e6b}
+
+Usage: `(new-hyperlink label url) => int`
+
+Create a new hyperlink with given `label` string and an `url` string as embedded link. A hyperlink looks like a label with link style; when it is clicked, the `url` is called by the default operating system mechanism for opening urls. Using hyperlinks might be disallowed by the host system configuration HyperlinksAllowed and may be re-written by the host system using the CheckHyperlinks function. If HyperlinksAllowed is false in the active GUI config of the host, this function raises an error. It also parses the given `url` and will raise an error if it does not represent a valid URL.
+
+See also: [`new-button`](#link6e65772d627574746f6e), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx)
+
+**Warning: Allowing the host to open hyperlinks usually launches a web browser and the details depend on the operating system. There is an added security risk!** [→topic](#gui)
+
+## `new-icon` : procedure/1 {#link6e65772d69636f6e}
+
+Usage: `(new-icon resource) => int`
+
+Create a new icon from `resource`, which must be suitable to create an image.
+
+See also: [`theme-icon`](#link7468656d652d69636f6e).	 [→index](#idx) [→topic](#gui)
+
+## `new-image-from-file` : procedure/1 {#link6e65772d696d6167652d66726f6d2d66696c65}
+
+Usage: `(new-image-from-file path) => int`
+
+Create and return a new image from the image file at `path`, which must be a PNG file.
+
+See also: [`new-image-from-resource`](#link6e65772d696d6167652d66726f6d2d7265736f75726365).	 [→index](#idx) [→topic](#gui)
+
+## `new-image-from-resource` : procedure/1 {#link6e65772d696d6167652d66726f6d2d7265736f75726365}
+
+Usage: `(new-image-from-resource resource) => int`
+
+Create and return a new image from the given `resource.`
+
+See also: [`new-image-from-file`](#link6e65772d696d6167652d66726f6d2d66696c65), [`theme-icon`](#link7468656d652d69636f6e).	 [→index](#idx) [→topic](#gui)
 
 ## `new-label` : procedure/1 {#link6e65772d6c6162656c}
 
@@ -8775,6 +10033,126 @@ Creates a new text label with string `str.`
 
 See also: [`set-label-text`](#link7365742d6c6162656c2d74657874).	 [→index](#idx) [→topic](#gui)
 
+## `new-line` : procedure/1 or more {#link6e65772d6c696e65}
+
+Usage: `(new-line fill-color [pos1] [pos2] [stroke-color] [stroke-width]) => int`
+
+Draw and return a line with the given NRGBA `fill-color` from optional position `pos1` to position `pos2`, where these are lists of `x` and `y` coordinates as floats. The optional `stroke-color` and `stroke-width` determines the outer edges of the line.
+
+See also: [`new-cirlce`](#link6e65772d6369726c6365), [`new-rectangle`](#link6e65772d72656374616e676c65), [`new-text`](#link6e65772d74657874).	 [→index](#idx) [→topic](#gui)
+
+## `new-list` : procedure/3 {#link6e65772d6c697374}
+
+Usage: `(new-list len-proc prep-proc update-proc) => int`
+
+Create a new list display. A list consists of rows of simple items like labels. The `len-proc` must be a procedure without arguments returning the length of the list as integer. The `prep-proc` must be a procedure without arguments that returns a canvas object (i.e. a label or other widgets) representing a template for a single list item. The `update-proc` must be a procedure that receives the ID of a canvas object (given by the template) and the 0-based list index as arguments. This procedure then should modify the canvas object with `ID` to display the given list item at the index. See the GUI examples on how to use this function.
+
+See also: [`new-table`](#link6e65772d7461626c65), [`new-tree`](#link6e65772d74726565).	 [→index](#idx) [→topic](#gui)
+
+## `new-main-menu` : procedure/1 or more {#link6e65772d6d61696e2d6d656e75}
+
+Usage: `(new-main-menu menu ...) => int`
+
+Return a new main menu with the given menus. A main menu displays a menubar for a window on some desktop platforms but it may also be displayed in other ways.
+
+See also: [`new-menu`](#link6e65772d6d656e75), [`new-menu*`](#link6e65772d6d656e752a).	 [→index](#idx) [→topic](#gui)
+
+## `new-menu` : procedure/1 {#link6e65772d6d656e75}
+
+Usage: `(new-menu menu*) => int`
+
+Create a new visible menu widget from the abstract `menu*` created by new-menu*.
+
+See also: [`new-menu*`](#link6e65772d6d656e752a), [`new-main-menu`](#link6e65772d6d61696e2d6d656e75).	 [→index](#idx) [→topic](#gui)
+
+## `new-menu*` : procedure/1 or more {#link6e65772d6d656e752a}
+
+Usage: `(new-menu* label [item...]) => int`
+
+Make a new abstract menu with given `label` and arbitary menu items `item` ... following. The starred function is used to define a menu but is not bound to any particular way of displaying it (popup-menu, normal menu, main menu). Use `new-menu` and `new-main-menu` to create visible menus and menu bars based on such abstract menus.
+
+See also: [`refresh-menu*`](#link726566726573682d6d656e752a), [`new-menu`](#link6e65772d6d656e75), [`new-main-menu`](#link6e65772d6d61696e2d6d656e75).	 [→index](#idx) [→topic](#gui)
+
+## `new-menu-item` : procedure/2 or more {#link6e65772d6d656e752d6974656d}
+
+Usage: `(new-menu-item str proc [selector...]) => int`
+
+Create a new menu item with given label `str` and callback `proc`, which takes no arguments. The optional `selector` symbol may be one of: 'is-quit - the item is the application Quit menu item (this is dealt with differently by operating system requirements), 'is-separator - the item is a menu item separator and the label string is ignored (redundent, use `new-menu-item-separator` instead), 'disabled - the menu item is disabled, or 'checked - the menu item is checked.
+
+See also: [`set-menu-item-checked`](#link7365742d6d656e752d6974656d2d636865636b6564), [`menu-item-checked?`](#link6d656e752d6974656d2d636865636b65643f), [`set-menu-item-disabled`](#link7365742d6d656e752d6974656d2d64697361626c6564), [`menu-item-disabled?`](#link6d656e752d6974656d2d64697361626c65643f), [`get-menu-item-label`](#link6765742d6d656e752d6974656d2d6c6162656c), [`set-menu-item-label`](#link7365742d6d656e752d6974656d2d6c6162656c), [`new-menu*`](#link6e65772d6d656e752a), [`new-menu`](#link6e65772d6d656e75), [`new-menu-item-separator`](#link6e65772d6d656e752d6974656d2d736570617261746f72).	 [→index](#idx) [→topic](#gui)
+
+## `new-menu-item-separator` : procedure/0 {#link6e65772d6d656e752d6974656d2d736570617261746f72}
+
+Usage: `(new-menu-item-separator) => int`
+
+Return a new menu item separator, which is a menu item without callback and label that displays a separator between menu items in menus.
+
+See also: [`new-menu-item`](#link6e65772d6d656e752d6974656d).	 [→index](#idx) [→topic](#gui)
+
+## `new-progress-bar` : procedure/0 {#link6e65772d70726f67726573732d626172}
+
+Usage: `(new-progress-bar) => int`
+
+Create a new progress bar whose default minimum is 0.0 and maximum is 1.0.
+
+See also: [`set-progress-bar`](#link7365742d70726f67726573732d626172), [`new-infinite-progress-bar`](#link6e65772d696e66696e6974652d70726f67726573732d626172), [`get-progress-bar-value`](#link6765742d70726f67726573732d6261722d76616c7565).	 [→index](#idx) [→topic](#gui)
+
+## `new-raster-with-pixels` : procedure/1 {#link6e65772d7261737465722d776974682d706978656c73}
+
+Usage: `(new-raster-with-pixels pixel-proc) => int`
+
+Create a new raster image generated dynamically by the given `pixel-proc`. The `pixel-proc` takes `x` and `y` pixel coordinates and the `width` and `height` of the image in pixels, and returns the color of the pixel `x`, `y` as a color list of the form '(red green blue [alpha]) where `alpha` is optional. Notice that specifying the color of each pixel can be very CPU-intensive for larger images, so optimizations might be necessary.
+
+See also: [`new-image-from-file`](#link6e65772d696d6167652d66726f6d2d66696c65).	 [→index](#idx) [→topic](#gui)
+
+## `new-rectangle` : procedure/1 or more {#link6e65772d72656374616e676c65}
+
+Usage: `(new-rectangle fill-color [width height] [position] [stroke-color] [stroke-width] [corner-radius]) => int`
+
+Draw and return a rectangle with the given NRGBA `fill-color`. The optional int `width` and `height` arguments set the width and height of the rectangle explicitly (otherwise they are 1). The optional `position` argument must be a list of `x` and `y` coordinates as floats. The optional `stroke-color` and `stroke-width` arguments determine the color and width of the outline of the rectangle, and the optional `corner-radious` defines how rounded the rectangle is. Notice that the rectangle's size and position can be set by the layout of the container, so to set it manually you need to make sure the underlying container has no layout that positions or resizes the rectangle.
+
+See also: [`new-circle`](#link6e65772d636972636c65), [`new-line`](#link6e65772d6c696e65), [`new-text`](#link6e65772d74657874).	 [→index](#idx) [→topic](#gui)
+
+## `new-regexp-validator` : procedure/2 {#link6e65772d7265676578702d76616c696461746f72}
+
+Usage: `(new-regexp-validator regexp reason) => int`
+
+Create a new string validator from the `regexp` string, which must be a valid regular expression in Go's regexp syntax. The `reason` string is displayed to the user by widgets like `entry` when the validation fails.
+
+See also: [`set-entry-validator`](#link7365742d656e7472792d76616c696461746f72), [`new-validator`](#link6e65772d76616c696461746f72), [`new-combined-string-validator`](#link6e65772d636f6d62696e65642d737472696e672d76616c696461746f72), [`new-time-validator`](#link6e65772d74696d652d76616c696461746f72), [`set-object-on-validation-change-callback`](#link7365742d6f626a6563742d6f6e2d76616c69646174696f6e2d6368616e67652d63616c6c6261636b), [`validate-object`](#link76616c69646174652d6f626a656374).	 [→index](#idx) [→topic](#gui)
+
+## `new-shortcut` : procedure/1 or more {#link6e65772d73686f7274637574}
+
+Usage: `(new-shortcut key [mod...]) => int`
+
+Create a new keyboard shortcut based on symbol or string `key` and a number of modifier keys `mod`. If multiple non-modifier keys are present, only the last one is taken. However, multiple modifier keys are possible. Possible modifiers are symbols or corresponding strings in '(shift control alt suprt). Possible keys are in '(escape return tab backspace insert delete right left down up page-up page-down home end f1 f2 f3 f4 f5 f6 f7 f8 f9 f10 f11 f12 enter 0 1 2 3 4 5 6 7 8 9 key0 key1 key2 key3 key4 key5 key6 key7 key8 key9 a b c d e f g h i j k l m n o p q r s t u v w x y z space tick comma minus period slash backslash left-bracket right-bracket semicolon equal asterisk plus back-tick) and their string variants.
+
+See also: [`new-window`](#link6e65772d77696e646f77).	 [→index](#idx) [→topic](#gui)
+
+## `new-slider` : procedure/3 {#link6e65772d736c69646572}
+
+Usage: `(new-slider min max proc) => int`
+
+Create a new slider that allows users to adjust numerical values. The `min` and `max` arguments must be floats. The procedure `proc` takes the current slider float value as argument and is called when the slider changes.
+
+See also: [`set-slider-value`](#link7365742d736c696465722d76616c7565).	 [→index](#idx) [→topic](#gui)
+
+## `new-spacer` : procedure/0 {#link6e65772d737061636572}
+
+Usage: `(new-spacer) => int`
+
+Create a new spacer, which adjusts size dynamically by taking up space and displaying nothing. Use this to fill containers e.g. to right align a widget.
+
+See also: [`new-hbox-layout`](#link6e65772d68626f782d6c61796f7574), [`new-vbox-layout`](#link6e65772d76626f782d6c61796f7574), [`new-grid-layout`](#link6e65772d677269642d6c61796f7574), [`new-grid-wrap-layout`](#link6e65772d677269642d777261702d6c61796f7574), [`new-form-layout`](#link6e65772d666f726d2d6c61796f7574), [`new-center-layout`](#link6e65772d63656e7465722d6c61796f7574), [`new-stack-layout`](#link6e65772d737461636b2d6c61796f7574), [`new-container`](#link6e65772d636f6e7461696e6572).	 [→index](#idx) [→topic](#gui)
+
+## `new-stack-layout` : procedure/0 {#link6e65772d737461636b2d6c61796f7574}
+
+Usage: `(new-stack-layout) => int`
+
+Create a new stack layout that stacks container elements on top of each other, overlapping. This may be used for drawing, for example.
+
+See also: [`new-form`](#link6e65772d666f726d), [`append-form`](#link617070656e642d666f726d), [`new-spacer`](#link6e65772d737061636572), [`new-hbox-layout`](#link6e65772d68626f782d6c61796f7574), [`new-vbox-layout`](#link6e65772d76626f782d6c61796f7574), [`new-grid-layout`](#link6e65772d677269642d6c61796f7574), [`new-grid-wrap-layout`](#link6e65772d677269642d777261702d6c61796f7574), [`new-form-layout`](#link6e65772d666f726d2d6c61796f7574), [`new-center-layout`](#link6e65772d63656e7465722d6c61796f7574), [`new-container`](#link6e65772d636f6e7461696e6572).	 [→index](#idx) [→topic](#gui)
+
 ## `new-struct` : procedure/2 {#link6e65772d737472756374}
 
 Usage: `(new-struct name li)`
@@ -8783,11 +10161,83 @@ Defines a new structure `name` with the properties in the a-list `li`. Structs a
 
 See also: [`defstruct`](#link646566737472756374).	 [→index](#idx) [→topic](#oop)
 
+## `new-tabitem` : procedure/2 {#link6e65772d7461626974656d}
+
+Usage: `(new-tabitem title obj) => int`
+
+Create a new tab item for use in app-tabs and doc-tabs with a `title` and an embedded canvas object `obj` shown when the tab item is selected in the tabs.
+
+See also: [`new-tabitem-with-icon`](#link6e65772d7461626974656d2d776974682d69636f6e), [`new-app-tabs`](#link6e65772d6170702d74616273), [`new-doc-tabs`](#link6e65772d646f632d74616273).	 [→index](#idx) [→topic](#gui)
+
+## `new-tabitem-with-icon` : procedure/3 {#link6e65772d7461626974656d2d776974682d69636f6e}
+
+Usage: `(new-tabitem-with-icon title icon obj) => int`
+
+Create a new tab item for use in app-tabs and doc-tabs with given `title` string, `icon` resource, and embedded canvas object `obj` that shwon when the tab item is selected in the tabs.
+
+See also: [`new-tabitem`](#link6e65772d7461626974656d), [`new-app-tabs`](#link6e65772d6170702d74616273), [`new-doc-tabs`](#link6e65772d646f632d74616273).	 [→index](#idx) [→topic](#gui)
+
+## `new-table` : procedure/3 {#link6e65772d7461626c65}
+
+Usage: `(new-table len-proc prep-proc update-proc) => int`
+
+Create a new table display. A table consists of a number of rows, each of which has a fixed number of columns such as labels. The `len-proc` must be a procedure without arguments returning the length of the table as integer. The `prep-proc` must be a procedure without arguments that returns a canvas object that represents the table row with updatable columns. The `update-proc` takes the row, column, and ID of a canvas object and updates a table template with the right display for the table cell at `row` and `column.`
+
+See also: [`new-list`](#link6e65772d6c697374), [`new-tree`](#link6e65772d74726565).	 [→index](#idx) [→topic](#gui)
+
+## `new-text` : procedure/2 {#link6e65772d74657874}
+
+Usage: `(new-text str color) => int`
+
+Draw and return text with the given string `str` and foreground NRGBA `color.`
+
+See also: [`set-text-alignment`](#link7365742d746578742d616c69676e6d656e74), [`set-text-size`](#link7365742d746578742d73697a65), [`set-text-style`](#link7365742d746578742d7374796c65), [`new-line`](#link6e65772d6c696e65), [`new-cirle`](#link6e65772d6369726c65), [`new-rectangle`](#link6e65772d72656374616e676c65).	 [→index](#idx) [→topic](#gui)
+
+## `new-text-grid` : procedure/0 or more {#link6e65772d746578742d67726964}
+
+Usage: `(new-text-grid [<string>] [show-line-numbers|show-whitespace|tab-width <int>]) => int`
+
+Create a new text grid widget, which displays multiline text with custom background and foreground colors. The optional `string` argument is the initial text of the grid without formatting. The following symbols might be `'show-line-numbers` to turn the line number display on and `'show-whitespace` to display white space characters by special unicode symbols. If the selector `'tab-width` occurs, then it must be immediately followed by an integer for the tabulator width of the text grid in space characters.
+
+See also: [`text-grid-show-line-numbers?`](#link746578742d677269642d73686f772d6c696e652d6e756d626572733f), [`text-grid-show-whitespace?`](#link746578742d677269642d73686f772d776869746573706163653f), [`get-text-grid-tab-width`](#link6765742d746578742d677269642d7461622d7769647468), [`set-text-grid-tab-width`](#link7365742d746578742d677269642d7461622d7769647468), [`set-text-grid-show-line-numbers`](#link7365742d746578742d677269642d73686f772d6c696e652d6e756d62657273), [`set-text-grid-show-whitespace`](#link7365742d746578742d677269642d73686f772d77686974657370616365), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`get-text-grid-row-text`](#link6765742d746578742d677269642d726f772d74657874), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`set-text-grid-row`](#link7365742d746578742d677269642d726f77), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765), [`set-text-grid-text`](#link7365742d746578742d677269642d74657874), [`get-text-grid-text`](#link6765742d746578742d677269642d74657874).	 [→index](#idx) [→topic](#gui)
+
+## `new-time-validator` : procedure/1 {#link6e65772d74696d652d76616c696461746f72}
+
+Usage: `(new-time-validator format-str) => int`
+
+Create a new string validator for time and date based on the given template `format-str`. This validator uses Go's data parsing function and therefore is quite restrictive. Only datetimes entered in exactly the format given (including timezones) validate successfully. To obtain a more relaxed date and time validator, use `new-validator` to create a custom validator with your own parsing or try a `new-regexp-validator.`
+
+See also: [`set-entry-validator`](#link7365742d656e7472792d76616c696461746f72), [`new-validator`](#link6e65772d76616c696461746f72), [`new-combined-string-validator`](#link6e65772d636f6d62696e65642d737472696e672d76616c696461746f72), [`new-time-validator`](#link6e65772d74696d652d76616c696461746f72), [`new-regexp-validator`](#link6e65772d7265676578702d76616c696461746f72), [`set-object-on-validation-change-callback`](#link7365742d6f626a6563742d6f6e2d76616c69646174696f6e2d6368616e67652d63616c6c6261636b), [`validate-object`](#link76616c69646174652d6f626a656374).	 [→index](#idx) [→topic](#gui)
+
+## `new-tree` : procedure/4 {#link6e65772d74726565}
+
+Usage: `(new-tree child-uid-proc is-branch-proc create-node-proc update-node-proc) => int`
+
+Create a new tree display. A tree displays nested branches and leaf nodes. The `child-uid-proc` is a procedure that takes an id string as argument. If the string is empty, it should return a list of top-level branch uid strings. If the string is not empty, it represents an uid; the procedure should then return a list of all child id strings of that branch. This defines the tree's structure. All id strings must be unique to the tree. The `is-branch-proc` takes an id string as argument and should return non-nil if the id represents a branch, nil if it has no children. The `create-node-proc` takes a bool `b` as argument and should return a branch template if `b` is non-nil and a leaf template object if `b` is nil. Finally, the `update-node-proc` is a procedure that takes a node id string, a boolean that is true if the node is a branch, and a node template canvas-object as it is returned by `create-node-proc`. The procedure should fill the template with the display values for the respective node id.
+
+See also: [`new-list`](#link6e65772d6c697374), [`new-table`](#link6e65772d7461626c65).	 [→index](#idx) [→topic](#gui)
+
+## `new-validator` : procedure/1 {#link6e65772d76616c696461746f72}
+
+Usage: `(new-validator proc) => int`
+
+Create a new string validator based on validation procedure `proc`. The procedure `proc` takes a string as argument and returns a string. If the string returned is not the empty string "", then validation fails and the returned string is given as a reason for validation failure. If the empty string is returned, then validation succeeds. If an error occurs in `proc`, then validation fails with the error's error message as reason. Notice that validators are fairly limited and can only be attached to a few validatable objects such as text entry fields. For a more general approach, it might make sense to implement your own validation system based on key press, focus change, and change callbacks of various GUI objects.
+
+See also: [`set-entry-validator`](#link7365742d656e7472792d76616c696461746f72), [`new-combined-string-validator`](#link6e65772d636f6d62696e65642d737472696e672d76616c696461746f72), [`new-regexp-validator`](#link6e65772d7265676578702d76616c696461746f72), [`new-time-validator`](#link6e65772d74696d652d76616c696461746f72), [`set-object-on-validation-change-callback`](#link7365742d6f626a6563742d6f6e2d76616c69646174696f6e2d6368616e67652d63616c6c6261636b), [`validate-object`](#link76616c69646174652d6f626a656374).	 [→index](#idx) [→topic](#gui)
+
+## `new-vbox-layout` : procedure/0 {#link6e65772d76626f782d6c61796f7574}
+
+Usage: `(new-vbox-layout) => int`
+
+Create a new vertical box layout, which lays out container elements vertically.
+
+See also: [`new-spacer`](#link6e65772d737061636572), [`new-hbox-layout`](#link6e65772d68626f782d6c61796f7574), [`new-grid-layout`](#link6e65772d677269642d6c61796f7574), [`new-grid-wrap-layout`](#link6e65772d677269642d777261702d6c61796f7574), [`new-form-layout`](#link6e65772d666f726d2d6c61796f7574), [`new-center-layout`](#link6e65772d63656e7465722d6c61796f7574), [`new-stack-layout`](#link6e65772d737461636b2d6c61796f7574), [`new-container`](#link6e65772d636f6e7461696e6572).	 [→index](#idx) [→topic](#gui)
+
 ## `new-window` : procedure/1 {#link6e65772d77696e646f77}
 
 Usage: `(new-window title) => int`
 
-Create a new window with `title` string and return the window ID.
+Create a new window with `title` string and return the window ID. This function raises an error if the host configuration WindowsAllowed is not true. In certain embedded uses, creating new windows is not allowed and you should check the documentation how to find a pre-configured window and add user interface elements to it.
 
 See also: [`set-window-content`](#link7365742d77696e646f772d636f6e74656e74), [`close-window`](#link636c6f73652d77696e646f77), [`show-window`](#link73686f772d77696e646f77).	 [→index](#idx) [→topic](#gui)
 
@@ -8847,6 +10297,14 @@ Destructively reverse `li.`
 
 See also: [`reverse`](#link72657665727365).	 [→index](#idx) [→topic](#lisp)
 
+## `nrgba` : procedure/4 {#link6e72676261}
+
+Usage: `(nrgba red green blue alpha) => int`
+
+Create an RGBA color where `red`, `green`, `blue`, and `alpha` are 8-bit uint integers, i.e., values between 0 and 255 (inclusive). Notice that some GUI functions require NRGBA color returned by this function, whereas others require a color list of int values '(red green blue alpha). This is for performance reasons, since it sometimes faster to convert a list to a color on-the-fly and sometimes more convenient to store pre-defined colors for later re-use.
+
+See also: [`new-rectangle`](#link6e65772d72656374616e676c65), [`new-circle`](#link6e65772d636972636c65), [`new-line`](#link6e65772d6c696e65), [`new-text`](#link6e65772d74657874).	 [→index](#idx) [→topic](#gui)
+
 ## `nth` : procedure/2 {#link6e7468}
 
 Usage: `(nth seq n) => any`
@@ -8886,6 +10344,14 @@ Usage: `(num? n) => bool`
 Return true if `n` is a number (exact or inexact), nil otherwise.
 
 See also: [`str?`](#link7374723f), [`atom?`](#link61746f6d3f), [`sym?`](#link73796d3f), [`closure?`](#link636c6f737572653f), [`intrinsic?`](#link696e7472696e7369633f), [`macro?`](#link6d6163726f3f).	 [→index](#idx) [→topic](#lisp)
+
+## `object-disabled?` : procedure/1 {#link6f626a6563742d64697361626c65643f}
+
+Usage: `(object-disabled? obj) => bool`
+
+Return true if the canvas object `obj` is disabled, nil otherwise.
+
+See also: [`disable-object`](#link64697361626c652d6f626a656374), [`enable-object`](#link656e61626c652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`move-object`](#link6d6f76652d6f626a656374), [`resize-object`](#link726573697a652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx) [→topic](#gui)
 
 ## `object?` : procedure/1 {#link6f626a6563743f}
 
@@ -9257,6 +10723,30 @@ Returns true if `s` is a struct record, i.e., an instance of a struct; nil other
 
 See also: [`struct?`](#link7374727563743f), [`defstruct`](#link646566737472756374).	 [→index](#idx) [→topic](#oop)
 
+## `refresh-main-menu` : procedure/1 {#link726566726573682d6d61696e2d6d656e75}
+
+Usage: `(refresh-main-menu main-menu)`
+
+Refresh the given `main-menu` display. This should be called after some submenus or menu items in the main menu have changed.
+
+See also: [`new-main-menu`](#link6e65772d6d61696e2d6d656e75), [`refresh-menu*`](#link726566726573682d6d656e752a).	 [→index](#idx) [→topic](#gui)
+
+## `refresh-menu*` : procedure/1 {#link726566726573682d6d656e752a}
+
+Usage: `(refresh-menu* menu)`
+
+Refresh the given `menu` after a change was made that has a visual impact. This will refresh the menu widget in which this abstract menu occurs.
+
+See also: [`refresh-main-menu`](#link726566726573682d6d61696e2d6d656e75), [`new-menu*`](#link6e65772d6d656e752a).	 [→index](#idx) [→topic](#gui)
+
+## `refresh-object` : procedure/1 {#link726566726573682d6f626a656374}
+
+Usage: `(refresh-object obj)`
+
+Refresh the canvas object `obj`, causing the graphical display to be re-drawn as soon as possible. This may be needed if the object's state has changed.
+
+See also: [`disable-object`](#link64697361626c652d6f626a656374), [`enable-object`](#link656e61626c652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`move-object`](#link6d6f76652d6f626a656374), [`resize-object`](#link726573697a652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx) [→topic](#gui)
+
 ## `register-action` : procedure/1 {#link72656769737465722d616374696f6e}
 
 Usage: `(register-action action)`
@@ -9330,6 +10820,14 @@ Usage: `(reset-color)`
 Reset the 'text and 'back colors of the display to default values. These values are not specified in the color database and depend on the runtime implementation. Other colors like 'gfx or 'frame are not affected.
 
 See also: [`set-color`](#link7365742d636f6c6f72), [`color`](#link636f6c6f72), [`the-color`](#link7468652d636f6c6f72), [`with-colors`](#link776974682d636f6c6f7273).	 [→index](#idx) [→topic](#ui)
+
+## `resize-object` : procedure/2 {#link726573697a652d6f626a656374}
+
+Usage: `(resize-object obj width height)`
+
+Resize canvas object `obj` to the given `width` and `height` as floats.
+
+See also: [`disable-object`](#link64697361626c652d6f626a656374), [`enable-object`](#link656e61626c652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`move-object`](#link6d6f76652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx) [→topic](#gui)
 
 ## `reverse` : procedure/1 {#link72657665727365}
 
@@ -9519,6 +11017,14 @@ Convert set `s` to a list of set elements.
 
 See also: [`list->set`](#link6c6973742d3e736574), [`make-set`](#link6d616b652d736574), [`set-element?`](#link7365742d656c656d656e743f), [`set-union`](#link7365742d756e696f6e), [`set-intersection`](#link7365742d696e74657273656374696f6e), [`set-complement`](#link7365742d636f6d706c656d656e74), [`set-difference`](#link7365742d646966666572656e6365), [`set?`](#link7365743f), [`set-empty`](#link7365742d656d707479).	 [→index](#idx) [→topic](#conversion)
 
+## `set-clipboard-content` : procedure/1 {#link7365742d636c6970626f6172642d636f6e74656e74}
+
+Usage: `(set-clipboard-content str)`
+
+Set the operating system clipboard content to string `str`. This function might raise an error if clipboard access is prohibited by host security settings.
+
+See also: [`get-clipboard-content`](#link6765742d636c6970626f6172642d636f6e74656e74).	 [→index](#idx) [→topic](#gui)
+
 ## `set-color` : procedure/1 {#link7365742d636f6c6f72}
 
 Usage: `(set-color sel colorlist)`
@@ -9655,6 +11161,38 @@ Sets the text of `label` to string `str`. This might resize the label depending 
 
 See also: [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx) [→topic](#gui)
 
+## `set-menu-item-checked` : procedure/2 {#link7365742d6d656e752d6974656d2d636865636b6564}
+
+Usage: `(set-menu-item-checked item checked?)`
+
+Set the menu item check mark display if `checked?` is non-nil, remove it otherwise.
+
+See also: [`menu-item-checked?`](#link6d656e752d6974656d2d636865636b65643f), [`set-menu-item-disabled`](#link7365742d6d656e752d6974656d2d64697361626c6564), [`menu-item-disabled?`](#link6d656e752d6974656d2d64697361626c65643f), [`get-menu-item-label`](#link6765742d6d656e752d6974656d2d6c6162656c), [`set-menu-item-label`](#link7365742d6d656e752d6974656d2d6c6162656c), [`new-menu*`](#link6e65772d6d656e752a), [`new-menu`](#link6e65772d6d656e75), [`new-menu-item`](#link6e65772d6d656e752d6974656d), [`new-menu-item-separator`](#link6e65772d6d656e752d6974656d2d736570617261746f72).	 [→index](#idx) [→topic](#gui)
+
+## `set-menu-item-disabled` : procedure/2 {#link7365742d6d656e752d6974656d2d64697361626c6564}
+
+Usage: `(set-menu-item-disabled item disabled?)`
+
+Disable the menu item if `disabled?` is non-nil, enable it otherwise.
+
+See also: [`menu-item-disabled?`](#link6d656e752d6974656d2d64697361626c65643f), [`set-menu-item-checked`](#link7365742d6d656e752d6974656d2d636865636b6564), [`menu-item-checked?`](#link6d656e752d6974656d2d636865636b65643f), [`get-menu-item-label`](#link6765742d6d656e752d6974656d2d6c6162656c), [`set-menu-item-label`](#link7365742d6d656e752d6974656d2d6c6162656c), [`new-menu*`](#link6e65772d6d656e752a), [`new-menu`](#link6e65772d6d656e75), [`new-menu-item`](#link6e65772d6d656e752d6974656d), [`new-menu-item-separator`](#link6e65772d6d656e752d6974656d2d736570617261746f72).	 [→index](#idx) [→topic](#gui)
+
+## `set-menu-item-label` : procedure/2 {#link7365742d6d656e752d6974656d2d6c6162656c}
+
+Usage: `(set-menu-item-label item str)`
+
+Set the label of menu `item` to `str.`
+
+See also: [`get-menu-item-label`](#link6765742d6d656e752d6974656d2d6c6162656c), [`set-menu-item-disabled`](#link7365742d6d656e752d6974656d2d64697361626c6564), [`menu-item-disabled`](#link6d656e752d6974656d2d64697361626c6564), [`set-menu-item-checked`](#link7365742d6d656e752d6974656d2d636865636b6564), [`menu-item-checked?`](#link6d656e752d6974656d2d636865636b65643f), [`new-menu*`](#link6e65772d6d656e752a), [`new-menu`](#link6e65772d6d656e75), [`new-menu-item`](#link6e65772d6d656e752d6974656d), [`new-menu-item-separator`](#link6e65772d6d656e752d6974656d2d736570617261746f72).	 [→index](#idx) [→topic](#gui)
+
+## `set-object-on-validation-change-callback` : procedure/2 {#link7365742d6f626a6563742d6f6e2d76616c69646174696f6e2d6368616e67652d63616c6c6261636b}
+
+Usage: `(set-object-on-validation-change-callback obj proc)`
+
+Set a validatable object's `obj` validation change callback, which is called when the object's validation changes. The callback `proc` takes a string or nil as argument. When it is nil, the validation was successful. When it is a string, then the validation failed with the string as reason. This can be used to track validation changes of any validatable object (such as a text entry) to e.g. display custom messages or icons when the validation fails or succeeds.
+
+See also: [`validate-object`](#link76616c69646174652d6f626a656374), [`new-validator`](#link6e65772d76616c696461746f72), [`set-entry-validator`](#link7365742d656e7472792d76616c696461746f72).	 [→index](#idx) [→topic](#gui)
+
 ## set-permissions : nil {#link7365742d7065726d697373696f6e73}
 
 Usage: `(set-permissions li)`
@@ -9663,6 +11201,22 @@ Set the permissions for the current interpreter. This will trigger an error when
 
 See also: [`permissions`](#link7065726d697373696f6e73), [`permission?`](#link7065726d697373696f6e3f), [`when-permission`](#link7768656e2d7065726d697373696f6e), [`sys`](#link737973).	 [→index](#idx) [→topic](#system)
 
+## `set-progress-bar` : procedure/1 or more {#link7365742d70726f67726573732d626172}
+
+Usage: `(set-progress-bar bar value [selector value])`
+
+Set the value of progress-bar `bar` as follows. If a single number is provided, then the current value of the progress-bar is set to this number. If a selector symbol is provided, then if it is 'value, the progress-bar value is set to the following number, if it is 'max or 'min, then the progress-bar maximum or minimum values are set to the respective following number. If it is 'formatter, then the following value must be a procedure that takes the progress-bar ID as argument and returns a string that represents the display of the progress-bar at the given time.
+
+See also: [`get-progress-bar-value`](#link6765742d70726f67726573732d6261722d76616c7565), [`new-progress-bar`](#link6e65772d70726f67726573732d626172), [`new-infinite-progress-bar`](#link6e65772d696e66696e6974652d70726f67726573732d626172).	 [→index](#idx) [→topic](#gui)
+
+## `set-slider-value` : procedure/2 {#link7365742d736c696465722d76616c7565}
+
+Usage: `(set-slider-value slider fl)`
+
+Set the value of `slider` to float `fl.`
+
+See also: [`new-slider`](#link6e65772d736c69646572).	 [→index](#idx) [→topic](#gui)
+
 ## `set-subset?` : procedure/2 {#link7365742d7375627365743f}
 
 Usage: `(set-subset? a b) => bool`
@@ -9670,6 +11224,110 @@ Usage: `(set-subset? a b) => bool`
 Return true if `a` is a subset of `b`, nil otherwise.
 
 See also: [`set-equal?`](#link7365742d657175616c3f), [`list->set`](#link6c6973742d3e736574), [`set->list`](#link7365742d3e6c697374), [`make-set`](#link6d616b652d736574), [`set-element?`](#link7365742d656c656d656e743f), [`set-union`](#link7365742d756e696f6e), [`set-difference`](#link7365742d646966666572656e6365), [`set-intersection`](#link7365742d696e74657273656374696f6e), [`set-complement`](#link7365742d636f6d706c656d656e74), [`set?`](#link7365743f), [`set-empty?`](#link7365742d656d7074793f).	 [→index](#idx) [→topic](#data)
+
+## `set-text-alignment` : procedure/2 {#link7365742d746578742d616c69676e6d656e74}
+
+Usage: `(set-text-alignment text sym)`
+
+Set the alignment of `text` to `sym`, which must be one of '(leading center trailing).
+
+See also: [`new-text`](#link6e65772d74657874), [`set-text-size`](#link7365742d746578742d73697a65), [`set-text-style`](#link7365742d746578742d7374796c65).	 [→index](#idx) [→topic](#gui)
+
+## `set-text-grid-cell` : procedure/4 {#link7365742d746578742d677269642d63656c6c}
+
+Usage: `(set-text-grid-cell grid row column li)`
+
+Set the text `grid` cell at `row` and `column` (both 0-indexed) to the list `li`, where `li` must consist of a unicode string containing one rune and a valid grid style list.
+
+See also: [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`set-text-grid-row`](#link7365742d746578742d677269642d726f77).	 [→index](#idx) [→topic](#gui)
+
+## `set-text-grid-row` : procedure/3 {#link7365742d746578742d677269642d726f77}
+
+Usage: `(set-text-grid-row grid row row-spec)`
+
+Set the `row` of `grid` to the given `row-spec`, which is a list containing an array of grid cells like in the return value of `get-text-grid-row` and a grid style for the row as a whole.
+
+See also: [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765).	 [→index](#idx) [→topic](#gui)
+
+## `set-text-grid-row-style` : procedure/3 {#link7365742d746578742d677269642d726f772d7374796c65}
+
+Usage: `(set-text-grid-row-style grid row style)`
+
+Set the style of text `grid` at `row` to the given grid `style.`
+
+See also: [`set-text-grid-row`](#link7365742d746578742d677269642d726f77), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765).	 [→index](#idx) [→topic](#gui)
+
+## `set-text-grid-rune` : procedure/4 {#link7365742d746578742d677269642d72756e65}
+
+Usage: `(set-text-grid-rune grid row column str)`
+
+Set the rune of `grid` at `row` and `column` to the unicode glyph in string `str.`
+
+See also: [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c).	 [→index](#idx) [→topic](#gui)
+
+## `set-text-grid-show-line-numbers` : procedure/2 {#link7365742d746578742d677269642d73686f772d6c696e652d6e756d62657273}
+
+Usage: `(set-text-grid-show-line-numbers grid show?)`
+
+Set whether `grid` shows line numbers. If `show?` is not nil, then line numbers are shown, otherwise they are not shown.
+
+See also: [`new-text-grid`](#link6e65772d746578742d67726964), [`text-grid-show-line-numbers?`](#link746578742d677269642d73686f772d6c696e652d6e756d626572733f), [`text-grid-show-whitespace?`](#link746578742d677269642d73686f772d776869746573706163653f), [`get-text-grid-tab-width`](#link6765742d746578742d677269642d7461622d7769647468), [`set-text-grid-tab-width`](#link7365742d746578742d677269642d7461622d7769647468), [`set-text-grid-show-whitespace`](#link7365742d746578742d677269642d73686f772d77686974657370616365), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`get-text-grid-row-text`](#link6765742d746578742d677269642d726f772d74657874), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`set-text-grid-row`](#link7365742d746578742d677269642d726f77), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765), [`set-text-grid-text`](#link7365742d746578742d677269642d74657874), [`get-text-grid-text`](#link6765742d746578742d677269642d74657874).	 [→index](#idx) [→topic](#gui)
+
+## `set-text-grid-show-whitespace` : procedure/2 {#link7365742d746578742d677269642d73686f772d77686974657370616365}
+
+Usage: `(set-text-grid-show-whitespace grid show?)`
+
+Set whether `grid` shows whitespace characters. If `show?` is not nil, then whitespace characters are shown, otherwise they are not shown.
+
+See also: [`new-text-grid`](#link6e65772d746578742d67726964), [`text-grid-show-line-numbers?`](#link746578742d677269642d73686f772d6c696e652d6e756d626572733f), [`text-grid-show-whitespace?`](#link746578742d677269642d73686f772d776869746573706163653f), [`get-text-grid-tab-width`](#link6765742d746578742d677269642d7461622d7769647468), [`set-text-grid-tab-width`](#link7365742d746578742d677269642d7461622d7769647468), [`set-text-grid-show-line-numbers`](#link7365742d746578742d677269642d73686f772d6c696e652d6e756d62657273), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`get-text-grid-row-text`](#link6765742d746578742d677269642d726f772d74657874), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`set-text-grid-row`](#link7365742d746578742d677269642d726f77), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765), [`set-text-grid-text`](#link7365742d746578742d677269642d74657874), [`get-text-grid-text`](#link6765742d746578742d677269642d74657874).	 [→index](#idx) [→topic](#gui)
+
+## `set-text-grid-style` : procedure/4 {#link7365742d746578742d677269642d7374796c65}
+
+Usage: `(set-text-grid-style grid row column style)`
+
+Set the grid style of `grid` at `row` and `column` to the list `style.`
+
+See also: [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765).	 [→index](#idx) [→topic](#gui)
+
+## `set-text-grid-style-range` : procedure/6 {#link7365742d746578742d677269642d7374796c652d72616e6765}
+
+Usage: `(set-text-grid-style-range grid start-row start-column end-row end-column style)`
+
+Set the grid style of `grid` starting at `start-row` and `start-column` and ending at `end-row` and `end-column` (all inclusive) to the grid `style.`
+
+See also: [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65).	 [→index](#idx) [→topic](#gui)
+
+## `set-text-grid-tab-width` : procedure/2 {#link7365742d746578742d677269642d7461622d7769647468}
+
+Usage: `(set-text-grid-tab-width grid width)`
+
+Set the tabulator width of `grid` to integer `width` space characters.
+
+See also: [`new-text-grid`](#link6e65772d746578742d67726964), [`text-grid-show-line-numbers?`](#link746578742d677269642d73686f772d6c696e652d6e756d626572733f), [`text-grid-show-whitespace?`](#link746578742d677269642d73686f772d776869746573706163653f), [`get-text-grid-tab-width`](#link6765742d746578742d677269642d7461622d7769647468), [`set-text-grid-show-line-numbers`](#link7365742d746578742d677269642d73686f772d6c696e652d6e756d62657273), [`set-text-grid-show-whitespace`](#link7365742d746578742d677269642d73686f772d77686974657370616365), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`get-text-grid-row-text`](#link6765742d746578742d677269642d726f772d74657874), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`set-text-grid-row`](#link7365742d746578742d677269642d726f77), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765), [`set-text-grid-text`](#link7365742d746578742d677269642d74657874), [`get-text-grid-text`](#link6765742d746578742d677269642d74657874).	 [→index](#idx) [→topic](#gui)
+
+## `set-text-grid-text` : procedure/2 {#link7365742d746578742d677269642d74657874}
+
+Usage: `(set-text-grid-text grid str)`
+
+Set the text of the text `grid` to the given `str.`
+
+See also: [`get-text-grid-text`](#link6765742d746578742d677269642d74657874), [`new-text-grid`](#link6e65772d746578742d67726964), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-row`](#link7365742d746578742d677269642d726f77).	 [→index](#idx) [→topic](#gui)
+
+## `set-text-size` : procedure/2 {#link7365742d746578742d73697a65}
+
+Usage: `(set-text-size text size)`
+
+Set the size of `text` to float `size.`
+
+See also: [`new-text`](#link6e65772d74657874), [`set-text-alignment`](#link7365742d746578742d616c69676e6d656e74), [`set-text-style`](#link7365742d746578742d7374796c65).	 [→index](#idx) [→topic](#gui)
+
+## `set-text-style` : procedure/2 {#link7365742d746578742d7374796c65}
+
+Usage: `(set-text-style text li`
+
+Set the style of `text` to the specification in list `li`, which must contain symbols in '(bold italic monospace symbol tab-width). If a symbol in the list is `tab-width`, it must be followed by an integer. `bold` sets boldface, `italic` makes the style italic, `monospace` selects the monospace/typewriter font, and `symbol` selects the `symbol` font. `tab-width` followed by an integer sets the width of tabulator in terms of the number of space characters.
+
+See also: [`new-text`](#link6e65772d74657874), [`set-text-alignment`](#link7365742d746578742d616c69676e6d656e74), [`set-text-size`](#link7365742d746578742d73697a65).	 [→index](#idx) [→topic](#gui)
 
 ## `set-union` : procedure/2 {#link7365742d756e696f6e}
 
@@ -9790,6 +11448,14 @@ Usage: `(shorten s n) => str`
 Shorten string `s` to length `n` in a smart way if possible, leave it untouched if the length of `s` is smaller than `n.`
 
 See also: [`substr`](#link737562737472).	 [→index](#idx) [→topic](#str)
+
+## `show-object` : procedure/1 {#link73686f772d6f626a656374}
+
+Usage: `(show-object obj)`
+
+Show the canvas object `obj.`
+
+See also: [`disable-object`](#link64697361626c652d6f626a656374), [`enable-object`](#link656e61626c652d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`move-object`](#link6d6f76652d6f626a656374), [`resize-object`](#link726573697a652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx) [→topic](#gui)
 
 ## `sleep` : procedure/1 {#link736c656570}
 
@@ -10399,6 +12065,22 @@ Registers the string `name` as the name of the tests that are next registered wi
 
 See also: [`expect`](#link657870656374), [`expect-err`](#link6578706563742d657272), [`expect-ok`](#link6578706563742d6f6b), [`run-selftest`](#link72756e2d73656c6674657374).	 [→index](#idx) [→topic](#system)
 
+## `text-grid-show-line-numbers?` : procedure/1 {#link746578742d677269642d73686f772d6c696e652d6e756d626572733f}
+
+Usage: `(text-grid-show-line-numbers? grid) => bool`
+
+Return true if the text `grid` shows line numbers, nil otherwise.
+
+See also: [`new-text-grid`](#link6e65772d746578742d67726964), [`text-grid-show-whitespace?`](#link746578742d677269642d73686f772d776869746573706163653f), [`get-text-grid-tab-width`](#link6765742d746578742d677269642d7461622d7769647468), [`set-text-grid-tab-width`](#link7365742d746578742d677269642d7461622d7769647468), [`set-text-grid-show-line-numbers`](#link7365742d746578742d677269642d73686f772d6c696e652d6e756d62657273), [`set-text-grid-show-whitespace`](#link7365742d746578742d677269642d73686f772d77686974657370616365), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`get-text-grid-row-text`](#link6765742d746578742d677269642d726f772d74657874), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`set-text-grid-row`](#link7365742d746578742d677269642d726f77), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765), [`set-text-grid-text`](#link7365742d746578742d677269642d74657874), [`get-text-grid-text`](#link6765742d746578742d677269642d74657874).	 [→index](#idx) [→topic](#gui)
+
+## `text-grid-show-whitespace?` : procedure/1 {#link746578742d677269642d73686f772d776869746573706163653f}
+
+Usage: `(text-grid-show-whitespace? grid) => bool`
+
+Return true if the text `grid` shows whitespace glyphs, nil otherwise.
+
+See also: [`new-text-grid`](#link6e65772d746578742d67726964), [`text-grid-show-line-numbers?`](#link746578742d677269642d73686f772d6c696e652d6e756d626572733f), [`get-text-grid-tab-width`](#link6765742d746578742d677269642d7461622d7769647468), [`set-text-grid-tab-width`](#link7365742d746578742d677269642d7461622d7769647468), [`set-text-grid-show-line-numbers`](#link7365742d746578742d677269642d73686f772d6c696e652d6e756d62657273), [`set-text-grid-show-whitespace`](#link7365742d746578742d677269642d73686f772d77686974657370616365), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77), [`get-text-grid-row-text`](#link6765742d746578742d677269642d726f772d74657874), [`set-text-grid-cell`](#link7365742d746578742d677269642d63656c6c), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`set-text-grid-row`](#link7365742d746578742d677269642d726f77), [`set-text-grid-row-style`](#link7365742d746578742d677269642d726f772d7374796c65), [`set-text-grid-rune`](#link7365742d746578742d677269642d72756e65), [`set-text-grid-style`](#link7365742d746578742d677269642d7374796c65), [`set-text-grid-style-range`](#link7365742d746578742d677269642d7374796c652d72616e6765), [`set-text-grid-text`](#link7365742d746578742d677269642d74657874), [`get-text-grid-text`](#link6765742d746578742d677269642d74657874).	 [→index](#idx) [→topic](#gui)
+
 ## `the-color` : procedure/1 {#link7468652d636f6c6f72}
 
 Usage: `(the-color colors-spec) => (r g b a)`
@@ -10415,6 +12097,14 @@ Return the list of color names in *colors*.
 
 See also: [`*colors*`](#link2a636f6c6f72732a), [`the-color`](#link7468652d636f6c6f72).	 [→index](#idx) [→topic](#ui)
 
+## `theme-icon` : procedure/1 {#link7468656d652d69636f6e}
+
+Usage: `(theme-icon selector) => int`
+
+Obtain a pre-defined icon from the application's theme based on the symbol `selector`, which may be one of '(cancel check-button check-button-checked color-achromatic color-chromatic color-palette computer confirm content-add content-clear content-copy content-cut content-paste content-redo content-remove content-undo delete document-create document-print document download error file-application file-audio file-image file-text file-video file folder-new folder-open folder grid help history home info list login logout mail-attachment mail-compose mail-forward mail-reply-all mail-reply mail-send media-fast-forward media-fast-rewind media-music media-pause media-photo media-play media-record media-replay media-skip-next media-skip-previous media-stop media-video media-expand menu more-horizontal more-vertical move-down move-up navigate-back navigate-next question radio-button radio-button-checked search-replace search settings storage upload view-full-screen view-refresh view-restore visibility-off visibility volume-down volume-mute volume-up warning).
+
+See also: [`new-icon`](#link6e65772d69636f6e), [`new-image-from-`](#link6e65772d696d6167652d66726f6d2d), [`new-image-from-resource`](#link6e65772d696d6167652d66726f6d2d7265736f75726365).	 [→index](#idx) [→topic](#gui)
+
 ## `time` : procedure/1 {#link74696d65}
 
 Usage: `(time proc) => int`
@@ -10422,6 +12112,14 @@ Usage: `(time proc) => int`
 Return the time in nanoseconds that it takes to execute the procedure with no arguments `proc.`
 
 See also: [`now-ns`](#link6e6f772d6e73), [`now`](#link6e6f77).	 [→index](#idx) [→topic](#time)
+
+## `trigger-menu-last` : procedure/1 {#link747269676765722d6d656e752d6c617374}
+
+Usage: `(trigger-menu-last menu)`
+
+Find the last active menu or submenu item and trigger it.
+
+See also: [`activate-menu-last-submenu`](#link61637469766174652d6d656e752d6c6173742d7375626d656e75), [`activate-menu-next`](#link61637469766174652d6d656e752d6e657874), [`activate-menu-previous`](#link61637469766174652d6d656e752d70726576696f7573), [`new-menu`](#link6e65772d6d656e75).	 [→index](#idx) [→topic](#gui)
 
 ## `truncate` : procedure/1 or more {#link7472756e63617465}
 
@@ -10486,6 +12184,14 @@ Usage: `(valid? obj) => bool`
 Return true if `obj` is a valid object, nil otherwise. What exactly object validity means is undefined, but certain kind of objects such as graphics objects may be marked invalid when they can no longer be used because they have been disposed off by a subsystem and cannot be automatically garbage collected. Generally, invalid objects ought no longer be used and need to be discarded.
 
 See also: [`blob?`](#link626c6f623f).	 [→index](#idx) [→topic](#boxed)
+
+## `validate-object` : procedure/2 {#link76616c69646174652d6f626a656374}
+
+Usage: `(validate-object obj) => str`
+
+Validate the validatable object `obj` programmatically and return the validation failure as string, or the empty string if validation succeeded. It sometimes makes sense to call this explicitly in order to force the object to display its validation state.
+
+See also: [`set-object-on-validation-change-callback`](#link7365742d6f626a6563742d6f6e2d76616c69646174696f6e2d6368616e67652d63616c6c6261636b), [`new-validator`](#link6e65772d76616c696461746f72), [`set-entry-validator`](#link7365742d656e7472792d76616c696461746f72).	 [→index](#idx) [→topic](#gui)
 
 ## `void` : procedure/0 or more {#link766f6964}
 

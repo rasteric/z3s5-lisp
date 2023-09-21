@@ -1092,7 +1092,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.AsLispBool(menu.ActivateLastSubmenu())
 	})
 
-	// (activate-menu-next <menu>)
+	// (activate-meno u-next <menu>)
 	interp.Def(pre("activate-menu-next"), 1, func(a []any) any {
 		menu := mustGet(pre("activate-menu-next"), "GUI menu ID", a, 0).(*widget.Menu)
 		menu.ActivateNext()
@@ -1386,7 +1386,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
-	// (resize-object <obj> <pos>) attempts to resize a GUI object (polymorphic)
+	// (resize-object <obj> <w> <h>) attempts to resize a GUI object (polymorphic)
 	interp.Def(pre("resize-object"), 3, func(a []any) any {
 		obj := mustGet(pre("resize-object"), "GUI canvas object ID", a, 0)
 		w := float32(z3.ToFloat64(a[1]))
@@ -1404,7 +1404,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 	})
 
 	// (get-object-min-size <obj>) => li
-	interp.Def(pre("get-min-size"), 1, func(a []any) any {
+	interp.Def(pre("get-object-min-size"), 1, func(a []any) any {
 		obj := mustGet(pre("get-object-min-size"), "GUI canvas object ID", a, 0)
 		size := obj.(fyne.CanvasObject).MinSize()
 		return &z3.Cell{Car: goarith.AsNumber(float64(size.Width)),
@@ -1417,20 +1417,6 @@ func DefGUI(interp *z3.Interp, config Config) {
 		pos := obj.(fyne.CanvasObject).Position()
 		return &z3.Cell{Car: goarith.AsNumber(float64(pos.X)),
 			Cdr: &z3.Cell{Car: goarith.AsNumber(float64(pos.Y)), Cdr: z3.Nil}}
-	})
-
-	// (hide-object <obj>)
-	interp.Def(pre("hide-object"), 1, func(a []any) any {
-		obj := mustGet(pre("hide-object"), "GUI canvas object ID", a, 0)
-		obj.(fyne.CanvasObject).Hide()
-		return z3.Void
-	})
-
-	// (show-object <obj>)
-	interp.Def(pre("show-object"), 1, func(a []any) any {
-		obj := mustGet(pre("show-object"), "GUI canvas object ID", a, 0)
-		obj.(fyne.CanvasObject).Show()
-		return z3.Void
 	})
 
 	// (object-visible? <obj>) => bool

@@ -412,9 +412,9 @@
   (arity 2)
   (topic (gui text-grid))
   (see  (set-text-grid-row get-text-grid-row-text get-text-grid-cell new-text-grid text-grid-show-line-numbers? text-grid-show-whitespace?
-				get-text-grid-tab-width set-text-grid-tab-width set-text-grid-show-line-numbers set-text-grid-show-whitespace  
-				set-text-grid-cell  set-text-grid-row-style set-text-grid-rune set-text-grid-style set-text-grid-style-range set-text-grid-text
-				get-text-grid-text)))
+			   get-text-grid-tab-width set-text-grid-tab-width set-text-grid-show-line-numbers set-text-grid-show-whitespace  
+			   set-text-grid-cell  set-text-grid-row-style set-text-grid-rune set-text-grid-style set-text-grid-style-range set-text-grid-text
+			   get-text-grid-text)))
 
 (defhelp get-text-grid-row-text
     (use "(get-text-grid-row-text grid row) => str")
@@ -423,9 +423,9 @@
   (arity 2)
   (topic (gui text-grid))
   (see  (set-text-grid-rune  get-text-grid-row get-text-grid-cell set-text-grid-row new-text-grid text-grid-show-line-numbers? text-grid-show-whitespace?
-			   get-text-grid-tab-width set-text-grid-tab-width set-text-grid-show-line-numbers set-text-grid-show-whitespace  
-			   set-text-grid-cell  set-text-grid-row-style set-text-grid-rune set-text-grid-style set-text-grid-style-range set-text-grid-text
-			   get-text-grid-text)))
+			     get-text-grid-tab-width set-text-grid-tab-width set-text-grid-show-line-numbers set-text-grid-show-whitespace  
+			     set-text-grid-cell  set-text-grid-row-style set-text-grid-rune set-text-grid-style set-text-grid-style-range set-text-grid-text
+			     get-text-grid-text)))
 
 (defhelp set-text-grid-cell
     (use "(set-text-grid-cell grid row column li)")
@@ -659,5 +659,477 @@
   (type proc)
   (arity 1)
   (topic (gui menu))
-  (see (new-menu*)))
+  (see (refresh-main-menu new-menu*)))
 
+(defhelp new-menu
+    (use "(new-menu menu*) => int")
+  (info "Create a new visible menu widget from the abstract #menu* created by new-menu*.")
+  (type proc)
+  (arity 1)
+  (topic (gui menu))
+  (see (new-menu* new-main-menu)))
+
+(defhelp activate-menu-last-submenu
+    (use "(activate-menu-last-submenu menu) => bool")
+  (info "Find the last active menu item traversing through open submenus, and activate its submenu if one is found. Return true if a submenu was activated, nil otherwise.")
+  (type proc)
+  (arity 1)
+  (topic (gui menu))
+  (see (deactivate-menu-last-submenu new-menu activate-menu-next activate-menu-previous)))
+
+(defhelp activate-menu-next
+    (use "(activate-menu-next menu)")
+  (info "Activate the menu item following the currently active menu item, if there is any.")
+  (type proc)
+  (arity 1)
+  (topic (gui menu))
+  (see (activate-menu-previous new-menu activate-menu-last-submenu)))
+
+(defhelp activate-menu-previous
+    (use "(activate-menu-previous menu)")
+  (info "Activate the menu item before the currently active menu item, if there is any.")
+  (type proc)
+  (arity 1)
+  (topic (gui menu))
+  (see (activate-menu-next new-menu activate-menu-last-submenu)))
+
+(defhelp deactivate-menu-child
+    (use "(deactivate-menu-child menu)")
+  (info "Deactivate the currently active menu item and close its submenu if there is one.")
+  (type proc)
+  (arity 1)
+  (topic (gui menu))
+  (see (activate-menu-last-submenu activate-menu-next activate-menu-previous new-menu)))
+
+(defhelp deactivate-menu-last-submenu
+    (use "(deactivate-menu-last-submenu menu)")
+  (info "Traverse the menu and deactivate the last open submenu found.")
+  (type proc)
+  (arity 1)
+  (topic (gui menu))
+  (see (activate-menu-last-submenu activate-menu-next activate-menu-previous new-menu)))
+
+(defhelp trigger-menu-last
+    (use "(trigger-menu-last menu)")
+  (info "Find the last active menu or submenu item and trigger it.")
+  (type proc)
+  (arity 1)
+  (topic (gui menu))
+  (see (activate-menu-last-submenu activate-menu-next activate-menu-previous new-menu)))
+
+(defhelp new-main-menu
+    (use "(new-main-menu menu ...) => int")
+  (info "Return a new main menu with the given menus. A main menu displays a menubar for a window on some desktop platforms but it may also be displayed in other ways.")
+  (type proc)
+  (arity -2)
+  (topic (gui menu))
+  (see (new-menu new-menu*)))
+
+(defhelp refresh-main-menu
+    (use "(refresh-main-menu main-menu)")
+  (info "Refresh the given #main-menu display. This should be called after some submenus or menu items in the main menu have changed.")
+  (type proc)
+  (arity 1)
+  (topic (gui menu))
+  (see (new-main-menu refresh-menu*)))
+
+(defhelp new-image-from-resource
+    (use "(new-image-from-resource resource) => int")
+  (info "Create and return a new image from the given #resource.")
+  (type proc)
+  (arity 1)
+  (topic (gui image))
+  (see (new-image-from-file theme-icon)))
+
+(defhelp new-image-from-file
+    (use "(new-image-from-file path) => int")
+  (info "Create and return a new image from the image file at #path, which must be a PNG file.")
+  (type proc)
+  (arity 1)
+  (topic (gui image))
+  (see (new-image-from-resource)))
+
+(defhelp nrgba
+    (use "(nrgba red green blue alpha) => int")
+  (info "Create an RGBA color where #red, #green, #blue, and #alpha are 8-bit uint integers, i.e., values between 0 and 255 (inclusive). Notice that some GUI functions require NRGBA color returned by this function, whereas others require a color list of int values '(red green blue alpha). This is for performance reasons, since it sometimes faster to convert a list to a color on-the-fly and sometimes more convenient to store pre-defined colors for later re-use.")
+  (type proc)
+  (arity 4)
+  (topic (gui drawing))
+  (see (new-rectangle new-circle new-line new-text)))
+
+(defhelp new-rectangle
+    (use "(new-rectangle fill-color [width height] [position] [stroke-color] [stroke-width] [corner-radius]) => int")
+  (info "Draw and return a rectangle with the given NRGBA #fill-color. The optional int #width and #height arguments set the width and height of the rectangle explicitly (otherwise they are 1). The optional #position argument must be a list of #x and #y coordinates as floats. The optional #stroke-color and #stroke-width arguments determine the color and width of the outline of the rectangle, and the optional #corner-radious defines how rounded the rectangle is. Notice that the rectangle's size and position can be set by the layout of the container, so to set it manually you need to make sure the underlying container has no layout that positions or resizes the rectangle.")
+  (type proc)
+  (arity -2)
+  (topic (gui drawing))
+  (see (new-circle new-line new-text)))
+
+(defhelp new-circle
+    (use "(new-circle fill-color [pos1] [pos2] [stroke-color] [stroke-width]) => int")
+  (info "Draw and return a circle with the given NRGBA #fill-color. If the optional #pos1 and #pos2 position lists of #x and #y coordinates in floats are given , then the circle is drawn inside the rectangle defined by these positions. The optional #stroke-color and #stroke-width arguments determine the outline of the circle. Notice that circle's size and position may be set by the layout of the container, so to set these manually using #pos1 and #pos2 you need to make sure the underlying container has no such layout.")
+  (type proc)
+  (arity -2)
+  (topic (gui drawing))
+  (see (new-rectangle new-line-new-text)))
+
+(defhelp new-line
+    (use "(new-line fill-color [pos1] [pos2] [stroke-color] [stroke-width]) => int")
+  (info "Draw and return a line with the given NRGBA #fill-color from optional position #pos1 to position #pos2, where these are lists of #x and #y coordinates as floats. The optional #stroke-color and #stroke-width determines the outer edges of the line.")
+  (type proc)
+  (arity -2)
+  (topic (gui drawing))
+  (see (new-cirlce new-rectangle new-text)))
+
+(defhelp new-text
+    (use "(new-text str color) => int")
+  (info "Draw and return text with the given string #str and foreground NRGBA #color.")
+  (arity 2)
+  (type proc)
+  (arity 2)
+  (topic (gui drawing))
+  (see (set-text-alignment set-text-size set-text-style new-line new-cirle new-rectangle)))
+
+(defhelp set-text-alignment
+    (use "(set-text-alignment text sym)")
+  (info "Set the alignment of #text to #sym, which must be one of '(leading center trailing).")
+  (type proc)
+  (arity 2)
+  (topic (gui drawing))
+  (see (new-text set-text-size set-text-style)))
+
+(defhelp set-text-size
+    (use "(set-text-size text size)")
+  (info "Set the size of #text to float #size.")
+  (type proc)
+  (arity 2)
+  (topic (gui drawing))
+  (see (new-text set-text-alignment set-text-style)))
+
+(defhelp set-text-style
+    (use "(set-text-style text li")
+  (info "Set the style of #text to the specification in list #li, which must contain symbols in '(bold italic monospace symbol tab-width). If a symbol in the list is #tab-width, it must be followed by an integer. #bold sets boldface, #italic makes the style italic, #monospace selects the monospace/typewriter font, and #symbol selects the #symbol font. #tab-width followed by an integer sets the width of tabulator in terms of the number of space characters.")
+  (type proc)
+  (arity 2)
+  (topic (gui drawing))
+  (see (new-text set-text-alignment set-text-size)))
+
+(defhelp new-raster-with-pixels
+    (use "(new-raster-with-pixels pixel-proc) => int")
+  (info "Create a new raster image generated dynamically by the given #pixel-proc. The #pixel-proc takes #x and #y pixel coordinates and the #width and #height of the image in pixels, and returns the color of the pixel #x, #y as a color list of the form '(red green blue [alpha]) where #alpha is optional. Notice that specifying the color of each pixel can be very CPU-intensive for larger images, so optimizations might be necessary.")
+  (type proc)
+  (arity 1)
+  (topic (gui drawing))
+  (see (new-image-from-file)))
+
+(defhelp new-shortcut
+    (use "(new-shortcut key [mod...]) => int")
+  (info "Create a new keyboard shortcut based on symbol or string #key and a number of modifier keys #mod. If multiple non-modifier keys are present, only the last one is taken. However, multiple modifier keys are possible. Possible modifiers are symbols or corresponding strings in '(shift control alt suprt). Possible keys are in '(escape return tab backspace insert delete right left down up page-up page-down home end f1 f2 f3 f4 f5 f6 f7 f8 f9 f10 f11 f12 enter 0 1 2 3 4 5 6 7 8 9 key0 key1 key2 key3 key4 key5 key6 key7 key8 key9 a b c d e f g h i j k l m n o p q r s t u v w x y z space tick comma minus period slash backslash left-bracket right-bracket semicolon equal asterisk plus back-tick) and their string variants.")
+  (type proc)
+  (arity -2)
+  (topic (gui keyboard))
+  (see (new-window))) ; TODO
+
+(defhelp disable-object
+    (use "(disable-object obj)")
+  (info "Disable the canvas object #obj.")
+  (arity 1)
+  (type proc)
+  (topic (gui canvas-object))
+  (see (enable-object hide-object show-object object-disabled? move-object resize-object get-object-size get-object-min-size get-object-position object-visible? refresh-object new-entry new-label)))
+
+(defhelp enable-object
+    (use "(enable-object obj)")
+  (info "Enable the canvas object #obj.")
+  (arity 1)
+  (type proc)
+  (topic (gui canvas-object))
+  (see (disable-object hide-object show-object object-disabled? move-object resize-object get-object-size get-object-min-size get-object-position object-visible? refresh-object new-entry new-label)))
+
+(defhelp hide-object
+    (use "(hide-object obj)")
+  (info "Hide the canvas object #obj.")
+  (arity 1)
+  (type proc)
+  (topic (gui canvas-object))
+  (see (disable-object enable-object show-object object-disabled? move-object resize-object get-object-size get-object-min-size get-object-position object-visible? refresh-object new-entry new-label)))
+
+(defhelp show-object
+    (use "(show-object obj)")
+  (info "Show the canvas object #obj.")
+  (arity 1)
+  (type proc)
+  (topic (gui canvas-object))
+  (see (disable-object enable-object hide-object object-disabled? move-object resize-object get-object-size get-object-min-size get-object-position object-visible? refresh-object new-entry new-label)))
+
+(defhelp object-disabled?
+    (use "(object-disabled? obj) => bool")
+  (info "Return true if the canvas object #obj is disabled, nil otherwise.")
+  (arity 1)
+  (type proc)
+  (topic (gui canvas-object))
+  (see (disable-object enable-object show-object hide-object move-object resize-object get-object-size get-object-min-size get-object-position object-visible? refresh-object new-entry new-label)))
+
+(defhelp move-object
+    (use "(move-object obj position)")
+  (info "Move the canvas object #obj to the given #position list, containing its #x and #y coordinates as floats.")
+  (type proc)
+  (arity 2)
+  (topic (gui canvas-object))
+  (see (disable-object enable-object show-object hide-object object-disabled? resize-object get-object-size get-object-min-size get-object-position object-visible? refresh-object new-entry new-label)))
+
+(defhelp resize-object
+    (use "(resize-object obj width height)")
+  (info "Resize canvas object #obj to the given #width and #height as floats.")
+  (type proc)
+  (arity 2)
+  (topic (gui canvas-object))
+  (see (disable-object enable-object show-object hide-object object-disabled? move-object get-object-size get-object-min-size get-object-position object-visible? refresh-object new-entry new-label)))
+
+(defhelp get-object-size
+    (use "(get-object-size obj) => li")
+  (info "Return the size of canvas object #obj as a list containing the width and height as floats.")
+  (type proc)
+  (arity 1)
+  (topic (gui canvas-object))
+  (see (disable-object enable-object show-object hide-object object-disabled? move-object resize-object get-object-min-size get-object-position object-visible? refresh-object new-entry new-label)))
+
+(defhelp get-object-min-size
+    (use "(get-object-min-size obj) => li")
+  (info "Return the minimum size of canvas object #obj as a list containing the width and height as floats. The minimum size is computed based on various internal criteria and can only be changed for some special widgets.")
+  (type proc)
+  (arity 1)
+  (topic (gui canvas-object))
+  (see (disable-object enable-object show-object hide-object object-disabled? move-object resize-object get-object-size get-object-position object-visible? refresh-object new-entry new-label)))
+
+(defhelp get-object-position
+    (use "(get-object-position obj) => li")
+  (info "Return the position of canvas object #obj as a list containing the x and y coordinates as floats.")
+  (type proc)
+  (arity 1)
+  (topic (gui canvas-object))
+  (see (disable-object enable-object show-object hide-object object-disabled? move-object resize-object get-object-size get-object-min-size object-visible? refresh-object new-entry new-label)))
+
+(defhelp refresh-object
+    (use "(refresh-object obj)")
+  (info "Refresh the canvas object #obj, causing the graphical display to be re-drawn as soon as possible. This may be needed if the object's state has changed.")
+  (type proc)
+  (arity 1)
+  (topic (gui canvas-object))
+  (see (disable-object enable-object show-object hide-object object-disabled? move-object resize-object get-object-size get-object-min-size object-visible? get-object-position new-entry new-label)))
+
+(defhelp new-progress-bar
+    (use "(new-progress-bar) => int")
+  (info "Create a new progress bar whose default minimum is 0.0 and maximum is 1.0.")
+  (type proc)
+  (arity 0)
+  (topic (gui progress-bar))
+  (see (set-progress-bar new-infinite-progress-bar get-progress-bar-value)))
+
+(defhelp set-progress-bar
+    (use "(set-progress-bar bar value [selector value])")
+  (info "Set the value of progress-bar #bar as follows. If a single number is provided, then the current value of the progress-bar is set to this number. If a selector symbol is provided, then if it is 'value, the progress-bar value is set to the following number, if it is 'max or 'min, then the progress-bar maximum or minimum values are set to the respective following number. If it is 'formatter, then the following value must be a procedure that takes the progress-bar ID as argument and returns a string that represents the display of the progress-bar at the given time.")
+  (type proc)
+  (arity -2)
+  (topic (gui progress-bar))
+  (see (get-progress-bar-value new-progress-bar new-infinite-progress-bar)))
+
+(defhelp get-progress-bar-value
+    (use "(get-progress-bar-value bar) => num")
+  (info "Return the current value of progress-bar #bar.")
+  (type proc)
+  (arity 1)
+  (topic (gui progress-bar))
+  (see (set-progress-bar new-progress-bar new-infinite-progress-bar)))
+
+(defhelp new-slider
+    (use "(new-slider min max proc) => int")
+  (info "Create a new slider that allows users to adjust numerical values. The #min and #max arguments must be floats. The procedure #proc takes the current slider float value as argument and is called when the slider changes.")
+  (type proc)
+  (arity 3)
+  (topic (gui slider))
+  (see (set-slider-value)))
+
+(defhelp set-slider-value
+    (use "(set-slider-value slider fl)")
+  (info "Set the value of #slider to float #fl.")
+  (type proc)
+  (arity 2)
+  (topic (gui slider))
+  (see (new-slider)))
+
+(defhelp new-icon
+    (use "(new-icon resource) => int")
+  (info "Create a new icon from #resource, which must be suitable to create an image.")
+  (type proc)
+  (arity 1)
+  (topic (gui icon))
+  (see (theme-icon)))
+
+(defhelp forget-gui-object
+    (use "(forget-gui-object int)")
+  (info "Forget the GUI object #int. This removes any association with the object but does not free internal resources if the object still exists. Internal use only.")
+  (type proc)
+  (arity 1)
+  (topic (gui misc))
+  (see (close-window close-gui)))
+
+(defhelp close-gui
+    (use "(close-gui)")
+  (info "Close the GUI, freeing all resources associated with it. After this function has been called, no further GUI functions can be used.")
+  (type proc)
+  (arity 0)
+  (topic (gui misc))
+  (see (forget-gui-object close-window)))
+
+(defhelp get-clipboard-content
+    (use "(get-clipboard-content) => str")
+  (info "Return the current content of the operating system clipboard as string. This function might raise an error if clipboard access is prohibited by host security settings.")
+  (type proc)
+  (arity 0)
+  (topic (gui misc))
+  (see (set-clipboard-content)))
+
+(defhelp set-clipboard-content
+    (use "(set-clipboard-content str)")
+  (info "Set the operating system clipboard content to string #str. This function might raise an error if clipboard access is prohibited by host security settings.")
+  (type proc)
+  (arity 1)
+  (topic (gui misc))
+  (see (get-clipboard-content)))
+
+(defhelp get-device-info
+    (use "(get-device-info) => li")
+  (info "Return a list with information about the current host device. This returns an association list where 'orientation might be one of '(vertical vertical-upside-down left right unknown), self-explanatory boolean keys 'is-mobile?, 'is-browser, 'has-keyboard?, and 'system-scale with the current scaling factor for graphics as float. The system scale is used to dynamically scale user interface elements to remain legible on hi res displays.")
+  (type proc)
+  (arity 0)
+  (topic (gui misc))
+  (see (close-gui)))
+
+(defhelp new-spacer
+    (use "(new-spacer) => int")
+  (info "Create a new spacer, which adjusts size dynamically by taking up space and displaying nothing. Use this to fill containers e.g. to right align a widget.")
+  (type proc)
+  (arity 0)
+  (topic (gui layout))
+  (see (new-hbox-layout new-vbox-layout new-grid-layout new-grid-wrap-layout new-form-layout new-center-layout new-stack-layout new-container)))
+
+(defhelp new-hbox-layout
+    (use "(new-hbox-layout) => int")
+  (info "Create a new horizontal box layout, which lays out container elements horizontally.")
+  (type proc)
+  (arity 0)
+  (topic (gui layout))
+  (see (new-spacer new-vbox-layout new-grid-layout new-grid-wrap-layout new-form-layout new-center-layout new-stack-layout new-container)))
+
+(defhelp new-vbox-layout
+    (use "(new-vbox-layout) => int")
+  (info "Create a new vertical box layout, which lays out container elements vertically.")
+  (type proc)
+  (arity 0)
+  (topic (gui layout))
+  (see (new-spacer new-hbox-layout new-grid-layout new-grid-wrap-layout new-form-layout new-center-layout new-stack-layout new-container)))
+
+(defhelp new-grid-layout
+    (use "(new-grid-layout n) => int")
+  (info "Create a new grid layout, which arranges elements in #n columns.")
+  (type proc)
+  (arity 1)
+  (topic (gui layout))
+  (see (new-spacer new-hbox-layout new-vbox-layout new-grid-wrap-layout new-form-layout new-center-layout new-stack-layout new-container)))
+
+(defhelp new-grid-wrap-layout
+    (use "(new-grid-wrap-layout width height) => int")
+  (info "Create a new grid wrap layout, which arranges elements such that each element has the given #width and #height, and wraps lines based on the size of the parent container.")
+  (type proc)
+  (arity 2)
+  (topic (gui layout))
+  (see (new-spacer new-hbox-layout new-vbox-layout new-grid-layout new-form-layout new-center-layout new-stack-layout new-container)))
+
+(defhelp new-form-layout
+    (use "(new-form-layout) => int")
+  (info "Create a form layout, which arranges elements in two columns per row, where the columns are aligned.")
+  (type proc)
+  (arity 0)
+  (topic (gui layout))
+  (see (new-form append-form new-spacer new-hbox-layout new-vbox-layout new-grid-layout new-grid-wrap-layout new-center-layout new-stack-layout new-container)))
+
+(defhelp new-center-layout
+    (use "(new-center-layout) => int")
+  (info "Create a new center layout, which centers container elements (possibly overlapping). This may be used for drawing centered on the window, for example.")
+  (type proc)
+  (arity 0)
+  (topic (gui layout))
+  (see (new-form append-form new-spacer new-hbox-layout new-vbox-layout new-grid-layout new-grid-wrap-layout new-form-layout new-stack-layout new-container)))
+
+(defhelp new-stack-layout
+    (use "(new-stack-layout) => int")
+  (info "Create a new stack layout that stacks container elements on top of each other, overlapping. This may be used for drawing, for example.")
+  (type proc)
+  (arity 0)
+  (topic (gui layout))
+  (see (new-form append-form new-spacer new-hbox-layout new-vbox-layout new-grid-layout new-grid-wrap-layout new-form-layout new-center-layout new-container)))
+
+(defhelp new-container
+    (use "(new-container layout obj ...) => int")
+  (info "Create a new container with the given #layout and various canvas objects #obj arranged by the layout.")
+  (type proc)
+  (arity -2)
+  (topic (gui container))
+  (see (new-container-without-layout new-border)))
+
+(defhelp new-container-without-layout
+    (use "(new-container-without-layout obj ...) => int")
+  (info "Create a new container without a layout (overlapping objects) with the given canvas objects #obj.")
+  (type proc)
+  (arity -1)
+  (topic (gui container))
+  (see (new-container new-border)))
+
+(defhelp new-border
+    (use "(new-border top bottom left right [obj ...]) => int")
+  (info "Create a new border layout, which is one of the most useful layouts. Any of #top, #bottom, #left, and #right is put in the respective place (with minimum size) and might also be #nil for no widget. The remaining canvas objects #obj are arranged in the center and take maximum size. This allows you e.g. to put a list on the left side of a window, a panel of buttons on the top, and the main content in another container in the center.")
+  (type proc)
+  (arity -5)
+  (topic (gui container))
+  (see (new-container new-container-without-layout)))
+
+(defhelp new-tabitem
+    (use "(new-tabitem title obj) => int")
+  (info "Create a new tab item for use in app-tabs and doc-tabs with a #title and an embedded canvas object #obj shown when the tab item is selected in the tabs.")
+  (type proc)
+  (arity 2)
+  (topic (gui tabs))
+  (see (new-tabitem-with-icon new-app-tabs new-doc-tabs)))
+
+(defhelp new-tabitem-with-icon
+    (use "(new-tabitem-with-icon title icon obj) => int")
+  (info "Create a new tab item for use in app-tabs and doc-tabs with given #title string, #icon resource, and embedded canvas object #obj that shwon when the tab item is selected in the tabs.")
+  (type proc)
+  (arity 3)
+  (topic (gui tabs))
+  (see (new-tabitem new-app-tabs new-doc-tabs)))
+
+(defhelp new-app-tabs
+    (use "(new-app-tabs tab-item ...) => int")
+  (info "Create a new application tabs, which allow users to choose different items within an application.")
+  (type proc)
+  (arity -1)
+  (topic (gui tabs))
+  (see (new-doc-tabs new-tabitem new-tabitem-with-icon)))
+
+(defhelp new-doc-tabs
+    (use "(new-doc-tabs tab-item ...) => int")
+  (info "Create new document tabs, which allow users to choose different items in a window (not the application as a whole like app-tabs).")
+  (type proc)
+  (arity -1)
+  (topic (gui tabs))
+  (see (new-app-tabs new-tabitem new-tabitem-with-icon)))
+
+(defhelp theme-icon
+    (use "(theme-icon selector) => int")
+  (info "Obtain a pre-defined icon from the application's theme based on the symbol #selector, which may be one of '(cancel check-button check-button-checked color-achromatic color-chromatic color-palette computer confirm content-add content-clear content-copy content-cut content-paste content-redo content-remove content-undo delete document-create document-print document download error file-application file-audio file-image file-text file-video file folder-new folder-open folder grid help history home info list login logout mail-attachment mail-compose mail-forward mail-reply-all mail-reply mail-send media-fast-forward media-fast-rewind media-music media-pause media-photo media-play media-record media-replay media-skip-next media-skip-previous media-stop media-video media-expand menu more-horizontal more-vertical move-down move-up navigate-back navigate-next question radio-button radio-button-checked search-replace search settings storage upload view-full-screen view-refresh view-restore visibility-off visibility volume-down volume-mute volume-up warning).")
+  (type proc)
+  (arity 1)
+  (topic (gui theme))
+  (see (new-icon new-image-from- new-image-from-resource)))
