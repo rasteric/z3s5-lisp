@@ -33,7 +33,9 @@ var revstore sync.Map
 var apl fyne.App
 var mainWin fyne.Window
 
+var VersionSym = z3.NewSym("*z3s5-version*")
 var GUISym = z3.NewSym("gui")
+var FyneSym = z3.NewSym("fyne2")
 var IsQuitSym = z3.NewSym("is-quit")
 var IsSeparatorSym = z3.NewSym("is-separator")
 var DisabledSym = z3.NewSym("disabled")
@@ -181,7 +183,12 @@ func DefGUI(interp *z3.Interp, config Config) {
 	if !ok {
 		reflect = z3.Nil
 	}
-	interp.SetGlobalVar(z3.ReflectSym, &z3.Cell{Car: GUISym, Cdr: reflect})
+	interp.SetGlobalVar(z3.ReflectSym, &z3.Cell{Car: GUISym, Cdr: &z3.Cell{Car: FyneSym, Cdr: reflect}})
+
+	version, ok := interp.GetGlobalVar(VersionSym)
+	if ok {
+		interp.SetGlobalVar(VersionSym, version.(string)+"-"+GUISym.String()+"."+FyneSym.String())
+	}
 
 	cfg := config
 
