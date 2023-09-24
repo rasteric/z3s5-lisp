@@ -206,6 +206,81 @@ t
 
 The reason this doesn't work with `let` is that `is-even?` is not bound in the definition of `is-odd?` and vice versa when `let` is used, whereas `letrec` makes sure that these bindings are mutually available. Although the current implementation always uses `letrec` under the hood, it is best to use `let` whenever it is possible since at least in theory it could be implemented more efficiently. Notice that `setq` can be used to mutate local bindings, of course, and is not just intended for toplevel symbols. Although beginners should avoid it, sometimes mutating variables with `setq` can make definitions simpler at the cost of some elegance.
 
+# GUI Programming
+
+Starting from version 2.4, Z3S5 Lisp has an optional GUI based on Go's [Fyne](https://fyne.io) framework. This allows users to write GUI applications in Z3S5 Lisp.
+
+## Embedding the GUI
+
+To activate the GUI in your own application embedding Z3S5 Lisp, you need to import the separate library  `import z3ui "github.com/rasteric/z3s5-lisp/gui"`. After booting the interpreter during application startup, you may then call the GUI definitions and help declarations as follows:
+
+~~~~{.Go}
+	z3ui.DefGUI(interp, z3ui.DefaultConfig)
+	if err := z3ui.DefGUIHelp(interp); err != nil {
+		fmt.Fprintf(os.Stderr, err.Error())
+		return 3
+	}
+~~~~
+
+Function `z3ui.DefGUI()` defines the GUI functions in the given interpreter and takes a Config structure defined in the GUI library. The default configuration provided above allows full access to all GUI functions. However, the GUI Config structure may be changed to prohibit access to certain functions. For example, links may be prohibited or creating new windows may raise an error. This will make it possible in the future to use the GUI in an environment where functions may only modify a particular window, e.g. to create some embedded GUI plugins.
+
+When the GUI is started using `z3ui.RunGUI()`, the call blocks and events are handled by the GUI and its respective callback functions. Therefore, the Z3S5 Lisp interpreter needs to be run concurrently using e.g. `interp.Run()` in a separate goroutine. See the implementation in `cmd/z3g/z3g.go` for an example of how to do this.
+
+## GUI Basics
+
+Functions defined in Lisp are derived from corresponding functions of the [Fyne](https://fyne.io) framework and listed under the 'gui label in the help system. If the GUI is present, the symbols `gui` and `fyne2` are present in the global list `*reflect*`.
+
+The names of Lisp functions roughly follow those of Fyne functions with the following adaptations to Lisp style :
+
+1. Camelcase is translated to lowercase with hyphens.
+
+2. A function `object.VerbQualifier` becomes verb-object-qualifier.
+
+3. Getters are written in the form `get-object-qualifier` and setters `set-object-qualifier`.
+
+4. As an exception of the previous rules, when the result of a function is a bool, the form is `object-predicate?`.
+
+Fyne objects are represented by integer numbers. The system internally translates between these numbers and objects in a thread-safe way. This means that they are not automatically garbage-collected. To forget an object no longer in use on the Lisp side, use the function `(forget-gui-object id)`. This *has* to be called if you create a lot of objects and want to free them after use. If and when they are garbage-collected depends on the Go and Fyne side, however.
+
+Occasionally, Fyne objects are also created on the fly for performance reasons. For example, sometimes color lists of the form `(r g b a)` with integers `r`, `g`,`b`, `a` are used instead of creating and storing color objects using `(nrgba r g b a)`. There are also sometimes shortcut accessors using selector symbols and other convenience wrappers for Fyne functions. When in doubt, refer to the Lisp help for details.
+
+## Examples
+
+Take a look at the examples in `cmd/z3g/demo.lisp` to see how the GUI may be used. Here is an example snippet:
+
+~~~~{.Lisp}
+(defun demo4 ()
+  (letrec ((win (new-window "Demo 4: Forms"))
+           (form (new-form)))
+    (append-form form "Name" (new-entry))
+    (append-form form "Address" (new-entry))
+    (append-form form "Phone" (new-entry))
+    (append-form form "Email" (new-entry))
+    (append-form form "More" (new-hyperlink "Click here for more info" "https://z3s5.com"))
+    (set-window-content win form)
+    (show-window win)))
+~~~~
+
+In this example, a window is created and as its only content a `form` widget is added to it. This form widget displays a label string plus a widget per line and neatly justifies the columns of the form.
+
+As another example, the following program opens a window with a button that displays a predefined icon from the default theme, and when the button is pressed, the window is closed:
+
+~~~~{.Lisp}
+(defun demo5 ()
+  (letrec ((win (new-window "Demo 5: Button with Icon"))
+           (button (new-button-with-icon "Press me!" 
+					 (theme-icon 'view-restore)
+					 (lambda () (close-window win)))))
+    (set-window-content win button)
+    (show-window win)))
+~~~~
+
+Generally, when windows are closed the GUI keeps being active and new windows can be created again. There is no `MasterWindow` that causes the application to close when it is closed like in Fyne. To close the GUI entirely, use either `z3ui.ShutDownGUI()` in Go or `(close-gui)` in Lisp. After this function has been called, the GUI can no longer be used and using GUI functions may result in undefined behavior.
+
+Note that Z3S5 Lisp can continue to run once the GUI has been closed. The interpreter is independent of the GUI and keeps running until it is exited by the usual mechanisms like `(exit 0)`.
+
+See the help topic `'gui` for more information about GUI-related function and check the Fyne documentation for more information about the underlying framework. At the time of this writing, not all Fyne functions have been implemented on the Z3S5 Lisp side yet, although the framework is already fairly complete and usable for small GUI programs. More functionality from Fyne and other libraries is on the roadmap.
+
 # Advanced Topics
 
 ## Error Handling
