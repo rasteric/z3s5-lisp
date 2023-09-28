@@ -187,7 +187,15 @@
   (type proc)
   (arity 2)
   (topic (gui label))
-  (see (new-label)))
+  (see (get-label-text new-label)))
+
+(defhelp get-label-text
+     (use "(get-label-text label) => str")
+  (info "Gets the text of #label")
+  (type proc)
+  (arity 1)
+  (topic (gui label))
+  (see (set-label-text new-label)))
 
 (defhelp new-entry
     (use "(new-entry [selector]) => int")
@@ -1156,7 +1164,15 @@
   (type proc)
   (arity 2)
   (topic (gui canvas))
-  (see (add-canvas-shortcut get-window-canvas)))
+  (see (set-canvas-on-typed-rune add-canvas-shortcut get-window-canvas)))
+
+(defhelp set-canvas-on-typed-rune
+    (use "(set-canvas-on-typed-rune canvas proc)")
+  (info "Set the procedure #proc called when a rune is typed in #canvas. #proc takes one argument, a string containing a single Unicode rune.")
+  (type proc)
+  (arity 2)
+  (topic (gui canvas))
+  (see (add-canvas-shortcut get-window-canvas set-canvas-on-typed-key)))
 
 (defhelp set-entry-text-wrap
     (use "(set-entry-text-wrap entry selector)")
@@ -1195,5 +1211,37 @@
   (info "Set the focus within #canvas to #object. The object must be a focusable canvas object such as an entry or button.")
   (type proc)
   (arity 2)
-  (topic (gui canvas-object))
-  (see (get-window-canvas)))
+  (topic (gui canvas canvas-object))
+  (see (get-window-canvas get-focused-canvas-object focus-next-canvas-object focus-previous-canvas-object unfocus-canvas-objects)))
+
+(defhelp focus-next-canvas-object
+    (use "(focus-next-canvas-object canvas)")
+  (info "Focus the next focusable user interface element in #canvas.")
+  (type proc)
+  (arity 1)
+  (topic (gui canvas canvas-object))
+  (see (get-window-canvas focus-canvas-object focus-previous-canvas-object unfocus-canvas-objects get-focused-canvas-object)))
+
+(defhelp focus-previous-canvas-object
+    (use "(focus-previous-canvas-object canvas)")
+  (info "Focus the previous focusable user interface element in #canvas.")
+  (type proc)
+  (arity 1)
+  (topic (gui canvas canvas-object))
+  (see (get-window-canvas focus-canvas-object focus-next-canvas-object unfocus-canvas-objects get-focused-canvas-object)))
+
+(defhelp unfocus-canvas-objects
+    (use "(unfocus-canvas-objects canvas)")
+  (info "Remove the focus on any user interface element in #canvas.")
+  (type proc)
+  (arity 1)
+  (topic (gui canvas canvas-object))
+  (see (get-window-canvas focus-canvas-object focus-next-canvas-object focus-previous-canvas-object get-focused-canvas-object)))
+
+(defhelp get-focused-canvas-object
+    (use "(get-focused-canvas-object canvas) => int")
+  (info "Obtain the canvas object that is currently focused in #canvas, or nil if there is none.")
+  (type proc)
+  (arity 1)
+  (topic (gui canvas canvas-object))
+  (see (get-window-canvas focus-canvas-object focus-next-canvas-object focus-previous-canvas-object)))

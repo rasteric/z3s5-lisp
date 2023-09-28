@@ -491,6 +491,12 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	// (get-label-text label) => str
+	interp.Def(pre("get-label-text"), 1, func(a []any) any {
+		label := mustGet(pre("get-label-text"), "GUI label ID", a, 0).(*widget.Label)
+		return label.Text
+	})
+
 	// ENTRY
 
 	// (new-entry [<selector>])
@@ -1481,6 +1487,17 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	// (set-canvas-on-typed-rune canvas proc)
+	interp.Def(pre("set-canvas-on-typed-rune"), 2, func(a []any) any {
+		canvas := mustGet(pre("set-canvas-on-typed-rune"), "GUI canvas ID", a, 0).(fyne.Canvas)
+		proc := a[1].(*z3.Closure)
+		canvas.SetOnTypedRune(func(r rune) {
+			li := &z3.Cell{Car: proc, Cdr: &z3.Cell{Car: string(r), Cdr: z3.Nil}}
+			interp.Eval(li, z3.Nil)
+		})
+		return z3.Void
+	})
+
 	// (focus-canvas-object canvas object)
 	interp.Def(pre("focus-canvas-object"), 2, func(a []any) any {
 		canvas := mustGet(pre("focus-canvas-object"), "GUI canvas ID", a, 0).(fyne.Canvas)
@@ -1490,6 +1507,44 @@ func DefGUI(interp *z3.Interp, config Config) {
 		}
 		canvas.Focus(obj)
 		return z3.Void
+	})
+
+	// (focus-next-canvas-object canvas)
+	interp.Def(pre("focus-next-canvas-object"), 1, func(a []any) any {
+		canvas := mustGet(pre("focus-next-canvas-object"), "GUI canvas ID", a, 0).(fyne.Canvas)
+		canvas.FocusNext()
+		return z3.Void
+	})
+
+	// (unfocus-canvas-objects canvas)
+	interp.Def(pre("unfocus-canvas-objects"), 1, func(a []any) any {
+		canvas := mustGet(pre("unfocus-canvas-objects"), "GUI canvas ID", a, 0).(fyne.Canvas)
+		canvas.Unfocus()
+		return z3.Void
+	})
+
+	// (focus-previous-canvas-object canvas)
+	interp.Def(pre("focus-previous-canvas-object"), 1, func(a []any) any {
+		canvas := mustGet(pre("focus-previous-canvas-object"), "GUI canvas ID", a, 0).(fyne.Canvas)
+		canvas.FocusPrevious()
+		return z3.Void
+	})
+
+	// (get-focused-canvas-object canvas) => int or nil
+	interp.Def(pre("get-focused-canvas-object"), 1, func(a []any) any {
+		canvas := mustGet(pre("get-focused-canvas-object"), "GUI canvas ID", a, 0).(fyne.Canvas)
+		focused := canvas.Focused()
+		if focused == nil {
+			return z3.Nil
+		}
+		if obj, ok := focused.(fyne.Focusable); ok {
+			id, found := getID(obj)
+			if !found {
+				return z3.Nil
+			}
+			return id
+		}
+		return z3.Nil
 	})
 
 	// CANVAS OBJECT (polymorphic methods)

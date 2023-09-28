@@ -2408,7 +2408,7 @@
     ((or (str-empty? sfx) (str-empty? s)) s)
     ((equal? (str-slice s (- (len s) (min (len sfx) (len s))) (len s))
 	     sfx)
-     (str-slice s (- (len s) (min (len sfx) (len s))) (len s)))
+     (str-slice s 0 (- (len s) (len sfx))))
     (t s)))
 
 (defhelp str-remove-suffix
