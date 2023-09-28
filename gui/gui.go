@@ -40,7 +40,95 @@ var IsQuitSym = z3.NewSym("is-quit")
 var IsSeparatorSym = z3.NewSym("is-separator")
 var DisabledSym = z3.NewSym("disabled")
 var CheckedSym = z3.NewSym("checked")
+var WrapOffSym = z3.NewSym("none")
+var WrapBreakSym = z3.NewSym("break")
+var WrapWordSym = z3.NewSym("word")
 
+// key name symbols, for a more Lispy interface to logical key names
+var KeyEscape = z3.NewSym("escape")
+var KeyReturn = z3.NewSym("return")
+var KeyTab = z3.NewSym("tab")
+var KeyBackspace = z3.NewSym("backspace")
+var KeyInsert = z3.NewSym("insert")
+var KeyDelete = z3.NewSym("delete")
+var KeyRight = z3.NewSym("right")
+var KeyLeft = z3.NewSym("left")
+var KeyDown = z3.NewSym("down")
+var KeyUp = z3.NewSym("up")
+var KeyPageUp = z3.NewSym("page-up")
+var KeyPageDown = z3.NewSym("page-down")
+var KeyHome = z3.NewSym("home")
+var KeyEnd = z3.NewSym("end")
+var KeyF1 = z3.NewSym("f1")
+var KeyF2 = z3.NewSym("f2")
+var KeyF3 = z3.NewSym("f3")
+var KeyF4 = z3.NewSym("f4")
+var KeyF5 = z3.NewSym("f5")
+var KeyF6 = z3.NewSym("f6")
+var KeyF7 = z3.NewSym("f7")
+var KeyF8 = z3.NewSym("f8")
+var KeyF9 = z3.NewSym("f9")
+var KeyF10 = z3.NewSym("f10")
+var KeyF11 = z3.NewSym("f11")
+var KeyF12 = z3.NewSym("f12")
+var KeyEnter = z3.NewSym("enter")
+var Key0 = z3.NewSym("key0")
+var Key1 = z3.NewSym("key1")
+var Key2 = z3.NewSym("key2")
+var Key3 = z3.NewSym("key3")
+var Key4 = z3.NewSym("key4")
+var Key5 = z3.NewSym("key5")
+var Key6 = z3.NewSym("key6")
+var Key7 = z3.NewSym("key7")
+var Key8 = z3.NewSym("key8")
+var Key9 = z3.NewSym("key9")
+var KeyA = z3.NewSym("a")
+var KeyB = z3.NewSym("b")
+var KeyC = z3.NewSym("c")
+var KeyD = z3.NewSym("d")
+var KeyE = z3.NewSym("e")
+var KeyF = z3.NewSym("f")
+var KeyG = z3.NewSym("g")
+var KeyH = z3.NewSym("h")
+var KeyI = z3.NewSym("i")
+var KeyJ = z3.NewSym("j")
+var KeyK = z3.NewSym("k")
+var KeyL = z3.NewSym("l")
+var KeyM = z3.NewSym("m")
+var KeyN = z3.NewSym("n")
+var KeyO = z3.NewSym("o")
+var KeyP = z3.NewSym("p")
+var KeyQ = z3.NewSym("q")
+var KeyR = z3.NewSym("r")
+var KeyS = z3.NewSym("s")
+var KeyT = z3.NewSym("t")
+var KeyU = z3.NewSym("u")
+var KeyV = z3.NewSym("v")
+var KeyW = z3.NewSym("w")
+var KeyX = z3.NewSym("x")
+var KeyY = z3.NewSym("y")
+var KeyZ = z3.NewSym("z")
+var KeySpace = z3.NewSym("space")
+var KeyTick = z3.NewSym("tick")
+var KeyComma = z3.NewSym("comma")
+var KeyMinus = z3.NewSym("minus")
+var KeyPeriod = z3.NewSym("dot")
+var KeySlash = z3.NewSym("slash")
+var KeyBackslash = z3.NewSym("backslash")
+var KeyLeftBracket = z3.NewSym("left-bracket")
+var KeyRightBracket = z3.NewSym("right-bracket")
+var KeySemicolon = z3.NewSym("semicolon")
+var KeyEqual = z3.NewSym("equal")
+var KeyAsterisk = z3.NewSym("asterisk")
+var KeyPlus = z3.NewSym("plus")
+var KeyBackTick = z3.NewSym("back-tick")
+var KeyShift = z3.NewSym("shift")
+var KeyControl = z3.NewSym("control")
+var KeyAlt = z3.NewSym("alt")
+var KeySuper = z3.NewSym("super")
+var KeyUnknown = z3.NewSym("unknown")
+
+// used to work around Go prohibition to hash functions
 type validatorWrapper struct {
 	fn fyne.StringValidator
 }
@@ -438,6 +526,15 @@ func DefGUI(interp *z3.Interp, config Config) {
 			li := &z3.Cell{Car: proc, Cdr: li2}
 			interp.Eval(li, z3.Nil)
 		}
+		return z3.Void
+	})
+
+	// (set-entry-text-wrap entry selector)
+	interp.Def(pre("set-entry-text-wrap"), 2, func(a []any) any {
+		e := mustGet(pre("set-entry-text-wrap"), "GUI entry ID", a, 0).(*widget.Entry)
+		wrap := a[1].(*z3.Sym)
+		mode := MustConvertSymToTextWrap(pre("set-entry-text-wrap"), wrap)
+		e.Wrapping = mode
 		return z3.Void
 	})
 
@@ -1346,6 +1443,55 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(&desktop.CustomShortcut{KeyName: key, Modifier: modifier})
 	})
 
+	// CANVAS
+
+	// (add-canvas-shortcut canvas shortcut proc)
+	interp.Def(pre("add-canvas-shortcut"), 3, func(a []any) any {
+		canvas := mustGet(pre("add-canvas-shortcut"), "GUI canvas ID", a, 0).(fyne.Canvas)
+		shortcut := mustGet(pre("add-canvas-shortcut"), "GUI shortcut ID", a, 1).(fyne.Shortcut)
+		proc := a[2].(*z3.Closure)
+
+		canvas.AddShortcut(shortcut, func(sc fyne.Shortcut) {
+			obj, ok := getID(sc)
+			if !ok {
+				panic(fmt.Sprintf(pre("add-canvas-shortcut: shortcut id not found in handler: %v"), z3.Str(a[1])))
+			}
+			interp.Eval(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: obj, Cdr: z3.Nil}}, z3.Nil)
+		})
+		return z3.Void
+	})
+
+	// (remove-canvas-shortcut canvas shortcut)
+	interp.Def(pre("remove-canvas-shortcut"), 2, func(a []any) any {
+		canvas := mustGet(pre("remove-canvas-shortcut"), "GUI canvas ID", a, 0).(fyne.Canvas)
+		shortcut := mustGet(pre("remove-canvas-shortcut"), "GUI shortcut ID", a, 1).(fyne.Shortcut)
+		canvas.RemoveShortcut(shortcut)
+		return z3.Void
+	})
+
+	// (set-canvas-on-typed-key canvas proc)
+	interp.Def(pre("set-canvas-on-typed-key"), 2, func(a []any) any {
+		canvas := mustGet(pre("set-canvas-on-typed-key"), "GUI canvas ID", a, 0).(fyne.Canvas)
+		proc := a[1].(*z3.Closure)
+		canvas.SetOnTypedKey(func(evt *fyne.KeyEvent) {
+			qq := z3.QqQuote(KeyNameToSymbol(evt.Name))
+			li := &z3.Cell{Car: proc, Cdr: &z3.Cell{Car: qq, Cdr: &z3.Cell{Car: goarith.AsNumber(evt.Physical.ScanCode), Cdr: z3.Nil}}}
+			interp.Eval(li, z3.Nil)
+		})
+		return z3.Void
+	})
+
+	// (focus-canvas-object canvas object)
+	interp.Def(pre("focus-canvas-object"), 2, func(a []any) any {
+		canvas := mustGet(pre("focus-canvas-object"), "GUI canvas ID", a, 0).(fyne.Canvas)
+		obj, ok := mustGet(pre("focus-canvas-object"), "GUI focusable canvas object ID", a, 1).(fyne.Focusable)
+		if !ok {
+			panic(fmt.Sprintf("%v: expected a focusable canvas object as second argument, but the given canvas object cannot take focus: %v", pre("focus-canvas-object"), a[1]))
+		}
+		canvas.Focus(obj)
+		return z3.Void
+	})
+
 	// CANVAS OBJECT (polymorphic methods)
 
 	// (disable-object <obj>)
@@ -1704,7 +1850,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(container.NewTabItemWithIcon(title, ics, canvas.(fyne.CanvasObject)))
 	})
 
-	// container.AppTabs
+	// (new-app-tabs tab-item ...) => int
 	interp.Def(pre("new-app-tabs"), -1, func(a []any) any {
 		li := a[0].(*z3.Cell)
 		arr := make([]*container.TabItem, 0)
@@ -1716,7 +1862,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(container.NewAppTabs(arr...))
 	})
 
-	// container.DocTabs
+	// (new-doc-tabs tab-item ...) => int
 	interp.Def(pre("new-doc-tabs"), -1, func(a []any) any {
 		li := a[0].(*z3.Cell)
 		arr := make([]*container.TabItem, 0)
@@ -1726,6 +1872,28 @@ func DefGUI(interp *z3.Interp, config Config) {
 			li = li.CdrCell()
 		}
 		return put(container.NewDocTabs(arr...))
+	})
+
+	// (new-hsplit leading trailing) => int
+	interp.Def(pre("new-hsplit"), 2, func(a []any) any {
+		lead := mustGet(pre("new-hsplit"), "GUI canvas object ID", a, 0).(fyne.CanvasObject)
+		trail := mustGet(pre("new-hsplit"), "GUI canvas object ID", a, 1).(fyne.CanvasObject)
+		return put(container.NewHSplit(lead, trail))
+	})
+
+	// (new-vsplit leading trailing) => int
+	interp.Def(pre("new-vsplit"), 2, func(a []any) any {
+		top := mustGet(pre("new-vsplit"), "GUI canvas object ID", a, 0).(fyne.CanvasObject)
+		bottom := mustGet(pre("new-vsplit"), "GUI canvas object ID", a, 1).(fyne.CanvasObject)
+		return put(container.NewVSplit(top, bottom))
+	})
+
+	// (set-split-offset split fl)
+	interp.Def(pre("set-split-offset"), 2, func(a []any) any {
+		split := mustGet(pre("set-split-offset"), "GUI split ID", a, 0).(*container.Split)
+		fl := z3.ToFloat64(a[1])
+		split.SetOffset(fl)
+		return z3.Void
 	})
 
 	// RESOURCES
@@ -2017,15 +2185,501 @@ func MustGetTextStyle(caller string, idx int, a any) fyne.TextStyle {
 	return style
 }
 
+// KeyNameToSymbol converts a Fyne key name string to a symbol, as they are used in MustGetShortcut.
+func KeyNameToSymbol(name fyne.KeyName) *z3.Sym {
+	switch name {
+	case fyne.KeyEscape:
+		return KeyEscape
+	case fyne.KeyReturn:
+		return KeyReturn
+	case fyne.KeyTab:
+		return KeyTab
+	case fyne.KeyBackspace:
+		return KeyBackspace
+	case fyne.KeyInsert:
+		return KeyInsert
+	case fyne.KeyDelete:
+		return KeyDelete
+	case fyne.KeyRight:
+		return KeyRight
+	case fyne.KeyLeft:
+		return KeyLeft
+	case fyne.KeyDown:
+		return KeyDown
+	case fyne.KeyUp:
+		return KeyUp
+	case fyne.KeyPageDown:
+		return KeyPageDown
+	case fyne.KeyPageUp:
+		return KeyPageUp
+	case fyne.KeyHome:
+		return KeyHome
+	case fyne.KeyEnd:
+		return KeyEnd
+	case fyne.KeyF1:
+		return KeyF1
+	case fyne.KeyF2:
+		return KeyF2
+	case fyne.KeyF3:
+		return KeyF3
+	case fyne.KeyF4:
+		return KeyF4
+	case fyne.KeyF5:
+		return KeyF5
+	case fyne.KeyF6:
+		return KeyF6
+	case fyne.KeyF7:
+		return KeyF7
+	case fyne.KeyF8:
+		return KeyF8
+	case fyne.KeyF9:
+		return KeyF9
+	case fyne.KeyF10:
+		return KeyF10
+	case fyne.KeyF11:
+		return KeyF11
+	case fyne.KeyEnter:
+		return KeyEnter
+	case fyne.Key0:
+		return Key0
+	case fyne.Key1:
+		return Key1
+	case fyne.Key2:
+		return Key2
+	case fyne.Key3:
+		return Key3
+	case fyne.Key4:
+		return Key4
+	case fyne.Key5:
+		return Key5
+	case fyne.Key6:
+		return Key6
+	case fyne.Key7:
+		return Key7
+	case fyne.Key8:
+		return Key8
+	case fyne.Key9:
+		return Key9
+	case fyne.KeyA:
+		return KeyA
+	case fyne.KeyB:
+		return KeyB
+	case fyne.KeyC:
+		return KeyC
+	case fyne.KeyD:
+		return KeyD
+	case fyne.KeyE:
+		return KeyE
+	case fyne.KeyF:
+		return KeyF
+	case fyne.KeyG:
+		return KeyG
+	case fyne.KeyH:
+		return KeyH
+	case fyne.KeyI:
+		return KeyI
+	case fyne.KeyJ:
+		return KeyJ
+	case fyne.KeyK:
+		return KeyK
+	case fyne.KeyL:
+		return KeyL
+	case fyne.KeyM:
+		return KeyM
+	case fyne.KeyN:
+		return KeyN
+	case fyne.KeyO:
+		return KeyO
+	case fyne.KeyP:
+		return KeyP
+	case fyne.KeyQ:
+		return KeyQ
+	case fyne.KeyR:
+		return KeyR
+	case fyne.KeyS:
+		return KeyS
+	case fyne.KeyT:
+		return KeyT
+	case fyne.KeyU:
+		return KeyU
+	case fyne.KeyV:
+		return KeyV
+	case fyne.KeyW:
+		return KeyW
+	case fyne.KeyX:
+		return KeyX
+	case fyne.KeyY:
+		return KeyY
+	case fyne.KeyZ:
+		return KeyZ
+	case fyne.KeySpace:
+		return KeySpace
+	case fyne.KeyApostrophe:
+		return KeyTick
+	case fyne.KeyComma:
+		return KeyComma
+	case fyne.KeyMinus:
+		return KeyMinus
+	case fyne.KeyPeriod:
+		return KeyPeriod
+	case fyne.KeySlash:
+		return KeySlash
+	case fyne.KeyBackslash:
+		return KeyBackslash
+	case fyne.KeyLeftBracket:
+		return KeyLeftBracket
+	case fyne.KeyRightBracket:
+		return KeyRightBracket
+	case fyne.KeySemicolon:
+		return KeySemicolon
+	case fyne.KeyEqual:
+		return KeyEqual
+	case fyne.KeyAsterisk:
+		return KeyAsterisk
+	case fyne.KeyPlus:
+		return KeyPlus
+	case fyne.KeyBackTick:
+		return KeyBackTick
+	default:
+		return KeyUnknown
+	}
+}
+
 // MustGetShortcut converts a Z3S5 Lisp list shortcut representations into the key name and modifier
 // of a fyne.KeyShortcut.
 func MustGetShortcut(caller string, li *z3.Cell) (fyne.KeyName, fyne.KeyModifier) {
 	var mod fyne.KeyModifier
 	var key fyne.KeyName
+	var s string
 	for li != z3.Nil {
-		var s string
 		sym, ok := li.Car.(*z3.Sym)
 		if ok {
+			switch sym {
+			case KeyShift:
+				mod = mod | fyne.KeyModifierShift
+				li = li.CdrCell()
+				continue
+			case KeyControl:
+				mod = mod | fyne.KeyModifierControl
+				li = li.CdrCell()
+				continue
+			case KeyAlt:
+				mod = mod | fyne.KeyModifierAlt
+				li = li.CdrCell()
+				continue
+			case KeySuper:
+				mod = mod | fyne.KeyModifierSuper
+				li = li.CdrCell()
+				continue
+			case KeyEscape:
+				key = fyne.KeyEscape
+				li = li.CdrCell()
+				continue
+			case KeyReturn:
+				key = fyne.KeyReturn
+				li = li.CdrCell()
+				continue
+			case KeyTab:
+				key = fyne.KeyTab
+				li = li.CdrCell()
+				continue
+			case KeyBackspace:
+				key = fyne.KeyBackspace
+				li = li.CdrCell()
+				continue
+			case KeyInsert:
+				key = fyne.KeyInsert
+				li = li.CdrCell()
+				continue
+			case KeyDelete:
+				key = fyne.KeyDelete
+				li = li.CdrCell()
+				continue
+			case KeyRight:
+				key = fyne.KeyRight
+				li = li.CdrCell()
+				continue
+			case KeyLeft:
+				key = fyne.KeyLeft
+				li = li.CdrCell()
+				continue
+			case KeyDown:
+				key = fyne.KeyDown
+				li = li.CdrCell()
+				continue
+			case KeyUp:
+				key = fyne.KeyUp
+				li = li.CdrCell()
+				continue
+			case KeyPageUp:
+				key = fyne.KeyPageUp
+				li = li.CdrCell()
+				continue
+			case KeyPageDown:
+				key = fyne.KeyPageDown
+				li = li.CdrCell()
+				continue
+			case KeyHome:
+				key = fyne.KeyHome
+				li = li.CdrCell()
+				continue
+			case KeyEnd:
+				key = fyne.KeyEnd
+				li = li.CdrCell()
+				continue
+			case KeyF1:
+				key = fyne.KeyF1
+				li = li.CdrCell()
+				continue
+			case KeyF2:
+				key = fyne.KeyF2
+				li = li.CdrCell()
+				continue
+			case KeyF3:
+				key = fyne.KeyF3
+				li = li.CdrCell()
+				continue
+			case KeyF4:
+				key = fyne.KeyF4
+				li = li.CdrCell()
+				continue
+			case KeyF5:
+				key = fyne.KeyF5
+				li = li.CdrCell()
+				continue
+			case KeyF6:
+				key = fyne.KeyF6
+				li = li.CdrCell()
+				continue
+			case KeyF7:
+				key = fyne.KeyF7
+				li = li.CdrCell()
+				continue
+			case KeyF8:
+				key = fyne.KeyF8
+				li = li.CdrCell()
+				continue
+			case KeyF9:
+				key = fyne.KeyF9
+				li = li.CdrCell()
+				continue
+			case KeyF10:
+				key = fyne.KeyF10
+				li = li.CdrCell()
+				continue
+			case KeyF11:
+				key = fyne.KeyF11
+				li = li.CdrCell()
+				continue
+			case KeyF12:
+				key = fyne.KeyF12
+				li = li.CdrCell()
+				continue
+			case KeyEnter:
+				key = fyne.KeyEnter
+				li = li.CdrCell()
+				continue
+			case Key0:
+				key = fyne.Key0
+				li = li.CdrCell()
+				continue
+			case Key1:
+				key = fyne.Key1
+				li = li.CdrCell()
+				continue
+			case Key2:
+				key = fyne.Key2
+				li = li.CdrCell()
+				continue
+			case Key3:
+				key = fyne.Key3
+				li = li.CdrCell()
+				continue
+			case Key4:
+				key = fyne.Key4
+				li = li.CdrCell()
+				continue
+			case Key5:
+				key = fyne.Key5
+				li = li.CdrCell()
+				continue
+			case Key6:
+				key = fyne.Key6
+				li = li.CdrCell()
+				continue
+			case Key7:
+				key = fyne.Key7
+				li = li.CdrCell()
+				continue
+			case Key8:
+				key = fyne.Key8
+				li = li.CdrCell()
+				continue
+			case Key9:
+				key = fyne.Key9
+				li = li.CdrCell()
+				continue
+			case KeyA:
+				key = fyne.KeyA
+				li = li.CdrCell()
+				continue
+			case KeyB:
+				key = fyne.KeyB
+				li = li.CdrCell()
+				continue
+			case KeyC:
+				key = fyne.KeyC
+				li = li.CdrCell()
+				continue
+			case KeyD:
+				key = fyne.KeyD
+				li = li.CdrCell()
+				continue
+			case KeyE:
+				key = fyne.KeyE
+				li = li.CdrCell()
+				continue
+			case KeyF:
+				key = fyne.KeyF
+				li = li.CdrCell()
+				continue
+			case KeyG:
+				key = fyne.KeyG
+				li = li.CdrCell()
+				continue
+			case KeyH:
+				key = fyne.KeyH
+				li = li.CdrCell()
+				continue
+			case KeyI:
+				key = fyne.KeyI
+				li = li.CdrCell()
+				continue
+			case KeyJ:
+				key = fyne.KeyJ
+				li = li.CdrCell()
+				continue
+			case KeyK:
+				key = fyne.KeyK
+				li = li.CdrCell()
+				continue
+			case KeyL:
+				key = fyne.KeyL
+				li = li.CdrCell()
+				continue
+			case KeyM:
+				key = fyne.KeyM
+				li = li.CdrCell()
+				continue
+			case KeyN:
+				key = fyne.KeyN
+				li = li.CdrCell()
+				continue
+			case KeyO:
+				key = fyne.KeyO
+				li = li.CdrCell()
+				continue
+			case KeyP:
+				key = fyne.KeyP
+				li = li.CdrCell()
+				continue
+			case KeyQ:
+				key = fyne.KeyQ
+				li = li.CdrCell()
+				continue
+			case KeyR:
+				key = fyne.KeyR
+				li = li.CdrCell()
+				continue
+			case KeyS:
+				key = fyne.KeyS
+				li = li.CdrCell()
+				continue
+			case KeyT:
+				key = fyne.KeyT
+				li = li.CdrCell()
+				continue
+			case KeyU:
+				key = fyne.KeyU
+				li = li.CdrCell()
+				continue
+			case KeyV:
+				key = fyne.KeyV
+				li = li.CdrCell()
+				continue
+			case KeyW:
+				key = fyne.KeyW
+				li = li.CdrCell()
+				continue
+			case KeyX:
+				key = fyne.KeyX
+				li = li.CdrCell()
+				continue
+			case KeyY:
+				key = fyne.KeyY
+				li = li.CdrCell()
+				continue
+			case KeyZ:
+				key = fyne.KeyZ
+				li = li.CdrCell()
+				continue
+			case KeySpace:
+				key = fyne.KeySpace
+				li = li.CdrCell()
+				continue
+			case KeyTick:
+				key = fyne.KeyApostrophe
+				li = li.CdrCell()
+				continue
+			case KeyComma:
+				key = fyne.KeyComma
+				li = li.CdrCell()
+				continue
+			case KeyMinus:
+				key = fyne.KeyMinus
+				li = li.CdrCell()
+				continue
+			case KeyPeriod:
+				key = fyne.KeyPeriod
+				li = li.CdrCell()
+				continue
+			case KeySlash:
+				key = fyne.KeySlash
+				li = li.CdrCell()
+				continue
+			case KeyBackslash:
+				key = fyne.KeyBackslash
+				li = li.CdrCell()
+				continue
+			case KeyLeftBracket:
+				key = fyne.KeyLeftBracket
+				li = li.CdrCell()
+				continue
+			case KeyRightBracket:
+				key = fyne.KeyRightBracket
+				li = li.CdrCell()
+				continue
+			case KeySemicolon:
+				key = fyne.KeySemicolon
+				li = li.CdrCell()
+				continue
+			case KeyEqual:
+				key = fyne.KeyEqual
+				li = li.CdrCell()
+				continue
+			case KeyAsterisk:
+				key = fyne.KeyAsterisk
+				li = li.CdrCell()
+				continue
+			case KeyPlus:
+				key = fyne.KeyPlus
+				li = li.CdrCell()
+				continue
+			case KeyBackTick:
+				key = fyne.KeyBackTick
+				li = li.CdrCell()
+				continue
+			}
 			s = sym.String()
 		} else if str, ok := li.Car.(string); ok {
 			s = str
@@ -2272,4 +2926,18 @@ func ListToTextGridStyle(li *z3.Cell) widget.TextGridStyle {
 	li = li.CdrCell()
 	bg := ListToColor(li.Car.(*z3.Cell))
 	return &widget.CustomTextGridStyle{FGColor: fg, BGColor: bg}
+}
+
+// MustConvertSymToTextWrap converts a symbol to a fyne.TextWrap or panics with an error message.
+func MustConvertSymToTextWrap(caller string, sym *z3.Sym) fyne.TextWrap {
+	switch sym {
+	case WrapOffSym:
+		return fyne.TextWrapOff
+	case WrapBreakSym:
+		return fyne.TextWrapBreak
+	case WrapWordSym:
+		return fyne.TextWrapWord
+	default:
+		panic(fmt.Sprintf("%v: expected valid text wrap symbol in '(none break word), given: %v", caller, z3.Str(sym)))
+	}
 }

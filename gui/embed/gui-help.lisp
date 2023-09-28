@@ -67,7 +67,7 @@
   (type proc)
   (arity 1)
   (topic (gui window drawing))
-  (see (get-window-content set-window-content)))
+  (see (get-window-content set-window-content focus-canvas-object)))
 
 (defhelp get-window-title
     (use "(get-window-title window) => str")
@@ -1133,3 +1133,67 @@
   (arity 1)
   (topic (gui theme))
   (see (new-icon new-image-from- new-image-from-resource)))
+
+(defhelp add-canvas-shortcut
+    (use "(add-canvas-shortcut canvas shortcut proc)")
+  (info "Add the given #shortcut to the given #canvas, calling the handler #proc when it is triggered. #proc must be a function that takes a shortcut as argument.")
+  (type proc)
+  (arity 3)
+  (topic (gui canvas shortcut))
+  (see (get-window-canvas remove-canvas-shortcut)))
+
+(defhelp remove-canvas-shortcut
+    (use "(remove-canvas-shortcut canvas shortcut)")
+  (info "Remove the #shortcut from #canvas.")
+  (type proc)
+  (arity 2)
+  (topic (gui canvas shortcut))
+  (see (add-canvas-shortcut get-window-canvas)))
+
+(defhelp set-canvas-on-typed-key
+    (use "(set-canvas-on-typed-key canvas proc)")
+  (info "Set the procedure #proc called when a key is typed in #canvas. #proc takes two arguments, the first one is a platform-independent key symbol and the second one is a platform- and keyboard-dependent hardware scancode.")
+  (type proc)
+  (arity 2)
+  (topic (gui canvas))
+  (see (add-canvas-shortcut get-window-canvas)))
+
+(defhelp set-entry-text-wrap
+    (use "(set-entry-text-wrap entry selector)")
+  (info "Set or remove the text wrapping of #entry, which is only relevant for multiline entries. #selector must be one of '(none break wrap), where 'none indicates no text wrapping, 'break indicates that words are broken without special wrapping algorithm, and 'word means word wrapping.")
+  (type proc)
+  (arity 2)
+  (topic (gui entry))
+  (see (new-entry)))
+
+(defhelp new-hsplit
+    (use "(new-hsplit obj1 obj2) => int")
+  (info "Return a new horizontal divider between canvas object #obj1 and #obj2. The user can adjust the division by drag & drop.")
+  (type proc)
+  (arity 2)
+  (topic (gui split))
+  (see (set-split-offset new-vsplit)))
+
+(defhelp new-vsplit
+    (use "(new-vsplit obj1 obj2) => int")
+  (info "Return a new vertical divider between canvas object #obj1 and #obj2. The user can adjust the division by drag & drop.")
+  (type proc)
+  (arity 2)
+  (topic (gui split))
+  (see (set-split-offset new-hplit)))
+
+(defhelp set-split-offset
+    (use "(set-split-offset split offset)")
+  (info "Set the offset of #split to float #offset between 0.0 and 1.0. #offset indicates the percentage between the objects shown in the split. If #offset is 0.0, then only the second object is shown, if it is 1.0 then only the first object is shown.")
+  (type proc)
+  (arity 2)
+  (topic (gui split))
+  (see (new-vsplit new-hsplit)))
+
+(defhelp focus-canvas-object
+    (use "(focus-canvas-object canvas object)")
+  (info "Set the focus within #canvas to #object. The object must be a focusable canvas object such as an entry or button.")
+  (type proc)
+  (arity 2)
+  (topic (gui canvas-object))
+  (see (get-window-canvas)))

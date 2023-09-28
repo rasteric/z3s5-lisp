@@ -231,5 +231,45 @@
 				(doit)))))
 		    (doit))))))
 
-(out "Use (demo1) ... (demo17) to run GUI demos.\n")
+(defun demo18 ()
+  (letrec ((win (new-window "Demo 18: Keyboard"))
+	   (lb (new-label "     <type something>     ")))
+    (set-window-content win lb)
+    (set-canvas-on-typed-key (get-window-canvas win) (lambda (sym scancode)
+						       (set-label-text
+							lb
+							(fmt "key: %v code: %v" sym scancode))))
+    (show-window win)))
+
+(defun demo19 ()
+  (letrec ((win (new-window "Demo 19: Split"))
+	   (e1 (new-entry 'multi-line))
+	   (e2 (new-entry 'multi-line))
+	   (split (new-vsplit e1 e2)))
+    (set-entry-place-holder e2 "Enter some Lisp symbol to look up")
+    (set-entry-text-wrap e1 'word)
+    (set-entry-on-change-callback
+     e2 (lambda (s)
+	  (let ((sym (str->sym s)))
+	    (cond
+	      ((_bound? sym)
+	       (let ((h (help-entry sym)))
+		 (if h
+		     (set-entry-text e1
+				     (str+
+				      (assoc1 'use h)
+				      "\n\n"
+				      (assoc1 'info h)
+				      "\n\n"
+				      (fmt "See also: %v" (assoc1 'see h))))
+		     (set-entry-text e1
+				     (fmt "%v\n\nNo help available, value: %v" sym (eval sym))))))
+	      (t (set-entry-text e1 (fmt "Not bound: %v" sym))))))) 
+    (set-window-content win split)
+    (set-split-offset split 0.8)
+    (focus-canvas-object (get-window-canvas win) e2)
+    (set-window-size win 800 600)
+    (show-window win)))
+
+(out "Use (demo1) ... (demo19) to run GUI demos.\n")
 
