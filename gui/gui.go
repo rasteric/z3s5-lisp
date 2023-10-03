@@ -813,7 +813,12 @@ func DefGUI(interp *z3.Interp, config Config) {
 		grid := mustGet(pre("get-text-grid-cell"), "GUI text grid ID", a, 0).(*widget.TextGrid)
 		row := int(z3.ToInt64(pre("get-text-grid-cell"), a[1]))
 		column := int(z3.ToInt64(pre("get-text-grid-cell"), a[2]))
-		cell := grid.Rows[row].Cells[column]
+		gridRow := grid.Rows[row]
+		cell := gridRow.Cells[column]
+		if cell.Style == nil {
+			return &z3.Cell{Car: string(cell.Rune), Cdr: &z3.Cell{Car: TextGridStyleToList(gridRow.Style),
+				Cdr: z3.Nil}}
+		}
 		return &z3.Cell{Car: string(cell.Rune), Cdr: &z3.Cell{Car: TextGridStyleToList(cell.Style),
 			Cdr: z3.Nil}}
 	})
@@ -894,6 +899,19 @@ func DefGUI(interp *z3.Interp, config Config) {
 	interp.Def(pre("get-text-grid-text"), 1, func(a []any) any {
 		grid := mustGet(pre("get-text-grid-text"), "GUI text grid ID", a, 0).(*widget.TextGrid)
 		return grid.Text()
+	})
+
+	// (count-text-grid-rows grid) => int
+	interp.Def(pre("count-text-grid-rows"), 1, func(a []any) any {
+		grid := mustGet(pre("count-text-grid-rows"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		return goarith.AsNumber(len(grid.Rows))
+	})
+
+	// (count-text-grid-row-columns grid row) => int
+	interp.Def(pre("count-text-grid-row-columns"), 2, func(a []any) any {
+		grid := mustGet(pre("count-text-grid-row-columns"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := int(z3.ToInt64(pre("count-text-grid-row-columns"), a[1]))
+		return goarith.AsNumber(len(grid.Rows[row].Cells))
 	})
 
 	// CHECK
@@ -2970,6 +2988,9 @@ func ListToColor(li *z3.Cell) color.Color {
 
 // TextGridStyleToList converts a text grid style to a Z3S5 Lisp list.
 func TextGridStyleToList(s widget.TextGridStyle) *z3.Cell {
+	if s == nil {
+		return z3.Nil
+	}
 	return &z3.Cell{Car: ColorToList(s.TextColor()), Cdr: &z3.Cell{Car: ColorToList(s.BackgroundColor()),
 		Cdr: z3.Nil}}
 }

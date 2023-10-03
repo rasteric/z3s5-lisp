@@ -446,11 +446,27 @@
 
 (defhelp get-text-grid-cell
     (use "(get-text-grid-cell grid row column) => li")
-  (info "Return the cell of #grid at #row and #column. The result is a list consisting of a string containing one unicode rune and a grid style list.")
+  (info "Return the cell of #grid at #row and #column. The result is a list consisting of a string containing one unicode rune and a grid style list. The style might be nil. If it is not nil, then the list contains a foreground and a background color list.")
   (type proc)
   (arity 3)
   (topic (gui text-grid))
   (see (set-text-grid-cell get-text-grid-row set-text-grid-rune set-text-grid-style-range)))
+
+(defhelp count-text-grid-rows
+    (use "(count-text-grid-rows grid) => int")
+  (info "Return the number of the last row in grid, 0 if there are none.")
+  (type proc)
+  (arity 1)
+  (topic (gui text-grid))
+  (see (count-text-grid-row-columns get-text-grid-cell get-text-grid-row)))
+
+(defhelp count-text-grid-row-columns
+    (use "(count-text-grid-row-columns grid row) => int")
+  (info "Return the number of columns in #row of #grid, 0 if there are none.")
+  (type proc)
+  (arity 2)
+  (topic (gui text-grid))
+  (see (count-text-grid-rows get-text-grid-cell get-text-grid-row)))
 
 (defhelp set-text-grid-row
     (use "(set-text-grid-row grid row row-spec)")

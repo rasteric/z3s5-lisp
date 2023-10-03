@@ -312,5 +312,7 @@
     (set-window-size win 600 40)
     (show-window win)))
 
+(include "editor.lisp")
+
 (out "Use (demo1) ... (demo21) to run GUI demos.\n")
 
