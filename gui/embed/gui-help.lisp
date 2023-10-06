@@ -450,7 +450,15 @@
   (type proc)
   (arity 3)
   (topic (gui text-grid))
-  (see (set-text-grid-cell get-text-grid-row set-text-grid-rune set-text-grid-style-range)))
+  (see (get-text-grid-rune set-text-grid-cell get-text-grid-row set-text-grid-rune set-text-grid-style-range get-text-grid-style)))
+
+(defhelp get-text-grid-rune
+    (use "(get-text-grid-rune grid row column) => str")
+  (info "Return the string containing a single rune at the cell in #row and #column of #grid.")
+  (type proc)
+  (arity 3)
+  (topic (gui text-grid))
+  (see (get-text-grid-cell get-text-grid-style get-text-grid-row)))
 
 (defhelp count-text-grid-rows
     (use "(count-text-grid-rows grid) => int")
@@ -779,7 +787,15 @@
   (type proc)
   (arity 4)
   (topic (gui drawing))
-  (see (new-rectangle new-circle new-line new-text)))
+  (see (nrgba64 theme-color new-rectangle new-circle new-line new-text)))
+
+(defhelp nrgba64
+    (use "(nrgba64 red green blue alpha) => int")
+  (info "Create a 64-bit RGBA color where #red, #green, #blue, and #alpha are 16-bit uint integers, i.e., values between 0 and 65365 (inclusive). Notice that some GUI functions require NRGBA64 color returned by this function, whereas others require a color list of int values '(red green blue alpha). This is for performance reasons, since it sometimes faster to convert a list to a color on-the-fly and sometimes more convenient to store pre-defined colors for later re-use.")
+  (type proc)
+  (arity 4)
+  (topic (gui drawing))
+  (see (nrgba theme-color new-rectangle new-circle new-line new-text)))
 
 (defhelp new-rectangle
     (use "(new-rectangle fill-color [width height] [position] [stroke-color] [stroke-width] [corner-radius]) => int")
@@ -1261,3 +1277,11 @@
   (arity 1)
   (topic (gui canvas canvas-object))
   (see (get-window-canvas focus-canvas-object focus-next-canvas-object focus-previous-canvas-object)))
+
+(defhelp theme-color
+    (use "(theme-color selector) => li")
+  (info "Obtain a theme color as color list. #selector must be one of '(foreground background button disabled-button disabled disabled-text error focus hover input-background input-border menu-background overlay-background place-holder pressed primary scroll-bar selection separator shadow success warning).")
+  (type proc)
+  (arity 1)
+  (topic (gui theme))
+  (see (theme-icon)))

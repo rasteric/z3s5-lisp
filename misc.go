@@ -74,6 +74,12 @@ func ToUInt8(a any) uint8 {
 	return uint8(n)
 }
 
+// ToUint16 converts a value to uint16
+func ToUInt16(a any) uint16 {
+	n, _ := goarith.AsNumber(a).Int()
+	return uint16(n)
+}
+
 // ToUInt32 converts a value to uint32
 func ToUInt32(a any) uint32 {
 	n, _ := goarith.AsNumber(a).Int()

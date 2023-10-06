@@ -44,6 +44,30 @@ var WrapOffSym = z3.NewSym("none")
 var WrapBreakSym = z3.NewSym("break")
 var WrapWordSym = z3.NewSym("word")
 
+// theme selectors
+var ForegroundColor = z3.NewSym("foreground")
+var BackgroundColor = z3.NewSym("background")
+var ButtonColor = z3.NewSym("button")
+var DisabledButtonColor = z3.NewSym("disabled-button")
+var DisabledColor = z3.NewSym("disabled")
+var DisabledTextColor = z3.NewSym("disabled-text")
+var ErrorColor = z3.NewSym("error")
+var FocusColor = z3.NewSym("focus")
+var HoverColor = z3.NewSym("hover")
+var InputBackgroundColor = z3.NewSym("input-background")
+var InputBorderColor = z3.NewSym("input-border")
+var MenuBackgroundColor = z3.NewSym("menu-background")
+var OverlayBackgroundColor = z3.NewSym("overlay-background")
+var PlaceHolderColor = z3.NewSym("place-holder")
+var PressedColor = z3.NewSym("pressed")
+var PrimaryColor = z3.NewSym("primary")
+var ScrollBarColor = z3.NewSym("scroll-bar")
+var SelectionColor = z3.NewSym("selection")
+var SeparatorColor = z3.NewSym("separator")
+var ShadowColor = z3.NewSym("shadow")
+var SuccessColor = z3.NewSym("success")
+var WarningColor = z3.NewSym("warning")
+
 // key name symbols, for a more Lispy interface to logical key names
 var KeyEscape = z3.NewSym("escape")
 var KeyReturn = z3.NewSym("return")
@@ -823,6 +847,16 @@ func DefGUI(interp *z3.Interp, config Config) {
 			Cdr: z3.Nil}}
 	})
 
+	// (get-text-grid-rune grid row column) => str
+	interp.Def(pre("get-text-grid-rune"), 3, func(a []any) any {
+		grid := mustGet(pre("get-text-grid-cell"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := int(z3.ToInt64(pre("get-text-grid-cell"), a[1]))
+		column := int(z3.ToInt64(pre("get-text-grid-cell"), a[2]))
+		gridRow := grid.Rows[row]
+		cell := gridRow.Cells[column]
+		return string(cell.Rune)
+	})
+
 	// (set-text-grid-row <grid> <row> <rowspec>) where <rowspec> has the same format as is returned
 	// by get-text-grid-row, i.e. it is an array of cell lists containing a rune string and a style list.
 	interp.Def(pre("set-text-grid-row"), 3, func(a []any) any {
@@ -1300,6 +1334,15 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(color.NRGBA{R: r, G: g, B: b, A: alpha})
 	})
 
+	// (nrgba64 r g b a) => NRGBA64 color
+	interp.Def(pre("nrgba64"), 4, func(a []any) any {
+		r := z3.ToUInt16(a[0])
+		g := z3.ToUInt16(a[1])
+		b := z3.ToUInt16(a[2])
+		alpha := z3.ToUInt16(a[3])
+		return put(color.NRGBA64{R: r, G: g, B: b, A: alpha})
+	})
+
 	// (new-rectangle <fill-color> [<width> <height>] [<position>] [<stroke-color>] [<stroke-width>] [<corner-radius>])
 	interp.Def(pre("new-rectangle"), -1, func(a []any) any {
 		li := a[0].(*z3.Cell)
@@ -1447,7 +1490,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 	})
 
 	// (new-raster-with-pixels <pixel-proc>) where <pixel-proc> takes x, y, w, h and returns
-	// a color list (NOT an nrgba color, for performance reasons this is created at the Go side).
+	// a color list (NOT an nrgba64 color, for performance reasons this is created at the Go side).
 	interp.Def(pre("new-raster-with-pixels"), 1, func(a []any) any {
 		proc := a[0].(*z3.Closure)
 		raster := canvas.NewRasterWithPixels(func(x, y, w, h int) color.Color {
@@ -1967,6 +2010,63 @@ func DefGUI(interp *z3.Interp, config Config) {
 		fl := z3.ToFloat64(a[1])
 		split.SetOffset(fl)
 		return z3.Void
+	})
+
+	// THEME
+
+	// (theme-color selector) => li
+	interp.Def(pre("theme-color"), 1, func(a []any) any {
+		sym := a[0].(*z3.Sym)
+		var c color.Color
+		switch sym {
+		case ForegroundColor:
+			c = theme.ForegroundColor()
+		case BackgroundColor:
+			c = theme.BackgroundColor()
+		case ButtonColor:
+			c = theme.ButtonColor()
+		case DisabledButtonColor:
+			c = theme.DisabledColor()
+		case DisabledColor:
+			c = theme.DisabledColor()
+		case DisabledTextColor:
+			c = theme.DisabledColor()
+		case ErrorColor:
+			c = theme.ErrorColor()
+		case FocusColor:
+			c = theme.FocusColor()
+		case HoverColor:
+			c = theme.HoverColor()
+		case InputBackgroundColor:
+			c = theme.InputBackgroundColor()
+		case InputBorderColor:
+			c = theme.InputBorderColor()
+		case MenuBackgroundColor:
+			c = theme.MenuBackgroundColor()
+		case OverlayBackgroundColor:
+			c = theme.OverlayBackgroundColor()
+		case PlaceHolderColor:
+			c = theme.PlaceHolderColor()
+		case PressedColor:
+			c = theme.PressedColor()
+		case PrimaryColor:
+			c = theme.PrimaryColor()
+		case ScrollBarColor:
+			c = theme.ScrollBarColor()
+		case SelectionColor:
+			c = theme.SelectionColor()
+		case SeparatorColor:
+			c = theme.SeparatorColor()
+		case ShadowColor:
+			c = theme.ShadowColor()
+		case SuccessColor:
+			c = theme.SuccessColor()
+		case WarningColor:
+			c = theme.WarningColor()
+		default:
+			panic(fmt.Sprintf(pre("theme-color: theme color selector must be one of '(foreground background button disabled-button disabled disabled-text error focus hover input-background input-border menu-background overlay-background place-holder pressed primary scroll-bar selection separator shadow success warning), given %v"), z3.Str(sym)))
+		}
+		return ColorToList(c)
 	})
 
 	// RESOURCES
@@ -2971,19 +3071,19 @@ func ColorToList(c color.Color) *z3.Cell {
 
 // ListToColor converts a Z3S5 Lisp color list to a color.
 func ListToColor(li *z3.Cell) color.Color {
-	r := z3.ToUInt8(li.Car)
+	r := z3.ToUInt16(li.Car)
 	li = li.CdrCell()
-	g := z3.ToUInt8(li.Car)
+	g := z3.ToUInt16(li.Car)
 	li = li.CdrCell()
-	b := z3.ToUInt8(li.Car)
+	b := z3.ToUInt16(li.Car)
 	li = li.CdrCell()
-	var alpha uint8
+	var alpha uint16
 	if li != z3.Nil {
-		alpha = z3.ToUInt8(li.Car)
+		alpha = z3.ToUInt16(li.Car)
 	} else {
-		alpha = 255
+		alpha = 65365
 	}
-	return color.NRGBA{R: r, G: g, B: b, A: alpha}
+	return color.NRGBA64{R: r, G: g, B: b, A: alpha}
 }
 
 // TextGridStyleToList converts a text grid style to a Z3S5 Lisp list.
