@@ -1284,4 +1284,29 @@
   (type proc)
   (arity 1)
   (topic (gui theme))
-  (see (theme-icon)))
+  (see (theme-icon nrgba64 nrgba color->color-64 color-64->color *colors*)))
+
+(defhelp theme-is-dark?
+    (use "(theme-is-dark?) => bool")
+  (info "Return true if the current GUI theme is dark, nil otherwise.")
+  (type proc)
+  (arity 1)
+  (topic (gui theme))
+  (see (theme-color *colors*)))
+    
+(defhelp color->color64
+    (use "(color64->color li) => li")
+  (info "Convert a 32-bit NRGBA color list with values from 0 to 255 (inclusive) as it is used by Z3S5 Lisp's *color* dict to a 64-bit NRGBA64 color list with values from 0 to 65635 (inclusive) as they are used by the GUI.")
+  (type proc)
+  (arity 1)
+  (topic (gui theme))
+  (see (theme-color the-color *colors*)))
+
+(defhelp color64->color
+    (use "(color64->color li) => li")
+  (info "Convert a 64-bit NRGBA64 color list with values from 0 to 65365 (inclusive) to a 32-bit color list with values from 0 to 255 (inclusive) as they are used by Z3S5 Lisp's *colors* dict.")
+  (type proc)
+  (arity 1)
+  (topic (gui theme))
+  (see (theme-color the-color *colors*)))
+

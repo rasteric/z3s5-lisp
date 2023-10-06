@@ -29,13 +29,22 @@ func run() int {
 		fmt.Fprintf(os.Stderr, "Z3S5 Lisp failed to boot the standard prelude: %v\n", err)
 		return 2
 	}
+
 	interp.SafeEval(&z3.Cell{Car: z3.NewSym("protect-toplevel-symbols"), Cdr: z3.Nil}, z3.Nil)
+
+	// Maybe load the user init file.
+	if err := interp.MaybeLoadUserInit(); err != nil {
+		fmt.Fprintf(os.Stderr, err.Error())
+		return 4
+	}
+
 	//	hooks.Exec(z3.StartupHook, nil)
 	defer hooks.Exec(z3.ShutdownHook, nil)
 	if *load != "" {
 		file, err := os.Open(*load)
 		if err != nil {
-			panic(err)
+			fmt.Fprintf(os.Stderr, "Z3S5 Lisp error, failed to open file \"%v\" given with -l flag: %v\n", *load, err)
+			return 6
 		}
 		defer file.Close()
 		if !interp.Run(file, z3.NewFileSource(*load)) {
@@ -50,7 +59,7 @@ func run() int {
 		ss := strings.NewReader(*exec)
 		if !interp.Run(ss, z3.NewInternalSource("cmdline-exec-string", *exec)) {
 			fmt.Fprintf(os.Stderr, "Z3S5 Lisp error in input expression given with -e flag.\n")
-			return 4
+			return 5
 		}
 		if !(*interactive) {
 			return 0

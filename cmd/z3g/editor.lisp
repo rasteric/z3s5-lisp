@@ -1,7 +1,11 @@
 ;;;; Z3S5 Lisp editor
 
 (setq zed.*blink-cursor-on-interval* 800)
+(declare-unprotected 'zed.*blink-cursor-on-interval*)
 (setq zed.*blink-cursor-off-interval* 200)
+(declare-unprotected 'zed.*blink-cursor-off-interval*)
+(setq zed.*paren-color* '(40000 40000 40000 65635))
+(declare-unprotected 'zed.*paren-color*)
 
 (defun zed.blink-cursor (ed)
   (future (letrec ((blink (lambda ()
@@ -16,6 +20,7 @@
        	    (blink))))
 
 (defun zed.new ()
+  (if (theme-is-dark?) (setq zed.*paren-color* (color->color64 '(255 164 0 255))) (setq zed.*paren-color* '(10000 10000 32896 65535)))
   (let ((grid (new-text-grid)))
     (letrec ((ed (array 'zed.editor grid 0 0 true true (make-mutex) (dict))))
       (zed.set-text ed "")
@@ -219,7 +224,13 @@
       (zed.lisp-syntax-color-range ed (1st range) (2nd range) (3rd range) (4th range)))))
 
 (defun zed.lisp-syntax-color-range (ed start-row start-col end-row end-col)
-  (out (fmt "%v, %v:%v, %v\n" start-row start-col end-row end-col)))
+  (let ((rune (get-text-grid-rune (zed.grid ed) start-row start-col)))
+    (case rune
+      (("(" ")") (set-text-grid-style (zed.grid ed) start-row start-col (list zed.*paren-color* (theme-color 'background)))))
+    (unless (and (= start-row end-row)
+		 (= start-col end-col))
+      (zed.lisp-syntax-color-range ed (zed.next-row ed start-row start-col) (zed.next-col ed start-row start-col)
+				   end-row end-col))))
 
 ;; uses parse-expressions to get the ranges of all expressions in the buffer
 ;; Todo: This is inefficient if we really just need the expression under the cursor.

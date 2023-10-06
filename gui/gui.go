@@ -27,6 +27,9 @@ import (
 //go:embed embed/gui-help.lisp
 var helpGUIFile []byte
 
+//go:embed embed/gui.lisp
+var embeddedGUIFile []byte
+
 var counter uint64
 var storage sync.Map
 var revstore sync.Map
@@ -279,6 +282,15 @@ func DefGUIHelp(interp *z3.Interp) error {
 	help := bytes.NewReader(helpGUIFile)
 	if !interp.Run(help, z3.NewInternalSource("embed/gui-help.lisp", "")) {
 		return errors.New(`Z3S5 Lisp GUI help definitions failed`)
+	}
+	return nil
+}
+
+// DefGUIAdditions defines additional functions from an embedded Lisp source.
+func DefGUIAdditions(interp *z3.Interp) error {
+	help := bytes.NewReader(embeddedGUIFile)
+	if !interp.Run(help, z3.NewInternalSource("embed/gui.lisp", "")) {
+		return errors.New(`Z3S5 Lisp GUI embedded definitions failed`)
 	}
 	return nil
 }
@@ -2069,6 +2081,11 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return ColorToList(c)
 	})
 
+	// (theme-is-dark?) => bool
+	interp.Def(pre("theme-is-dark?"), 0, func(a []any) any {
+		return z3.AsLispBool(fyne.CurrentApp().Settings().ThemeVariant() == theme.VariantDark)
+	})
+
 	// RESOURCES
 
 	// THEME ICONS
@@ -2265,6 +2282,9 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(res)
 	})
 
+	if err := DefGUIAdditions(interp); err != nil {
+		panic(fmt.Sprintf("Z3S5 Lisp internal error, failed to boot embedded GUI additions: %v", err))
+	}
 }
 
 // MustGetPosition expects a position in argument a at argument index argIdx and returns it,

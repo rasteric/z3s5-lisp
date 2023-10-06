@@ -1,7 +1,7 @@
 /*
-  Z3S5 Lisp by Erich Rast.
-  A Lisp-1 for Go based on Nukata Lisp 2.0 by SUZUKI Hisao.
-  MIT License, see the accompanying LICENSE file.
+Z3S5 Lisp by Erich Rast.
+A Lisp-1 for Go based on Nukata Lisp 2.0 by SUZUKI Hisao.
+MIT License, see the accompanying LICENSE file.
 */
 package z3s5
 
@@ -1328,7 +1328,8 @@ func qqExpand0(x any, level int) any {
 
 // qqExpand1 expands x of `x so that the result can be used as an argument of
 // append.  Example 1: (,a b) => ((list a 'b))
-//          Example 2: (,a ,@(cons 2 3)) => ((cons a (cons 2 3)))
+//
+//	Example 2: (,a ,@(cons 2 3)) => ((cons a (cons 2 3)))
 func qqExpand1(x any, level int) *Cell {
 	if j, ok := x.(*Cell); ok {
 		if j == Nil {
@@ -1946,6 +1947,26 @@ func (interp *Interp) Boot() error {
 			return errors.New(`Z3S5 Lisp could not read the version information`)
 		}
 	}
+	if p.LoadUserInit {
+		file, err := os.Open(`init.lisp`)
+		if err != nil {
+			if !os.IsNotExist(err) {
+				return fmt.Errorf("Z3S5 Lisp could not open the init.lisp file: %w", err)
+			}
+			return nil
+		}
+		defer file.Close()
+		if !interp.Run(file, NewFileSource("init.lisp")) {
+			return errors.New(`Z3S5 Lisp encountered an error in init.lisp.`)
+		}
+	}
+	return nil
+}
+
+// MaybeLoadUserInit attempts to load the user init file if it exists in the local directory
+// and if the permission is available.
+func (interp *Interp) MaybeLoadUserInit() error {
+	p := interp.pc.Perm()
 	if p.LoadUserInit {
 		file, err := os.Open(`init.lisp`)
 		if err != nil {
