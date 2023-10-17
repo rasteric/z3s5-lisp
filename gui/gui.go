@@ -70,6 +70,8 @@ var SeparatorColor = z3.NewSym("separator")
 var ShadowColor = z3.NewSym("shadow")
 var SuccessColor = z3.NewSym("success")
 var WarningColor = z3.NewSym("warning")
+var TextGridForegroundColor = z3.NewSym("text-grid-foreground")
+var TextGridBackgroundColor = z3.NewSym("text-grid-background")
 
 // key name symbols, for a more Lispy interface to logical key names
 var KeyEscape = z3.NewSym("escape")
@@ -768,6 +770,21 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(grid)
 	})
 
+	// (get-text-grid-cell-size grid) => li
+	interp.Def(pre("get-text-grid-cell-size"), 1, func(a []any) any {
+		_, ok = mustGet(pre("get-text-grid-cell-size"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		if !ok {
+			panic(fmt.Sprintf(pre("get-text-grid-cell-size: expected text grid as argument, given %v"), z3.Str(a[0])))
+		}
+		// unfortunately text-grid cell size and line calculations are internal, as of Fyne v2.4
+		// the following is taken from textgrid.go: (t *TextGridRenderer) updateCellSize():
+		size := fyne.MeasureText("M", theme.TextSize(), fyne.TextStyle{Monospace: true})
+		// round it for seamless background
+		w := math.Round(float64((size.Width)))
+		h := math.Round(float64((size.Height)))
+		return &z3.Cell{Car: goarith.AsNumber(w), Cdr: &z3.Cell{Car: goarith.AsNumber(h), Cdr: z3.Nil}}
+	})
+
 	// (text-grid-show-line-numbers? <grid>) => bool
 	interp.Def(pre("text-grid-show-line-numbers?"), 1, func(a []any) any {
 		grid := mustGet(pre("text-grid-show-line-numbers?"), "GUI text grid ID", a, 0).(*widget.TextGrid)
@@ -851,10 +868,6 @@ func DefGUI(interp *z3.Interp, config Config) {
 		column := int(z3.ToInt64(pre("get-text-grid-cell"), a[2]))
 		gridRow := grid.Rows[row]
 		cell := gridRow.Cells[column]
-		if cell.Style == nil {
-			return &z3.Cell{Car: string(cell.Rune), Cdr: &z3.Cell{Car: TextGridStyleToList(gridRow.Style),
-				Cdr: z3.Nil}}
-		}
 		return &z3.Cell{Car: string(cell.Rune), Cdr: &z3.Cell{Car: TextGridStyleToList(cell.Style),
 			Cdr: z3.Nil}}
 	})
@@ -877,13 +890,13 @@ func DefGUI(interp *z3.Interp, config Config) {
 		li := a[2].(*z3.Cell)
 		columns := li.Car.([]any)
 		li = li.CdrCell()
-		style := ListToTextGridStyle(li.Car.(*z3.Cell))
+		style := ListToTextGridStyle(li.Car)
 		cells := make([]widget.TextGridCell, 0, len(columns))
 		for i := range columns {
 			li = columns[i].(*z3.Cell)
 			r := []rune(li.Car.(string))[0]
 			li = li.CdrCell()
-			sty := ListToTextGridStyle(li.Car.(*z3.Cell))
+			sty := ListToTextGridStyle(li.Car)
 			cells = append(cells, widget.TextGridCell{Rune: r, Style: sty})
 		}
 		grid.SetRow(row, widget.TextGridRow{Cells: cells, Style: style})
@@ -916,7 +929,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 		grid := mustGet(pre("set-text-grid-style"), "GUI text grid ID", a, 0).(*widget.TextGrid)
 		row := int(z3.ToInt64(pre("set-text-grid-style"), a[1]))
 		column := int(z3.ToInt64(pre("set-text-grid-style"), a[2]))
-		style := ListToTextGridStyle(a[3].(*z3.Cell))
+		style := ListToTextGridStyle(a[3])
 		grid.SetStyle(row, column, style)
 		return z3.Void
 	})
@@ -928,7 +941,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 		column1 := int(z3.ToInt64(pre("set-text-grid-style-range"), a[2]))
 		row2 := int(z3.ToInt64(pre("set-text-grid-style-range"), a[3]))
 		column2 := int(z3.ToInt64(pre("set-text-grid-style-range"), a[4]))
-		style := ListToTextGridStyle(a[5].(*z3.Cell))
+		style := ListToTextGridStyle(a[5])
 		grid.SetStyleRange(row1, column1, row2, column2, style)
 		return z3.Void
 	})
@@ -1870,6 +1883,39 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(layout.NewVBoxLayout())
 	})
 
+	interp.Def(pre("new-hscroll"), 1, func(a []any) any {
+		obj := mustGet1(pre("new-hscroll"), "GUI canvas object ID", a[0]).(fyne.CanvasObject)
+		return put(container.NewHScroll(obj))
+	})
+
+	interp.Def(pre("new-scroll"), 1, func(a []any) any {
+		obj := mustGet1(pre("new-scroll"), "GUI canvas object ID", a[0]).(fyne.CanvasObject)
+		return put(container.NewScroll(obj))
+	})
+
+	interp.Def(pre("new-vscroll"), 1, func(a []any) any {
+		obj := mustGet1(pre("new-vscroll"), "GUI canvas object ID", a[0]).(fyne.CanvasObject)
+		return put(container.NewVScroll(obj))
+	})
+
+	interp.Def(pre("get-scroll-offset"), 1, func(a []any) any {
+		obj := mustGet1(pre("get-scroll-offset"), "GUI scroll ID", a[0]).(*container.Scroll)
+		offset := obj.Offset
+		return &z3.Cell{Car: goarith.AsNumber(float64(offset.X)),
+			Cdr: &z3.Cell{Car: goarith.AsNumber(float64(offset.Y)), Cdr: z3.Nil}}
+	})
+
+	interp.Def(pre("set-scroll-offset"), 2, func(a []any) any {
+		obj := mustGet1(pre("get-scroll-offset"), "GUI scroll ID", a[0]).(*container.Scroll)
+		offset, ok := MustGetPosition(pre("set-scroll-offset"), 1, a[1])
+		if !ok {
+			panic(fmt.Sprintf(pre("get-scroll-offset: expected valid position as second argument, given %v"),
+				z3.Str(a[1])))
+		}
+		obj.Offset = offset
+		return z3.Void
+	})
+
 	interp.Def(pre("new-grid-layout"), 1, func(a []any) any {
 		n := z3.ToInt64(pre("new-grid-layout"), a[0])
 		return put(layout.NewGridLayout(int(n)))
@@ -2075,8 +2121,12 @@ func DefGUI(interp *z3.Interp, config Config) {
 			c = theme.SuccessColor()
 		case WarningColor:
 			c = theme.WarningColor()
+		case TextGridForegroundColor:
+			c = widget.TextGridStyleDefault.TextColor()
+		case TextGridBackgroundColor:
+			c = widget.TextGridStyleDefault.BackgroundColor()
 		default:
-			panic(fmt.Sprintf(pre("theme-color: theme color selector must be one of '(foreground background button disabled-button disabled disabled-text error focus hover input-background input-border menu-background overlay-background place-holder pressed primary scroll-bar selection separator shadow success warning), given %v"), z3.Str(sym)))
+			panic(fmt.Sprintf(pre("theme-color: theme color selector must be one of '(foreground background button disabled-button disabled disabled-text error focus hover input-background input-border menu-background overlay-background place-holder pressed primary scroll-bar selection separator shadow success warning text-grid-foreground text-grid-background), given %v"), z3.Str(sym)))
 		}
 		return ColorToList(c)
 	})
@@ -3108,7 +3158,7 @@ func ListToColor(li *z3.Cell) color.Color {
 
 // TextGridStyleToList converts a text grid style to a Z3S5 Lisp list.
 func TextGridStyleToList(s widget.TextGridStyle) *z3.Cell {
-	if s == nil {
+	if s == nil || s == widget.TextGridStyleDefault || s.BackgroundColor() == nil || s.TextColor() == nil {
 		return z3.Nil
 	}
 	return &z3.Cell{Car: ColorToList(s.TextColor()), Cdr: &z3.Cell{Car: ColorToList(s.BackgroundColor()),
@@ -3117,11 +3167,17 @@ func TextGridStyleToList(s widget.TextGridStyle) *z3.Cell {
 
 // ListToTextGridStyle converts a list in the format returned by TextGridStyleToList back to
 // a Fyne text grid style.
-func ListToTextGridStyle(li *z3.Cell) widget.TextGridStyle {
-	fg := ListToColor(li.Car.(*z3.Cell))
-	li = li.CdrCell()
-	bg := ListToColor(li.Car.(*z3.Cell))
-	return &widget.CustomTextGridStyle{FGColor: fg, BGColor: bg}
+func ListToTextGridStyle(arg any) widget.TextGridStyle {
+	if li, ok := arg.(*z3.Cell); ok {
+		if li == z3.Nil {
+			return widget.TextGridStyleDefault
+		}
+		fg := ListToColor(li.Car.(*z3.Cell))
+		li = li.CdrCell()
+		bg := ListToColor(li.Car.(*z3.Cell))
+		return &widget.CustomTextGridStyle{FGColor: fg, BGColor: bg}
+	}
+	return widget.TextGridStyleDefault
 }
 
 // MustConvertSymToTextWrap converts a symbol to a fyne.TextWrap or panics with an error message.

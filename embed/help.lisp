@@ -1281,7 +1281,7 @@
   (type proc)
   (topic (array))
   (arity -1)
-  (see (array? build-array)))
+  (see (array? build-array array+)))
 
 (defhelp build-array
     (use "(build-array n init) => array")
@@ -1289,7 +1289,7 @@
   (type proc)
   (topic (array))
   (arity 2)
-  (see (array array? array-slice array-append array-copy)))
+  (see (array array? array-slice array-append array-copy array+)))
 
 (defhelp array-slice
     (use "(array-slice arr low high) => array")
@@ -1297,7 +1297,7 @@
   (type proc)
   (topic (array))
   (arity 3)
-  (see (array-ref array-len array-append build-array array array-copy)))
+  (see (array-ref array-len array-append build-array array array-copy array+)))
 
 (defhelp array-append
     (use "(array-append arr elem) => array")
@@ -1305,6 +1305,14 @@
   (type proc)
   (topic (array))
   (arity 2)
+  (see (array-ref array-len build-array array-slice array array-copy array+)))
+
+(defhelp array+
+    (use "(array+ array1 ...) => array")
+  (info "Create a new array that results from concatenating the given arrays in order. This function does not mutate #array1.")
+  (type proc)
+  (arity -2)
+  (topic (array))
   (see (array-ref array-len build-array array-slice array array-copy)))
 
 (defhelp array-len

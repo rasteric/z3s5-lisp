@@ -991,6 +991,20 @@ func (interp *Interp) Define_Base() {
 		return arr
 	})
 
+	// (array+ array1 ...) => array
+	interp.Def("array+", -1, func(a []any) any {
+		li := a[0].(*Cell)
+		tmp := li.Car.([]any)
+		arr := make([]any, len(tmp))
+		copy(arr, tmp)
+		li = li.CdrCell()
+		for li != Nil {
+			arr = append(arr, li.Car.([]any)...)
+			li = li.CdrCell()
+		}
+		return arr
+	})
+
 	// (build-array n init-value) => array
 	interp.Def("build-array", 2, func(a []any) any {
 		n, ok := goarith.AsNumber(a[0]).Int()

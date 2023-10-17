@@ -20,12 +20,15 @@
        	    (blink))))
 
 (defun zed.new ()
-  (if (theme-is-dark?) (setq zed.*paren-color* (color->color64 '(255 164 0 255))) (setq zed.*paren-color* '(10000 10000 32896 65535)))
-  (let ((grid (new-text-grid)))
-    (letrec ((ed (array 'zed.editor grid 0 0 true true (make-mutex) (dict))))
-      (zed.set-text ed "")
-      (zed.blink-cursor ed)
-      ed)))
+  (if (theme-is-dark?)
+      (setq zed.*paren-color* (color->color64 '(255 164 0 255)))
+      (setq zed.*paren-color* '(10000 10000 32896 65535)))
+  (letrec ((grid (new-text-grid))
+	   (scroll (new-scroll grid))
+	   (ed (array 'zed.editor grid 0 0 true true (make-mutex) scroll)))
+    (zed.set-text ed "")
+    (zed.blink-cursor ed)
+    ed))
 
 ;;; ACCESSORS
 
@@ -77,13 +80,9 @@
 (defun zed.unlock (ed)
   (mutex-unlock (array-ref ed 6)))
 
-;; 7 style at a given row and column, used for restoring to normal
-(defun zed.get-style (ed row column)
-  (get-or-set (array-ref ed 7) (fmt "%v:%v" row column)
-	      (list (theme-color 'foreground) (theme-color 'input-background))))
-
-(defun zed.save-style (ed row column style)
-  (set (array-ref ed 7) (fmt "%v:%v" row column) style))
+;; 7 scroll, which embeds the text-grid for the editor
+(defun zed.scroll (ed)
+  (array-ref ed 7))
 
 ;;; GENERAL EDITING
 
@@ -99,10 +98,8 @@
      col
      (cond
        (on?
-;	(ed.save-style ed row col style)
 	(list (zed.invert-color fgcolor) fgcolor))
        (t
-					;	(zed.get-style ed row col))))
 	(list (theme-color 'foreground) (theme-color 'background)))))
     (refresh-object (zed.grid ed)))) 
 
@@ -151,15 +148,126 @@
     ((left) (zed.cursor-left ed))
     ((right) (zed.cursor-right ed))
     ((up) (zed.cursor-up ed))
-    ((down) (zed.cursor-down ed)))
+    ((down) (zed.cursor-down ed))
+    ((backspace) (zed.backspace ed))
+    ((delete) (zed.delete1 ed))
+    ((page-down) (zed.scroll-right ed))
+    ((page-up) (zed.scroll-left ed)))
   (zed.lisp-syntax-color-at-expression ed)
   (zed.draw-cursor ed true))
+
+(defun zed.rune-handler (ed rune)
+  (zed.draw-cursor ed nil)
+  (zed.insert-at-cursor ed rune)
+  (zed.draw-cursor ed true))
+
+;; insert the given string (without special characters such as newline)
+;; at the current cursor position, advancing the cursor as necessary
+(defun zed.insert-at-cursor (ed s)
+  (letrec ((row (zed.cursor-row ed))
+	   (col (zed.cursor-column ed))
+	   (row-data (get-text-grid-row (zed.grid ed) row))
+	   (row-cells (1st row-data))
+	   (row-style (2nd row-data))
+	   (part1 (build-array col nil))
+	   (part2 (build-array (len s) nil))
+	   (part3 (build-array (- (len row-cells) col) nil))
+	   (default-style (list (theme-color 'foreground)(theme-color 'background))))
+    (dotimes (i (len part1))
+      (array-set part1 i (array-ref row-cells i)))
+    (dotimes (i (len part2))
+      (array-set part2 i (list (str-slice s i (add1 i)) default-style)))
+    (dotimes (i (len part3))
+      (array-set part3 i (array-ref row-cells (+ i col))))
+    (set-text-grid-row (zed.grid ed) row (list (array+ part1 part2 part3) nil))
+    (zed.cursor-right ed)
+    (refresh-object (zed.scroll ed))))
+
+;; delete one cell to the left of the cursor (backspace key behavior)
+(defun zed.backspace (ed)
+  (letrec ((row (zed.cursor-row ed))
+	   (col (zed.cursor-column ed)))
+    (unless (and (= row 0) (= col 0))
+      (cond
+	((= col 0) (zed.cursor-left ed)) ;; WRONG: Need to remove the line (and move content to next line)
+	(t
+	 (letrec ((row-data (get-text-grid-row (zed.grid ed) row))
+		  (row-cells (1st row-data))
+		  (row-style (2nd row-data)))
+	   (cond
+	     ((= col 1)
+	      (set-text-grid-row
+	       (zed.grid ed) row
+	       (list (array-slice row-cells 1 (len row-cells)) row-style)))		 
+	     (t
+	      (set-text-grid-row
+	       (zed.grid ed) row
+	       (list (array+ (array-slice (array-copy row-cells) 0 (sub1 col))
+			     (array-slice row-cells col (len row-cells)))
+		     row-style)))))
+	 (zed.cursor-left ed)
+	 (refresh-object (zed.scroll ed)))))))
+
+;; delete the cell under the cursor without moving the cursor (delete key behavior)
+(defun zed.delete1 (ed)
+  (letrec ((row (zed.cursor-row ed))
+	   (col (zed.cursor-column ed)))
+    (cond
+      ((= col (zed.last-column ed row))
+       (out "SPECIAL CASE: DELETE LINE, GET NEXT LINE!\n"))
+      (t
+       (letrec ((row-data (get-text-grid-row (zed.grid ed) row))
+		(row-cells (1st row-data))
+		(row-style (2nd row-data)))
+	 (set-text-grid-row
+	  (zed.grid ed) row
+	  (list (array+ (array-slice (array-copy row-cells) 0 col)
+			(array-slice row-cells (add1 col) (len row-cells)))
+		row-style)))))
+    (refresh-object (zed.scroll ed))))
+
+;; the maximum number of fully displayed lines (there may be additional partial lines visible, though)
+(defun zed.max-displayed-lines (ed)
+  (letrec ((h (2nd (get-text-grid-cell-size (zed.grid ed))))
+	   (pixel-height (2nd (get-object-size (zed.scroll ed)))))
+    (int (/ pixel-height h))))
+
+;; the maximum number of fully displayed columns (there may be additional partial column glyphs visible, though)
+(defun zed.max-displayed-columns (ed)
+  (letrec ((w (1st (get-text-grid-cell-size (zed.grid ed))))
+	   (pixel-width (1st (get-object-size (zed.scroll ed)))))
+    (int (/ pixel-width w))))
+
+(defun zed.first-displayed-line (ed)
+  (letrec ((offset (get-scroll-offset (zed.scroll ed)))
+	   (hoffset (2nd offset))
+	   (delta-h (2nd (get-text-grid-cell-size (zed.grid ed)))))
+    (int (/ hoffset delta-h))))
+
+(defun zed.first-displayed-column (ed)
+  (letrec ((offset (get-scroll-offset (zed.scroll ed)))
+	   (woffset (1st offset))
+	   (delta-w (1st (get-text-grid-cell-size (zed.grid ed)))))
+    (int (/ woffset delta-w))))
+     
+(defun zed.set-display-size (ed columns lines)
+  (letrec ((size (get-text-grid-cell-size (zed.grid ed)))
+	   (h (2nd size))
+	   (w (1st size)))
+    (resize-object (zed.scroll ed) (* w columns)  (* h lines))))
 
 (defun zed.install-key-handler (ed canvas)
   (set-canvas-on-typed-key
    canvas (lambda (key code)
 	    (zed.lock ed)
 	    (zed.key-handler ed key code)
+	    (zed.unlock ed))))
+
+(defun zed.install-rune-handler (ed canvas)
+  (set-canvas-on-typed-rune
+   canvas (lambda (rune)
+	    (zed.lock ed)
+	    (zed.rune-handler ed rune)
 	    (zed.unlock ed))))
  
 (defun zed.cursor-left (ed)
@@ -169,13 +277,16 @@
 	   (colMinus (sub1 col)))
     (cond
       ((and (= row 0) (= col 0)) (void))
-      ((> col 0) (zed.set-cursor-column ed colMinus))
+      ((> col 0)
+       (when (< col (zed.first-displayed-column ed)) (zed.scroll-left ed))
+       (zed.set-cursor-column ed colMinus))
       (t
        (zed.set-cursor-column ed (zed.last-column ed rowMinus))
+       (zed.scroll-right-to-cursor ed)
        (zed.set-cursor-row ed rowMinus)))))
 
 (defun zed.cursor-right (ed)
-   (letrec ((row (zed.cursor-row ed))
+  (letrec ((row (zed.cursor-row ed))
 	   (col (zed.cursor-column ed))
 	   (rowPlus (add1 row))
 	   (colPlus (add1 col)))
@@ -184,11 +295,12 @@
 	    (= col (zed.last-column ed row)))
        (void))
       ((<= colPlus (zed.last-column ed row))
+       (when (= (add1 col) (zed.last-displayed-column ed)) (zed.scroll-right ed))
        (zed.set-cursor-column ed colPlus))
-      (t
-       (when (<= rowPlus (zed.last-row ed))
+      ((<= rowPlus (zed.last-row ed))
 	 (zed.set-cursor-column ed 0)
-	 (zed.set-cursor-row ed rowPlus))))))
+	 (zed.scroll-left-to-line-start ed)
+	 (zed.set-cursor-row ed rowPlus)))))
 
 (defun zed.last-column (ed row)
   (sub1 (count-text-grid-row-columns (zed.grid ed) row)))
@@ -196,12 +308,20 @@
 (defun zed.last-row (ed)
   (sub1 (count-text-grid-rows (zed.grid ed))))
 
+;; Return true if the cursor is in the last line displayed, i.e., at the bottom of the editor.
+(defun zed.last-displayed-line (ed)
+  (+ (zed.first-displayed-line ed) (zed.max-displayed-lines ed)))
+
+(defun zed.last-displayed-column (ed)
+  (+ (zed.first-displayed-column ed) (zed.max-displayed-columns ed)))
+    
 (defun zed.cursor-down (ed)
   (letrec ((row (zed.cursor-row ed))
 	   (rowPlus (add1 row)))
     (cond
       ((= row (zed.last-row ed)) (zed.set-cursor-column ed (zed.last-column ed row)))
       (t
+       (when (= (add1 row) (zed.last-displayed-line ed)) (zed.scroll-down ed))
        (zed.set-cursor-column ed (min (zed.last-column ed rowPlus) (zed.cursor-column ed)))
        (zed.set-cursor-row ed rowPlus)))))
 
@@ -211,8 +331,55 @@
     (cond
       ((= row 0) (void))
       (t
+       (when (= row (zed.first-displayed-line ed)) (zed.scroll-up ed))
        (zed.set-cursor-column ed (min (zed.last-column ed rowMin) (zed.cursor-column ed)))
        (zed.set-cursor-row ed rowMin)))))
+
+(defun zed.scroll-down (ed)
+  (letrec ((offset (get-scroll-offset (zed.scroll ed)))
+	   (woffset (1st offset))
+	   (hoffset (2nd offset))
+	   (delta-h (2nd (get-text-grid-cell-size (zed.grid ed)))))
+    (set-scroll-offset (zed.scroll ed) (list woffset (+ hoffset delta-h)))
+    (refresh-object (zed.scroll ed))))
+
+(defun zed.scroll-up (ed)
+  (letrec ((offset (get-scroll-offset (zed.scroll ed)))
+	   (woffset (1st offset))
+	   (hoffset (2nd offset))
+	   (delta-h (2nd (get-text-grid-cell-size (zed.grid ed)))))
+    (set-scroll-offset (zed.scroll ed) (list woffset (max 0 (- hoffset delta-h))))
+    (refresh-object (zed.scroll ed))))
+
+(defun zed.scroll-right (ed)
+  (letrec ((offset (get-scroll-offset (zed.scroll ed)))
+	   (woffset (1st offset))
+	   (hoffset (2nd offset))
+	   (delta-w (1st (get-text-grid-cell-size (zed.grid ed)))))
+    (set-scroll-offset (zed.scroll ed) (list (+ woffset delta-w) hoffset))
+    (refresh-object (zed.scroll ed))))
+
+(defun zed.scroll-left (ed)
+   (letrec ((offset (get-scroll-offset (zed.scroll ed)))
+	   (woffset (1st offset))
+	   (hoffset (2nd offset))
+	   (delta-w (1st (get-text-grid-cell-size (zed.grid ed)))))
+    (set-scroll-offset (zed.scroll ed) (list (max 0 (- woffset delta-w)) hoffset))
+    (refresh-object (zed.scroll ed))))
+
+(defun zed.scroll-left-to-line-start (ed)
+  (set-scroll-offset (zed.scroll ed) (list 0 (2nd (get-scroll-offset (zed.scroll ed)))))
+  (refresh-object (zed.scroll ed)))
+
+;; scroll to the right to ensure the cursor is visible (should be in the middle of the display)
+(defun zed.scroll-right-to-cursor (ed)
+  (letrec ((col (zed.cursor-column ed))
+	   (offset (get-scroll-offset (zed.scroll ed)))
+	   (delta-w (1st (get-text-grid-cell-size (zed.grid ed))))
+	   (right-offset (* (max 0 (- col 4)) delta-w)))
+    (when (> col (zed.max-displayed-columns ed))
+      (set-scroll-offset (zed.scroll ed) (list right-offset (2nd (get-scroll-offset (zed.scroll ed)))))
+      (refresh-object (zed.scroll ed)))))
 
 ;;; Z3S5 LISP FUNCTIONS
 
@@ -226,7 +393,8 @@
 (defun zed.lisp-syntax-color-range (ed start-row start-col end-row end-col)
   (let ((rune (get-text-grid-rune (zed.grid ed) start-row start-col)))
     (case rune
-      (("(" ")") (set-text-grid-style (zed.grid ed) start-row start-col (list zed.*paren-color* (theme-color 'background)))))
+      (("(" ")") (set-text-grid-style (zed.grid ed) start-row start-col
+				      (list zed.*paren-color* (theme-color 'background)))))
     (unless (and (= start-row end-row)
 		 (= start-col end-col))
       (zed.lisp-syntax-color-range ed (zed.next-row ed start-row start-col) (zed.next-col ed start-row start-col)
@@ -324,9 +492,10 @@
 (defun zed.test ()
   (letrec ((win (new-window "Editor"))
 	   (ed (zed.new)))
-    (zed.set-text ed "(defun zed.draw-cursor (ed on?)\n  (letrec ((row (zed.cursor-row ed))\n	   (col (zed.cursor-column ed))\n	   (style (2nd (get-text-grid-cell (zed.grid ed) row col) nil))\n	   (fgcolor (zed.style-fg-color style))\n	   (bgcolor (zed.style-bg-color style)))\n    (set-text-grid-style\n      (zed.grid ed)\n     row\n     col\n     (if on?\n	 (list bgcolor fgcolor)\n	 (list fgcolor bgcolor)))))\n\n(defun mult (x y)\n    (* x y))")
+    (zed.set-text ed "(defun zed.draw-cursor (ed on?)\n  (letrec ((row (zed.cursor-row ed))\n	   (col (zed.cursor-column ed))\n	   (style (2nd (get-text-grid-cell (zed.grid ed) row col) nil))\n	   (fgcolor (zed.style-fg-color style))\n	   (bgcolor (zed.style-bg-color style)))\n    (set-text-grid-style\n      (zed.grid ed)\n     row\n     col\n     (if on?\n	 (list bgcolor fgcolor)\n	 (list fgcolor bgcolor)))))\n\n(defun mult (x y)\n    (* x y))\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
     (zed.install-key-handler ed (get-window-canvas win))
-    (set-window-content win (zed.grid ed))
-    (set-window-size win 600 400)
+    (zed.install-rune-handler ed (get-window-canvas win))
+    (set-window-content win (zed.scroll ed))
+    (set-window-size win 400 300)
     (show-window win)))
 

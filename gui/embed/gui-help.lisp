@@ -353,6 +353,14 @@
 				     set-text-grid-cell get-text-grid-cell set-text-grid-row set-text-grid-row-style set-text-grid-rune set-text-grid-style set-text-grid-style-range set-text-grid-text
 				     get-text-grid-text)))
 
+(defhelp get-text-grid-cell-size
+    (use "(get-text-grid-cell-size grid) => li")
+  (info "Return the size of one text grid cell as a list of floats (w h) where #w is the width and #h is the height.")
+  (type proc)
+  (arity 1)
+  (topic (gui text-grid))
+  (see (new-text-grid)))
+
 (defhelp text-grid-show-line-numbers?
     (use "(text-grid-show-line-numbers? grid) => bool")
   (info "Return true if the text #grid shows line numbers, nil otherwise.")
@@ -1116,7 +1124,7 @@
   (type proc)
   (arity -2)
   (topic (gui container))
-  (see (new-container-without-layout new-border)))
+  (see (new-container-without-layout new-border new-vscroll new-hscroll)))
 
 (defhelp new-container-without-layout
     (use "(new-container-without-layout obj ...) => int")
@@ -1132,7 +1140,47 @@
   (type proc)
   (arity -5)
   (topic (gui container))
-  (see (new-container new-container-without-layout)))
+  (see (new-container new-container-without-layout new-vscroll new-hscroll)))
+
+(defhelp new-hscroll
+    (use "(new-hscroll obj) => int")
+  (info "Embed canvas object #obj into a new horizontal scroll container, which allows the user to scroll horizontally if #obj does not fit into the hscroll container horizontally.")
+  (type proc)
+  (arity 1)
+  (topic (gui container))
+  (see (new-scroll new-vscroll new-container new-hbox-layout)))
+
+(defhelp new-scroll
+    (use "(new-scroll obj) => int")
+  (info "Embed canvas object #obj into a new scroll container, which allows the user to scroll both horizontally and vertically if #obj does not fit into the scroll container.")
+  (type proc)
+  (arity 1)
+  (topic (gui container))
+  (see (new-vscroll new-hscroll new-container new-hbox-layout)))
+
+(defhelp new-vscroll
+    (use "(new-vscroll obj) => int")
+  (info "Embed canvas object #obj into a new vertical scroll container, which allows the user to scroll vertically if #obj does not fit into the vscroll container vertically.")
+  (type proc)
+  (arity 1)
+  (topic (gui container))
+  (see (new-scroll new-hscroll new-container new-vbox-layout)))
+
+(defhelp get-scroll-offset
+    (use "(get-scroll-offset scroll) => li")
+  (info "Get the offset of #scroll, which may be a hscroll, vscroll, or scroll, as a position list of (x y) where #x and #y are floats.")
+  (type proc)
+  (arity 1)
+  (topic (gui container))
+  (see (set-scroll-offset new-scroll new-hscroll new-vscroll)))
+
+(defhelp set-scroll-offset
+    (use "(set-scroll-offset scroll li)")
+  (info "Set the #scroll offset to #li, which is a position of the form (x y) where #x and #y are floats. If you don't want to change #x or #y respectively, you need to use #get-scroll-offset first to get the value that you don't want to change, and construct the position from that.")
+  (type proc)
+  (arity 2)
+  (topic (gui container))
+  (see (get-scroll-offset new-scroll new-hscroll new-vscroll)))
 
 (defhelp new-tabitem
     (use "(new-tabitem title obj) => int")
