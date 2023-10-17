@@ -2457,7 +2457,7 @@
   (see (expect expect-ok run-selftest testing)))
 
 (defhelp expect-ok
-    (use "(expect-err expr ...)")
+    (use "(expect-ok expr ...)")
   (info "Registers a test under the current test name that checks that #expr does not produce an error.")
   (type macro)
   (topic (system))
