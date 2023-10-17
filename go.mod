@@ -15,13 +15,12 @@ require (
 	github.com/rasteric/hooks v0.0.6
 	github.com/shopspring/decimal v1.3.1
 	github.com/teris-io/shortid v0.0.0-20220617161101-71ec9f2aa569
-	golang.org/x/crypto v0.13.0
+	golang.org/x/crypto v0.14.0
 	golang.org/x/mod v0.12.0
 	golang.org/x/text v0.13.0
 )
 
 require (
-	fyne.io/fyne v1.4.3 // indirect
 	fyne.io/systray v1.10.1-0.20230722100817-88df1e0ffa9a // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fredbi/uri v1.0.0 // indirect
@@ -34,12 +33,12 @@ require (
 	github.com/go-text/render v0.0.0-20230619120952-35bccb6164b8 // indirect
 	github.com/go-text/typesetting v0.0.0-20230905121921-abdbcca6e0eb // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
-	github.com/goki/freetype v1.0.1 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/hajimehoshi/oto v1.0.1 // indirect
 	github.com/jfreymuth/oggvorbis v1.0.5 // indirect
 	github.com/jfreymuth/vorbis v1.0.2 // indirect
 	github.com/jsummers/gobmp v0.0.0-20230614200233-a9de23ed2e25 // indirect
+	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/srwiley/oksvg v0.0.0-20221011165216-be6e8873101c // indirect
@@ -51,8 +50,9 @@ require (
 	golang.org/x/exp/shiny v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/image v0.12.0 // indirect
 	golang.org/x/mobile v0.0.0-20230906021930-dc64209e86f1 // indirect
-	golang.org/x/net v0.15.0 // indirect
-	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/net v0.17.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
+	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	honnef.co/go/js/dom v0.0.0-20230808055721-96db8f4d5e3b // indirect
 )
