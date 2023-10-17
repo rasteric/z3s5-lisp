@@ -2,9 +2,9 @@
 title: Z3S5 Lisp Reference Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: Version 2.4+f4dacc3-gui.fyne2
+footer-left: Version 2.4+0ecedfe-gui.fyne2
 author: by Erich Rast and all Help system contributors
-date: 2023-10-17 16:50
+date: 2023-10-17 17:11
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -13,7 +13,7 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
-For Z3S5 Lisp Version 2.4+f4dacc3-gui.fyne2 with installed modules (gui fyne2 oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).
+For Z3S5 Lisp Version 2.4+0ecedfe-gui.fyne2 with installed modules (gui fyne2 oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).
 
 # Introduction
 
@@ -5813,7 +5813,7 @@ See also: [`expect`](#link657870656374), [`expect-ok`](#link6578706563742d6f6b),
 
 ### `expect-ok` : macro/1 or more
 
-Usage: `(expect-err expr ...)`
+Usage: `(expect-ok expr ...)`
 
 Registers a test under the current test name that checks that `expr` does not produce an error.
 
@@ -8397,7 +8397,7 @@ See also: [`expect`](#link657870656374), [`expect-ok`](#link6578706563742d6f6b),
 
 ## `expect-ok` : macro/1 or more {#link6578706563742d6f6b}
 
-Usage: `(expect-err expr ...)`
+Usage: `(expect-ok expr ...)`
 
 Registers a test under the current test name that checks that `expr` does not produce an error.
 

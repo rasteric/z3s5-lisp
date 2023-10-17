@@ -20,9 +20,9 @@
 <header id="title-block-header">
 <h1 class="title">Z3S5 Lisp Reference Manual</h1>
 <p class="author">by Erich Rast and all Help system contributors</p>
-<p class="date">2023-10-17 16:50</p>
+<p class="date">2023-10-17 17:11</p>
 </header>
-<p>For Z3S5 Lisp Version 2.4+f4dacc3-gui.fyne2 with installed modules (gui fyne2 oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).</p>
+<p>For Z3S5 Lisp Version 2.4+0ecedfe-gui.fyne2 with installed modules (gui fyne2 oop lib kvdb zimage tasks help beep db fileio decimal ling float console base).</p>
 <h1 data-number="1" id="introduction"><span class="header-section-number">1</span> Introduction</h1>
 <p>This is the reference manual for Z3S5 Lisp. This manual has been automatically generated from the entries of the online help system. The reference manual is divided into two large sections. Section <a href="#topics">By Topics</a> lists functions and symbols organized by topics. Within each topic, entries are sorted alphabetically. Section <a href="#reference">Complete Reference</a> lists all functions and symbols alphabetically. Please consult the <em>User Manual</em> and the <em>Readme</em> document for more general information about Z3S5 Lisp, an introduction to its use, and how to embedd it into Go programs.</p>
 <p>Incorrect documentation strings are bugs. Please report bugs using the corresponding <a href="https://github.com/rasteric/z3s5-lisp/issues">Github issue tracker for Z3S5 Lisp</a> and be as precise as possible. Superfluous and missing documentation entries are misfeatures and may also be reported.</p>
@@ -2877,7 +2877,7 @@
 <p>Registers a test under the current test name that checks that <code>expr</code> is nil.</p>
 <p>See also: <a href="#link657870656374"><code>expect</code></a>, <a href="#link6578706563742d6f6b"><code>expect-ok</code></a>, <a href="#link72756e2d73656c6674657374"><code>run-selftest</code></a>, <a href="#link74657374696e67"><code>testing</code></a>. <a href="#idx">→index</a></p>
 <h3 data-number="3.24.31" id="expect-ok-macro1-or-more"><span class="header-section-number">3.24.31</span> <code>expect-ok</code> : macro/1 or more</h3>
-<p>Usage: <code>(expect-err expr ...)</code></p>
+<p>Usage: <code>(expect-ok expr ...)</code></p>
 <p>Registers a test under the current test name that checks that <code>expr</code> does not produce an error.</p>
 <p>See also: <a href="#link657870656374"><code>expect</code></a>, <a href="#link6578706563742d6f6b"><code>expect-ok</code></a>, <a href="#link72756e2d73656c6674657374"><code>run-selftest</code></a>, <a href="#link74657374696e67"><code>testing</code></a>. <a href="#idx">→index</a></p>
 <h3 data-number="3.24.32" id="expect-true-macro1-or-more"><span class="header-section-number">3.24.32</span> <code>expect-true</code> : macro/1 or more</h3>
@@ -4158,7 +4158,7 @@
 <p>Registers a test under the current test name that checks that <code>expr</code> is nil.</p>
 <p>See also: <a href="#link657870656374"><code>expect</code></a>, <a href="#link6578706563742d6f6b"><code>expect-ok</code></a>, <a href="#link72756e2d73656c6674657374"><code>run-selftest</code></a>, <a href="#link74657374696e67"><code>testing</code></a>. <a href="#idx">→index</a> <a href="#system">→topic</a></p>
 <h2 data-number="4.220" id="link6578706563742d6f6b"><span class="header-section-number">4.220</span> <code>expect-ok</code> : macro/1 or more</h2>
-<p>Usage: <code>(expect-err expr ...)</code></p>
+<p>Usage: <code>(expect-ok expr ...)</code></p>
 <p>Registers a test under the current test name that checks that <code>expr</code> does not produce an error.</p>
 <p>See also: <a href="#link657870656374"><code>expect</code></a>, <a href="#link6578706563742d6f6b"><code>expect-ok</code></a>, <a href="#link72756e2d73656c6674657374"><code>run-selftest</code></a>, <a href="#link74657374696e67"><code>testing</code></a>. <a href="#idx">→index</a> <a href="#system">→topic</a></p>
 <h2 data-number="4.221" id="link6578706563742d74727565"><span class="header-section-number">4.221</span> <code>expect-true</code> : macro/1 or more</h2>
