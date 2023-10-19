@@ -351,7 +351,7 @@
   (topic (gui text-grid))
   (see (text-grid-show-line-numbers? text-grid-show-whitespace? get-text-grid-tab-width set-text-grid-tab-width set-text-grid-show-line-numbers set-text-grid-show-whitespace get-text-grid-row get-text-grid-row-text
 				     set-text-grid-cell get-text-grid-cell set-text-grid-row set-text-grid-row-style set-text-grid-rune set-text-grid-style set-text-grid-style-range set-text-grid-text
-				     get-text-grid-text)))
+				     get-text-grid-text remove-text-grid-row insert-text-grid-row)))
 
 (defhelp get-text-grid-cell-size
     (use "(get-text-grid-cell-size grid) => li")
@@ -430,7 +430,7 @@
   (see  (set-text-grid-row get-text-grid-row-text get-text-grid-cell new-text-grid text-grid-show-line-numbers? text-grid-show-whitespace?
 			   get-text-grid-tab-width set-text-grid-tab-width set-text-grid-show-line-numbers set-text-grid-show-whitespace  
 			   set-text-grid-cell  set-text-grid-row-style set-text-grid-rune set-text-grid-style set-text-grid-style-range set-text-grid-text
-			   get-text-grid-text)))
+			   get-text-grid-text remove-text-grid-row insert-text-grid-row)))
 
 (defhelp get-text-grid-row-text
     (use "(get-text-grid-row-text grid row) => str")
@@ -459,6 +459,22 @@
   (arity 3)
   (topic (gui text-grid))
   (see (get-text-grid-rune set-text-grid-cell get-text-grid-row set-text-grid-rune set-text-grid-style-range get-text-grid-style)))
+
+(defhelp remove-text-grid-row
+    (use "(remove-text-grid-row grid row)")
+  (info "Remove the #row from the given text #grid. An incorrect #row index will result in an error.")
+  (type proc)
+  (arity 2)
+  (topic (gui text-grid))
+  (see (insert-text-grid-row new-text-grid get-text-grid-row)))
+
+(defhelp insert-text-grid-row
+    (use "(insert-text-grid-row grid row)")
+  (info "Insert a new text grid row before #row in the given text #grid. If #row is the number of rows, a new row is appended to the end of the text grid.")
+  (type proc)
+  (arity 2)
+  (topic (gui text-grid))
+  (see (remove-text-grid-row count-text-grid-rows new-text-grid get-text-grid-row)))
 
 (defhelp get-text-grid-rune
     (use "(get-text-grid-rune grid row column) => str")

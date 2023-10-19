@@ -151,6 +151,7 @@
     ((down) (zed.cursor-down ed))
     ((backspace) (zed.backspace ed))
     ((delete) (zed.delete1 ed))
+    ((return) (zed.return ed))
     ((page-down) (zed.scroll-right ed))
     ((page-up) (zed.scroll-left ed)))
   (zed.lisp-syntax-color-at-expression ed)
@@ -189,7 +190,21 @@
 	   (col (zed.cursor-column ed)))
     (unless (and (= row 0) (= col 0))
       (cond
-	((= col 0) (zed.cursor-left ed)) ;; WRONG: Need to remove the line (and move content to next line)
+	((= col 0)
+	 (letrec ((row-data (get-text-grid-row (zed.grid ed) row))
+		  (row-cells (1st row-data))
+		  (prev-row-data (get-text-grid-row (zed.grid ed) (sub1 row)))
+		  (prev-row-cells (1st prev-row-data)))
+	   ;; in the following, the array of the previous line is sliced to make sure
+	   ;; the trailing " " is not kept (line row has its own trailing space)
+	   (set-text-grid-row (zed.grid ed) (sub1 row)
+			      (list (array+ (array-slice prev-row-cells 0
+							 (sub1 (len prev-row-cells)))
+					    row-cells)
+				    (2nd prev-row-data)))
+	   (zed.set-cursor-row ed (sub1 row))
+	   (zed.set-cursor-column ed (sub1 (len prev-row-cells)))
+	   (remove-text-grid-row (zed.grid ed) row)))
 	(t
 	 (letrec ((row-data (get-text-grid-row (zed.grid ed) row))
 		  (row-cells (1st row-data))
@@ -213,8 +228,11 @@
   (letrec ((row (zed.cursor-row ed))
 	   (col (zed.cursor-column ed)))
     (cond
+      ((and (= col (zed.last-column ed row))
+	    (= row (zed.last-row ed)))
+       (void))
       ((= col (zed.last-column ed row))
-       (out "SPECIAL CASE: DELETE LINE, GET NEXT LINE!\n"))
+       (remove-text-grid-row (zed.grid ed) row))
       (t
        (letrec ((row-data (get-text-grid-row (zed.grid ed) row))
 		(row-cells (1st row-data))
@@ -225,6 +243,36 @@
 			(array-slice row-cells (add1 col) (len row-cells)))
 		row-style)))))
     (refresh-object (zed.scroll ed))))
+
+;; return creates a new line, copying the rest of the current line to it (return key behavior)
+;; edge case: If the cursor is at 0,0 then a new line is created above.
+(defun zed.return (ed)
+  (letrec ((row (zed.cursor-row ed))
+	   (col (zed.cursor-column ed)))
+    (cond
+      ((and (= row 0)(= col 0))
+       (insert-text-grid-row (zed.grid ed) 0)
+       (set-text-grid-row (zed.grid ed) 0 (list #((" " nil)) nil))
+       (zed.cursor-down ed))
+      (t
+       (insert-text-grid-row (zed.grid ed) (add1 row))
+       (cond
+	 ((= col (zed.last-column ed row))
+	  (set-text-grid-row (zed.grid ed) (add1 row) (list #((" " nil)) nil)))
+	 (t
+	  (letrec ((row-data (get-text-grid-row (zed.grid ed) row))
+		   (row-cells (1st row-data))
+		   (row-style (2nd row-data))
+		   (row-slice (array-slice row-cells col (len row-cells))))
+	    ;; copy from col to last cell (inclusive), which is " ", into new line
+	    (set-text-grid-row (zed.grid ed) (add1 row) (list row-slice row-style))
+	    ;; leave from 0 to col (exclusive) the original line
+	    (set-text-grid-row (zed.grid ed) row
+			       (list (array-append (array-slice row-cells 0 col) (list " " nil)) row-style)))))
+       (zed.set-cursor-column ed 0)
+       (zed.set-cursor-row ed (add1 row))
+       (zed.scroll-left-to-line-start ed)))))
+  
 
 ;; the maximum number of fully displayed lines (there may be additional partial lines visible, though)
 (defun zed.max-displayed-lines (ed)

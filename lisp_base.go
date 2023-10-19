@@ -976,7 +976,11 @@ func (interp *Interp) Define_Base() {
 	// (array-slice arr low high) => array returns the array slice.
 	interp.Def("array-slice", 3, func(a []any) any {
 		n := interp.ExpectInts("slice", a, 1, 2)
-		return a[0].([]any)[n[0]:n[1]]
+		arr := a[0].([]any)
+		if n[1] > len(arr) {
+			panic(fmt.Sprintf("slice: index out of range [%v:%v] in array of length %v", n[0], n[1], len(arr)))
+		}
+		return arr[n[0]:n[1]]
 	})
 
 	// (array-len arr) => int returns the length of the array.

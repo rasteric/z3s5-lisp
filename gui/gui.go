@@ -903,6 +903,28 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	// (remove-text-grid-row grid row)
+	interp.Def(pre("remove-text-grid-row"), 2, func(a []any) any {
+		grid := mustGet(pre("remove-text-grid-row"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := int(z3.ToInt64(pre("remove-text-grid-row"), a[1]))
+		grid.Rows = append(grid.Rows[:row], grid.Rows[row+1:]...)
+		return z3.Void
+	})
+
+	// (insert-text-grid-row grid row)
+	interp.Def(pre("insert-text-grid-row"), 2, func(a []any) any {
+		grid := mustGet(pre("insert-text-grid-row"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := int(z3.ToInt64(pre("insert-text-grid-row"), a[1]))
+		if row == len(grid.Rows) {
+			grid.Rows = append(grid.Rows, widget.TextGridRow{})
+			return z3.Void
+		}
+		grid.Rows = append(grid.Rows, widget.TextGridRow{})
+		copy(grid.Rows[row+1:], grid.Rows[row:])
+		grid.Rows[row] = widget.TextGridRow{}
+		return z3.Void
+	})
+
 	// (set-text-grid-row-style <grid> <row> <style-list>) sets the whole row to the style list,
 	// which contains a foreground color and a background color list.
 	interp.Def(pre("set-text-grid-row-style"), 3, func(a []any) any {
