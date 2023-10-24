@@ -142,21 +142,92 @@
 (defun zed.style-bg-color (s)
   (2nd s '(255 255 255 255)))
 
-(defun zed.key-handler (ed key code)
-  (zed.draw-cursor ed nil)
-  (case key
-    ((left) (zed.cursor-left ed))
-    ((right) (zed.cursor-right ed))
-    ((up) (zed.cursor-up ed))
-    ((down) (zed.cursor-down ed))
-    ((backspace) (zed.backspace ed))
-    ((delete) (zed.delete1 ed))
-    ((return) (zed.return ed))
-    ((page-down) (zed.scroll-right ed))
-    ((page-up) (zed.scroll-left ed)))
-  (zed.lisp-syntax-color-at-expression ed)
-  (zed.draw-cursor ed true))
+(defun zed.handler-call (ed proc)
+  (with-final
+      (lambda (err v)
+	(zed.draw-cursor ed true)
+	(when err (*error-printer* err)))
+    (zed.draw-cursor ed nil)
+    (proc)))
 
+;; handle non-alphanumeric keys such as tab,return,backspace
+(defun zed.key-handler (ed key code)
+  (zed.handler-call ed
+   (lambda ()
+     (case key
+       ((left) (zed.cursor-left ed))
+       ((right) (zed.cursor-right ed))
+       ((up) (zed.cursor-up ed))
+       ((down) (zed.cursor-down ed))
+       ((backspace) (zed.backspace ed))
+       ((delete) (zed.delete1 ed))
+       ((return) (zed.return ed))
+       ((home) (zed.cursor-home ed))
+       ((end) (zed.cursor-end ed))
+       ((page-down) (zed.cursor-half-page-down ed))
+       ((page-up) (zed.cursor-half-page-up ed)))
+     (zed.lisp-syntax-color-at-expression ed))))
+
+;; set editor default keyboard shortcuts in the canvas
+(defun zed.install-default-shortcuts (ed canvas)
+  (add-canvas-shortcut
+   canvas '(ctrl e)
+   (lambda ()
+     (zed.handler-call
+      ed
+      (lambda ()
+	(zed.cursor-jump-to-line-end ed)))))
+  (add-canvas-shortcut
+   canvas '(ctrl q)
+   (lambda ()
+     (zed.handler-call
+      ed
+      (lambda ()
+	(zed.cursor-jump-to-line-start ed)))))
+  (add-canvas-shortcut
+   canvas '(ctrl p)
+   (lambda ()
+     (zed.handler-call
+      ed
+      (lambda ()
+	(zed.cursor-up ed)))))
+  (add-canvas-shortcut
+   canvas '(alt n)
+   (lambda ()
+     (zed.handler-call
+      ed
+      (lambda ()
+	(zed.cursor-down ed)))))
+  (add-canvas-shortcut
+   canvas '(alt p)
+   (lambda ()
+     (zed.handler-call
+      ed
+      (lambda ()
+	(zed.cursor-half-page-up ed)))))
+  (add-canvas-shortcut
+   canvas '(alt n)
+   (lambda ()
+     (zed.handler-call
+      ed
+      (lambda ()
+	(zed.cursor-half-page-down ed)))))
+  (add-canvas-shortcut
+   canvas '(ctrl f)
+   (lambda ()
+     (zed.handler-call
+      ed
+      (lambda ()
+	(zed.cursor-right ed)))))
+  (add-canvas-shortcut
+   canvas '(ctrl b)
+   (lambda ()
+     (zed.handler-call
+      ed
+      (lambda ()
+	(zed.cursor-left ed))))))
+
+;; handle alphanumeric keys
 (defun zed.rune-handler (ed rune)
   (zed.draw-cursor ed nil)
   (zed.insert-at-cursor ed rune)
@@ -204,7 +275,8 @@
 				    (2nd prev-row-data)))
 	   (zed.set-cursor-row ed (sub1 row))
 	   (zed.set-cursor-column ed (sub1 (len prev-row-cells)))
-	   (remove-text-grid-row (zed.grid ed) row)))
+	   (remove-text-grid-row (zed.grid ed) row))
+	 (zed.scroll-up-to-cursor ed))
 	(t
 	 (letrec ((row-data (get-text-grid-row (zed.grid ed) row))
 		  (row-cells (1st row-data))
@@ -271,7 +343,8 @@
 			       (list (array-append (array-slice row-cells 0 col) (list " " nil)) row-style)))))
        (zed.set-cursor-column ed 0)
        (zed.set-cursor-row ed (add1 row))
-       (zed.scroll-left-to-line-start ed)))))
+       (zed.scroll-left-to-line-start ed)
+       (zed.scroll-down-to-cursor ed)))))
   
 
 ;; the maximum number of fully displayed lines (there may be additional partial lines visible, though)
@@ -290,7 +363,7 @@
   (letrec ((offset (get-scroll-offset (zed.scroll ed)))
 	   (hoffset (2nd offset))
 	   (delta-h (2nd (get-text-grid-cell-size (zed.grid ed)))))
-    (int (/ hoffset delta-h))))
+    (fl.ceil (/ hoffset delta-h))))
 
 (defun zed.first-displayed-column (ed)
   (letrec ((offset (get-scroll-offset (zed.scroll ed)))
@@ -391,6 +464,15 @@
     (set-scroll-offset (zed.scroll ed) (list woffset (+ hoffset delta-h)))
     (refresh-object (zed.scroll ed))))
 
+;; scrolls down until the cursor is in the last visible line (this can be used
+;; to make sure the editor is scrolled right, e.g. after return key)
+(defun zed.scroll-down-to-cursor (ed)
+  (letrec ((row (zed.cursor-row ed))
+	   (last-row (zed.last-displayed-line ed)))
+    (when (> row last-row)
+      (zed.scroll-down ed)
+      (zed.scroll-down-to-cursor ed))))
+
 (defun zed.scroll-up (ed)
   (letrec ((offset (get-scroll-offset (zed.scroll ed)))
 	   (woffset (1st offset))
@@ -398,6 +480,16 @@
 	   (delta-h (2nd (get-text-grid-cell-size (zed.grid ed)))))
     (set-scroll-offset (zed.scroll ed) (list woffset (max 0 (- hoffset delta-h))))
     (refresh-object (zed.scroll ed))))
+
+;; scrolls up until the cursor is about at the half of the editor display
+;; (i.e., it doesn't just scroll up minimally but a whole page to make more than
+;; one line above visible since this is the more desired behavior)
+(defun zed.scroll-up-to-cursor (ed)
+  (letrec ((row (zed.cursor-row ed))
+	   (first-row (zed.first-displayed-line ed)))
+    (when (< row first-row)
+      (dotimes (n (/ (zed.max-displayed-lines ed) 2)) (zed.scroll-up ed))
+      (zed.scroll-up-to-cursor ed))))
 
 (defun zed.scroll-right (ed)
   (letrec ((offset (get-scroll-offset (zed.scroll ed)))
@@ -429,6 +521,34 @@
       (set-scroll-offset (zed.scroll ed) (list right-offset (2nd (get-scroll-offset (zed.scroll ed)))))
       (refresh-object (zed.scroll ed)))))
 
+(defun zed.cursor-jump-to-line-start (ed)
+  (zed.set-cursor-column ed 0)
+  (zed.scroll-left-to-line-start ed))
+
+(defun zed.cursor-jump-to-line-end (ed)
+  (zed.set-cursor-column ed (zed.last-column ed (zed.cursor-row ed)))
+  (zed.scroll-right-to-cursor ed))
+
+(defun zed.cursor-half-page-up (ed)
+  (dotimes (n (/ (zed.max-displayed-lines ed) 2)) (zed.cursor-up ed)))
+
+(defun zed.cursor-half-page-down (ed)
+  (dotimes (n (/ (zed.max-displayed-lines ed) 2)) (zed.cursor-down ed)))
+
+(defun zed.cursor-home (ed)
+  (set-scroll-offset (zed.scroll ed) (list 0 0))
+  (zed.set-cursor-row ed 0)
+  (zed.set-cursor-column ed 0)
+  (refresh-object (zed.scroll ed)))
+
+(defun zed.cursor-end (ed)
+  (letrec ((row (zed.last-row ed))
+	   (col (zed.last-column ed row)))
+    (zed.set-cursor-row ed row)
+    (zed.set-cursor-column ed col)
+    (set-scroll-offset (zed.scroll ed) (list 0 (2nd (get-object-size (zed.grid ed)))))
+    (refresh-object (zed.scroll ed))))
+		       
 ;;; Z3S5 LISP FUNCTIONS
 
 (defun zed.lisp-syntax-color-at-expression (ed)
@@ -539,11 +659,13 @@
 ;;; TESTING
 (defun zed.test ()
   (letrec ((win (new-window "Editor"))
+	   (canvas (get-window-canvas win))
 	   (ed (zed.new)))
-    (zed.set-text ed "(defun zed.draw-cursor (ed on?)\n  (letrec ((row (zed.cursor-row ed))\n	   (col (zed.cursor-column ed))\n	   (style (2nd (get-text-grid-cell (zed.grid ed) row col) nil))\n	   (fgcolor (zed.style-fg-color style))\n	   (bgcolor (zed.style-bg-color style)))\n    (set-text-grid-style\n      (zed.grid ed)\n     row\n     col\n     (if on?\n	 (list bgcolor fgcolor)\n	 (list fgcolor bgcolor)))))\n\n(defun mult (x y)\n    (* x y))\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
-    (zed.install-key-handler ed (get-window-canvas win))
-    (zed.install-rune-handler ed (get-window-canvas win))
+    (zed.set-text ed ";; This is an example.\n(defun zed.draw-cursor (ed on?)\n  (letrec ((row (zed.cursor-row ed))\n	   (col (zed.cursor-column ed))\n	   (style (2nd (get-text-grid-cell (zed.grid ed) row col) nil))\n	   (fgcolor (zed.style-fg-color style))\n	   (bgcolor (zed.style-bg-color style)))\n    (set-text-grid-style\n      (zed.grid ed)\n     row\n     col\n     (if on?\n	 (list bgcolor fgcolor)\n	 (list fgcolor bgcolor)))))\n\n(defun mult (x y)\n    (* x y))\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+    (zed.install-key-handler ed canvas)
+    (zed.install-rune-handler ed canvas)
     (set-window-content win (zed.scroll ed))
     (set-window-size win 400 300)
+    (zed.install-default-shortcuts ed canvas)
     (show-window win)))
 

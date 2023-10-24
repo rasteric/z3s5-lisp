@@ -886,14 +886,6 @@
   (topic (gui drawing))
   (see (new-image-from-file)))
 
-(defhelp new-shortcut
-    (use "(new-shortcut key [mod...]) => int")
-  (info "Create a new keyboard shortcut based on symbol or string #key and a number of modifier keys #mod. If multiple non-modifier keys are present, only the last one is taken. However, multiple modifier keys are possible. Possible modifiers are symbols or corresponding strings in '(shift control alt suprt). Possible keys are in '(escape return tab backspace insert delete right left down up page-up page-down home end f1 f2 f3 f4 f5 f6 f7 f8 f9 f10 f11 f12 enter 0 1 2 3 4 5 6 7 8 9 key0 key1 key2 key3 key4 key5 key6 key7 key8 key9 a b c d e f g h i j k l m n o p q r s t u v w x y z space tick comma minus period slash backslash left-bracket right-bracket semicolon equal asterisk plus back-tick) and their string variants.")
-  (type proc)
-  (arity -2)
-  (topic (gui keyboard))
-  (see (new-window))) ; TODO
-
 (defhelp disable-object
     (use "(disable-object obj)")
   (info "Disable the canvas object #obj.")
@@ -1240,7 +1232,7 @@
 
 (defhelp add-canvas-shortcut
     (use "(add-canvas-shortcut canvas shortcut proc)")
-  (info "Add the given #shortcut to the given #canvas, calling the handler #proc when it is triggered. #proc must be a function that takes a shortcut as argument.")
+  (info "Add the given #shortcut to the given #canvas, calling the handler #proc when it is triggered. #shortcut must be a list consisting of valid keyboard modifier symbols and a valid key symbol. #proc must be a function that takes a shortcut as argument. If multiple non-modifier keys are present, only the last one is taken. However, multiple modifier keys are possible. Possible modifiers are symbols or corresponding strings in '(shift control alt suprt). Possible keys are in '(escape return tab backspace insert delete right left down up page-up page-down home end f1 f2 f3 f4 f5 f6 f7 f8 f9 f10 f11 f12 enter 0 1 2 3 4 5 6 7 8 9 key0 key1 key2 key3 key4 key5 key6 key7 key8 key9 a b c d e f g h i j k l m n o p q r s t u v w x y z space tick comma minus period slash backslash left-bracket right-bracket semicolon equal asterisk plus back-tick) and their string variants.")
   (type proc)
   (arity 3)
   (topic (gui canvas shortcut))
@@ -1248,7 +1240,7 @@
 
 (defhelp remove-canvas-shortcut
     (use "(remove-canvas-shortcut canvas shortcut)")
-  (info "Remove the #shortcut from #canvas.")
+  (info "Remove the #shortcut from #canvas, where #shortcut is a list consisting of valid keyboard modifier symbols and a valid key symbol.")
   (type proc)
   (arity 2)
   (topic (gui canvas shortcut))

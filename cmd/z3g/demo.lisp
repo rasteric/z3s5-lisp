@@ -312,7 +312,21 @@
     (set-window-size win 600 40)
     (show-window win)))
 
+(defun demo22 ()
+  (letrec ((win (new-window "Demo 22: Shortcuts"))
+	   (info (new-label "Use shortcuts Ctrl-S to Ctrl-F."))
+	   (canvas (get-window-canvas win))
+	   (b (new-button "Remove Ctrl-F" (lambda () (remove-canvas-shortcut canvas '(ctrl f)))))
+	   (form (new-form)))
+    (append-form form "Pressed:" info)
+    (append-form form "" b)
+    (set-window-content win form)
+    (add-canvas-shortcut canvas '(ctrl s) (lambda () (set-label-text info "Ctrl-S")))
+    (add-canvas-shortcut canvas '(ctrl d) (lambda () (set-label-text info "Ctrl-D")))
+    (add-canvas-shortcut canvas '(ctrl f) (lambda () (set-label-text info "Ctrl-F")))
+    (show-window win)))
+
 (include "editor.lisp")
 
-(out "Use (demo1) ... (demo21) to run GUI demos.\n")
+(out "Use (demo1) ... (demo22) to run GUI demos.\n")
 

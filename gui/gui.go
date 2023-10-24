@@ -1552,25 +1552,16 @@ func DefGUI(interp *z3.Interp, config Config) {
 
 	// KEYBOARD
 
-	interp.Def(pre("new-shortcut"), -1, func(a []any) any {
-		key, modifier := MustGetShortcut(pre("new-shortcut"), a[0].(*z3.Cell))
-		return put(&desktop.CustomShortcut{KeyName: key, Modifier: modifier})
-	})
-
 	// CANVAS
 
 	// (add-canvas-shortcut canvas shortcut proc)
 	interp.Def(pre("add-canvas-shortcut"), 3, func(a []any) any {
 		canvas := mustGet(pre("add-canvas-shortcut"), "GUI canvas ID", a, 0).(fyne.Canvas)
-		shortcut := mustGet(pre("add-canvas-shortcut"), "GUI shortcut ID", a, 1).(fyne.Shortcut)
+		key, modifier := MustGetShortcut(pre("add-canvas-shortcut"), a[1].(*z3.Cell))
 		proc := a[2].(*z3.Closure)
-
+		shortcut := &desktop.CustomShortcut{KeyName: key, Modifier: modifier}
 		canvas.AddShortcut(shortcut, func(sc fyne.Shortcut) {
-			obj, ok := getID(sc)
-			if !ok {
-				panic(fmt.Sprintf(pre("add-canvas-shortcut: shortcut id not found in handler: %v"), z3.Str(a[1])))
-			}
-			interp.Eval(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: obj, Cdr: z3.Nil}}, z3.Nil)
+			interp.Eval(&z3.Cell{Car: proc, Cdr: z3.Nil}, z3.Nil)
 		})
 		return z3.Void
 	})
@@ -1578,7 +1569,8 @@ func DefGUI(interp *z3.Interp, config Config) {
 	// (remove-canvas-shortcut canvas shortcut)
 	interp.Def(pre("remove-canvas-shortcut"), 2, func(a []any) any {
 		canvas := mustGet(pre("remove-canvas-shortcut"), "GUI canvas ID", a, 0).(fyne.Canvas)
-		shortcut := mustGet(pre("remove-canvas-shortcut"), "GUI shortcut ID", a, 1).(fyne.Shortcut)
+		key, modifier := MustGetShortcut(pre("remove-canvas-shortcut"), a[1].(*z3.Cell))
+		shortcut := &desktop.CustomShortcut{KeyName: key, Modifier: modifier}
 		canvas.RemoveShortcut(shortcut)
 		return z3.Void
 	})
