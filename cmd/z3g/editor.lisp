@@ -192,7 +192,7 @@
       (lambda ()
 	(zed.cursor-up ed)))))
   (add-canvas-shortcut
-   canvas '(alt n)
+   canvas '(ctrl n)
    (lambda ()
      (zed.handler-call
       ed
@@ -212,6 +212,36 @@
       ed
       (lambda ()
 	(zed.cursor-half-page-down ed)))))
+  (add-canvas-shortcut
+   canvas '(alt left)
+   (lambda ()
+     (zed.handler-call
+      ed
+      (lambda ()
+	(zed.cursor-to-previous-half-word ed)))))
+    (add-canvas-shortcut
+   canvas '(alt b)
+   (lambda ()
+     (zed.handler-call
+      ed
+      (lambda ()
+	(zed.cursor-to-previous-half-word ed)))))
+  (add-canvas-shortcut
+   canvas '(alt right)
+   (lambda ()
+     (zed.handler-call
+      ed
+      (lambda ()
+	(zed.cursor-to-next-half-word ed)
+	(zed.cursor-right-on-punctuation ed)))))
+   (add-canvas-shortcut
+   canvas '(alt f)
+   (lambda ()
+     (zed.handler-call
+      ed
+      (lambda ()
+	(zed.cursor-to-next-half-word ed)
+	(zed.cursor-right-on-punctuation ed)))))
   (add-canvas-shortcut
    canvas '(ctrl f)
    (lambda ()
@@ -517,8 +547,17 @@
 	   (offset (get-scroll-offset (zed.scroll ed)))
 	   (delta-w (1st (get-text-grid-cell-size (zed.grid ed))))
 	   (right-offset (* (max 0 (- col 4)) delta-w)))
-    (when (> col (zed.max-displayed-columns ed))
+    (when (>= col (zed.max-displayed-columns ed))
       (set-scroll-offset (zed.scroll ed) (list right-offset (2nd (get-scroll-offset (zed.scroll ed)))))
+      (refresh-object (zed.scroll ed)))))
+
+(defun zed.scroll-left-to-cursor (ed)
+   (letrec ((col (zed.cursor-column ed))
+	   (offset (get-scroll-offset (zed.scroll ed)))
+	   (delta-w (1st (get-text-grid-cell-size (zed.grid ed))))
+	   (left-offset (* (max 0 (- col 4)) delta-w)))
+    (when (< col (zed.first-displayed-column ed))
+      (set-scroll-offset (zed.scroll ed) (list left-offset (2nd (get-scroll-offset (zed.scroll ed)))))
       (refresh-object (zed.scroll ed)))))
 
 (defun zed.cursor-jump-to-line-start (ed)
@@ -548,7 +587,193 @@
     (zed.set-cursor-column ed col)
     (set-scroll-offset (zed.scroll ed) (list 0 (2nd (get-object-size (zed.grid ed)))))
     (refresh-object (zed.scroll ed))))
-		       
+
+(defun zed.cursor-to-next-word (ed)
+  (letrec ((row (zed.cursor-row ed))
+	   (col (zed.cursor-column ed))
+	   (pos (zed.next-word ed row col)))
+    (cond
+      (pos (zed.set-cursor-row ed (1st pos))
+	   (zed.set-cursor-column ed (2nd pos))
+	   (if (= row (1st pos))
+	       (zed.scroll-right-to-cursor ed)
+	       (zed.scroll-left-to-line-start ed)))
+      (t (zed.cursor-jump-to-line-end ed)))))
+
+(defun zed.cursor-to-next-half-word (ed)
+  (letrec ((row (zed.cursor-row ed))
+	   (col (zed.cursor-column ed))
+	   (pos (zed.next-half-word ed row col)))
+    (cond
+      (pos (zed.set-cursor-row ed (1st pos))
+	   (zed.set-cursor-column ed (2nd pos))
+	   (if (= row (1st pos))
+	       (zed.scroll-right-to-cursor ed)
+	       (zed.scroll-left-to-line-start ed)))
+      (t (zed.cursor-jump-to-line-end ed)))))
+
+(defun zed.cursor-to-previous-word (ed)
+  (letrec ((row (zed.cursor-row ed))
+	   (col (zed.cursor-column ed))
+	   (pos (zed.previous-word ed row col)))
+    (cond
+      (pos (zed.set-cursor-row ed (1st pos))
+	   (zed.set-cursor-column ed (2nd pos))
+	   (if (= row (1st pos))
+	       (zed.scroll-left-to-cursor ed)
+	       (zed.scroll-right-to-cursor ed)))
+      (t (zed.cursor-jump-to-line-start ed)))))
+
+(defun zed.cursor-to-previous-half-word (ed)
+  (letrec ((row (zed.cursor-row ed))
+	   (col (zed.cursor-column ed))
+	   (pos (zed.previous-half-word ed row col)))
+    (cond
+      (pos (zed.set-cursor-row ed (1st pos))
+	   (zed.set-cursor-column ed (2nd pos))
+	   (if (= row (1st pos))
+	       (zed.scroll-left-to-cursor ed)
+	       (zed.scroll-right-to-cursor ed)))
+      (t (zed.cursor-jump-to-line-start ed)))))
+
+;; advance the cursor by one to the left if it is on a "." or ","
+;; for convenience, used on top of certain movement operations
+(defun zed.cursor-right-on-punctuation (ed)
+   (letrec ((row (zed.cursor-row ed))
+	    (col (zed.cursor-column ed))
+	    (rune (get-text-grid-rune (zed.grid ed) row col)))
+     (case rune
+       (("." "," ";" "?" "!") (zed.cursor-right ed)))))
+
+(defun zed.pos-dec (ed row col)
+  (if (and (= col 0) (= row 0))
+      nil
+      (let ((rowMin (sub1 row))
+	    (colMin (sub1 col)))
+	(cond
+	  ((= col 0) (list rowMin (zed.last-column ed rowMin)))
+	  (t
+	   (list row colMin))))))
+
+(defun zed.pos-inc (ed row col)
+  (if (and (= row (zed.last-row ed))
+	   (= col (zed.last-column ed row)))
+      nil
+      (let ((rowPlus (add1 row))
+	    (colPlus (add1 col)))
+	(cond
+	  ((= col (zed.last-column ed row)) (list rowPlus 0))
+	  (t
+	   (list row colPlus))))))
+
+(defun zed.delimiter-rune? (rune)
+  (case rune
+    (("(" ")" "[" "]" "\"" " " "." ";" "," "?" "!") true)
+    (t nil)))
+
+;; we're in a word and look for the word's start position
+(defun zed.find-word-start (ed row col)
+  (let ((pos (zed.pos-dec ed row col)))
+    (if (not pos)
+	(list row col)
+	(letrec ((r (1st pos))
+		 (c (2nd pos))
+		 (rune (get-text-grid-rune (zed.grid ed) r c)))
+	  (cond
+	    ((zed.delimiter-rune? rune) (list row col))
+	    (t (zed.find-word-start ed r c)))))))
+
+;; we're in a word and look for the word's end position (exclusive, i.e.,
+;; the first position after the word)
+(defun zed.find-word-end (ed row col)
+  (let ((pos (zed.pos-inc ed row col)))
+    (if (not pos)
+	(list row col)
+	(letrec ((r (1st pos))
+		 (c (2nd pos))
+		 (rune (get-text-grid-rune (zed.grid ed) r c)))
+	  (cond
+	    ((zed.delimiter-rune? rune) (list r c))
+	    (t (zed.find-word-end ed r c)))))))
+
+;; get the start of the next word (returns nil if et end of text)
+;; if row and col are inside a word, simply returns row and col
+(defun zed.skip-to-next-word (ed row col)
+  (cond
+    ((zed.delimiter-rune? (get-text-grid-rune (zed.grid ed) row col))
+     (let ((pos (zed.pos-inc ed row col)))
+       (if (not pos)
+	   nil
+	   (zed.skip-to-next-word ed (1st pos) (2nd pos)))))
+    (t
+     (list row col))))
+
+;; get the end of the previous word, nil if there is none
+(defun zed.skip-to-previous-word (ed row col)
+  (cond
+    ((zed.delimiter-rune? (get-text-grid-rune (zed.grid ed) row col))
+     (let ((pos (zed.pos-dec ed row col)))
+       (if (not pos)
+	   nil
+	   (zed.skip-to-previous-word ed (1st pos) (2nd pos)))))
+    (t
+     (list row col))))
+
+;; get the position of the next word: if outside a word, skip to the next word,
+;; if inside a word, skip to end, and then to the next word
+(defun zed.next-word (ed row col)
+  (cond
+    ((zed.delimiter-rune? (get-text-grid-rune (zed.grid ed) row col))
+     (zed.skip-to-next-word ed row col))
+    (t
+     (let ((pos (zed.find-word-end ed row col)))
+       (if (not pos)
+	   nil
+	   (zed.skip-to-next-word ed (1st pos)(2nd pos)))))))
+
+;; get the position of the previous word: if outside a word, skip to the previous
+;; word and then go to the start, if inside a word, go to start, then to previous word
+(defun zed.previous-word (ed row col)
+   (cond
+    ((zed.delimiter-rune? (get-text-grid-rune (zed.grid ed) row col))
+     (let ((pos (zed.skip-to-previous-word ed row col)))
+       (if (not pos)
+	   nil
+	   (zed.find-word-start ed (1st pos)(2nd pos)))))
+    (t
+     (letrec ((pos (zed.find-word-start ed row col))
+	      (pos2 (zed.pos-dec ed (1st pos)(2nd pos))))
+       (if (not pos2)
+	   nil
+	   (let ((pos3 (zed.skip-to-previous-word ed (1st pos2)(2nd pos2))))
+	     (if (not pos3)
+		 nil
+		 (zed.find-word-start ed (1st pos3)(2nd pos3)))))))))
+
+;; get the position of the next word start or the position of the word end,
+;; depending on whether row col are inside or outside of a word
+(defun zed.next-half-word (ed row col)
+   (cond
+    ((zed.delimiter-rune? (get-text-grid-rune (zed.grid ed) row col))
+     (zed.skip-to-next-word ed row col))
+    (t
+     (let ((pos (zed.find-word-end ed row col)))
+       pos))))
+
+(defun zed.previous-half-word (ed row col)
+    (cond
+    ((zed.delimiter-rune? (get-text-grid-rune (zed.grid ed) row col))
+     (let ((pos (zed.skip-to-previous-word ed row col)))
+       (if (not pos)
+	   (list 0 0)
+	   (zed.find-word-start ed (1st pos)(2nd pos)))))
+    (t
+     (letrec ((pos (zed.find-word-start ed row col))
+	      (pos2 (zed.pos-dec ed (1st pos)(2nd pos))))
+       (if (not pos2)
+	   pos
+	   pos2)))))
+
 ;;; Z3S5 LISP FUNCTIONS
 
 (defun zed.lisp-syntax-color-at-expression (ed)
