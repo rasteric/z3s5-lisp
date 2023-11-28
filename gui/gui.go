@@ -6,10 +6,12 @@ import (
 	"errors"
 	"fmt"
 	"image/color"
+	"log"
 	"math"
 	"net/url"
 	"sync"
 	"sync/atomic"
+	"unicode"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -22,6 +24,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 	"github.com/nukata/goarith"
 	z3 "github.com/rasteric/z3s5-lisp"
+	"golang.org/x/exp/slices"
 )
 
 //go:embed embed/gui-help.lisp
@@ -901,6 +904,75 @@ func DefGUI(interp *z3.Interp, config Config) {
 		}
 		grid.SetRow(row, widget.TextGridRow{Cells: cells, Style: style})
 		return z3.Void
+	})
+
+	// (wrap-insert-text-grid grid cells row col wrapcol soft-wrap? hard-lf-rune soft-lf-rune) => li
+	// Soft or hard wrap a paragraph in which row, col is located, based on hard-lf-rune and soft-lf-rune
+	// markers for end-of-line (since "\n" is not a good candidate for this, other markers are normally used).
+	// The function returns a list of the form (row col) that represents the new cursor position if
+	// row and col are the old cursor positions.
+	interp.Def(pre("wrap-insert-text-grid"), 8, func(a []any) any {
+		grid := mustGet(pre("wrap-insert-text-grid"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		// cells are an array of any containing lists of the form (rune text-grid-style-list)
+		// these are converted to an array of TextGridCell like in a TextGridRow
+		cells := a[1].([]any)
+		tgCells := make([]widget.TextGridCell, len(cells))
+		for i := range cells {
+			tgCells[i] = ListToTextGridCell(cells[i])
+		}
+		row := int(z3.ToInt64(pre("wrap-insert-text-grid"), a[2]))
+		col := int(z3.ToInt64(pre("wrap-insert-text-grid"), a[3]))
+		wrapCol := int(z3.ToInt64(pre("wrap-insert-text-grid"), a[4]))
+		softWrap := z3.ToBool(a[5])
+		hardLF := []rune(a[6].(string))[0]
+		softLF := []rune(a[7].(string))[0]
+		// we now obtain the paragraph start and end row and store the rows in an array
+		// these are wrapped and the new wrapped rows replace the original rows
+		// what we do in what follows has heavy performance implications
+		startRow := FindTextGridParagraphStart(grid, row, hardLF)
+		endRow := FindTextGridParagraphEnd(grid, row, hardLF)
+		log.Printf("startRow=%v, endRow=%v\n", startRow, endRow)
+		rows := make([]widget.TextGridRow, (endRow-startRow)+1)
+		for i := range rows {
+			rows[i] = grid.Row(i + startRow)
+		}
+		k := row - startRow // the row into which we insert
+		line := rows[k].Cells
+		lenLine := len(line)
+		lenInsert := len(tgCells)
+		n := lenLine + lenInsert
+		newLine := make([]widget.TextGridCell, 0, n)
+		if col >= lenLine {
+			newLine = append(newLine, line...)
+			newLine = append(newLine, tgCells...)
+		} else if col == 0 {
+			newLine = append(newLine, tgCells...)
+			newLine = append(newLine, line...)
+		} else {
+			newLine = append(newLine, line[:col]...)
+			newLine = append(newLine, tgCells...)
+			newLine = append(newLine, line[col:lenLine]...)
+		}
+		rows[k] = widget.TextGridRow{Cells: newLine, Style: rows[k].Style}
+		// We now have rows with the text insert correctly into rows[k].
+		// To achieve this, we extract all cells into one array, work on this
+		// and then put the cells back into the rows. This is obviously not very efficient,
+		// but correctness is more important for now.
+		newCursorRow := row
+		newCursorCol := col
+		if wrapCol > 0 {
+			rows, newCursorRow, newCursorCol = WordWrapTextGridRows(rows, wrapCol, softWrap, hardLF, softLF, row-startRow, col)
+		}
+		// check if we need to insert additional rows
+		if len(rows) > endRow-startRow+1 {
+			newRows := make([]widget.TextGridRow, len(rows)-(endRow-startRow+1))
+			grid.Rows = slices.Insert(grid.Rows, endRow+1, newRows...)
+		}
+		for i := range rows {
+			grid.SetRow(i+startRow, rows[i])
+		}
+		return &z3.Cell{Car: goarith.AsNumber(startRow + newCursorRow),
+			Cdr: &z3.Cell{Car: goarith.AsNumber(newCursorCol), Cdr: z3.Nil}}
 	})
 
 	// (remove-text-grid-row grid row)
@@ -3194,6 +3266,17 @@ func ListToTextGridStyle(arg any) widget.TextGridStyle {
 	return widget.TextGridStyleDefault
 }
 
+// ListToTextGridCell converts a list in the format (rune style-list) to a text grid
+// TextGridCell.
+func ListToTextGridCell(arg any) widget.TextGridCell {
+	li := arg.(*z3.Cell)
+	var cell widget.TextGridCell
+	cell.Rune = []rune(li.Car.(string))[0]
+	li = li.CdrCell()
+	cell.Style = ListToTextGridStyle(li.Car)
+	return cell
+}
+
 // MustConvertSymToTextWrap converts a symbol to a fyne.TextWrap or panics with an error message.
 func MustConvertSymToTextWrap(caller string, sym *z3.Sym) fyne.TextWrap {
 	switch sym {
@@ -3206,4 +3289,183 @@ func MustConvertSymToTextWrap(caller string, sym *z3.Sym) fyne.TextWrap {
 	default:
 		panic(fmt.Sprintf("%v: expected valid text wrap symbol in '(none break word), given: %v", caller, z3.Str(sym)))
 	}
+}
+
+// FindTextGridParagraphStart finds the start row of the paragraph in which row is located.
+// If the row is 0, 0 is returned, otherwise this checks for the next line ending with lf and
+// returns the row after it.
+func FindTextGridParagraphStart(grid *widget.TextGrid, row int, lf rune) int {
+	if row <= 0 {
+		return 0
+	}
+	k := len(grid.Rows[row-1].Cells)
+	if k == 0 {
+		return row
+	}
+	if grid.Rows[row-1].Cells[k-1].Rune == lf {
+		return row
+	}
+	return FindTextGridParagraphStart(grid, row-1, lf)
+}
+
+// FindTextGridParagraphEnd finds the end row of the paragraph in which row is located.
+// If row is the last row, then it is returned. Otherwise, it checks for the next row that
+// ends in lf (which may be the row with which this function was called).
+func FindTextGridParagraphEnd(grid *widget.TextGrid, row int, lf rune) int {
+	if row >= len(grid.Rows)-1 {
+		return row
+	}
+	k := len(grid.Rows[row].Cells)
+	if k == 0 {
+		return row
+	}
+	if grid.Rows[row].Cells[k-1].Rune == lf {
+		return row
+	}
+	return FindTextGridParagraphEnd(grid, row+1, lf)
+}
+
+// GetTextGridParagraph returns the styled text of the paragraph as a list of cells,
+// ignoring any row styles (the caller of this function needs to take care of proper
+// handling of row styles themselves).
+func GetTextGridParagraph(grid *widget.TextGrid, first, last int) []widget.TextGridCell {
+	cells := make([]widget.TextGridCell, 0, (last-first+1)*200)
+	for i := first; i <= last; i++ {
+		for j := range grid.Rows[i].Cells {
+			cell := grid.Rows[i].Cells[j]
+			cells = append(cells, cell)
+		}
+	}
+	return cells
+}
+
+// ad hoc struct for holding text grid cells plus hosuekeeping info
+type xCell struct {
+	Cell         widget.TextGridCell
+	Row          *widget.TextGridRow
+	IsCursorCell bool
+}
+
+// WordWrapTextGridRows word wraps a number of text grid rows, making sure soft line breaks are adjusted
+// and removed accordingly. The number of rows returned may be larger then the number of rows
+// provided as an argument. The position of the original cursor row and column is returned.
+func WordWrapTextGridRows(rows []widget.TextGridRow, wrapCol int,
+	softWrap bool, hardLF, softLF rune, cursorRow, cursorCol int) ([]widget.TextGridRow, int, int) {
+	para := make([]xCell, 0)
+	// push all characters into one array of extended cells
+	// but ignore line breaks
+	cursorToNext := false
+	for i := range rows {
+		for j, c := range rows[i].Cells {
+			isCursor := false
+			if (i == cursorRow && j == cursorCol) || cursorToNext {
+				isCursor = true
+				cursorToNext = false
+			}
+			if (c.Rune == hardLF && j == len(rows[i].Cells)-1) || c.Rune == softLF {
+				if i == cursorRow && j == cursorCol {
+					cursorToNext = true // delete LF but make sure cursor will be on next char
+				}
+			} else {
+				para = append(para, xCell{Cell: c,
+					Row: &rows[i], IsCursorCell: isCursor})
+			}
+		}
+	}
+	// now word break the paragraph and push into a result array
+	// adding soft line breaks, and the final hard line break
+	result := make([]widget.TextGridRow, 0)
+	lastSpc := 0
+	line := make([]xCell, 0, wrapCol+1)
+	var overflow []xCell
+	col := 0
+	newCol := cursorCol
+	newRow := 0
+	var currentRow widget.TextGridRow
+	var handled bool
+	lpos := 0
+	for i := range para {
+		handled = false
+		c := para[i]
+		lpos++
+		line = append(line, c)
+		if unicode.IsSpace(c.Cell.Rune) {
+			lastSpc = lpos // space position + 1 because of lpos++
+		}
+		if lpos >= wrapCol {
+			cutPos := lpos
+			if lastSpc > 0 {
+				cutPos = min(lpos, lastSpc)
+			}
+			// log.Printf("wrapCol=%v, cutPos=%v, lineLength=%v\n", wrapCol, cutPos, len(line))
+			if cutPos >= wrapCol/2 && cutPos < len(line) {
+				overflow = make([]xCell, 0, len(line)-cutPos)
+				overflow = append(overflow, line[cutPos:]...)
+				line = line[:cutPos]
+			}
+			currentRow, col = xCellsToTextGridRow(line)
+			if col >= 0 {
+				// log.Println("line contains cursor")
+				newCol = col
+				newRow = len(result)
+			}
+			result = append(result, currentRow)
+			line = make([]xCell, 0, wrapCol)
+			if overflow != nil && len(overflow) > 0 {
+				line = append(line, overflow...)
+				if cellsContainCursor(overflow) {
+					// log.Println("overflow contains cursor")
+					newCol = len(line) - 1
+					newRow = len(result)
+				}
+				overflow = nil
+				lpos = len(line)
+			} else {
+				handled = true
+				lpos = 0
+			}
+			lastSpc = 0
+		}
+	}
+	if !handled {
+		currentRow, col = xCellsToTextGridRow(line)
+		if col >= 0 {
+			// log.Println("last line contains cursor")
+			newCol = col
+			newRow = len(result)
+		}
+		result = append(result, currentRow)
+	}
+	for i := range result {
+		result[i].Cells = append(result[i].Cells, widget.TextGridCell{Rune: softLF, Style: nil})
+	}
+	k := len(result) - 1
+	n := len(result[k].Cells) - 1
+	result[k].Cells[n] = widget.TextGridCell{Rune: hardLF, Style: nil}
+	// log.Printf("newRow=%v, newCol=%v\n", newRow, newCol)
+	return result, newRow, newCol
+}
+
+func xCellsToTextGridRow(cells []xCell) (widget.TextGridRow, int) {
+	if len(cells) == 0 {
+		return widget.TextGridRow{Cells: make([]widget.TextGridCell, 0), Style: nil}, -1
+	}
+	result := make([]widget.TextGridCell, len(cells))
+	col := -1
+	for i, c := range cells {
+		result[i] = c.Cell
+		if c.IsCursorCell {
+			col = i
+		}
+	}
+	return widget.TextGridRow{Cells: result, Style: cells[0].Row.Style}, col
+}
+
+func cellsContainCursor(cells []xCell) bool {
+	for _, c := range cells {
+		if c.IsCursorCell {
+			return true
+		}
+	}
+	return false
 }

@@ -6,6 +6,10 @@
 (declare-unprotected 'zed.*blink-cursor-off-interval*)
 (setq zed.*paren-color* '(40000 40000 40000 65635))
 (declare-unprotected 'zed.*paren-color*)
+(setq zed.*valid-props* '(soft-wrap horizontal-scroll auto-columns))
+(setq zed.*default-soft-columns* 40)
+(setq zed.*soft-lf* "\r")
+(setq zed.*lf* " ")
 
 (defun zed.blink-cursor (ed)
   (future (letrec ((blink (lambda ()
@@ -19,13 +23,15 @@
        			    (blink))))
        	    (blink))))
 
-(defun zed.new ()
+(defun zed.new (&rest args)
   (if (theme-is-dark?)
       (setq zed.*paren-color* (color->color64 '(255 164 0 255)))
       (setq zed.*paren-color* '(10000 10000 32896 65535)))
   (letrec ((grid (new-text-grid))
-	   (scroll (new-scroll grid))
-	   (ed (array 'zed.editor grid 0 0 true true (make-mutex) scroll)))
+	   (props (zed._validate-props (1st args nil)))
+	   (columns (2nd args zed.*default-soft-columns*))
+	   (scroll (if (member 'horizontal-scroll props)(new-scroll grid)(new-vscroll grid)))
+	   (ed (array 'zed.editor grid 0 0 true true (make-mutex) scroll props columns)))
     (zed.set-text ed "")
     (zed.blink-cursor ed)
     ed))
@@ -84,6 +90,30 @@
 (defun zed.scroll (ed)
   (array-ref ed 7))
 
+;; 8 properties of editor, a list of selectors for determining the visual appearance
+(defun zed.props (ed)
+  (array-ref ed 8))
+
+(defun zed.has? (ed flag)
+  (member flag (zed.props ed)))
+
+(defun zed._validate-props (li)
+  (foreach li
+	   (lambda (x)
+	     (unless (member x zed.*valid-props*)
+	       (error (fmt "zed.new: invalid property '%v, it must be one of '%v" x zed.*valid-props*)))))
+  li)
+
+;; 9 columns for soft-wrapping, uses a sanity check <=4 because zed.max-displayed-columns
+;; might under certain conditions not return the correct size
+(defun zed.soft-columns (ed)
+  (if (zed.has? ed 'auto-columns)
+      (if (<= (zed.max-displayed-columns ed) 4)(array-ref ed 9)(zed.max-displayed-columns ed))
+      (array-ref ed 9)))
+
+(defun zed.set-soft-columns (ed n)
+  (array-set ed 9 n))
+
 ;;; GENERAL EDITING
 
 (defun zed.draw-cursor (ed on?)
@@ -111,29 +141,26 @@
     (list (- 65535 r) (- 65535 g) (- 65535 b) a)))
 
 (defun zed.set-text (ed s)
-  (set-text-grid-text (zed.grid ed) (zed.add-internal-line-endings s)))
+  (set-text-grid-text
+   (zed.grid ed)
+   (cond
+     ((zed.has? ed 'soft-wrap)
+      (zed.soft-wrap-str (str-replace* s "\r\n" "\n")(zed.soft-columns ed)))
+     (t
+       (str-replace* (str-replace* s "\r\n" "\n") "\n" " \n"))))
+  (when (= (count-text-grid-row-columns (zed.grid ed) (zed.last-row ed)) 0)
+    (set-text-grid-row (zed.grid ed) (zed.last-row ed) (list (array `(,zed.*soft-lf* nil)) nil)))) 
 
 (defun zed.get-text (ed)
-  (zed.remove-internal-line-endings (get-text-grid-text (zed.grid ed))))
-
-(defun zed.add-internal-line-endings (s)
-  (let ((a (strsplit s "\n"))
-	(result ""))
-    (array-map! a (lambda (x) (str+ x " ")))
-    (dotimes (n (array-len a))
-      (if (= n (sub1 (array-len a)))
-	  (setq result (str+ result (array-ref a n)))
-	  (setq result (str+ result (array-ref a n) "\n"))))
-    result))
-
-(defun zed.remove-internal-line-endings (s)
-  (let ((a (strsplit s "\n"))
-	(result ""))
-    (array-map! a (lambda (x) (slice x 0 (len x))))
-    (dotimes (n (array-len a))
-      (if (= n (sub1 (array-len a)))
-	  (setq result (str+ result (array-ref a n)))
-	  (setq result (str+ result (array-ref a n) "\n"))))
+  (let ((result ""))
+    (dotimes (n (count-text-grid-rows (zed.grid ed)))
+      (let ((s (get-text-grid-row-text (zed.grid ed) n)))
+	(case (slice s (sub1 (len s)) (len s))
+	  ((zed.*soft-lf*) (setq result (str+ result (slice s 0 (max 0 (sub1 (len s)))))))
+	  (("\n") (setq result (str+ result s)))
+	  ((zed.*lf*) (setq result (str+ result (slice s 0 (max 0 (sub1 (len s)))) "\n")))
+	  (t (out "WARN: zed.get-text - line in editor.lisp does not end in SPC, CR, or LN!\n")
+	     (setq result (str+ result s))))))
     result))
 
 (defun zed.style-fg-color (s)
@@ -260,7 +287,19 @@
 ;; handle alphanumeric keys
 (defun zed.rune-handler (ed rune)
   (zed.draw-cursor ed nil)
-  (zed.insert-at-cursor ed rune)
+;  (zed.wrap-when-insert ed (zed.cursor-row ed)(zed.cursor-column ed))
+					;  (zed.insert-at-cursor ed rune)
+  (let ((pos (wrap-insert-text-grid (zed.grid ed) (array (list rune nil))
+			 (zed.cursor-row ed)
+			 (zed.cursor-column ed)
+			 (zed.soft-columns ed)
+			 true zed.*lf* zed.*soft-lf*)))
+    (out pos)(out "\n")
+    (zed.set-cursor-row ed (1st pos (zed.cursor-row ed)))
+    (zed.set-cursor-column ed (2nd pos (zed.cursor-column ed))))
+   ; (zed.set-cursor-row ed (1st pos (zed.cursor-row ed)))
+   ; (zed.set-cursor-column ed (2nd pos (zed.cursor-column ed))))
+  (zed.cursor-right ed)
   (zed.draw-cursor ed true))
 
 ;; insert the given string (without special characters such as newline)
@@ -282,7 +321,25 @@
     (dotimes (i (len part3))
       (array-set part3 i (array-ref row-cells (+ i col))))
     (set-text-grid-row (zed.grid ed) row (list (array+ part1 part2 part3) nil))
-    (zed.cursor-right ed)
+    (dotimes (n (len s)) (zed.cursor-right ed))
+    (refresh-object (zed.scroll ed))))
+
+;; insert styled text as an array of grid cells at the given location
+;; unlike insert-at-cursor this function does not advance the cursor
+(defun zed.insert-styled-text (ed row col text)
+  (letrec ((row-data (get-text-grid-row (zed.grid ed) row))
+	   (row-cells (array-copy (1st row-data)))
+	   (row-style (2nd row-data))
+	   (part1 (build-array col nil))
+	   (part2 (build-array (len text) nil))
+	   (part3 (build-array (- (len row-cells) col) nil)))
+    (dotimes (i (len part1))
+      (array-set part1 i (array-ref row-cells i)))
+    (dotimes (i (len part2))
+      (array-set part2 i (array-ref text i)))
+    (dotimes (i (len part3))
+      (array-set part3 i (array-ref row-cells (+ i col))))
+    (set-text-grid-row (zed.grid ed) row (list (array+ part1 part2 part3) nil))
     (refresh-object (zed.scroll ed))))
 
 ;; delete one cell to the left of the cursor (backspace key behavior)
@@ -297,7 +354,7 @@
 		  (prev-row-data (get-text-grid-row (zed.grid ed) (sub1 row)))
 		  (prev-row-cells (1st prev-row-data)))
 	   ;; in the following, the array of the previous line is sliced to make sure
-	   ;; the trailing " " is not kept (line row has its own trailing space)
+	   ;; the trailing zed.*lf* is not kept (line row has its own trailing space)
 	   (set-text-grid-row (zed.grid ed) (sub1 row)
 			      (list (array+ (array-slice prev-row-cells 0
 							 (sub1 (len prev-row-cells)))
@@ -354,27 +411,28 @@
     (cond
       ((and (= row 0)(= col 0))
        (insert-text-grid-row (zed.grid ed) 0)
-       (set-text-grid-row (zed.grid ed) 0 (list #((" " nil)) nil))
+       (set-text-grid-row (zed.grid ed) 0 (list (array `(,zed.*lf* nil)) nil))
        (zed.cursor-down ed))
       (t
        (insert-text-grid-row (zed.grid ed) (add1 row))
        (cond
 	 ((= col (zed.last-column ed row))
-	  (set-text-grid-row (zed.grid ed) (add1 row) (list #((" " nil)) nil)))
+	  (set-text-grid-row (zed.grid ed) (add1 row) (list (array `(,zed.*lf* nil)) nil)))
 	 (t
 	  (letrec ((row-data (get-text-grid-row (zed.grid ed) row))
 		   (row-cells (1st row-data))
 		   (row-style (2nd row-data))
 		   (row-slice (array-slice row-cells col (len row-cells))))
-	    ;; copy from col to last cell (inclusive), which is " ", into new line
+	    ;; copy from col to last cell (inclusive), which is zed.*lf*, into new line
 	    (set-text-grid-row (zed.grid ed) (add1 row) (list row-slice row-style))
 	    ;; leave from 0 to col (exclusive) the original line
 	    (set-text-grid-row (zed.grid ed) row
-			       (list (array-append (array-slice row-cells 0 col) (list " " nil)) row-style)))))
+			       (list (array-append (array-slice row-cells 0 col) (list zed.*lf* nil)) row-style)))))
        (zed.set-cursor-column ed 0)
        (zed.set-cursor-row ed (add1 row))
        (zed.scroll-left-to-line-start ed)
-       (zed.scroll-down-to-cursor ed)))))
+       (zed.scroll-down-to-cursor ed)
+       (when (= (add1 row) (zed.last-row ed)) (zed.cursor-end ed))))))
   
 
 ;; the maximum number of fully displayed lines (there may be additional partial lines visible, though)
@@ -666,10 +724,19 @@
 	  (t
 	   (list row colPlus))))))
 
+;; true if the rune is a sentence delimiter, used by cursor jumping
 (defun zed.delimiter-rune? (rune)
   (case rune
-    (("(" ")" "[" "]" "\"" " " "." ";" "," "?" "!") true)
+    ((zed.*lf* zed.*soft-lf* "(" ")" "[" "]" "\"" " " "." ";" "," "?" "!") true)
     (t nil)))
+
+;; true if the rune should be considered a delimiter for soft wrap
+;; this is different from the previous zed.delimiter-rune? because
+;; we want the punctuation in "word." not to break into "word" and "."
+(defun zed.soft-wrap-rune? (rune)
+  (case rune
+    ((zed.*lf* zed.*soft-lf*) true)
+    ( t nil)))
 
 ;; we're in a word and look for the word's start position
 (defun zed.find-word-start (ed row col)
@@ -773,6 +840,132 @@
        (if (not pos2)
 	   pos
 	   pos2)))))
+
+;; WORD WRAP
+
+;; soft wrap a string, used when text is inserted initially and not during editing
+;; this adds zed.*lf* before "\n" because set-text-grid-text removes trailing "\n"
+;; this uses zed.*soft-lf* at the end of a line instead of zed.*lf* as marker for soft wrap
+(defun zed.soft-wrap-str (s maxcol)
+  (letrec ((lines (strsplit s "\n"))
+	   (result ""))
+    (foreach lines
+	     (lambda (line)
+	       (cond
+		 ((> (strlen line) maxcol)
+		  (letrec ((li (zed.split-line line maxcol))
+			   (k (len li)))
+		    (dotimes (n k)
+		      (cond
+			((< n (sub1 k))
+			 (setq result (str+ result (nth li n) "\r\n")))
+			(t
+			 (setq result (str+ result (nth li n) " \n")))))))
+		 (t (setq result (str+ result line " \n"))))))
+    (slice result 0 (max 0 (- (strlen result) 2)))))
+
+(defun zed.split-line (line maxcol)
+  (zed._split-line line maxcol nil))
+
+(defun zed._split-line (line maxcol acc)
+  (cond
+    ((<= (strlen line) maxcol) (reverse (cons line acc)))
+    (t
+     (let ((splitpoint (zed.find-word-wrap-pos line maxcol)))
+       (cond
+	 ((= 0 splitpoint)
+	  (zed._split-line (slice line maxcol (strlen line)) maxcol (cons (slice line 0 maxcol) acc)))
+	 (t 
+	  (zed._split-line (slice line splitpoint (strlen line)) maxcol (cons (slice line 0 splitpoint) acc))))))))
+
+(defun zed.find-word-wrap-pos (s pos)
+  (let ((rune (slice s pos (add1 pos))))
+    (cond
+      ((= pos 0) 0)
+      ((zed.soft-wrap-rune? rune) (add1 pos))
+      (t
+       (zed.find-word-wrap-pos s (sub1 pos))))))
+
+
+
+;; soft wrap the grid directly when inserting one rune
+;; at row col
+(defun zed.wrap-when-insert (ed row col)
+  (when (>= (zed.last-column ed row)(sub1 (zed.soft-columns ed)))
+    (letrec ((lastcol (zed.last-column ed row))
+	     (last-rune-pos (max 0 (sub1 lastcol)))
+	     (last-rune (get-text-grid-rune
+			 (zed.grid ed) row
+			 last-rune-pos))
+	     (line-ending (get-text-grid-rune
+			   (zed.grid ed) row
+			   lastcol))
+	     (original-cursor-column (zed.cursor-column ed))
+	     (breakpos (if (zed.delimiter-rune? last-rune)
+			   last-rune-pos
+			   (zed.find-word-break ed row last-rune-pos last-rune-pos))))
+      (zed.soft-break-at ed row breakpos lastcol line-ending)
+      (when (and (= row (zed.cursor-row ed))(>= (zed.cursor-column ed) breakpos))
+	(zed.set-cursor-row ed (add1 row))
+	(zed.set-cursor-column ed (- original-cursor-column breakpos))
+	(when (>= row (zed.last-row ed)) (zed.scroll-down ed))))))
+
+;; inefficient way of wrapping when inserting ilen runes at row col
+(defun zed.wrap-when-insert* (ed row col ilen)
+  (dotimes (n ilen)
+    (zed.wrap-when-insert ed row col)))
+
+(defun zed.find-word-break (ed row pos origpos)
+  (cond
+    ((= pos 0) origpos)
+    ((zed.delimiter-rune? (get-text-grid-rune (zed.grid ed) row pos))
+     (min origpos (add1 pos)))
+    (t
+     (zed.find-word-break ed row (sub1 pos) origpos))))
+
+(defun zed.soft-break-at (ed row pos lastcol line-ending)
+  (letrec ((grid (zed.grid ed))
+	   (this-row (get-text-grid-row grid row))
+	   (row-data (array-copy (1st this-row)))
+	   (row-style (2nd this-row))
+	   (lhs (array-copy (slice row-data 0 pos)))
+	   (rhs (array-copy (slice row-data pos lastcol))))
+    (set-text-grid-row grid row (list (array-append lhs (list zed.*soft-lf* nil)) row-style))
+    (cond
+      ((equal? line-ending zed.*lf*)
+       (out "branch1\n")
+       (insert-text-grid-row grid (add1 row))
+       (set-text-grid-row grid (add1 row) (list (array-append rhs (list zed.*lf* nil)) row-style))
+       (zed.scroll-down ed))
+      (t
+       (cond
+	 ((= row (zed.last-row ed))
+	  (out "branch2\n")
+	  (insert-text-grid-row grid (add1 row))
+	  (set-text-grid-row grid (add1 row) (list (array-append rhs (list zed.*soft-lf* nil)) row-style))
+	  (zed.scroll-down ed))
+	 (t
+	  (out "branch3\n") ;; TODO This is buggy - completely mangles up things when cursor is within word wrapped.
+	  (zed.wrap-when-insert* ed (add1 row) 0 (len rhs))
+	  (zed.insert-styled-text ed (add1 row) 0 rhs)))))))
+
+;; TODO: zed.wrap-when-insert probably needs to take a range because zed.soft-break-at needs to call it
+;; recursively!
+
+;; soft wrap the grid directly when deleting one rune
+;; at row col
+(defun zed.wrap-when-delete (ed row col)
+  )
+
+;; find the row in which the paragraph starts in which row is, taking
+;; into account potential soft linebreaks zed.*soft-lf* in previous lines
+(defun zed.find-para-start-row (ed row)
+  (cond
+    ((= row 0) 0)
+    ((equal? (get-text-grid-rune (zed.grid ed) (sub1 row) (zed.last-column ed (sub1 row)))
+	     zed.*lf*) row)
+    (t
+     (zed.find-para-start-row ed (sub1 row)))))
 
 ;;; Z3S5 LISP FUNCTIONS
 
@@ -885,7 +1078,7 @@
 (defun zed.test ()
   (letrec ((win (new-window "Editor"))
 	   (canvas (get-window-canvas win))
-	   (ed (zed.new)))
+	   (ed (zed.new '(soft-wrap))))
     (zed.set-text ed ";; This is an example.\n(defun zed.draw-cursor (ed on?)\n  (letrec ((row (zed.cursor-row ed))\n	   (col (zed.cursor-column ed))\n	   (style (2nd (get-text-grid-cell (zed.grid ed) row col) nil))\n	   (fgcolor (zed.style-fg-color style))\n	   (bgcolor (zed.style-bg-color style)))\n    (set-text-grid-style\n      (zed.grid ed)\n     row\n     col\n     (if on?\n	 (list bgcolor fgcolor)\n	 (list fgcolor bgcolor)))))\n\n(defun mult (x y)\n    (* x y))\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
     (zed.install-key-handler ed canvas)
     (zed.install-rune-handler ed canvas)

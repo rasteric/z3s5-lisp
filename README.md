@@ -13,7 +13,7 @@ There is a build tag `nosound` you may use to leave out sound support. If this o
 
 ## Building
 
-Go 1.18+ is required. 
+Go 1.21+ is required. 
 
 Linux: Alsa sound support development library `libasound2` needs to be installed with `apt get install libasound2` on Debian-based distributions. For the manuals both `pandoc` and the  [Eisvogel Pandoc Template](https://github.com/Wandmalfarbe/pandoc-latex-template) are required. Notice that normal `make` will attempt to compile these manuals. You may use `make lisp` in directory `cmd/z3` to only compile the `z3` sample executable if you want to test it without generating manuals.
 

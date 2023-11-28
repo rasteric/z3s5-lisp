@@ -1,8 +1,20 @@
 # Version History
 
+## Version 2.4
+
+Build tags: `db fts5` for Sqlite3 support, `fileio` for file access.
+
+- Many bug fixes.
+
+- Added initial support for GUI in subpackage GUI. This needs to be imported separately instead of using a build tag in order to minimize dependencies of the base language.
+
+- Added GUI exectuable in `cmd/z3g/z3g.go`. Check this file on how to create a GUI capable Z3S5 Lisp, see the demos for examples.
+
+- Work on editor.lisp to create a GUI editor. This is a step towards a new Lisp machine, since the old attempt using Raylib was too crufty.
+
 ## Version 2.3.11
 
-Build tags: `db fts` for Sqlite3 support, `fileio` for file access.
+Build tags: `db fts5` for Sqlite3 support, `fileio` for file access.
 
 - Fixed various bugs with actions. However, the API is not yet final.
 
@@ -13,7 +25,7 @@ Build tags: `db fts` for Sqlite3 support, `fileio` for file access.
 
 ## Version 2.3.10
 
-Build tags: `db fts` for Sqlite3 support, `fileio` for file access.
+Build tags: `db fts5` for Sqlite3 support, `fileio` for file access.
 
 - Added OOP module 'oop, a simple object-oriented framework.
 
@@ -23,7 +35,7 @@ Build tags: `db fts` for Sqlite3 support, `fileio` for file access.
 
 ## Version 2.3.8
 
-Build tags: `db fts` for Sqlite3 support, `fileio` for file access.
+Build tags: `db fts5` for Sqlite3 support, `fileio` for file access.
 
 - Library system ported from Z3S5 Machine, providing the (load prefix) command. See (help load).
 
@@ -34,13 +46,13 @@ Build tags: `db fts` for Sqlite3 support, `fileio` for file access.
 
 ## Version 2.3.7
 
-Build tags: `db fts` for Sqlite3 support, `fileio` for file access.
+Build tags: `db fts5` for Sqlite3 support, `fileio` for file access.
 
 This is a maintenance release, recompiled with Go 1.19.
 
 ## Version 2.3.6
 
-Build tags: `db fts` for Sqlite3 support, `fileio` for file access.
+Build tags: `db fts5` for Sqlite3 support, `fileio` for file access.
 
 This is a maintenance release, updating the manual.
 

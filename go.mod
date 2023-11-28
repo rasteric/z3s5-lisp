@@ -1,6 +1,6 @@
 module github.com/rasteric/z3s5-lisp
 
-go 1.18
+go 1.21
 
 require (
 	fyne.io/fyne/v2 v2.4.0
@@ -16,6 +16,7 @@ require (
 	github.com/shopspring/decimal v1.3.1
 	github.com/teris-io/shortid v0.0.0-20220617161101-71ec9f2aa569
 	golang.org/x/crypto v0.14.0
+	golang.org/x/exp v0.0.0-20220909182711-5c715a9e8561
 	golang.org/x/mod v0.12.0
 	golang.org/x/text v0.13.0
 )
