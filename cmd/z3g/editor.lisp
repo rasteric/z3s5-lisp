@@ -343,44 +343,64 @@
     (refresh-object (zed.scroll ed))))
 
 ;; delete one cell to the left of the cursor (backspace key behavior)
+;; (defun zed.backspace (ed)
+;;   (letrec ((row (zed.cursor-row ed))
+;; 	   (col (zed.cursor-column ed)))
+;;     (unless (and (= row 0) (= col 0))
+;;       (cond
+;; 	((= col 0)
+;; 	 (letrec ((row-data (get-text-grid-row (zed.grid ed) row))
+;; 		  (row-cells (1st row-data))
+;; 		  (prev-row-data (get-text-grid-row (zed.grid ed) (sub1 row)))
+;; 		  (prev-row-cells (1st prev-row-data)))
+;; 	   ;; in the following, the array of the previous line is sliced to make sure
+;; 	   ;; the trailing zed.*lf* is not kept (line row has its own trailing space)
+;; 	   (set-text-grid-row (zed.grid ed) (sub1 row)
+;; 			      (list (array+ (array-slice prev-row-cells 0
+;; 							 (sub1 (len prev-row-cells)))
+;; 					    row-cells)
+;; 				    (2nd prev-row-data)))
+;; 	   (zed.set-cursor-row ed (sub1 row))
+;; 	   (zed.set-cursor-column ed (sub1 (len prev-row-cells)))
+;; 	   (remove-text-grid-row (zed.grid ed) row))
+;; 	 (zed.scroll-up-to-cursor ed))
+;; 	(t
+;; 	 (letrec ((row-data (get-text-grid-row (zed.grid ed) row))
+;; 		  (row-cells (1st row-data))
+;; 		  (row-style (2nd row-data)))
+;; 	   (cond
+;; 	     ((= col 1)
+;; 	      (set-text-grid-row
+;; 	       (zed.grid ed) row
+;; 	       (list (array-slice row-cells 1 (len row-cells)) row-style)))		 
+;; 	     (t
+;; 	      (set-text-grid-row
+;; 	       (zed.grid ed) row
+;; 	       (list (array+ (array-slice (array-copy row-cells) 0 (sub1 col))
+;; 			     (array-slice row-cells col (len row-cells)))
+;; 		     row-style)))))
+;; 	 (zed.cursor-left ed)
+;; 	 (refresh-object (zed.scroll ed)))))))
+
 (defun zed.backspace (ed)
-  (letrec ((row (zed.cursor-row ed))
-	   (col (zed.cursor-column ed)))
-    (unless (and (= row 0) (= col 0))
-      (cond
-	((= col 0)
-	 (letrec ((row-data (get-text-grid-row (zed.grid ed) row))
-		  (row-cells (1st row-data))
-		  (prev-row-data (get-text-grid-row (zed.grid ed) (sub1 row)))
-		  (prev-row-cells (1st prev-row-data)))
-	   ;; in the following, the array of the previous line is sliced to make sure
-	   ;; the trailing zed.*lf* is not kept (line row has its own trailing space)
-	   (set-text-grid-row (zed.grid ed) (sub1 row)
-			      (list (array+ (array-slice prev-row-cells 0
-							 (sub1 (len prev-row-cells)))
-					    row-cells)
-				    (2nd prev-row-data)))
-	   (zed.set-cursor-row ed (sub1 row))
-	   (zed.set-cursor-column ed (sub1 (len prev-row-cells)))
-	   (remove-text-grid-row (zed.grid ed) row))
-	 (zed.scroll-up-to-cursor ed))
-	(t
-	 (letrec ((row-data (get-text-grid-row (zed.grid ed) row))
-		  (row-cells (1st row-data))
-		  (row-style (2nd row-data)))
-	   (cond
-	     ((= col 1)
-	      (set-text-grid-row
-	       (zed.grid ed) row
-	       (list (array-slice row-cells 1 (len row-cells)) row-style)))		 
-	     (t
-	      (set-text-grid-row
-	       (zed.grid ed) row
-	       (list (array+ (array-slice (array-copy row-cells) 0 (sub1 col))
-			     (array-slice row-cells col (len row-cells)))
-		     row-style)))))
-	 (zed.cursor-left ed)
-	 (refresh-object (zed.scroll ed)))))))
+  (letrec ((to-row (zed.cursor-row ed))
+	   (to-col (zed.cursor-column ed))
+	   (pos (zed.pos-dec ed to-row to-col))
+	   (from-row (1st pos 0))
+	   (from-col (2nd pos 0)))
+    (unless (and (= to-row 0) (= to-col 0))
+      (letrec ((new-pos (wrap-delete-text-grid
+			 (zed.grid ed)
+			 (list from-row from-col to-row to-col)
+			 (zed.soft-columns ed)
+			 t
+			 zed.*lf*
+			 zed.*soft-lf*
+			 to-row to-col)))
+	(zed.set-cursor-row ed (1st pos))
+	(zed.set-cursor-column ed (2nd pos))
+;;	(zed.cursor-left ed)
+	(refresh-object (zed.scroll ed))))))
 
 ;; delete the cell under the cursor without moving the cursor (delete key behavior)
 (defun zed.delete1 (ed)

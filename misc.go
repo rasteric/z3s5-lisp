@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"math"
 	"math/big"
 	"runtime"
 	"strconv"
@@ -131,6 +132,26 @@ func ToInt64(caller string, a any) int64 {
 			panic(fmt.Sprintf("%v: expected exact integer, given %v", caller, a))
 		}
 		return int64(num)
+	}
+}
+
+// ToInt attempts to convert a value to the native int value,
+// panicking if the value does not fit into an int.
+func ToInt(caller string, a any) int {
+	switch n := a.(type) {
+	case goarith.Int32:
+		return int(n)
+	case goarith.Int64:
+		if n > math.MaxInt {
+			panic(fmt.Sprintf("%v: expected integer in range [%v...%v], given %v", caller, math.MinInt, math.MaxInt, n))
+		}
+		return int(n)
+	default:
+		num, exact := goarith.AsNumber(a).Int()
+		if !exact {
+			panic(fmt.Sprintf("%v: expected exact integer, given %v", caller, a))
+		}
+		return int(num)
 	}
 }
 

@@ -906,6 +906,85 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	// (wrap-delete-text-grid grid range-list wrapcol soft-wrap? hard-lf-rune soft-lf-rune cursor-row cursor-column) => li
+	// Delete the given range of the form (startrow endrow endrow endcol) (all inclusive) while ensuring
+	// that all paragraphs in the range are word wrapped. Returns a new cursor position.
+	interp.Def(pre("wrap-delete-text-grid"), 8, func(a []any) any {
+		grid := mustGet(pre("wrap-delete-text-grid"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+		startRow, startCol, endRow, endCol := TextGridRangeListToRange(pre("wrap-delete-text-grid"), a[1].(*z3.Cell))
+		log.Printf("startRow=%v, startCol=%v; endRow=%v, endCol=%v\n", startRow, startCol, endRow, endCol)
+		wrapCol := z3.ToInt(pre("wrap-delete-text-grid"), a[2])
+		softWrap := z3.ToBool(a[3])
+		hardLF := []rune(a[4].(string))[0]
+		softLF := []rune(a[5].(string))[0]
+		cursorRow := z3.ToInt(pre("wrap-delete-text-grid"), a[6])
+		cursorColumn := z3.ToInt(pre("wrap-delete-text-grid"), a[7])
+		// delete the range from startRow to endRow in the grid
+		var underflow []widget.TextGridCell
+		for i := endRow; i >= startRow; i-- {
+			if startRow < i && i < endRow {
+				grid.Rows = slices.Delete(grid.Rows, i, i+1)
+				continue
+			}
+			row := grid.Rows[i]
+			lenRow := len(row.Cells)
+			if i == startRow && i == endRow {
+				row.Cells = slices.Delete(row.Cells, startCol, endCol)
+				if cursorRow == i && cursorColumn >= startCol {
+					cursorColumn = startCol
+				}
+			} else if i == startRow {
+				row.Cells = slices.Delete(row.Cells, startCol, len(row.Cells))
+				if underflow != nil {
+					log.Println("appending overflow")
+					row.Cells = append(row.Cells, slices.Clone(underflow)...)
+					grid.SetRow(i, row)
+					cursorColumn = lenRow - len(underflow)
+					grid.Rows = slices.Delete(grid.Rows, i, i+1)
+					underflow = nil
+				}
+				if lenRow == 0 && i > 0 {
+					grid.Rows = slices.Delete(grid.Rows, i, i+1)
+					cursorColumn = 0
+					cursorRow = i
+				} else if inSelectionRange(startRow, startCol, endRow, endCol, cursorRow, cursorColumn) {
+					log.Println("adjusting cursorColumn")
+					cursorColumn = startCol
+					cursorRow = i
+				}
+			} else if i == endRow {
+				underflow = row.Cells[endCol:]
+				log.Printf("setting overflow:%v\n", underflow)
+				row.Cells = slices.Delete(row.Cells, 0, endCol)
+			}
+			grid.SetRow(i, row)
+		}
+		// now we reflow with word wrap like in wrap-insert-text-grid
+		paraStart := FindTextGridParagraphStart(grid, startRow, hardLF)
+		paraEnd := FindTextGridParagraphEnd(grid, startRow, hardLF)
+		rows := make([]widget.TextGridRow, paraEnd-paraStart+1)
+		for i := range rows {
+			rows[i] = grid.Row(i + paraStart)
+		}
+		newCursorRow := cursorRow
+		newCursorCol := cursorColumn
+		rows, newCursorRow, newCursorCol = WordWrapTextGridRows(rows, wrapCol, softWrap, hardLF, softLF, newCursorRow, newCursorCol)
+		// check if we need to delete rows
+		if len(rows) < paraEnd-paraStart+1 {
+			grid.Rows = slices.Delete(grid.Rows, paraStart+len(rows), paraEnd+1)
+		}
+		// check if we need to insert additional rows
+		if len(rows) > paraEnd-paraStart+1 {
+			newRows := make([]widget.TextGridRow, len(rows)-(paraEnd-paraStart+1))
+			grid.Rows = slices.Insert(grid.Rows, paraEnd+1, newRows...)
+		}
+		for i := range rows {
+			grid.SetRow(i+paraStart, rows[i])
+		}
+		return &z3.Cell{Car: goarith.AsNumber(startRow + newCursorRow),
+			Cdr: &z3.Cell{Car: goarith.AsNumber(newCursorCol), Cdr: z3.Nil}}
+	})
+
 	// (wrap-insert-text-grid grid cells row col wrapcol soft-wrap? hard-lf-rune soft-lf-rune) => li
 	// Soft or hard wrap a paragraph in which row, col is located, based on hard-lf-rune and soft-lf-rune
 	// markers for end-of-line (since "\n" is not a good candidate for this, other markers are normally used).
@@ -931,7 +1010,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 		// what we do in what follows has heavy performance implications
 		startRow := FindTextGridParagraphStart(grid, row, hardLF)
 		endRow := FindTextGridParagraphEnd(grid, row, hardLF)
-		log.Printf("startRow=%v, endRow=%v\n", startRow, endRow)
+		// log.Printf("startRow=%v, endRow=%v\n", startRow, endRow)
 		rows := make([]widget.TextGridRow, (endRow-startRow)+1)
 		for i := range rows {
 			rows[i] = grid.Row(i + startRow)
@@ -960,8 +1039,10 @@ func DefGUI(interp *z3.Interp, config Config) {
 		// but correctness is more important for now.
 		newCursorRow := row
 		newCursorCol := col
-		if wrapCol > 0 {
-			rows, newCursorRow, newCursorCol = WordWrapTextGridRows(rows, wrapCol, softWrap, hardLF, softLF, row-startRow, col)
+		rows, newCursorRow, newCursorCol = WordWrapTextGridRows(rows, wrapCol, softWrap, hardLF, softLF, row-startRow, col)
+		// check if we need to delete rows
+		if len(rows) < endRow-startRow+1 {
+			grid.Rows = slices.Delete(grid.Rows, startRow+len(rows), endRow+1)
 		}
 		// check if we need to insert additional rows
 		if len(rows) > endRow-startRow+1 {
@@ -3468,4 +3549,30 @@ func cellsContainCursor(cells []xCell) bool {
 		}
 	}
 	return false
+}
+
+// TextGridRangeListToRange converts a Z3S5 List containing a range of the form
+// (start-row- start-column end-row end-column) of integers to the integers.
+// end-row and end-column are optional.
+func TextGridRangeListToRange(caller string, li *z3.Cell) (int, int, int, int) {
+	startRow := z3.ToInt(caller, li.Car)
+	li = li.CdrCell()
+	startCol := z3.ToInt(caller, li.Car)
+	li = li.CdrCell()
+	if li == z3.Nil {
+		return startRow, startCol, startRow, startCol
+	}
+	endRow := z3.ToInt(caller, li.Car)
+	li = li.CdrCell()
+	endCol := z3.ToInt(caller, li.Car)
+	if endRow < startRow || (startRow == endRow && endCol < startCol) {
+		panic(fmt.Sprintf("%v: invalid negative range - the end is before the start, given: %v", caller, z3.Str(li)))
+	}
+	return startRow, startCol, endRow, endCol
+}
+
+// inSelectionRange is true if row, col is within the range startRow, startCol to endRow, endCol,
+// false otherwise.
+func inSelectionRange(startRow, startCol, endRow, endCol, row, col int) bool {
+	return (row == startRow && col >= startCol) || (row == endRow && col <= endCol) || (row > startRow && row < endRow)
 }
