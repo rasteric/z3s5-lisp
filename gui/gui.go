@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"image/color"
-	"log"
 	"math"
 	"net/url"
 	"sync"
@@ -912,7 +911,6 @@ func DefGUI(interp *z3.Interp, config Config) {
 	interp.Def(pre("wrap-delete-text-grid"), 8, func(a []any) any {
 		grid := mustGet(pre("wrap-delete-text-grid"), "GUI text grid ID", a, 0).(*widget.TextGrid)
 		startRow, startCol, endRow, endCol := TextGridRangeListToRange(pre("wrap-delete-text-grid"), a[1].(*z3.Cell))
-		log.Printf("startRow=%v, startCol=%v; endRow=%v, endCol=%v\n", startRow, startCol, endRow, endCol)
 		wrapCol := z3.ToInt(pre("wrap-delete-text-grid"), a[2])
 		softWrap := z3.ToBool(a[3])
 		hardLF := []rune(a[4].(string))[0]
@@ -927,7 +925,6 @@ func DefGUI(interp *z3.Interp, config Config) {
 				continue
 			}
 			row := grid.Rows[i]
-			lenRow := len(row.Cells)
 			if i == startRow && i == endRow {
 				row.Cells = slices.Delete(row.Cells, startCol, endCol)
 				if cursorRow == i && cursorColumn >= startCol {
@@ -936,25 +933,24 @@ func DefGUI(interp *z3.Interp, config Config) {
 			} else if i == startRow {
 				row.Cells = slices.Delete(row.Cells, startCol, len(row.Cells))
 				if underflow != nil {
-					log.Println("appending overflow")
-					row.Cells = append(row.Cells, slices.Clone(underflow)...)
+					row.Cells = append(row.Cells, underflow...)
 					grid.SetRow(i, row)
-					cursorColumn = lenRow - len(underflow)
+					cursorColumn = len(row.Cells) - len(underflow)
 					grid.Rows = slices.Delete(grid.Rows, i, i+1)
 					underflow = nil
 				}
-				if lenRow == 0 && i > 0 {
+				if len(row.Cells) == 0 && i > 0 {
 					grid.Rows = slices.Delete(grid.Rows, i, i+1)
 					cursorColumn = 0
 					cursorRow = i
 				} else if inSelectionRange(startRow, startCol, endRow, endCol, cursorRow, cursorColumn) {
-					log.Println("adjusting cursorColumn")
 					cursorColumn = startCol
 					cursorRow = i
 				}
 			} else if i == endRow {
-				underflow = row.Cells[endCol:]
-				log.Printf("setting overflow:%v\n", underflow)
+				if endCol < len(row.Cells) {
+					underflow = slices.Clone(row.Cells[endCol:])
+				}
 				row.Cells = slices.Delete(row.Cells, 0, endCol)
 			}
 			grid.SetRow(i, row)
@@ -968,7 +964,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 		}
 		newCursorRow := cursorRow
 		newCursorCol := cursorColumn
-		rows, newCursorRow, newCursorCol = WordWrapTextGridRows(rows, wrapCol, softWrap, hardLF, softLF, newCursorRow, newCursorCol)
+		rows, newCursorRow, newCursorCol = WordWrapTextGridRows(rows, wrapCol, softWrap, hardLF, softLF, newCursorRow-paraStart, newCursorCol)
 		// check if we need to delete rows
 		if len(rows) < paraEnd-paraStart+1 {
 			grid.Rows = slices.Delete(grid.Rows, paraStart+len(rows), paraEnd+1)
@@ -981,7 +977,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 		for i := range rows {
 			grid.SetRow(i+paraStart, rows[i])
 		}
-		return &z3.Cell{Car: goarith.AsNumber(startRow + newCursorRow),
+		return &z3.Cell{Car: goarith.AsNumber(paraStart + newCursorRow),
 			Cdr: &z3.Cell{Car: goarith.AsNumber(newCursorCol), Cdr: z3.Nil}}
 	})
 
@@ -3433,7 +3429,7 @@ type xCell struct {
 func WordWrapTextGridRows(rows []widget.TextGridRow, wrapCol int,
 	softWrap bool, hardLF, softLF rune, cursorRow, cursorCol int) ([]widget.TextGridRow, int, int) {
 	para := make([]xCell, 0)
-	// push all characters into one array of extended cells
+	// 1. push all characters into one array of extended cells
 	// but ignore line breaks
 	cursorToNext := false
 	for i := range rows {
@@ -3453,7 +3449,7 @@ func WordWrapTextGridRows(rows []widget.TextGridRow, wrapCol int,
 			}
 		}
 	}
-	// now word break the paragraph and push into a result array
+	// 2. now word break the paragraph and push into a result array
 	// adding soft line breaks, and the final hard line break
 	result := make([]widget.TextGridRow, 0)
 	lastSpc := 0
@@ -3465,6 +3461,7 @@ func WordWrapTextGridRows(rows []widget.TextGridRow, wrapCol int,
 	var currentRow widget.TextGridRow
 	var handled bool
 	lpos := 0
+	lineIdx := 0
 	for i := range para {
 		handled = false
 		c := para[i]
@@ -3478,7 +3475,6 @@ func WordWrapTextGridRows(rows []widget.TextGridRow, wrapCol int,
 			if lastSpc > 0 {
 				cutPos = min(lpos, lastSpc)
 			}
-			// log.Printf("wrapCol=%v, cutPos=%v, lineLength=%v\n", wrapCol, cutPos, len(line))
 			if cutPos >= wrapCol/2 && cutPos < len(line) {
 				overflow = make([]xCell, 0, len(line)-cutPos)
 				overflow = append(overflow, line[cutPos:]...)
@@ -3486,36 +3482,37 @@ func WordWrapTextGridRows(rows []widget.TextGridRow, wrapCol int,
 			}
 			currentRow, col = xCellsToTextGridRow(line)
 			if col >= 0 {
-				// log.Println("line contains cursor")
 				newCol = col
-				newRow = len(result)
 			}
 			result = append(result, currentRow)
-			line = make([]xCell, 0, wrapCol)
+			if cellsContainCursor(line) {
+				newRow = lineIdx
+			}
 			if overflow != nil && len(overflow) > 0 {
-				line = append(line, overflow...)
-				if cellsContainCursor(overflow) {
-					// log.Println("overflow contains cursor")
+				line = overflow
+				if cellsContainCursor(line) {
 					newCol = len(line) - 1
-					newRow = len(result)
 				}
 				overflow = nil
 				lpos = len(line)
 			} else {
+				line = make([]xCell, 0, wrapCol)
 				handled = true
 				lpos = 0
 			}
 			lastSpc = 0
+			lineIdx++
 		}
 	}
 	if !handled {
 		currentRow, col = xCellsToTextGridRow(line)
 		if col >= 0 {
-			// log.Println("last line contains cursor")
 			newCol = col
-			newRow = len(result)
 		}
 		result = append(result, currentRow)
+		if cellsContainCursor(line) {
+			newRow = lineIdx
+		}
 	}
 	for i := range result {
 		result[i].Cells = append(result[i].Cells, widget.TextGridCell{Rune: softLF, Style: nil})
@@ -3523,7 +3520,12 @@ func WordWrapTextGridRows(rows []widget.TextGridRow, wrapCol int,
 	k := len(result) - 1
 	n := len(result[k].Cells) - 1
 	result[k].Cells[n] = widget.TextGridCell{Rune: hardLF, Style: nil}
-	// log.Printf("newRow=%v, newCol=%v\n", newRow, newCol)
+	// The following can *only* happen if the cursor was at the very last LF,
+	// which had been deleted; see Step 1 above. So we set it to the pragraph end.
+	if cursorToNext {
+		newRow = k
+		newCol = n
+	}
 	return result, newRow, newCol
 }
 

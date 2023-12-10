@@ -287,18 +287,15 @@
 ;; handle alphanumeric keys
 (defun zed.rune-handler (ed rune)
   (zed.draw-cursor ed nil)
-;  (zed.wrap-when-insert ed (zed.cursor-row ed)(zed.cursor-column ed))
+					;  (zed.wrap-when-insert ed (zed.cursor-row ed)(zed.cursor-column ed))
 					;  (zed.insert-at-cursor ed rune)
   (let ((pos (wrap-insert-text-grid (zed.grid ed) (array (list rune nil))
-			 (zed.cursor-row ed)
-			 (zed.cursor-column ed)
-			 (zed.soft-columns ed)
-			 true zed.*lf* zed.*soft-lf*)))
-    (out pos)(out "\n")
+				    (zed.cursor-row ed)
+				    (zed.cursor-column ed)
+				    (zed.soft-columns ed)
+				    true zed.*lf* zed.*soft-lf*)))
     (zed.set-cursor-row ed (1st pos (zed.cursor-row ed)))
     (zed.set-cursor-column ed (2nd pos (zed.cursor-column ed))))
-   ; (zed.set-cursor-row ed (1st pos (zed.cursor-row ed)))
-   ; (zed.set-cursor-column ed (2nd pos (zed.cursor-column ed))))
   (zed.cursor-right ed)
   (zed.draw-cursor ed true))
 
@@ -397,9 +394,8 @@
 			 zed.*lf*
 			 zed.*soft-lf*
 			 to-row to-col)))
-	(zed.set-cursor-row ed (1st pos))
-	(zed.set-cursor-column ed (2nd pos))
-;;	(zed.cursor-left ed)
+	(zed.set-cursor-row ed (1st new-pos))
+	(zed.set-cursor-column ed (2nd new-pos))
 	(refresh-object (zed.scroll ed))))))
 
 ;; delete the cell under the cursor without moving the cursor (delete key behavior)
