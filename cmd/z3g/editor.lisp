@@ -7,7 +7,7 @@
 (setq zed.*paren-color* '(40000 40000 40000 65635))
 (declare-unprotected 'zed.*paren-color*)
 (setq zed.*valid-props* '(soft-wrap horizontal-scroll auto-columns))
-(setq zed.*default-soft-columns* 40)
+(setq zed.*default-soft-columns* 80)
 (setq zed.*soft-lf* "\r")
 (setq zed.*lf* " ")
 
@@ -31,8 +31,9 @@
 	   (props (zed._validate-props (1st args nil)))
 	   (columns (2nd args zed.*default-soft-columns*))
 	   (scroll (if (member 'horizontal-scroll props)(new-scroll grid)(new-vscroll grid)))
-	   (ed (array 'zed.editor grid 0 0 true true (make-mutex) scroll props columns)))
+	   (ed (array 'zed.editor grid 0 0 true true (make-mutex) scroll props columns nil nil (dict))))
     (zed.set-text ed "")
+    (zed.add-painter ed 'selection (lambda (ed) (zed.paint-selection ed)))
     (zed.blink-cursor ed)
     ed))
 
@@ -114,6 +115,39 @@
 (defun zed.set-soft-columns (ed n)
   (array-set ed 9 n))
 
+;; 10 current selection, nil if nothing is selected
+;; N.B. a selection might not have an end
+(defun zed.selection (ed)
+  (array-ref ed 10))
+
+(defun zed.set-selection (ed selection)
+  (array-set ed 10 selection))
+
+(defun zed.remove-selection (ed)
+  (array-set ed 10 nil))
+
+;; 11 syntax coloring procs, called when editor changes
+;; this is an a-list of (key painter) pairs, where order matters
+(defun zed.painters (ed)
+  (array-ref ed 11))
+
+(defun zed.set-painters (ed li)
+  (array-set ed 11 li))
+
+(defun zed.add-painter (ed key painter)
+  (array-set ed 11 (cons (list key painter) (array-ref ed 11))))
+
+(defun zed.remove-painter (ed key)
+  (array-set ed 11 (filter (array-ref ed 11) (lambda (elem) (not (equal? (1st elem nil) key))))))
+
+(defun zed.has-painter? (ed key)
+  (assoc key (array-ref ed 11)))
+
+;; 12 user-dict, used for storing data
+;; and restoring it later
+(defun zed.user-dict (ed) 
+ (array-ref ed 12))
+
 ;;; GENERAL EDITING
 
 (defun zed.draw-cursor (ed on?)
@@ -172,6 +206,7 @@
 (defun zed.handler-call (ed proc)
   (with-final
       (lambda (err v)
+	(zed.paint ed)
 	(zed.draw-cursor ed true)
 	(when err (*error-printer* err)))
     (zed.draw-cursor ed nil)
@@ -193,6 +228,7 @@
        ((end) (zed.cursor-end ed))
        ((page-down) (zed.cursor-half-page-down ed))
        ((page-up) (zed.cursor-half-page-up ed)))
+     (zed.paint ed)
      (zed.lisp-syntax-color-at-expression ed))))
 
 ;; set editor default keyboard shortcuts in the canvas
@@ -277,6 +313,13 @@
       (lambda ()
 	(zed.cursor-right ed)))))
   (add-canvas-shortcut
+   canvas '(ctrl m)
+   (lambda ()
+     (zed.handler-call
+      ed
+      (lambda ()
+	(zed.mark-selection-at-cursor ed)))))
+  (add-canvas-shortcut
    canvas '(ctrl b)
    (lambda ()
      (zed.handler-call
@@ -287,8 +330,6 @@
 ;; handle alphanumeric keys
 (defun zed.rune-handler (ed rune)
   (zed.draw-cursor ed nil)
-					;  (zed.wrap-when-insert ed (zed.cursor-row ed)(zed.cursor-column ed))
-					;  (zed.insert-at-cursor ed rune)
   (let ((pos (wrap-insert-text-grid (zed.grid ed) (array (list rune nil))
 				    (zed.cursor-row ed)
 				    (zed.cursor-column ed)
@@ -297,87 +338,8 @@
     (zed.set-cursor-row ed (1st pos (zed.cursor-row ed)))
     (zed.set-cursor-column ed (2nd pos (zed.cursor-column ed))))
   (zed.cursor-right ed)
+  (zed.scroll-down-to-cursor ed)
   (zed.draw-cursor ed true))
-
-;; insert the given string (without special characters such as newline)
-;; at the current cursor position, advancing the cursor as necessary
-(defun zed.insert-at-cursor (ed s)
-  (letrec ((row (zed.cursor-row ed))
-	   (col (zed.cursor-column ed))
-	   (row-data (get-text-grid-row (zed.grid ed) row))
-	   (row-cells (1st row-data))
-	   (row-style (2nd row-data))
-	   (part1 (build-array col nil))
-	   (part2 (build-array (len s) nil))
-	   (part3 (build-array (- (len row-cells) col) nil))
-	   (default-style (list (theme-color 'foreground)(theme-color 'background))))
-    (dotimes (i (len part1))
-      (array-set part1 i (array-ref row-cells i)))
-    (dotimes (i (len part2))
-      (array-set part2 i (list (str-slice s i (add1 i)) default-style)))
-    (dotimes (i (len part3))
-      (array-set part3 i (array-ref row-cells (+ i col))))
-    (set-text-grid-row (zed.grid ed) row (list (array+ part1 part2 part3) nil))
-    (dotimes (n (len s)) (zed.cursor-right ed))
-    (refresh-object (zed.scroll ed))))
-
-;; insert styled text as an array of grid cells at the given location
-;; unlike insert-at-cursor this function does not advance the cursor
-(defun zed.insert-styled-text (ed row col text)
-  (letrec ((row-data (get-text-grid-row (zed.grid ed) row))
-	   (row-cells (array-copy (1st row-data)))
-	   (row-style (2nd row-data))
-	   (part1 (build-array col nil))
-	   (part2 (build-array (len text) nil))
-	   (part3 (build-array (- (len row-cells) col) nil)))
-    (dotimes (i (len part1))
-      (array-set part1 i (array-ref row-cells i)))
-    (dotimes (i (len part2))
-      (array-set part2 i (array-ref text i)))
-    (dotimes (i (len part3))
-      (array-set part3 i (array-ref row-cells (+ i col))))
-    (set-text-grid-row (zed.grid ed) row (list (array+ part1 part2 part3) nil))
-    (refresh-object (zed.scroll ed))))
-
-;; delete one cell to the left of the cursor (backspace key behavior)
-;; (defun zed.backspace (ed)
-;;   (letrec ((row (zed.cursor-row ed))
-;; 	   (col (zed.cursor-column ed)))
-;;     (unless (and (= row 0) (= col 0))
-;;       (cond
-;; 	((= col 0)
-;; 	 (letrec ((row-data (get-text-grid-row (zed.grid ed) row))
-;; 		  (row-cells (1st row-data))
-;; 		  (prev-row-data (get-text-grid-row (zed.grid ed) (sub1 row)))
-;; 		  (prev-row-cells (1st prev-row-data)))
-;; 	   ;; in the following, the array of the previous line is sliced to make sure
-;; 	   ;; the trailing zed.*lf* is not kept (line row has its own trailing space)
-;; 	   (set-text-grid-row (zed.grid ed) (sub1 row)
-;; 			      (list (array+ (array-slice prev-row-cells 0
-;; 							 (sub1 (len prev-row-cells)))
-;; 					    row-cells)
-;; 				    (2nd prev-row-data)))
-;; 	   (zed.set-cursor-row ed (sub1 row))
-;; 	   (zed.set-cursor-column ed (sub1 (len prev-row-cells)))
-;; 	   (remove-text-grid-row (zed.grid ed) row))
-;; 	 (zed.scroll-up-to-cursor ed))
-;; 	(t
-;; 	 (letrec ((row-data (get-text-grid-row (zed.grid ed) row))
-;; 		  (row-cells (1st row-data))
-;; 		  (row-style (2nd row-data)))
-;; 	   (cond
-;; 	     ((= col 1)
-;; 	      (set-text-grid-row
-;; 	       (zed.grid ed) row
-;; 	       (list (array-slice row-cells 1 (len row-cells)) row-style)))		 
-;; 	     (t
-;; 	      (set-text-grid-row
-;; 	       (zed.grid ed) row
-;; 	       (list (array+ (array-slice (array-copy row-cells) 0 (sub1 col))
-;; 			     (array-slice row-cells col (len row-cells)))
-;; 		     row-style)))))
-;; 	 (zed.cursor-left ed)
-;; 	 (refresh-object (zed.scroll ed)))))))
 
 (defun zed.backspace (ed)
   (letrec ((to-row (zed.cursor-row ed))
@@ -573,7 +535,7 @@
 (defun zed.scroll-down-to-cursor (ed)
   (letrec ((row (zed.cursor-row ed))
 	   (last-row (zed.last-displayed-line ed)))
-    (when (> row last-row)
+    (when (> row (sub1 last-row))
       (zed.scroll-down ed)
       (zed.scroll-down-to-cursor ed))))
 
@@ -902,35 +864,6 @@
       (t
        (zed.find-word-wrap-pos s (sub1 pos))))))
 
-
-
-;; soft wrap the grid directly when inserting one rune
-;; at row col
-(defun zed.wrap-when-insert (ed row col)
-  (when (>= (zed.last-column ed row)(sub1 (zed.soft-columns ed)))
-    (letrec ((lastcol (zed.last-column ed row))
-	     (last-rune-pos (max 0 (sub1 lastcol)))
-	     (last-rune (get-text-grid-rune
-			 (zed.grid ed) row
-			 last-rune-pos))
-	     (line-ending (get-text-grid-rune
-			   (zed.grid ed) row
-			   lastcol))
-	     (original-cursor-column (zed.cursor-column ed))
-	     (breakpos (if (zed.delimiter-rune? last-rune)
-			   last-rune-pos
-			   (zed.find-word-break ed row last-rune-pos last-rune-pos))))
-      (zed.soft-break-at ed row breakpos lastcol line-ending)
-      (when (and (= row (zed.cursor-row ed))(>= (zed.cursor-column ed) breakpos))
-	(zed.set-cursor-row ed (add1 row))
-	(zed.set-cursor-column ed (- original-cursor-column breakpos))
-	(when (>= row (zed.last-row ed)) (zed.scroll-down ed))))))
-
-;; inefficient way of wrapping when inserting ilen runes at row col
-(defun zed.wrap-when-insert* (ed row col ilen)
-  (dotimes (n ilen)
-    (zed.wrap-when-insert ed row col)))
-
 (defun zed.find-word-break (ed row pos origpos)
   (cond
     ((= pos 0) origpos)
@@ -938,40 +871,6 @@
      (min origpos (add1 pos)))
     (t
      (zed.find-word-break ed row (sub1 pos) origpos))))
-
-(defun zed.soft-break-at (ed row pos lastcol line-ending)
-  (letrec ((grid (zed.grid ed))
-	   (this-row (get-text-grid-row grid row))
-	   (row-data (array-copy (1st this-row)))
-	   (row-style (2nd this-row))
-	   (lhs (array-copy (slice row-data 0 pos)))
-	   (rhs (array-copy (slice row-data pos lastcol))))
-    (set-text-grid-row grid row (list (array-append lhs (list zed.*soft-lf* nil)) row-style))
-    (cond
-      ((equal? line-ending zed.*lf*)
-       (out "branch1\n")
-       (insert-text-grid-row grid (add1 row))
-       (set-text-grid-row grid (add1 row) (list (array-append rhs (list zed.*lf* nil)) row-style))
-       (zed.scroll-down ed))
-      (t
-       (cond
-	 ((= row (zed.last-row ed))
-	  (out "branch2\n")
-	  (insert-text-grid-row grid (add1 row))
-	  (set-text-grid-row grid (add1 row) (list (array-append rhs (list zed.*soft-lf* nil)) row-style))
-	  (zed.scroll-down ed))
-	 (t
-	  (out "branch3\n") ;; TODO This is buggy - completely mangles up things when cursor is within word wrapped.
-	  (zed.wrap-when-insert* ed (add1 row) 0 (len rhs))
-	  (zed.insert-styled-text ed (add1 row) 0 rhs)))))))
-
-;; TODO: zed.wrap-when-insert probably needs to take a range because zed.soft-break-at needs to call it
-;; recursively!
-
-;; soft wrap the grid directly when deleting one rune
-;; at row col
-(defun zed.wrap-when-delete (ed row col)
-  )
 
 ;; find the row in which the paragraph starts in which row is, taking
 ;; into account potential soft linebreaks zed.*soft-lf* in previous lines
@@ -982,6 +881,113 @@
 	     zed.*lf*) row)
     (t
      (zed.find-para-start-row ed (sub1 row)))))
+
+;;; Selection Handling
+
+(defun zed.paint-selection (ed)
+  (let ((sel (zed.selection ed)))
+    (when (and sel
+	       (>= (len sel) 4))
+      (zed.color-range
+       ed
+       'background
+       (1st sel)(2nd sel)(3rd sel)(4th sel)
+       (theme-color 'selection)))))
+
+(defun zed.restore-selection-previous (ed)
+  (letrec ((d (get (zed.user-dict ed) 'selection-previous nil))
+	   (range (1st d nil))
+	   (data (2nd d nil)))
+    (when range
+      (zed.restore-styles-from-range ed (1st range)(2nd range) data))))
+    
+(defun zed.save-selection-previous (ed range)
+  (set (zed.user-dict ed)
+       'selection-previous
+       (list
+	range
+	(zed.get-range ed (1st range)(2nd range)(3rd range)(4th range)))))
+
+;; obtain a range as list
+(defun zed.get-range (ed start-row start-column end-row end-column)
+  (zed._get-range ed start-row start-column end-row end-column nil))
+
+(defun zed._get-range (ed row column end-row end-column acc)
+  (cond
+    ((or (> row end-row)
+	 (> row (zed.last-row ed))
+	 (and (= row end-row)
+	      (> column end-column)))
+     (reverse acc))
+    (t (zed._get-range ed (zed.next-row ed row column)
+		       (zed.next-col ed row column)
+		       end-row end-column
+		       (cons (get-text-grid-cell (zed.grid ed) row column) acc)))))
+
+;; restore range
+(defun zed.restore-styles-from-range (ed row column data)
+  (unless
+      (or (null? data)
+	  (> row (zed.last-row ed))
+	  (and (= row (zed.last-row ed))
+	       (> column (zed.last-column (zed.last-row ed) column))))
+    (set-text-grid-style (zed.grid ed) row column (2nd (car data) nil))
+    (zed.restore-styles-from-range ed (zed.next-row ed row column)
+				   (zed.next-col ed row column)
+				   (cdr data))))
+
+;; mark a selection, first the start, then the end, or remove the selection
+;; if it is already set (similar to Emacs Ctrl-SPACE)
+(defun zed.mark-selection-at-cursor (ed)
+  (when (and (zed.selection ed)
+	     (= (len (zed.selection ed)) 4))
+    (zed.remove-selection* ed))
+  (let ((sel (zed.selection ed))
+	(row (zed.cursor-row ed))
+	(col (zed.cursor-column ed)))
+    (cond
+      ((not sel)
+       (zed.set-selection ed (list row col)))
+      ((= (len sel) 2)
+       (zed.set-selection* ed (append (list (1st sel)(2nd sel))
+				      (zed.prev-pos ed (list row col))))))))
+
+;; like remove-selection but takes care of restoring original styles
+;; at selection (assuming editor hasn't changed)
+(defun zed.remove-selection* (ed)
+  (zed.restore-selection-previous ed)
+  (zed.remove-selection ed))
+
+;; like set-selection but saves the original style data at the selection
+(defun zed.set-selection* (ed sel)
+  (zed.save-selection-previous ed sel)
+  (zed.set-selection ed sel))
+   
+;;; Syntax Coloring
+
+(defun zed.paint (ed)
+  (foreach (zed.painters ed)
+	   (lambda (li)
+	     (cond
+	       ((and (functional? (2nd li nil))
+		     (= (functional-arity (2nd li nil)) 1))
+		((2nd li) ed))))))
+
+(defun zed.color-range (ed sort start-row start-column end-row end-column color)
+  (case sort
+    ((background) (set-text-grid-style-range (zed.grid ed) start-row start-column
+					     end-row end-column
+					     (list (theme-color 'foreground)
+						   color)))
+    ((foreground) (set-text-grid-style-range (zed.grid ed) start-row start-column
+					     end-row end-column
+					     (list color (theme-color 'background))))
+    (t (set-text-grid-style-range (zed.grid ed) start-row start-column
+				  end-row end-column
+				  color))))
+
+(defun zed.remove-colors (ed)
+  (set-text-grid-style-range (zed.grid ed) 0 0 (zed.last-row ed)(zed.last-column ed (zed.last-row ed)) nil))
 
 ;;; Z3S5 LISP FUNCTIONS
 
@@ -1035,6 +1041,22 @@
   (cond
     ((< col (zed.last-column ed row)) (add1 col))
     (t 0)))
+
+;; return the next (row col) position for input list (row col)
+;; returns the last position (not nil) as fixed point,
+;; if pos is the last position
+(defun zed.next-pos (ed pos)
+  (list (zed.next-row ed (1st pos)(2nd pos))
+	(zed.next-col ed (1st pos)(2nd pos))))
+
+;; return the previous (row col) position for input list (row col)
+;; returns (0 0) as fixed point (not nil), if pos is (0 0)
+(defun zed.prev-pos (ed pos)
+  (if (<= (2nd pos) 0)
+      (if (<= (1st pos) 0)
+	  '(0 0)
+	  (list (sub1 (1st pos))(zed.last-column ed (sub1 (1st pos)))))
+      (list (1st pos)(sub1 (2nd pos)))))
 
 ;; find all s-expressions in the buffer, return a list of lists (start-row start-col end-row end-col)
 (defun zed.parse-expressions (ed current-row current-col end-row end-col acc open-paren last-rune)
@@ -1090,12 +1112,24 @@
 	  (zed.next-col ed current-row current-col)
 	  end-row end-col acc open-paren rune)))))
 
+(defun zed.create-lorem-ipsum-content (n)
+  (letrec ((fn
+	    (lambda (i s)
+	      (cond
+		((= i 0) s)
+		(t (fn
+		    (sub1 i)
+		    (str+ s
+			  (create-lorem-ipsum 'paragraph 2 20)
+			  "\n\n")))))))
+    (fn n "")))
+
 ;;; TESTING
 (defun zed.test ()
   (letrec ((win (new-window "Editor"))
 	   (canvas (get-window-canvas win))
 	   (ed (zed.new '(soft-wrap))))
-    (zed.set-text ed ";; This is an example.\n(defun zed.draw-cursor (ed on?)\n  (letrec ((row (zed.cursor-row ed))\n	   (col (zed.cursor-column ed))\n	   (style (2nd (get-text-grid-cell (zed.grid ed) row col) nil))\n	   (fgcolor (zed.style-fg-color style))\n	   (bgcolor (zed.style-bg-color style)))\n    (set-text-grid-style\n      (zed.grid ed)\n     row\n     col\n     (if on?\n	 (list bgcolor fgcolor)\n	 (list fgcolor bgcolor)))))\n\n(defun mult (x y)\n    (* x y))\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+    (zed.set-text ed (zed.create-lorem-ipsum-content 5))
     (zed.install-key-handler ed canvas)
     (zed.install-rune-handler ed canvas)
     (set-window-content win (zed.scroll ed))

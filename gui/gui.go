@@ -21,6 +21,7 @@ import (
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+	lorem "github.com/drhodes/golorem"
 	"github.com/nukata/goarith"
 	z3 "github.com/rasteric/z3s5-lisp"
 	"golang.org/x/exp/slices"
@@ -158,6 +159,11 @@ var KeyControl = z3.NewSym("control")
 var KeyAlt = z3.NewSym("alt")
 var KeySuper = z3.NewSym("super")
 var KeyUnknown = z3.NewSym("unknown")
+
+// lorem ipsum selectors for create-lorem-ipsum helper
+var LoremWord = z3.NewSym("word")
+var LoremSentence = z3.NewSym("sentence")
+var LoremParagraph = z3.NewSym("paragraph")
 
 // used to work around Go prohibition to hash functions
 type validatorWrapper struct {
@@ -1972,6 +1978,23 @@ func DefGUI(interp *z3.Interp, config Config) {
 
 	// MISC
 
+	interp.Def(pre("create-lorem-ipsum"), 3, func(a []any) any {
+		sym := a[0].(*z3.Sym)
+		nmin := z3.ToInt(pre("create-lorem-ipsum"), a[1])
+		nmax := z3.ToInt(pre("create-lorem-ipsum"), a[2])
+		switch sym {
+		case LoremWord:
+			return lorem.Word(nmin, nmax)
+		case LoremSentence:
+			return lorem.Sentence(nmin, nmax)
+		case LoremParagraph:
+			return lorem.Paragraph(nmin, nmax)
+		default:
+			panic(fmt.Sprintf("%v: expected a symbol in '(word sentence paragraph), given %v", pre("create-lorem-ipsum"),
+				z3.Str(sym)))
+		}
+	})
+
 	// (forget-gui-object <id>) clears any internal association with the given GUI object
 	// but does not destroy resources associated with it. WARN: Internal use only, use with care!
 	interp.Def(pre("forget-gui-object"), 1, func(a []any) any {
@@ -3515,7 +3538,11 @@ func WordWrapTextGridRows(rows []widget.TextGridRow, wrapCol int,
 		}
 	}
 	for i := range result {
-		result[i].Cells = append(result[i].Cells, widget.TextGridCell{Rune: softLF, Style: nil})
+		if softWrap {
+			result[i].Cells = append(result[i].Cells, widget.TextGridCell{Rune: softLF, Style: nil})
+		} else {
+			result[i].Cells = append(result[i].Cells, widget.TextGridCell{Rune: hardLF, Style: nil})
+		}
 	}
 	k := len(result) - 1
 	n := len(result[k].Cells) - 1

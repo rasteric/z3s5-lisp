@@ -556,6 +556,22 @@
   (topic (gui text-grid))
   (see (set-text-grid-text new-text-grid get-text-grid-row get-text-grid-rune get-text-grid-cell)))
 
+(defhelp wrap-delete-text-grid
+    (use "(wrap-delete-text-grid grid range-list wrapcol soft-wrap? hard-lf-rune soft-lf-rune cursor-row cursor-column) => li")
+  (info "This helper implements deletion with word wrapping in #grid. The #range-list must contain integers of the form (start-row start-colum end-row end-column), which must be within the grid's maximum row and column ranges. #wrapcol is an integer indicating the number of chars per line; any more chars are wrapped. If #soft-wrap? is not nil, then the paragraphs in which deletion takes place are soft-wrapped. #hard-lf-rune is a string containing the rune for a hard line feed, whereas #soft-lf-rune is a string containing the rune for soft line feeds. The current #cursor-row and #cursor-column must be provided as well; when the function wraps the deleted paragraphs, their values are updated and returned in the list #li, which is of the form (new-cursor-row new-cursor-column).")
+  (type proc)
+  (arity 8)
+  (topic (gui text-grid))
+  (see (wrap-insert-text-grid new-text-grid)))
+
+(defhelp wrap-insert-text-grid
+    (use "(wrap-insert-text-grid grid cells row col wrapcol soft-wrap? hard-lf-rune soft-lf-rune) => li")
+  (info "This helper implements inserting styled text with word wrapping in #grid. #cells must be a list of text grid cells, each of which consists of a rune string, and a list containing a foreground and background color, or nil. #row and #col are the line and column in #grid before which the text is inserted. The number of characters per line is indicated with #wrapcol. If #soft-wrap? is true, then the paragraph into which it is inserted is soft-word-wrapped, using soft-lf-rune as a line ending. Otherwise, #hard-lf-rune is used for line-endings, which is also used for the last line of a paragraph. The returned list of the form (new-cursor-row new-cursor-column) reflects the updated cursor position if #row and #col are the current cursor position.")
+  (type proc)
+  (arity 8)
+  (topic (gui text-grid))
+  (see (wrap-delete-text-grid new-text-grid)))
+
 (defhelp new-check
     (use "(new-check title proc) => int")
   (info "Create and return a new check box with the given #title string and a callback procedure #proc. The callback #proc is called with the new state of the check box as bool when it has changed.")
@@ -1366,3 +1382,12 @@
   (topic (gui theme))
   (see (theme-color the-color *colors*)))
 
+(defhelp create-lorem-ipsum
+    (use "(create-lorem-ipsum selector min max) => str")
+  (info "Create random Lorem Ipsum fill text based on #selector. If #selector is 'word, then a word with at least #min letters and at most #max letters is created. If #selector is 'sentence, then a sentence with at least #min words and at most #max words is created. If #selector is 'paragraph, then a paragraph with at least #min sentences and at most #max sentences is created.")
+  (type proc)
+  (arity 1)
+  (topic (gui sequences))
+  (see (new-text-grid new-entry))) 
+  
+  
