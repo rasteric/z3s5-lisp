@@ -8,6 +8,7 @@
 (declare-unprotected 'zed.*paren-color*)
 (setq zed.*valid-props* '(soft-wrap horizontal-scroll auto-columns))
 (setq zed.*default-soft-columns* 80)
+(setq zed.*skip-expr-search-on-empty-line* true) ; don't search for end of Lisp expr beyond an empty line
 (setq zed.*soft-lf* "\r")
 (setq zed.*lf* " ")
 
@@ -26,7 +27,7 @@
 (defun zed.new (&rest args)
   (if (theme-is-dark?)
       (setq zed.*paren-color* (color->color64 '(255 164 0 255)))
-      (setq zed.*paren-color* '(10000 10000 32896 65535)))
+      (setq zed.*paren-color* '(10000 10000 65535 65535)))
   (letrec ((grid (new-text-grid))
 	   (props (zed._validate-props (1st args nil)))
 	   (columns (2nd args zed.*default-soft-columns*))
@@ -228,8 +229,7 @@
        ((end) (zed.cursor-end ed))
        ((page-down) (zed.cursor-half-page-down ed))
        ((page-up) (zed.cursor-half-page-up ed)))
-     (zed.paint ed)
-     (zed.lisp-syntax-color-at-expression ed))))
+     (zed.paint ed))))
 
 ;; set editor default keyboard shortcuts in the canvas
 (defun zed.install-default-shortcuts (ed canvas)
@@ -313,6 +313,14 @@
       (lambda ()
 	(zed.cursor-right ed)))))
   (add-canvas-shortcut
+   canvas '(ctrl l)
+   (lambda ()
+     (zed.handler-call
+      ed
+      (lambda ()
+	(out (zed.find-lisp-expression-at ed (zed.cursor-row ed)(zed.cursor-column ed)))
+	(out "\n")))))
+  (add-canvas-shortcut
    canvas '(ctrl m)
    (lambda ()
      (zed.handler-call
@@ -357,29 +365,25 @@
 			 zed.*soft-lf*
 			 to-row to-col)))
 	(zed.set-cursor-row ed (1st new-pos))
-	(zed.set-cursor-column ed (2nd new-pos))
-	(refresh-object (zed.scroll ed))))))
+	(zed.set-cursor-column ed (2nd new-pos))))))
 
 ;; delete the cell under the cursor without moving the cursor (delete key behavior)
 (defun zed.delete1 (ed)
-  (letrec ((row (zed.cursor-row ed))
-	   (col (zed.cursor-column ed)))
-    (cond
-      ((and (= col (zed.last-column ed row))
-	    (= row (zed.last-row ed)))
-       (void))
-      ((= col (zed.last-column ed row))
-       (remove-text-grid-row (zed.grid ed) row))
-      (t
-       (letrec ((row-data (get-text-grid-row (zed.grid ed) row))
-		(row-cells (1st row-data))
-		(row-style (2nd row-data)))
-	 (set-text-grid-row
-	  (zed.grid ed) row
-	  (list (array+ (array-slice (array-copy row-cells) 0 col)
-			(array-slice row-cells (add1 col) (len row-cells)))
-		row-style)))))
-    (refresh-object (zed.scroll ed))))
+  (let ((from-row (zed.cursor-row ed))
+	(from-col (zed.cursor-column ed)))
+    (unless (and (= from-row (zed.last-row ed))
+		 (= from-col (zed.last-column ed (zed.last-row ed))))
+      (letrec ((pos (zed.pos-inc ed from-row from-col))
+	       (to-row (1st pos))
+	       (to-col (2nd pos)))
+        (wrap-delete-text-grid
+	 (zed.grid ed)
+	 (list from-row from-col to-row to-col)
+	 (zed.soft-columns ed)
+	 t
+	 zed.*lf*
+	 zed.*soft-lf*
+	 to-row to-col)))))
 
 ;; return creates a new line, copying the rest of the current line to it (return key behavior)
 ;; edge case: If the cursor is at 0,0 then a new line is created above.
@@ -678,8 +682,7 @@
    (letrec ((row (zed.cursor-row ed))
 	    (col (zed.cursor-column ed))
 	    (rune (get-text-grid-rune (zed.grid ed) row col)))
-     (case rune
-       (("." "," ";" "?" "!") (zed.cursor-right ed)))))
+     (when (unicode.is-punct? rune) (zed.cursor-right ed))))
 
 (defun zed.pos-dec (ed row col)
   (if (and (= col 0) (= row 0))
@@ -847,7 +850,7 @@
 
 (defun zed._split-line (line maxcol acc)
   (cond
-    ((<= (strlen line) maxcol) (reverse (cons line acc)))
+    ((< (strlen line) maxcol) (reverse (cons line acc)))
     (t
      (let ((splitpoint (zed.find-word-wrap-pos line maxcol)))
        (cond
@@ -860,17 +863,9 @@
   (let ((rune (slice s pos (add1 pos))))
     (cond
       ((= pos 0) 0)
-      ((zed.soft-wrap-rune? rune) (add1 pos))
+      ((unicode.is-space? rune) (add1 pos))
       (t
        (zed.find-word-wrap-pos s (sub1 pos))))))
-
-(defun zed.find-word-break (ed row pos origpos)
-  (cond
-    ((= pos 0) origpos)
-    ((zed.delimiter-rune? (get-text-grid-rune (zed.grid ed) row pos))
-     (min origpos (add1 pos)))
-    (t
-     (zed.find-word-break ed row (sub1 pos) origpos))))
 
 ;; find the row in which the paragraph starts in which row is, taking
 ;; into account potential soft linebreaks zed.*soft-lf* in previous lines
@@ -998,6 +993,15 @@
     (unless (< (len range) 4)
       (zed.lisp-syntax-color-range ed (1st range) (2nd range) (3rd range) (4th range)))))
 
+(defun zed.lisp-syntax-color-buffer (ed)
+  (let ((expr (zed.parse-expressions ed 0 0 (zed.last-row ed) (zed.last-column ed (zed.last-row ed)) nil 0 nil)))
+    (foreach expr
+	     (lambda (r)
+	       (zed.lisp-syntax-color-range ed (1st r)(2nd r)(3rd r)(4th r))))))
+
+(defun zed.lisp-syntax-color-buffer/async (ed)
+  (void (future (zed.lisp-syntax-color-buffer ed))))
+
 (defun zed.lisp-syntax-color-range (ed start-row start-col end-row end-col)
   (let ((rune (get-text-grid-rune (zed.grid ed) start-row start-col)))
     (case rune
@@ -1008,6 +1012,9 @@
       (zed.lisp-syntax-color-range ed (zed.next-row ed start-row start-col) (zed.next-col ed start-row start-col)
 				   end-row end-col))))
 
+;; approximate the range of an expression at the given position
+;; this function assumes the expression starts on a separate new line
+;; and ends in a separate line
 ;; uses parse-expressions to get the ranges of all expressions in the buffer
 ;; Todo: This is inefficient if we really just need the expression under the cursor.
 (defun zed.find-lisp-expression-at (ed row col)
@@ -1130,6 +1137,7 @@
 	   (canvas (get-window-canvas win))
 	   (ed (zed.new '(soft-wrap))))
     (zed.set-text ed (zed.create-lorem-ipsum-content 5))
+    (zed.add-painter ed 'lisp zed.lisp-syntax-color-buffer/async)
     (zed.install-key-handler ed canvas)
     (zed.install-rune-handler ed canvas)
     (set-window-content win (zed.scroll ed))

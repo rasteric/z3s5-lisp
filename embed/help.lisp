@@ -83,6 +83,9 @@
 (set-help-topic-info 'oop
 		     "Object-oriented Programming"
 		     "The OOP system uses arrays to store objects and also offers a more lightweight array-based structure system. It is not built for performance but may be useful to prevent writing object-oriented wrapper data structures again and again. This is also the reason why it was decided to embed the OOP system with a fixed API rather than providing it as an include file, allowing for interoperable object-oriented programming without having to worry about whether the extension is loaded. It's very simple and lightweight.")
+(set-help-topic-info 'unicode
+		     "Unicode Standard"
+		     "This section lists helper function to deal with the unicode standard. Strings in Z3S5 Lisp can hold arbitrary data but for I/O purposes are supposed to be in UTF-8 format. Unicode helper functions can take a unicode rune as a string, in case of which only the first rune of the string is considered and the empty yields an error, or as a number.")
 
 ;;; help for builtin functions (intrinsics)
 
@@ -2941,9 +2944,140 @@
   (topic (zimage system))
   (see (save-zimage load-zimage declare-unprotected)))
 
+(defhelp unicode.is-space?
+    (use "(unicode.is-space? s) => bool")
+  (info "Return true if number #s or the first unicode glyph of string #s represents a white space character, nil otherwise.")
+  (type proc)
+  (arity 1)
+  (topic (unicode system))
+  (see (char->str str->chars unicode.is-punct? unicode.is-symbol? unicode.is-title? unicode.is-upper?
+		  unicode.is-control? unicode.is-digit? unicode.is-graphic? unicode.is-letter?
+		  unicode.is-lower? unicode.is-mark? unicode.is-number? unicode.is-print?)))
+
+(defhelp unicode.is-punct?
+    (use "(unicode.is-punct? s) => bool")
+  (info "Return true if number #s or the first unicode glyph of string #s represents a punctuation character, nil otherwise.")
+  (type proc)
+  (arity 1)
+  (topic (unicode system))
+  (see (char->str str->chars unicode.is-space? unicode.is-symbol? unicode.is-title? unicode.is-upper?
+		  unicode.is-control? unicode.is-digit? unicode.is-graphic? unicode.is-letter?
+		  unicode.is-lower? unicode.is-mark? unicode.is-number? unicode.is-print?)))
+
+
+(defhelp unicode.is-symbol?
+    (use "(unicode.is-symbol? s) => bool")
+  (info "Return true if number #s or the first unicode glyph of string #s represents a symbol, nil otherwise.")
+  (type proc)
+  (arity 1)
+  (topic (unicode system))
+  (see (char->str str->chars unicode.is-space? unicode.is-punct? unicode.is-title? unicode.is-upper?
+		  unicode.is-control? unicode.is-digit? unicode.is-graphic? unicode.is-letter?
+		  unicode.is-lower? unicode.is-mark? unicode.is-number? unicode.is-print?)))
+
+(defhelp unicode.is-title?
+    (use "(unicode.is-title? s) => bool")
+  (info "Return true if number #s or the first unicode glyph of string #s represents a titlecase character, nil otherwise.")
+  (type proc)
+  (arity 1)
+  (topic (unicode system))
+  (see (char->str str->chars unicode.is-space? unicode.is-punct? unicode.is-symbol? unicode.is-upper?
+		  unicode.is-control? unicode.is-digit? unicode.is-graphic? unicode.is-letter?
+		  unicode.is-lower? unicode.is-mark? unicode.is-number? unicode.is-print?)))
+
+(defhelp unicode.is-upper?
+    (use "(unicode.is-upper? s) => bool")
+  (info "Return true if number #s or the first unicode glyph of string #s represents an uppercase character, nil otherwise.")
+  (type proc)
+  (arity 1)
+  (topic (unicode system))
+  (see (char->str str->chars unicode.is-space? unicode.is-punct? unicode.is-symbol? unicode.is-title?
+		  unicode.is-control? unicode.is-digit? unicode.is-graphic? unicode.is-letter?
+		  unicode.is-lower? unicode.is-mark? unicode.is-number? unicode.is-print?)))
+
+(defhelp unicode.is-control?
+    (use "(unicode.is-control? s) => bool")
+  (info "Return true if number #s or the first unicode glyph of string #s represents a control character, nil otherwise.")
+  (type proc)
+  (arity 1)
+  (topic (unicode system))
+  (see (char->str str->chars unicode.is-space? unicode.is-punct? unicode.is-symbol? unicode.is-title?
+		  unicode.is-upper? unicode.is-digit? unicode.is-graphic? unicode.is-letter?
+		  unicode.is-lower? unicode.is-mark? unicode.is-number? unicode.is-print?)))
+
+(defhelp unicode.is-digit?
+    (use "(unicode.is-digit? s) => bool")
+  (info "Return true if number #s or the first unicode glyph of string #s represents a numerical digit, nil otherwise.")
+  (type proc)
+  (arity 1)
+  (topic (unicode system))
+  (see (char->str str->chars unicode.is-space? unicode.is-punct? unicode.is-symbol? unicode.is-title?
+		  unicode.is-upper? unicode.is-control? unicode.is-graphic? unicode.is-letter?
+		  unicode.is-lower? unicode.is-mark? unicode.is-number? unicode.is-print?)))
+
+(defhelp unicode.is-letter?
+    (use "(unicode.is-letter? s) => bool")
+  (info "Return true if number #s or the first unicode glyph of string #s represents a letter, nil otherwise.")
+  (type proc)
+  (arity 1)
+  (topic (unicode system))
+  (see (char->str str->chars unicode.is-space? unicode.is-punct? unicode.is-symbol? unicode.is-title?
+		  unicode.is-upper? unicode.is-control? unicode.is-graphic? unicode.is-digit?
+		  unicode.is-lower? unicode.is-mark? unicode.is-number? unicode.is-print?)))
+
+(defhelp unicode.is-graphic?
+    (use "(unicode.is-graphic? s) => bool")
+  (info "Return true if number #s or the first unicode glyph of string #s is graphically visible, nil otherwise.")
+  (type proc)
+  (arity 1)
+  (topic (unicode system))
+  (see (char->str str->chars unicode.is-space? unicode.is-punct? unicode.is-symbol? unicode.is-title?
+		  unicode.is-upper? unicode.is-control? unicode.is-digit? unicode.is-letter?
+		  unicode.is-lower? unicode.is-mark? unicode.is-number? unicode.is-print?)))
+
+(defhelp unicode.is-lower?
+    (use "(unicode.is-lower? s) => bool")
+  (info "Return true if number #s or the first unicode glyph of string #s is a lowercase character, nil otherwise.")
+  (type proc)
+  (arity 1)
+  (topic (unicode system))
+  (see (char->str str->chars unicode.is-space? unicode.is-punct? unicode.is-symbol? unicode.is-title?
+		  unicode.is-upper? unicode.is-control? unicode.is-digit? unicode.is-letter?
+		  unicode.is-graphic? unicode.is-mark? unicode.is-number? unicode.is-print?)))
+
+(defhelp unicode.is-mark?
+    (use "(unicode.is-mark? s) => bool")
+  (info "Return true if number #s or the first unicode glyph of string #s represents a mark (unicode category M), nil otherwise.")
+  (type proc)
+  (arity 1)
+  (topic (unicode system))
+  (see (char->str str->chars unicode.is-space? unicode.is-punct? unicode.is-symbol? unicode.is-title?
+		  unicode.is-upper? unicode.is-control? unicode.is-digit? unicode.is-letter?
+		  unicode.is-graphic? unicode.is-lower? unicode.is-number? unicode.is-print?)))
+
+(defhelp unicode.is-number?
+    (use "(unicode.is-number? s) => bool")
+  (info "Return true if number #s or the first unicode glyph of string #s represents a letter that may occur in a number, nil otherwise. This is for testing the unicode number category, which contains number and digit glyphs in other writing system. Note that it does not test whether a character belongs to a valid Z3S5 Lisp number.")
+  (type proc)
+  (arity 1)
+  (topic (unicode system))
+  (see (char->str str->chars unicode.is-space? unicode.is-punct? unicode.is-symbol? unicode.is-title?
+		  unicode.is-upper? unicode.is-control? unicode.is-digit? unicode.is-letter?
+		  unicode.is-graphic? unicode.is-lower? unicode.is-mark? unicode.is-print?)))
+
+(defhelp unicode.is-print?
+    (use "(unicode.is-print? s) => bool")
+  (info "Return true if number #s or the first unicode glyph of string #s represents a printable character.")
+  (type proc)
+  (arity 1)
+  (topic (unicode system))
+  (see (char->str str->chars unicode.is-space? unicode.is-punct? unicode.is-symbol? unicode.is-title?
+		  unicode.is-upper? unicode.is-control? unicode.is-digit? unicode.is-letter?
+		  unicode.is-graphic? unicode.is-lower? unicode.is-mark? unicode.is-number?)))
+
 ;;; Help end
 
-;;;  Copyright (c) 2019-2022 Erich Rast
+;;;  Copyright (c) 2019-2023 Erich Rast
 ;;;
 ;;;  The above copyright notice and this permission notice shall be included in
 ;;;  all copies or substantial portions of the Software.
