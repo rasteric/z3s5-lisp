@@ -5,6 +5,7 @@ go 1.21
 require (
 	fyne.io/fyne/v2 v2.4.0
 	github.com/adrg/xdg v0.4.0
+	github.com/drhodes/golorem v0.0.0-20220328165741-da82e5b29246
 	github.com/faiface/beep v1.1.0
 	github.com/gookit/color v1.5.4
 	github.com/jamesturk/go-jellyfish v0.0.0-20190821175037-81d50ddab23b
@@ -15,16 +16,15 @@ require (
 	github.com/rasteric/hooks v0.0.6
 	github.com/shopspring/decimal v1.3.1
 	github.com/teris-io/shortid v0.0.0-20220617161101-71ec9f2aa569
-	golang.org/x/crypto v0.14.0
+	golang.org/x/crypto v0.17.0
 	golang.org/x/exp v0.0.0-20220909182711-5c715a9e8561
 	golang.org/x/mod v0.12.0
-	golang.org/x/text v0.13.0
+	golang.org/x/text v0.14.0
 )
 
 require (
 	fyne.io/systray v1.10.1-0.20230722100817-88df1e0ffa9a // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/drhodes/golorem v0.0.0-20220328165741-da82e5b29246 // indirect
 	github.com/fredbi/uri v1.0.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/fyne-io/gl-js v0.0.0-20230506162202-1fdaa286a934 // indirect
@@ -53,7 +53,7 @@ require (
 	golang.org/x/image v0.12.0 // indirect
 	golang.org/x/mobile v0.0.0-20230906021930-dc64209e86f1 // indirect
 	golang.org/x/net v0.17.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/sys v0.15.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	honnef.co/go/js/dom v0.0.0-20230808055721-96db8f4d5e3b // indirect
