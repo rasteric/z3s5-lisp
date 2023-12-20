@@ -4,8 +4,27 @@
 (declare-unprotected 'zed.*blink-cursor-on-interval*)
 (setq zed.*blink-cursor-off-interval* 200)
 (declare-unprotected 'zed.*blink-cursor-off-interval*)
-(setq zed.*paren-color* '(40000 40000 40000 65635))
-(declare-unprotected 'zed.*paren-color*)
+(setq zed.*paren-style* nil)
+(declare-unprotected 'zed.*paren-style*)
+(setq zed.*comment-style* nil)
+(declare-unprotected 'zed.*comment-style*)
+(setq zed.*symbol-style* nil)
+(declare-unprotected 'zed.*symbol-style*)
+(setq zed.*literal-style* nil)
+(declare-unprotected 'zed.*literal-style*)
+(setq zed.*functional-style* nil)
+(declare-unprotected 'zed.*functional-style*)
+(setq zed.*error-style* nil)
+(declare-unprotected 'zed.*error-style*)
+(setq zed.*unbound-symbol-style* nil)
+(declare-unprotected 'zed.*unbound-symbol-style*)
+(setq zed.*special-form-style* nil)
+(declare-unprotected 'zed.*special-form-style*)
+(setq zed.*macro-style* nil)
+(declare-unprotected 'zed.*macro-style*)
+(setq zed.*highlight-paren-style* nil)
+(declare-unprotected 'zed.*highlight-paren-style*)
+(setq zed.*special-forms* (dict `(cond ,t setq ,t quote ,t progn ,t)))
 (setq zed.*valid-props* '(soft-wrap horizontal-scroll auto-columns))
 (setq zed.*default-soft-columns* 80)
 (setq zed.*skip-expr-search-on-empty-line* true) ; don't search for end of Lisp expr beyond an empty line
@@ -25,17 +44,40 @@
        	    (blink))))
 
 (defun zed.new (&rest args)
-  (if (theme-is-dark?)
-      (setq zed.*paren-color* (color->color64 '(255 164 0 255)))
-      (setq zed.*paren-color* '(10000 10000 65535 65535)))
+  (cond
+    ((theme-is-dark?)
+     (setq zed.*comment-style* (list (color->color64 (lighten (the-color 'brown)))(theme-color 'background)))
+     (setq zed.*literal-style* (list (color->color64 (the-color 'pale-green))(theme-color 'background)))
+     (setq zed.*symbol-style* (list (color->color64 (lighten (the-color 'sea-green)))(theme-color 'background)))
+     (setq zed.*functional-style* (list (color->color64  (the-color 'powder-blue))(theme-color 'background)))
+     (setq zed.*special-form-style* (list (color->color64 (the-color 'violet))(theme-color 'background)))
+     (setq zed.*error-style* (list (color->color64 (the-color 'crimson))(theme-color 'background)))
+     (setq zed.*macro-style* (list (color->color64 (the-color 'light-sky-blue))(theme-color 'background)))
+     (setq zed.*unbound-symbol-style* (list (theme-color 'foreground)(theme-color 'background)))
+     (setq zed.*highlight-paren-style* (list (color->color64 (lighten (the-color 'dark-gray))) (color->color64 (the-color 'light-salmon))))
+     (setq zed.*paren-style* (list (color->color64 (lighten (the-color 'dark-gray)))(theme-color 'background))))
+    (t
+     (setq zed.*comment-style* (list (color->color64 (the-color 'brown))(theme-color 'background)))
+     (setq zed.*literal-style* (list (color->color64 (the-color 'green))(theme-color 'background)))
+     (setq zed.*symbol-style* (list (color->color64 (the-color 'sea-green))(theme-color 'background)))
+     (setq zed.*error-style* (list (color->color64 (the-color 'red))(theme-color 'background)))
+     (setq zed.*special-form-style* (list (color->color64 (the-color 'indigo))(theme-color 'background)))
+     (setq zed.*functional-style* (list (color->color64 (the-color 'royal-blue))(theme-color 'background)))
+     (setq zed.*macro-style* (list (color->color64 (the-color 'dark-blue))(theme-color 'background)))
+     (setq zed.*unbound-symbol-style* (list (theme-color 'foreground)(theme-color 'background)))
+     (setq zed.*highlight-paren-style* (list (color->color64 (the-color 'dim-gray)) (color->color64 (the-color 'light-blue))))
+     (setq zed.*paren-style* (list (color->color64 (the-color 'dim-gray))(theme-color 'background)))))
   (letrec ((grid (new-text-grid))
 	   (props (zed._validate-props (1st args nil)))
 	   (columns (2nd args zed.*default-soft-columns*))
 	   (scroll (if (member 'horizontal-scroll props)(new-scroll grid)(new-vscroll grid)))
-	   (ed (array 'zed.editor grid 0 0 true true (make-mutex) scroll props columns nil nil (dict))))
+	   (ed (array 'zed.editor grid 0 0 true true (make-mutex) scroll props columns nil nil
+		      (dict) nil)))
     (zed.set-text ed "")
     (zed.add-painter ed 'selection (lambda (ed) (zed.paint-selection ed)))
-    (zed.blink-cursor ed)
+    (zed.add-painter ed 'parens (lambda (ed) (zed.maybe-highlight-parens ed)))
+    (zed.draw-cursor ed t)
+   ; (zed.blink-cursor ed)
     ed))
 
 ;;; ACCESSORS
@@ -149,6 +191,13 @@
 (defun zed.user-dict (ed) 
  (array-ref ed 12))
 
+;; 13 help callback, called when the cursor moves onto a symbol
+(defun zed.help-cb (ed)
+  (array-ref ed 13))
+
+(defun zed.set-help-cb (ed cb)
+  (array-set ed 13 cb))
+
 ;;; GENERAL EDITING
 
 (defun zed.draw-cursor (ed on?)
@@ -163,9 +212,11 @@
      col
      (cond
        (on?
+	(set (zed.user-dict ed) (fmt "%v,%v" row col) style)
 	(list (zed.invert-color fgcolor) fgcolor))
        (t
-	(list (theme-color 'foreground) (theme-color 'background)))))
+	(get (zed.user-dict ed)(fmt "%v,%v" row col)
+	     (list (theme-color 'foreground) (theme-color 'background))))))
     (refresh-object (zed.grid ed)))) 
 
 (defun zed.invert-color (li)
@@ -204,14 +255,20 @@
 (defun zed.style-bg-color (s)
   (2nd s '(255 255 255 255)))
 
+;; (defun zed.handler-call (ed proc)
+;;   (with-final
+;;       (lambda (err v)
+;; 	(zed.paint ed)
+;; 	(zed.draw-cursor ed true)
+;; 	(when err (*error-printer* err)))
+;;     (zed.draw-cursor ed nil)
+;;     (proc)))
+
 (defun zed.handler-call (ed proc)
-  (with-final
-      (lambda (err v)
-	(zed.paint ed)
-	(zed.draw-cursor ed true)
-	(when err (*error-printer* err)))
-    (zed.draw-cursor ed nil)
-    (proc)))
+  (zed.draw-cursor ed nil)
+  (proc)
+  (zed.paint ed)
+  (zed.draw-cursor ed t))
 
 ;; handle non-alphanumeric keys such as tab,return,backspace
 (defun zed.key-handler (ed key code)
@@ -228,8 +285,7 @@
        ((home) (zed.cursor-home ed))
        ((end) (zed.cursor-end ed))
        ((page-down) (zed.cursor-half-page-down ed))
-       ((page-up) (zed.cursor-half-page-up ed)))
-     (zed.paint ed))))
+       ((page-up) (zed.cursor-half-page-up ed))))))
 
 ;; set editor default keyboard shortcuts in the canvas
 (defun zed.install-default-shortcuts (ed canvas)
@@ -282,6 +338,13 @@
       ed
       (lambda ()
 	(zed.cursor-to-previous-half-word ed)))))
+  (add-canvas-shortcut
+   canvas '(ctrl k)
+   (lambda ()
+     (zed.handler-call
+      ed
+      (lambda ()
+	(zed.delete-to-right ed)))))
     (add-canvas-shortcut
    canvas '(alt b)
    (lambda ()
@@ -305,6 +368,13 @@
       (lambda ()
 	(zed.cursor-to-next-half-word ed)
 	(zed.cursor-right-on-punctuation ed)))))
+   (add-canvas-shortcut
+    canvas '(alt 0)
+    (lambda ()
+      (zed.handler-call
+       ed
+       (lambda ()
+	 (error "This is supposed to fail")))))
   (add-canvas-shortcut
    canvas '(ctrl f)
    (lambda ()
@@ -371,8 +441,7 @@
 (defun zed.delete1 (ed)
   (let ((from-row (zed.cursor-row ed))
 	(from-col (zed.cursor-column ed)))
-    (unless (and (= from-row (zed.last-row ed))
-		 (= from-col (zed.last-column ed (zed.last-row ed))))
+    (unless (zed.last-pos? ed from-row from-col)
       (letrec ((pos (zed.pos-inc ed from-row from-col))
 	       (to-row (1st pos))
 	       (to-col (2nd pos)))
@@ -384,6 +453,32 @@
 	 zed.*lf*
 	 zed.*soft-lf*
 	 to-row to-col)))))
+
+;; delete everything from the cell under the cursor to the end of the line
+(defun zed.delete-to-right (ed)
+  (letrec ((row (zed.cursor-row ed))
+	   (col (zed.cursor-column ed))
+	   (endcol (zed.last-column ed row)))
+    (cond
+      ((= col endcol)
+       (wrap-delete-text-grid
+	(zed.grid ed)
+	(list row col row (add1 endcol))
+	(zed.soft-columns ed)
+	t
+	zed.*lf*
+	zed.*soft-lf*
+	row col))
+      (t 
+       (wrap-delete-text-grid
+	(zed.grid ed)
+	(list row col row endcol)
+	(zed.soft-columns ed)
+	t
+	zed.*lf*
+	zed.*soft-lf*
+	row col)))))
+    
 
 ;; return creates a new line, copying the rest of the current line to it (return key behavior)
 ;; edge case: If the cursor is at 0,0 then a new line is created above.
@@ -482,8 +577,7 @@
 	   (rowPlus (add1 row))
 	   (colPlus (add1 col)))
     (cond
-      ((and (= row (zed.last-row ed))
-	    (= col (zed.last-column ed row)))
+      ((zed.last-pos? ed row col)
        (void))
       ((<= colPlus (zed.last-column ed row))
        (when (= (add1 col) (zed.last-displayed-column ed)) (zed.scroll-right ed))
@@ -498,6 +592,10 @@
 
 (defun zed.last-row (ed)
   (sub1 (count-text-grid-rows (zed.grid ed))))
+
+(defun zed.last-pos? (ed row col)
+  (and (= row (zed.last-row ed))
+       (= col (zed.last-col ed (zed.last-row ed)))))
 
 ;; Return true if the cursor is in the last line displayed, i.e., at the bottom of the editor.
 (defun zed.last-displayed-line (ed)
@@ -695,8 +793,7 @@
 	   (list row colMin))))))
 
 (defun zed.pos-inc (ed row col)
-  (if (and (= row (zed.last-row ed))
-	   (= col (zed.last-column ed row)))
+  (if (zed.last-pos? ed row col)
       nil
       (let ((rowPlus (add1 row))
 	    (colPlus (add1 col)))
@@ -985,32 +1082,220 @@
   (set-text-grid-style-range (zed.grid ed) 0 0 (zed.last-row ed)(zed.last-column ed (zed.last-row ed)) nil))
 
 ;;; Z3S5 LISP FUNCTIONS
-
-(defun zed.lisp-syntax-color-at-expression (ed)
+(defun zed.maybe-highlight-parens (ed)
   (letrec ((row (zed.cursor-row ed))
 	   (col (zed.cursor-column ed))
-	   (range (zed.find-lisp-expression-at ed row col)))
-    (unless (< (len range) 4)
-      (zed.lisp-syntax-color-range ed (1st range) (2nd range) (3rd range) (4th range)))))
+	   (prevrow (zed.prev-row ed row col))
+	   (prevcol (zed.prev-col ed row col)))
+    (cond
+      ((equal? (get-text-grid-rune (zed.grid ed) row col) "(")
+       (zed.paint-highlight-parens ed (list row col) (zed.find-matching-end-paren ed row col)))
+      ((equal? (get-text-grid-rune (zed.grid ed) prevrow prevcol) ")")
+       (zed.paint-highlight-parens ed (zed.find-matching-start-paren ed prevrow prevcol)(list prevrow prevcol))))))
 
-(defun zed.lisp-syntax-color-buffer (ed)
-  (let ((expr (zed.parse-expressions ed 0 0 (zed.last-row ed) (zed.last-column ed (zed.last-row ed)) nil 0 nil)))
-    (foreach expr
-	     (lambda (r)
-	       (zed.lisp-syntax-color-range ed (1st r)(2nd r)(3rd r)(4th r))))))
+(defun zed.paint-highlight-parens (ed pos1 pos2)
+  (cond
+    ((null? pos1)(when pos2 (set-text-grid-style (zed.grid ed) (1st pos2)(2nd pos2) zed.*error-style*)))
+    ((null? pos2)(when pos1 (set-text-grid-style (zed.grid ed) (1st pos1)(2nd pos1) zed.*error-style*)))
+    ((not (and (null? pos1)
+	       (null? pos2)))
+     (set-text-grid-style (zed.grid ed)(1st pos1)(2nd pos1) zed.*highlight-paren-style*)
+     (set-text-grid-style (zed.grid ed)(1st pos2)(2nd pos2) zed.*highlight-paren-style*))))
 
-(defun zed.lisp-syntax-color-buffer/async (ed)
-  (void (future (zed.lisp-syntax-color-buffer ed))))
+(defun zed.find-matching-end-paren (ed row col)
+  (zed._find-matching-end-paren ed (zed.next-row ed row col)(zed.next-col ed row col) 1))
 
-(defun zed.lisp-syntax-color-range (ed start-row start-col end-row end-col)
-  (let ((rune (get-text-grid-rune (zed.grid ed) start-row start-col)))
-    (case rune
-      (("(" ")") (set-text-grid-style (zed.grid ed) start-row start-col
-				      (list zed.*paren-color* (theme-color 'background)))))
-    (unless (and (= start-row end-row)
-		 (= start-col end-col))
-      (zed.lisp-syntax-color-range ed (zed.next-row ed start-row start-col) (zed.next-col ed start-row start-col)
-				   end-row end-col))))
+(defun zed._find-matching-end-paren (ed row col parens)
+  (cond
+    ((equal? (get-text-grid-rune (zed.grid ed) row col) ")")
+     (if (= parens 1)
+	 (list row col)
+	 (zed._find-matching-end-paren ed (zed.next-row ed row col)(zed.next-col ed row col)(sub1 parens))))
+    ((equal? (get-text-grid-rune (zed.grid ed) row col) "(")
+       (zed._find-matching-end-paren ed (zed.next-row ed row col)(zed.next-col ed row col)(add1 parens)))
+    ((zed.last-pos? ed row col)
+     nil)
+    (t (zed._find-matching-end-paren ed (zed.next-row ed row col)(zed.next-col ed row col) parens))))
+
+(defun zed.find-matching-start-paren (ed row col)
+  (zed._find-matching-start-paren ed (zed.prev-row ed row col)(zed.prev-col ed row col) 1))
+
+(defun zed._find-matching-start-paren (ed row col parens)
+  (cond
+    ((equal? (get-text-grid-rune (zed.grid ed) row col) "(")
+     (if (= parens 1)
+	 (list row col)
+	 (zed._find-matching-start-paren ed (zed.prev-row ed row col)(zed.prev-col ed row col)(sub1 parens))))
+    ((equal? (get-text-grid-rune (zed.grid ed) row col) ")")
+     (zed._find-matching-start-paren ed (zed.prev-row ed row col)(zed.prev-col ed row col)(add1 parens)))
+    ((and (= row 0)
+	  (= col 0))
+     nil)
+    (t (zed._find-matching-start-paren ed (zed.prev-row ed row col)(zed.prev-col ed row col) parens))))
+
+(defun zed.lisp-syntax-color-expression (ed row col)
+  (let ((start (zed.find-expression-start ed row col)))
+    (if start
+	(zed.lisp-parse-and-color-expression ed (1st start 0)(2nd start 0) 0)
+	(zed.lisp-parse-and-color-expression ed row 0 0))))
+
+(defun zed.lisp-parse-and-color-expression (ed row col parens)
+  (letrec ((token (zed.lisp-parse-next-token ed row col parens))
+	   (startrow (3rd token))
+	   (startcol (4th token))
+	   (endpos (zed.prev-pos ed (list (5th token)(6th token))))
+	   (endrow (1st endpos))
+	   (endcol (2nd endpos))
+	   (sym (1st token))
+	   (continue t))
+    (case sym
+      ((lparen rparen)
+       (cond
+	 ((< (7th token) 0)
+	  (set-text-grid-style-range
+	   (zed.grid ed)
+	   startrow startcol
+	   endrow endcol
+	   zed.*error-style*))
+	 (t (set-text-grid-style-range
+	     (zed.grid ed)
+	     startrow startcol
+	     endrow endcol
+	     zed.*paren-style*)))
+       (setq continue nil))
+      ((comment)
+       (set-text-grid-style-range
+	(zed.grid ed)
+	startrow startcol
+	endrow endcol
+	zed.*comment-style*))
+      ((symbol)
+       (let ((s (str->sym (2nd token))))
+	 (when (and (zed.help-cb ed)
+		    (zed.position-in-range?
+		     (list startrow startcol (5th token)(6th token))
+		     (list (zed.cursor-row ed)(zed.cursor-column ed))))
+	   ((zed.help-cb ed) s))
+	 (if (_bound? s)
+	     (cond
+	       ((macro? (eval s))
+		(set-text-grid-style-range
+		 (zed.grid ed)
+		 startrow startcol
+		 endrow endcol
+		 zed.*macro-style*))
+	       ((functional? (eval s))
+		(set-text-grid-style-range
+		 (zed.grid ed)
+		 startrow startcol
+		 endrow endcol
+		 zed.*functional-style*))
+	       (t (set-text-grid-style-range
+		   (zed.grid ed)
+		   startrow startcol
+		   endrow endcol
+		   zed.*symbol-style*)))
+	     (if (has-key? zed.*special-forms* s)
+		 (set-text-grid-style-range
+		  (zed.grid ed)
+		  startrow startcol
+		  endrow endcol
+		  zed.*special-form-style*)
+		 (set-text-grid-style-range
+		  (zed.grid ed)
+		  startrow startcol endrow endcol
+		  zed.*unbound-symbol-style*)))))
+      ((literal)
+       (set-text-grid-style-range
+	(zed.grid ed)
+	startrow startcol
+	endrow endcol
+	zed.*literal-style*)))
+    (when (and (or continue
+		   (> (7th token) 0))
+	       (not (zed.last-pos? ed endrow endcol)))
+      (zed.lisp-parse-and-color-expression ed (5th token)(6th token)(7th token)))))
+
+(defun zed.is-special-rune? (rune)
+  (or (and (unicode.is-space? rune)
+	   (not (equal? rune zed.*soft-lf*)))
+      (equal? rune "(")
+      (equal? rune ")")
+      (equal? rune "\"")
+      (equal? rune "'")
+      (equal? rune "`")
+      (equal? rune ";")))
+
+(defun zed.lisp-parse-next-token (ed row col parens)
+  (let ((next-row (zed.next-row ed row col))
+	(next-col (zed.next-col ed row col))
+	(c (get-text-grid-rune (zed.grid ed) row col)))
+    (cond 
+      ((equal? c "(")(list 'lparen "(" row col next-row next-col (add1 parens)))
+      ((equal? c ")")(list 'rparen ")" row col next-row next-col (sub1 parens)))
+      ((equal? c ";")(let ((txt (get-text-grid-row-text (zed.grid ed) row)))
+		       (list 'comment (slice txt col (max col (sub1 (len txt))))
+			     row col
+			     row (max col (sub1 (len txt)))
+			     parens)))
+      ((equal? c "\"")(zed.lisp-parse-string ed row col next-row next-col parens))
+      ((not (zed.is-special-rune? c)) (zed.lisp-parse-symbol ed row col parens))
+      (t
+       (unless (zed.last-pos? ed next-row next-col)
+	 (zed.lisp-parse-next-token ed next-row next-col parens))))))
+      
+(defun zed.lisp-parse-symbol (ed row col parens)
+  (let ((pos (zed._parse-until ed row col zed.is-special-rune?)))
+    (list 'symbol (zed.get-text-range ed row col (1st pos)(2nd pos))
+	  row col (1st pos)(2nd pos) parens)))
+
+(defun zed.lisp-parse-string (ed startrow startcol row col parens)
+  (letrec ((pos (zed._parse-until ed row col (lambda (c) (equal? c "\""))))
+	   (prev (zed.prev-pos ed pos))
+	   (next (zed.next-pos ed pos))
+	   (escaped? (equal? (get-text-grid-rune (zed.grid ed) (1st prev)(2nd prev)) "\\")))
+      (cond
+      ((zed.last-pos? ed row col)
+       (if escaped?
+	   (list 'incomplete-string (zed.get-text-range ed startrow startcol (1st pos) (2nd pos)) startrow startcol
+		 (1st next) (2nd next) parens)
+	   (list 'literal (zed.get-text-range ed startrow startcol (1st next) (2nd next)) startrow startcol
+		 (1st next) (2nd next) parens)))
+      (t
+       (if escaped?
+	   (zed.lisp-parse-string ed startrow startcol (1st next)(2nd next) parens)
+	   (list 'literal (zed.get-text-range ed startrow startcol (1st next) (2nd next)) startrow startcol
+		 (1st next) (2nd next) parens))))))
+    
+  
+;; get the text range from row col (inclusive) and end-row end-col (exclusive), where soft line breaks have been
+;; removed
+(defun zed.get-text-range (ed row col end-row end-col)
+  (zed._get-text-range ed (zed.grid ed) row col end-row end-col ""))
+
+(defun zed._get-text-range (ed grid row col end-row end-col acc)
+  (if (and (= row end-row)
+	   (= col end-col))
+      acc
+      (let ((c (get-text-grid-rune grid row col)))
+	(if (equal? c zed.*soft-lf*)
+	    (zed._get-text-range ed grid (zed.next-row ed row col)(zed.next-col ed row col) end-row end-col acc)
+	    (zed._get-text-range ed grid (zed.next-row ed row col)(zed.next-col ed row col) end-row end-col (str+ acc c))))))
+
+;; parse until the predicate is non-nil, return the end position (exclusive, i.e., the first
+;; position where pred returns non-nil)
+(defun zed._parse-until (ed row col pred)
+  (if (or (zed.last-pos? ed row col)
+	  (pred (get-text-grid-rune (zed.grid ed) row col)))
+      (list row col)
+      (zed._parse-until ed (zed.next-row ed row col)(zed.next-col ed row col) pred)))
+
+(defun zed.syntax-color-comment (ed row col)
+  (zed.style-to-end-of-line ed row col zed.*comment-style*))
+
+(defun zed.style-to-end-of-line (ed row col style)
+  (dotimes (n (add1 (- (zed.last-column ed row) col)))
+    (set-text-grid-style (zed.grid ed) row (sub1 (+ col n)) style)))
 
 ;; approximate the range of an expression at the given position
 ;; this function assumes the expression starts on a separate new line
@@ -1035,6 +1320,31 @@
 			       elem)
 			      (t (traverse (cdr li) acc)))))))))
     (traverse expr nil)))
+
+(defun zed.find-expression-start (ed row col)
+  (letrec ((loop
+	      (lambda (row)
+		(cond
+		  ((< row 0) nil)
+		  ((equal? (get-text-grid-rune (zed.grid ed) row 0) ";")
+		   (list row 0))
+		  ((and (zed.line-is-sexpr-start? ed row)
+			(zed.line-is-comment-or-empty? ed (sub1 row)))
+		   (list row 0))
+		  (t (loop (sub1 row)))))))
+    (loop row)))
+
+(defun zed.line-is-comment-or-empty? (ed row)
+  (cond
+    ((< row 0) t)
+    ((= (zed.last-column ed row) 0) t)
+    ((equal? (get-text-grid-rune (zed.grid ed) row 0) 
+	     ";") true)
+    (t nil)))
+
+(defun zed.line-is-sexpr-start? (ed row)
+  (equal? (get-text-grid-rune (zed.grid ed) row 0)
+	  "("))
     
 ;; return the next row, taking into account limits
 (defun zed.next-row (ed row col)
@@ -1049,6 +1359,16 @@
     ((< col (zed.last-column ed row)) (add1 col))
     (t 0)))
 
+;; return true if the position is in the given range, nil otherwise
+(defun zed.position-in-range? (range pos)
+  (and (>= (1st pos)(1st range))
+       (<= (1st pos)(3rd range))
+       (not (and (= (1st pos)(1st range))
+		 (< (2nd pos)(2nd range))))
+       (not (and (= (1st pos)(3rd range))
+		 (> (2nd pos)(4th range))))))
+  
+
 ;; return the next (row col) position for input list (row col)
 ;; returns the last position (not nil) as fixed point,
 ;; if pos is the last position
@@ -1056,21 +1376,27 @@
   (list (zed.next-row ed (1st pos)(2nd pos))
 	(zed.next-col ed (1st pos)(2nd pos))))
 
+(defun zed.prev-row (ed row col)
+  (if (= col 0)
+      (max 0 (sub1 row))
+      row))
+
+(defun zed.prev-col (ed row col)
+  (if (= col 0)
+      (zed.last-column ed (max 0 (sub1 row)))
+      (sub1 col)))
+
 ;; return the previous (row col) position for input list (row col)
 ;; returns (0 0) as fixed point (not nil), if pos is (0 0)
 (defun zed.prev-pos (ed pos)
-  (if (<= (2nd pos) 0)
-      (if (<= (1st pos) 0)
-	  '(0 0)
-	  (list (sub1 (1st pos))(zed.last-column ed (sub1 (1st pos)))))
-      (list (1st pos)(sub1 (2nd pos)))))
+      (list (zed.prev-row ed (1st pos)(2nd pos))
+	    (zed.prev-col ed (1st pos)(2nd pos))))
 
 ;; find all s-expressions in the buffer, return a list of lists (start-row start-col end-row end-col)
 (defun zed.parse-expressions (ed current-row current-col end-row end-col acc open-paren last-rune)
   (let ((rune (get-text-grid-rune (zed.grid ed) current-row current-col)))
     (cond
-      ((and (= current-row (zed.last-row ed))
-	    (= current-col (zed.last-column ed current-row)))
+      ((zed.last-pos? ed current-row current-column)
        acc)
       ((equal? rune "(")
        (cond
@@ -1132,16 +1458,47 @@
     (fn n "")))
 
 ;;; TESTING
+(defun get-help-string (sym)
+  (let ((h (help-entry sym)))
+    (if h
+	(str+
+	 (assoc1 'use h)
+	 "\n\n"
+	 (str-replace* (assoc1 'info h) "#" "")
+	 "\n\n"
+	 (fmt "See also: %v" (assoc1 'see h)))
+	(fmt "%v\n\nNo help available." sym))))
+
 (defun zed.test ()
   (letrec ((win (new-window "Editor"))
 	   (canvas (get-window-canvas win))
-	   (ed (zed.new '(soft-wrap))))
-    (zed.set-text ed (zed.create-lorem-ipsum-content 5))
-    (zed.add-painter ed 'lisp zed.lisp-syntax-color-buffer/async)
+	   (ed (zed.new '(soft-wrap)))
+	   (e (new-entry 'multi-line))
+	   (split (new-hsplit (zed.scroll ed) e)))
+    (zed.set-text
+     ed
+     (str+ ";; return the next column, taking into account limits\n"
+	   "(defun zed.next-col (ed row col)\n"
+	   "  (cond\n"
+	   "    ((< col (zed.last-column ed row)) (add1 col))\n"
+	   "    (t 0)))\n"
+	   "\n"
+	   ";; return the next (row col) position for input list (row col)\n"
+	   ";; returns the last position (not nil) as fixed point,\n"
+	   ";; if pos is the last position\n"
+	   "(defun zed.next-pos (ed pos)\n"
+	   "  (list (zed.next-row ed (1st pos)(2nd pos))\n"
+	   "	(zed.next-col ed (1st pos)(2nd pos))))\n"
+	   "\n"
+	   "(setq a \"This is a test\")\n\n"))
+    (set-entry-text-wrap e 'word)
+    (zed.add-painter ed 'lisp (lambda (ed) (zed.lisp-syntax-color-expression ed (zed.cursor-row ed)(zed.cursor-column ed))))
     (zed.install-key-handler ed canvas)
     (zed.install-rune-handler ed canvas)
-    (set-window-content win (zed.scroll ed))
-    (set-window-size win 400 300)
+    (zed.set-help-cb ed (lambda (sym) (when (help-entry sym) (set-entry-text e (get-help-string sym)))))
+    (set-split-offset split 0.6)
+    (set-window-content win split)
+    (set-window-size win 1100 600)
     (zed.install-default-shortcuts ed canvas)
     (show-window win)))
 

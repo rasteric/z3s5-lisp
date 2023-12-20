@@ -212,6 +212,19 @@ func put(obj any) any {
 	return goarith.AsNumber(int64(n))
 }
 
+// newID returns a new, unallocated object ID for use with putWithID and its
+// Z3S5 Lisp counterpart.
+func newID() (uint64, any) {
+	n := atomic.AddUint64(&counter, 1)
+	return n, goarith.AsNumber(int64(n))
+}
+
+// putWithID adds an object based on a given ID which must have been obtained by newID.
+func putWithID(n uint64, obj any) {
+	revstore.Store(obj, n)
+	storage.Store(n, obj)
+}
+
 // get retrieves an object by its number and returns the object and true if found, nil and false otherwise.
 func get(n any) (any, bool) {
 	k := z3.ToInt64("user interface", n)
@@ -403,7 +416,8 @@ func DefGUI(interp *z3.Interp, config Config) {
 		win.(fyne.Window).SetOnClosed(func() {
 			li2 := z3.Nil
 			li := &z3.Cell{Car: proc, Cdr: li2}
-			interp.Eval(li, z3.Nil)
+			interp.SafeEvalWithInfo(li, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN window %v on-close-callback", z3.Str(a[0])))
 		})
 		return z3.Void
 	})
@@ -527,7 +541,9 @@ func DefGUI(interp *z3.Interp, config Config) {
 
 	// (new-label <string>)
 	interp.Def(pre("new-label"), 1, func(a []any) any {
-		return put(widget.NewLabel(a[0].(string)))
+		label := widget.NewLabel(a[0].(string))
+		label.Wrapping = fyne.TextWrapWord
+		return put(label)
 	})
 
 	// (set-label-text <label> <string>)
@@ -576,7 +592,8 @@ func DefGUI(interp *z3.Interp, config Config) {
 		e.(*widget.Entry).OnChanged = func(s string) {
 			li2 := &z3.Cell{Car: s, Cdr: z3.Nil}
 			li := &z3.Cell{Car: proc, Cdr: li2}
-			interp.Eval(li, z3.Nil)
+			interp.SafeEvalWithInfo(li, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN entry %v on-change-callback", z3.Str(a[0])))
 		}
 		return z3.Void
 	})
@@ -633,7 +650,8 @@ func DefGUI(interp *z3.Interp, config Config) {
 		e := mustGet(pre("set-entry-on-cursor-change-callback"), "GUI entry ID", a, 0).(*widget.Entry)
 		proc := a[1].(*z3.Closure)
 		e.OnCursorChanged = func() {
-			interp.Eval(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: a[0], Cdr: z3.Nil}}, z3.Nil)
+			interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: a[0], Cdr: z3.Nil}}, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN entry %v on-cursor-change-callback", z3.Str(a[0])))
 		}
 		return z3.Void
 	})
@@ -730,7 +748,8 @@ func DefGUI(interp *z3.Interp, config Config) {
 			} else {
 				arg = e.Error()
 			}
-			interp.Eval(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: arg, Cdr: z3.Nil}}, z3.Nil)
+			interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: arg, Cdr: z3.Nil}}, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN validatable object %v on-validation-change callback", z3.Str(a[0])))
 		})
 		return z3.Void
 	})
@@ -1156,12 +1175,14 @@ func DefGUI(interp *z3.Interp, config Config) {
 	interp.Def(pre("new-check"), 2, func(a []any) any {
 		title := a[0].(string)
 		proc := a[1].(*z3.Closure)
+		id, zid := newID()
 		changed := func(b bool) {
 			li2 := &z3.Cell{Car: z3.AsLispBool(b), Cdr: z3.Nil}
 			li := &z3.Cell{Car: proc, Cdr: li2}
-			interp.Eval(li, z3.Nil)
+			interp.SafeEvalWithInfo(li, z3.Nil, "%v\n"+fmt.Sprintf("IN check %v callback", z3.Str(zid)))
 		}
-		return put(widget.NewCheck(title, changed))
+		putWithID(id, widget.NewCheck(title, changed))
+		return zid
 	})
 
 	// CHOICE
@@ -1176,10 +1197,11 @@ func DefGUI(interp *z3.Interp, config Config) {
 		}
 		li := a[1].(*z3.Cell)
 		proc := a[2].(*z3.Closure)
+		id, zid := newID()
 		changed := func(s string) {
 			li2 := &z3.Cell{Car: s, Cdr: z3.Nil}
 			li := &z3.Cell{Car: proc, Cdr: li2}
-			interp.Eval(li, z3.Nil)
+			interp.SafeEvalWithInfo(li, z3.Nil, "%v\n"+fmt.Sprintf("IN choice %v callback", z3.Str(zid)))
 		}
 		s := make([]string, 0)
 		for li != z3.Nil {
@@ -1188,12 +1210,13 @@ func DefGUI(interp *z3.Interp, config Config) {
 		}
 		switch sort {
 		case "select":
-			return put(widget.NewSelect(s, changed))
+			putWithID(id, widget.NewSelect(s, changed))
 		case "radio", "radio-group":
-			return put(widget.NewRadioGroup(s, changed))
+			putWithID(id, widget.NewRadioGroup(s, changed))
 		default:
 			panic(fmt.Sprintf("new-choice: the first argument must be one of '(select radio-group), given %v", sort))
 		}
+		return zid
 	})
 
 	// FORM
@@ -1236,23 +1259,27 @@ func DefGUI(interp *z3.Interp, config Config) {
 	// (new-button str proc) => int
 	interp.Def(pre("new-button"), 2, func(a []any) any {
 		proc := a[1].(*z3.Closure)
+		id, zid := newID()
 		b := widget.NewButton(a[0].(string), func() {
 			li2 := z3.Nil
 			li := &z3.Cell{Car: proc, Cdr: li2}
-			interp.Eval(li, z3.Nil)
+			interp.SafeEvalWithInfo(li, z3.Nil, "%v\n"+fmt.Sprintf("IN button %v callback", z3.Str(zid)))
 		})
-		return put(b)
+		putWithID(id, b)
+		return zid
 	})
 
 	interp.Def(pre("new-button-with-icon"), 3, func(a []any) any {
 		icon := mustGet(pre("new-button-with-icon"), "GUI icon resource ID", a, 1).(fyne.Resource)
 		proc := a[2].(*z3.Closure)
+		id, zid := newID()
 		b := widget.NewButtonWithIcon(a[0].(string), icon, func() {
 			li2 := z3.Nil
 			li := &z3.Cell{Car: proc, Cdr: li2}
-			interp.Eval(li, z3.Nil)
+			interp.SafeEvalWithInfo(li, z3.Nil, "%v\n"+fmt.Sprintf("IN icon button %v callback", z3.Str(zid)))
 		})
-		return put(b)
+		putWithID(id, b)
+		return zid
 	})
 
 	// LIST
@@ -1262,22 +1289,27 @@ func DefGUI(interp *z3.Interp, config Config) {
 		lproc := a[0].(*z3.Closure)
 		pproc := a[1].(*z3.Closure)
 		uproc := a[2].(*z3.Closure)
+		id, zid := newID()
 		lenCB := func() int {
-			n := interp.Eval(&z3.Cell{Car: lproc, Cdr: z3.Nil}, z3.Nil)
+			n, _ := interp.SafeEvalWithInfo(&z3.Cell{Car: lproc, Cdr: z3.Nil}, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN list %v length callback", z3.Str(zid)))
 			return int(z3.ToInt64("GUI list length callback", n))
 		}
 		prepCB := func() fyne.CanvasObject {
-			result := interp.Eval(&z3.Cell{Car: pproc, Cdr: z3.Nil}, z3.Nil)
+			result, _ := interp.SafeEvalWithInfo(&z3.Cell{Car: pproc, Cdr: z3.Nil}, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN list %v preparation callback", z3.Str(zid)))
 			obj := mustGet1(pre("new-list"), "GUI canvas object ID (result from list preparation callback)", result)
 			return obj.(fyne.CanvasObject)
 		}
 		updCB := func(i widget.ListItemID, o fyne.CanvasObject) {
 			n := int(i)
 			if id, ok := getID(o); ok {
-				interp.Eval(&z3.Cell{Car: uproc, Cdr: &z3.Cell{Car: id, Cdr: &z3.Cell{Car: goarith.AsNumber(n), Cdr: z3.Nil}}}, z3.Nil)
+				interp.SafeEvalWithInfo(&z3.Cell{Car: uproc, Cdr: &z3.Cell{Car: id, Cdr: &z3.Cell{Car: goarith.AsNumber(n), Cdr: z3.Nil}}}, z3.Nil,
+					"%v\n"+fmt.Sprintf("IN list %v update callback", z3.Str(zid)))
 			}
 		}
-		return put(widget.NewList(lenCB, prepCB, updCB))
+		putWithID(id, widget.NewList(lenCB, prepCB, updCB))
+		return zid
 	})
 
 	// TABLE
@@ -1287,15 +1319,19 @@ func DefGUI(interp *z3.Interp, config Config) {
 		lproc := a[0].(*z3.Closure)
 		pproc := a[1].(*z3.Closure)
 		uproc := a[2].(*z3.Closure)
+		id, zid := newID()
 		lenCB := func() (int, int) {
-			c := interp.Eval(&z3.Cell{Car: lproc, Cdr: z3.Nil}, z3.Nil).(*z3.Cell)
+			result, _ := interp.SafeEvalWithInfo(&z3.Cell{Car: lproc, Cdr: z3.Nil}, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN table %v length callback", z3.Str(zid)))
+			c := result.(*z3.Cell)
 			a := z3.ToInt64("GUI table length callback return element #1", c.Car)
 			c = c.CdrCell()
 			b := z3.ToInt64("GUI table length callback return element #2", c.Car)
 			return int(a), int(b)
 		}
 		prepCB := func() fyne.CanvasObject {
-			result := interp.Eval(&z3.Cell{Car: pproc, Cdr: z3.Nil}, z3.Nil)
+			result, _ := interp.SafeEvalWithInfo(&z3.Cell{Car: pproc, Cdr: z3.Nil}, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN table %v preparation callback", z3.Str(zid)))
 			obj := mustGet1(pre("new-table"), "GUI canvas object ID (result from table preparation callback)", result)
 			return obj.(fyne.CanvasObject)
 		}
@@ -1303,10 +1339,12 @@ func DefGUI(interp *z3.Interp, config Config) {
 			row := id.Row
 			col := id.Col
 			if id, ok := getID(o); ok {
-				interp.Eval(&z3.Cell{Car: uproc, Cdr: &z3.Cell{Car: goarith.AsNumber(id), Cdr: &z3.Cell{Car: goarith.AsNumber(row), Cdr: &z3.Cell{Car: goarith.AsNumber(col), Cdr: z3.Nil}}}}, z3.Nil)
+				interp.SafeEvalWithInfo(&z3.Cell{Car: uproc, Cdr: &z3.Cell{Car: goarith.AsNumber(id), Cdr: &z3.Cell{Car: goarith.AsNumber(row), Cdr: &z3.Cell{Car: goarith.AsNumber(col), Cdr: z3.Nil}}}}, z3.Nil,
+					"%v\n"+fmt.Sprintf("IN table %v update callback", z3.Str(zid)))
 			}
 		}
-		return put(widget.NewTable(lenCB, prepCB, updCB))
+		putWithID(id, widget.NewTable(lenCB, prepCB, updCB))
+		return zid
 	})
 
 	// TREE
@@ -1317,9 +1355,12 @@ func DefGUI(interp *z3.Interp, config Config) {
 		proc2 := a[1].(*z3.Closure)
 		proc3 := a[2].(*z3.Closure)
 		proc4 := a[3].(*z3.Closure)
+		id, zid := newID()
 		fn1 := func(id widget.TreeNodeID) []widget.TreeNodeID {
 			var s string = id
-			li := interp.Eval(&z3.Cell{Car: proc1, Cdr: &z3.Cell{Car: s, Cdr: z3.Nil}}, z3.Nil).(*z3.Cell)
+			result, _ := interp.SafeEvalWithInfo(&z3.Cell{Car: proc1, Cdr: &z3.Cell{Car: s, Cdr: z3.Nil}}, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN tree %v child UID callback", z3.Str(zid)))
+			li := result.(*z3.Cell)
 			arr := make([]widget.TreeNodeID, 0)
 			for li != z3.Nil {
 				arr = append(arr, widget.TreeNodeID(li.Car.(string)))
@@ -1329,20 +1370,24 @@ func DefGUI(interp *z3.Interp, config Config) {
 		}
 		fn2 := func(id widget.TreeNodeID) bool {
 			var s string = id
-			result := interp.Eval(&z3.Cell{Car: proc2, Cdr: &z3.Cell{Car: s, Cdr: z3.Nil}}, z3.Nil)
+			result, _ := interp.SafeEvalWithInfo(&z3.Cell{Car: proc2, Cdr: &z3.Cell{Car: s, Cdr: z3.Nil}}, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN tree %v is-branch callback", z3.Str(zid)))
 			return z3.ToBool(result)
 		}
 		fn3 := func(branch bool) fyne.CanvasObject {
-			result := interp.Eval(&z3.Cell{Car: proc3, Cdr: &z3.Cell{Car: z3.AsLispBool(branch), Cdr: z3.Nil}}, z3.Nil)
+			result, _ := interp.SafeEvalWithInfo(&z3.Cell{Car: proc3, Cdr: &z3.Cell{Car: z3.AsLispBool(branch), Cdr: z3.Nil}}, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN tree %v creation callback", z3.Str(zid)))
 			obj := mustGet1(pre("new-tree"), "GUI tree creation callback canvas object ID", result)
 			return obj.(fyne.CanvasObject)
 		}
 		fn4 := func(id widget.TreeNodeID, branch bool, o fyne.CanvasObject) {
 			var s string = id
 			objID, _ := getID(o)
-			interp.Eval(&z3.Cell{Car: proc4, Cdr: &z3.Cell{Car: s, Cdr: &z3.Cell{Car: z3.AsLispBool(branch), Cdr: &z3.Cell{Car: objID, Cdr: z3.Nil}}}}, z3.Nil)
+			interp.SafeEvalWithInfo(&z3.Cell{Car: proc4, Cdr: &z3.Cell{Car: s, Cdr: &z3.Cell{Car: z3.AsLispBool(branch),
+				Cdr: &z3.Cell{Car: objID, Cdr: z3.Nil}}}}, z3.Nil, "%v\n"+fmt.Sprintf("IN tree %v update callback", z3.Str(zid)))
 		}
-		return put(widget.NewTree(fn1, fn2, fn3, fn4))
+		putWithID(id, widget.NewTree(fn1, fn2, fn3, fn4))
+		return zid
 	})
 
 	// MENU
@@ -1354,8 +1399,10 @@ func DefGUI(interp *z3.Interp, config Config) {
 		li = li.CdrCell()
 		proc := li.Car.(*z3.Closure)
 		li = li.CdrCell()
+		id, zid := newID()
 		item := fyne.NewMenuItem(label, func() {
-			interp.Eval(&z3.Cell{Car: proc, Cdr: z3.Nil}, z3.Nil)
+			interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: z3.Nil}, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN menu-item %v callback", z3.Str(zid)))
 		})
 		for li != z3.Nil {
 			sym := li.Car.(*z3.Sym)
@@ -1373,7 +1420,8 @@ func DefGUI(interp *z3.Interp, config Config) {
 			}
 			li = li.CdrCell()
 		}
-		return put(item)
+		putWithID(id, item)
+		return zid
 	})
 
 	// (set-menu-item-checked <item> <bool>)
@@ -1695,14 +1743,16 @@ func DefGUI(interp *z3.Interp, config Config) {
 	// a color list (NOT an nrgba64 color, for performance reasons this is created at the Go side).
 	interp.Def(pre("new-raster-with-pixels"), 1, func(a []any) any {
 		proc := a[0].(*z3.Closure)
+		id, zid := newID()
 		raster := canvas.NewRasterWithPixels(func(x, y, w, h int) color.Color {
 			li := &z3.Cell{Car: proc, Cdr: &z3.Cell{Car: goarith.AsNumber(x), Cdr: &z3.Cell{Car: goarith.AsNumber(y),
 				Cdr: &z3.Cell{Car: goarith.AsNumber(w), Cdr: &z3.Cell{Car: goarith.AsNumber(h), Cdr: z3.Nil}}}}}
-			result := interp.Eval(li, z3.Nil)
+			result, _ := interp.SafeEvalWithInfo(li, z3.Nil, "%v\n"+fmt.Sprintf("IN raster %v callback", z3.Str(zid)))
 			li = result.(*z3.Cell)
 			return ListToColor(li)
 		})
-		return put(raster)
+		putWithID(id, raster)
+		return zid
 	})
 
 	// KEYBOARD
@@ -1716,7 +1766,8 @@ func DefGUI(interp *z3.Interp, config Config) {
 		proc := a[2].(*z3.Closure)
 		shortcut := &desktop.CustomShortcut{KeyName: key, Modifier: modifier}
 		canvas.AddShortcut(shortcut, func(sc fyne.Shortcut) {
-			interp.Eval(&z3.Cell{Car: proc, Cdr: z3.Nil}, z3.Nil)
+			interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: z3.Nil}, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN canvas %v shortcut handler", z3.Str(a[0])))
 		})
 		return z3.Void
 	})
@@ -1737,7 +1788,8 @@ func DefGUI(interp *z3.Interp, config Config) {
 		canvas.SetOnTypedKey(func(evt *fyne.KeyEvent) {
 			qq := z3.QqQuote(KeyNameToSymbol(evt.Name))
 			li := &z3.Cell{Car: proc, Cdr: &z3.Cell{Car: qq, Cdr: &z3.Cell{Car: goarith.AsNumber(evt.Physical.ScanCode), Cdr: z3.Nil}}}
-			interp.Eval(li, z3.Nil)
+			interp.SafeEvalWithInfo(li, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN canvas %v on-typed-key handler", a[0]))
 		})
 		return z3.Void
 	})
@@ -1748,7 +1800,8 @@ func DefGUI(interp *z3.Interp, config Config) {
 		proc := a[1].(*z3.Closure)
 		canvas.SetOnTypedRune(func(r rune) {
 			li := &z3.Cell{Car: proc, Cdr: &z3.Cell{Car: string(r), Cdr: z3.Nil}}
-			interp.Eval(li, z3.Nil)
+			interp.SafeEvalWithInfo(li, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN canvas %v on-typed-rune handler", a[0]))
 		})
 		return z3.Void
 	})
@@ -1925,7 +1978,8 @@ func DefGUI(interp *z3.Interp, config Config) {
 				proc := li.Car.(*z3.Closure)
 				id, _ := getID(bar)
 				fn := func() string {
-					result := interp.Eval(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: id, Cdr: z3.Nil}}, z3.Nil)
+					result, _ := interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: id, Cdr: z3.Nil}}, z3.Nil,
+						"%v\n"+fmt.Sprintf("IN progress-bar %v formatter callback", z3.Str(id)))
 					if s, ok := result.(string); ok {
 						return s
 					}
@@ -1953,12 +2007,15 @@ func DefGUI(interp *z3.Interp, config Config) {
 	// (new-slider <min> <max> <change-cb>)
 	interp.Def(pre("new-slider"), 3, func(a []any) any {
 		proc := a[2].(*z3.Closure)
+		id, zid := newID()
 		fn := func(v float64) {
-			interp.Eval(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: goarith.AsNumber(v), Cdr: z3.Nil}}, z3.Nil)
+			interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: goarith.AsNumber(v), Cdr: z3.Nil}}, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN slider %v callback", z3.Str(zid)))
 		}
 		slider := widget.NewSlider(z3.ToFloat64(a[0]), z3.ToFloat64(a[1]))
 		slider.OnChanged = fn
-		return put(slider)
+		putWithID(id, slider)
+		return zid
 	})
 
 	// (set-slider-value <slider> <value>)

@@ -967,14 +967,31 @@ func (interp *Interp) Eval(expression any, env *Cell) any {
 }
 
 // SafeEval evaluates a Lisp expression in a given environment env and
-// returns the result and nil.
-// If an error happens, it returns Nil and the error
+// returns the result and nil. If an error happens, it is handled, and
+// only if this fails it returns Nil and the error.
 func (interp *Interp) SafeEval(expression any, env *Cell) (
 	result any, err any) {
 	defer func() {
 		if e := recover(); e != nil {
 			var ok bool
 			result, ok = interp.HandleError(e)
+			if !ok {
+				result, err = Nil, e
+			}
+		}
+	}()
+	return interp.Eval(expression, env), nil
+}
+
+// SafeEvalWithInfo evaluates a Lisp expression in a given enviroment and
+// returns the result and nil. An error is constructed from the template and
+// handled. If handling the error fails, Nil and the error is returned, otherwise the result and nil
+// is returned.
+func (interp *Interp) SafeEvalWithInfo(expression any, env *Cell, template string) (result any, err any) {
+	defer func() {
+		if e := recover(); e != nil {
+			var ok bool
+			result, ok = interp.HandleError(fmt.Errorf(template, e))
 			if !ok {
 				result, err = Nil, e
 			}
