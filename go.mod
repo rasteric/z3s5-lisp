@@ -3,8 +3,9 @@ module github.com/rasteric/z3s5-lisp
 go 1.21
 
 require (
-	fyne.io/fyne/v2 v2.4.0
+	fyne.io/fyne/v2 v2.4.2
 	github.com/adrg/xdg v0.4.0
+	github.com/drhodes/golorem v0.0.0-20220328165741-da82e5b29246
 	github.com/faiface/beep v1.1.0
 	github.com/gookit/color v1.5.4
 	github.com/jamesturk/go-jellyfish v0.0.0-20190821175037-81d50ddab23b
@@ -22,9 +23,8 @@ require (
 )
 
 require (
-	fyne.io/systray v1.10.1-0.20230722100817-88df1e0ffa9a // indirect
+	fyne.io/systray v1.10.1-0.20231115130155-104f5ef7839e // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/drhodes/golorem v0.0.0-20220328165741-da82e5b29246 // indirect
 	github.com/fredbi/uri v1.0.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/fyne-io/gl-js v0.0.0-20230506162202-1fdaa286a934 // indirect

@@ -347,31 +347,34 @@ func DefGUI(interp *z3.Interp, config Config) {
 	}
 	// WINDOW
 
-	// (new-window <title-string>)
-	interp.Def(pre("new-window"), 1, func(a []any) any {
+	fnNewWindow := pre("new-window")
+	// (new-window <title-string>) => window ID
+	interp.Def(fnNewWindow, 1, func(a []any) any {
 		if !cfg.WindowsAllowed {
-			panic(pre("new-window: creating new windows is not permitted!"))
+			panic(fnNewWindow + ": creating new windows is not permitted!")
 		}
 		return put(apl.NewWindow(a[0].(string)))
 	})
 
+	fnSetWindowContent := pre("set-window-content")
 	// (set-window-content <window> <canvas-object>)
-	interp.Def(pre("set-window-content"), 2, func(a []any) any {
+	interp.Def(fnSetWindowContent, 2, func(a []any) any {
 		win, ok := get(a[0])
 		if !ok {
-			panic(fmt.Sprintf(pre("set-window-content: no window found for %v"), z3.Str(a[0])))
+			panic(fmt.Sprintf(fnSetWindowContent+": no window found for %v", z3.Str(a[0])))
 		}
 		canvas, ok := get(a[1])
 		if !ok {
-			panic(fmt.Sprintf(pre("set-window-content: no canvas object found for %v"), z3.Str(a[1])))
+			panic(fmt.Sprintf(fnSetWindowContent+": no canvas object found for %v", z3.Str(a[1])))
 		}
 		win.(fyne.Window).SetContent(canvas.(fyne.CanvasObject))
 		return z3.Void
 	})
 
+	fnGetWindowContent := pre("get-window-content")
 	// (get-window-content <win>) => content ID
-	interp.Def(pre("get-window-content"), 1, func(a []any) any {
-		win := mustGet(pre("get-window-content"), "GUI window ID", a, 0).(fyne.Window)
+	interp.Def(fnGetWindowContent, 1, func(a []any) any {
+		win := mustGet(fnGetWindowContent, "GUI window ID", a, 0).(fyne.Window)
 		content := win.Content()
 		id, ok := getID(content)
 		if !ok {
@@ -380,38 +383,43 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return id
 	})
 
+	fnSetWindowSize := pre("set-window-size")
 	// (set-window-size <window> <width> <height>)
-	interp.Def(pre("set-window-size"), 3, func(a []any) any {
-		win := mustGet(pre("set-window-size"), "GUI window ID", a, 0).(fyne.Window)
+	interp.Def(fnSetWindowSize, 3, func(a []any) any {
+		win := mustGet(fnSetWindowSize, "GUI window ID", a, 0).(fyne.Window)
 		win.Resize(fyne.NewSize(float32(z3.ToFloat64(a[1])), float32(z3.ToFloat64(a[2]))))
 		return z3.Void
 	})
 
+	fnCloseWindow := pre("close-window")
 	// (close-window <window>)
-	interp.Def(pre("close-window"), 1, func(a []any) any {
-		win := mustGet(pre("close-window"), "GUI window ID", a, 0)
+	interp.Def(fnCloseWindow, 1, func(a []any) any {
+		win := mustGet(fnCloseWindow, "GUI window ID", a, 0)
 		win.(fyne.Window).Close()
 		clear(win)
 		return z3.Void
 	})
 
+	fnShowWindow := pre("show-window")
 	// (show-window <window>)
-	interp.Def(pre("show-window"), 1, func(a []any) any {
-		win := mustGet(pre("show-window"), "GUI window ID", a, 0)
+	interp.Def(fnShowWindow, 1, func(a []any) any {
+		win := mustGet(fnShowWindow, "GUI window ID", a, 0)
 		win.(fyne.Window).Show()
 		return z3.Void
 	})
 
+	fnHideWindow := pre("hide-window")
 	// (hide-window <window>)
-	interp.Def(pre("hide-window"), 1, func(a []any) any {
-		win := mustGet(pre("hide-window"), "GUI window ID", a, 0)
+	interp.Def(fnHideWindow, 1, func(a []any) any {
+		win := mustGet(fnHideWindow, "GUI window ID", a, 0)
 		win.(fyne.Window).Hide()
 		return z3.Void
 	})
 
+	fnSetWindowOnCloseCallback := pre("set-window-on-close-callback")
 	// (set-window-on-close-callback <window> <callback>)
-	interp.Def(pre("set-window-on-close-callback"), 2, func(a []any) any {
-		win := mustGet(pre("set-window-on-close-callback"), "GUI window ID", a, 0)
+	interp.Def(fnSetWindowOnCloseCallback, 2, func(a []any) any {
+		win := mustGet(fnSetWindowOnCloseCallback, "GUI window ID", a, 0)
 		proc := a[1].(*z3.Closure)
 		win.(fyne.Window).SetOnClosed(func() {
 			li2 := z3.Nil
@@ -422,9 +430,10 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	fnGetWindowCanvas := pre("get-window-canvas")
 	// (get-window-canvas <win>) => canvas ID
-	interp.Def(pre("get-window-canvas"), 1, func(a []any) any {
-		win := mustGet(pre("get-window-canvas"), "GUI window ID", a, 0).(fyne.Window)
+	interp.Def(fnGetWindowCanvas, 1, func(a []any) any {
+		win := mustGet(fnGetWindowCanvas, "GUI window ID", a, 0).(fyne.Window)
 		canvas := win.Canvas()
 		id, ok := getID(canvas)
 		if ok {
@@ -433,55 +442,63 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(canvas)
 	})
 
+	fnGetWindowTitle := pre("get-window-title")
 	// (get-window-title <win>) => str
-	interp.Def(pre("get-window-title"), 1, func(a []any) any {
-		win := mustGet(pre("get-window-title"), "GUI window ID", a, 0).(fyne.Window)
+	interp.Def(fnGetWindowTitle, 1, func(a []any) any {
+		win := mustGet(fnGetWindowTitle, "GUI window ID", a, 0).(fyne.Window)
 		return win.Title()
 	})
 
+	fnSetWindowTitle := pre("set-window-title")
 	// (set-window-title <win> <str>)
-	interp.Def(pre("set-window-title"), 2, func(a []any) any {
-		win := mustGet(pre("set-window-title"), "GUI window ID", a, 0).(fyne.Window)
+	interp.Def(fnSetWindowTitle, 2, func(a []any) any {
+		win := mustGet(fnSetWindowTitle, "GUI window ID", a, 0).(fyne.Window)
 		win.SetTitle(a[1].(string))
 		return z3.Void
 	})
 
+	fnSetWindowFullScreen := pre("set-window-full-screen")
 	// (set-window-full-screen <win> <bool>)
-	interp.Def(pre("set-window-full-screen"), 2, func(a []any) any {
-		win := mustGet(pre("set-window-full-screen"), "GUI window ID", a, 0).(fyne.Window)
+	interp.Def(fnSetWindowFullScreen, 2, func(a []any) any {
+		win := mustGet(fnSetWindowFullScreen, "GUI window ID", a, 0).(fyne.Window)
 		win.SetFullScreen(z3.ToBool(a[1]))
 		return z3.Void
 	})
 
+	fnWindowFullScreen := pre("window-full-screen?")
 	// (window-full-screen? <win>) => bool
-	interp.Def(pre("window-full-screen?"), 1, func(a []any) any {
-		win := mustGet(pre("window-full-screen?"), "GUI window ID", a, 0).(fyne.Window)
+	interp.Def(fnWindowFullScreen, 1, func(a []any) any {
+		win := mustGet(fnWindowFullScreen, "GUI window ID", a, 0).(fyne.Window)
 		return z3.AsLispBool(win.FullScreen())
 	})
 
+	fnRequestWindowFocus := pre("request-window-focus")
 	// (request-window-focus <win>)
-	interp.Def(pre("request-window-focus"), 1, func(a []any) any {
-		win := mustGet(pre("request-window-focus"), "GUI window ID", a, 0).(fyne.Window)
+	interp.Def(fnRequestWindowFocus, 1, func(a []any) any {
+		win := mustGet(fnRequestWindowFocus, "GUI window ID", a, 0).(fyne.Window)
 		win.RequestFocus()
 		return z3.Void
 	})
 
+	fnSetWindowFixedSize := pre("set-window-fized-size")
 	// (set-window-fixed-size <win> <bool>)
-	interp.Def(pre("set-window-fized-size"), 2, func(a []any) any {
-		win := mustGet(pre("set-window-fixed-size"), "GUI window ID", a, 0).(fyne.Window)
+	interp.Def(fnSetWindowFixedSize, 2, func(a []any) any {
+		win := mustGet(fnSetWindowFixedSize, "GUI window ID", a, 0).(fyne.Window)
 		win.SetFixedSize(z3.ToBool(a[1]))
 		return z3.Void
 	})
 
+	fnWindowFixedSize := pre("window-fixed-size?")
 	// (window-fixed-size? <win>) => bool
-	interp.Def(pre("window-fixed-size?"), 1, func(a []any) any {
-		win := mustGet(pre("window-fixed-size?"), "GUI window ID", a, 0).(fyne.Window)
+	interp.Def(fnWindowFixedSize, 1, func(a []any) any {
+		win := mustGet(fnWindowFixedSize, "GUI window ID", a, 0).(fyne.Window)
 		return z3.AsLispBool(win.FixedSize())
 	})
 
+	fnCenterWindowOnScreen := pre("center-window-on-screen")
 	// (center-window-on-screen <win>)
-	interp.Def(pre("center-window-on-screen"), 1, func(a []any) any {
-		win := mustGet(pre("center-window-on-screen"), "GUI window ID", a, 0).(fyne.Window)
+	interp.Def(fnCenterWindowOnScreen, 1, func(a []any) any {
+		win := mustGet(fnCenterWindowOnScreen, "GUI window ID", a, 0).(fyne.Window)
 		win.CenterOnScreen()
 		return z3.Void
 	})
@@ -493,23 +510,26 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	fnWindowPadded := pre("window-padded?")
 	// (window-padded? <win>) => bool
-	interp.Def(pre("window-padded?"), 1, func(a []any) any {
-		win := mustGet(pre("window-padded?"), "GUI window ID", a, 0).(fyne.Window)
+	interp.Def(fnWindowPadded, 1, func(a []any) any {
+		win := mustGet(fnWindowPadded, "GUI window ID", a, 0).(fyne.Window)
 		return z3.AsLispBool(win.Padded())
 	})
 
+	fnSetWindowIcon := pre("set-window-icon")
 	// (set-window-icon <win> <icon>)
-	interp.Def(pre("set-window-icon"), 2, func(a []any) any {
-		win := mustGet(pre("set-window-icon"), "GUI window ID", a, 0).(fyne.Window)
-		icon := mustGet(pre("set-window-icon"), "GUI window ID", a, 1).(fyne.Resource)
+	interp.Def(fnSetWindowIcon, 2, func(a []any) any {
+		win := mustGet(fnSetWindowIcon, "GUI window ID", a, 0).(fyne.Window)
+		icon := mustGet(fnSetWindowIcon, "GUI window ID", a, 1).(fyne.Resource)
 		win.SetIcon(icon)
 		return z3.Void
 	})
 
+	fnGetWindowIcon := pre("get-window-icon")
 	// (get-window-icon <win>)
-	interp.Def(pre("get-window-icon"), 1, func(a []any) any {
-		win := mustGet(pre("get-window-icon"), "GUI window ID", a, 0).(fyne.Window)
+	interp.Def(fnGetWindowIcon, 1, func(a []any) any {
+		win := mustGet(fnGetWindowIcon, "GUI window ID", a, 0).(fyne.Window)
 		icon := win.Icon()
 		id, ok := getID(icon)
 		if ok {
@@ -518,17 +538,19 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(icon)
 	})
 
+	fnSetWindowMainMenu := pre("set-window-main-menu")
 	// (set-window-main-menu <win> <menu>)
-	interp.Def(pre("set-window-main-menu"), 2, func(a []any) any {
-		win := mustGet(pre("set-window-main-menu"), "GUI window ID", a, 0).(fyne.Window)
-		menu := mustGet(pre("set-window-main-menu"), "GUI main menu ID", a, 1).(*fyne.MainMenu)
+	interp.Def(fnSetWindowMainMenu, 2, func(a []any) any {
+		win := mustGet(fnSetWindowMainMenu, "GUI window ID", a, 0).(fyne.Window)
+		menu := mustGet(fnSetWindowMainMenu, "GUI main menu ID", a, 1).(*fyne.MainMenu)
 		win.SetMainMenu(menu)
 		return z3.Void
 	})
 
+	fnGetWindowMainMenu := pre("get-window-main-menu")
 	// (get-window-main-menu <win>) => main menu ID
-	interp.Def(pre("get-window-main-menu"), 1, func(a []any) any {
-		win := mustGet(pre("get-window-main-menu"), "GUI window ID", a, 0).(fyne.Window)
+	interp.Def(fnGetWindowMainMenu, 1, func(a []any) any {
+		win := mustGet(fnGetWindowMainMenu, "GUI window ID", a, 0).(fyne.Window)
 		menu := win.MainMenu()
 		id, ok := getID(menu)
 		if ok {
@@ -539,30 +561,34 @@ func DefGUI(interp *z3.Interp, config Config) {
 
 	// LABEL
 
+	fnNewLabel := pre("new-label")
 	// (new-label <string>)
-	interp.Def(pre("new-label"), 1, func(a []any) any {
+	interp.Def(fnNewLabel, 1, func(a []any) any {
 		label := widget.NewLabel(a[0].(string))
 		label.Wrapping = fyne.TextWrapWord
 		return put(label)
 	})
 
+	fnSetLabelText := pre("set-label-text")
 	// (set-label-text <label> <string>)
-	interp.Def(pre("set-label-text"), 2, func(a []any) any {
-		label := mustGet(pre("set-label-text"), "GUI label ID", a, 0)
+	interp.Def(fnSetLabelText, 2, func(a []any) any {
+		label := mustGet(fnSetLabelText, "GUI label ID", a, 0)
 		label.(*widget.Label).SetText(a[1].(string))
 		return z3.Void
 	})
 
+	fnGetLabelText := pre("get-label-text")
 	// (get-label-text label) => str
-	interp.Def(pre("get-label-text"), 1, func(a []any) any {
-		label := mustGet(pre("get-label-text"), "GUI label ID", a, 0).(*widget.Label)
+	interp.Def(fnGetLabelText, 1, func(a []any) any {
+		label := mustGet(fnGetLabelText, "GUI label ID", a, 0).(*widget.Label)
 		return label.Text
 	})
 
 	// ENTRY
 
+	fnNewEntry := pre("new-entry")
 	// (new-entry [<selector>])
-	interp.Def(pre("new-entry"), -1, func(a []any) any {
+	interp.Def(fnNewEntry, -1, func(a []any) any {
 		li := a[0].(*z3.Cell)
 		sort := "single-line"
 		if li != z3.Nil {
@@ -580,14 +606,15 @@ func DefGUI(interp *z3.Interp, config Config) {
 		case "password":
 			return put(widget.NewPasswordEntry())
 		default:
-			panic(fmt.Sprintf("new-entry: unknown selector '%v, must be one of '(single-line multi-line password)",
+			panic(fmt.Sprintf(fnNewEntry+": unknown selector '%v, must be one of '(single-line multi-line password)",
 				sort))
 		}
 	})
 
+	fnSetEntryOnChangeCallback := pre("set-entry-on-change-callback")
 	// (set-entry-on-change-callback <entry> (lambda (str) ...))
-	interp.Def(pre("set-entry-on-change-callback"), 2, func(a []any) any {
-		e := mustGet(pre("set-entry-on-change-callback"), "GUI entry ID", a, 0)
+	interp.Def(fnSetEntryOnChangeCallback, 2, func(a []any) any {
+		e := mustGet(fnSetEntryOnChangeCallback, "GUI entry ID", a, 0)
 		proc := a[1].(*z3.Closure)
 		e.(*widget.Entry).OnChanged = func(s string) {
 			li2 := &z3.Cell{Car: s, Cdr: z3.Nil}
@@ -598,56 +625,63 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	fnSetEntryTextWrap := pre("set-entry-text-wrap")
 	// (set-entry-text-wrap entry selector)
-	interp.Def(pre("set-entry-text-wrap"), 2, func(a []any) any {
-		e := mustGet(pre("set-entry-text-wrap"), "GUI entry ID", a, 0).(*widget.Entry)
+	interp.Def(fnSetEntryTextWrap, 2, func(a []any) any {
+		e := mustGet(fnSetEntryTextWrap, "GUI entry ID", a, 0).(*widget.Entry)
 		wrap := a[1].(*z3.Sym)
-		mode := MustConvertSymToTextWrap(pre("set-entry-text-wrap"), wrap)
+		mode := MustConvertSymToTextWrap(fnSetEntryTextWrap, wrap)
 		e.Wrapping = mode
 		return z3.Void
 	})
 
+	fnSetEntryValidator := pre("set-entry-validator")
 	// (set-entry-validator <entry> <validator>))
-	interp.Def(pre("set-entry-validator"), 2, func(a []any) any {
-		e := mustGet(pre("set-entry-validator"), "GUI entry ID", a, 0).(*widget.Entry)
-		validator := mustGet(pre("set-entry-validator"), "GUI validator ID", a, 1).(*validatorWrapper)
+	interp.Def(fnSetEntryValidator, 2, func(a []any) any {
+		e := mustGet(fnSetEntryValidator, "GUI entry ID", a, 0).(*widget.Entry)
+		validator := mustGet(fnSetEntryValidator, "GUI validator ID", a, 1).(*validatorWrapper)
 		e.Validator = validator.fn
 		return z3.Void
 	})
 
+	fnEntryAcceptsTab := pre("entry-accepts-tab?")
 	// (entry-accepts-tab? <entry>) => bool
-	interp.Def(pre("entry-accepts-tab?"), 1, func(a []any) any {
-		e := mustGet(pre("entry-accepts-tab"), "entry", a, 0).(*widget.Entry)
+	interp.Def(fnEntryAcceptsTab, 1, func(a []any) any {
+		e := mustGet(fnEntryAcceptsTab, "entry", a, 0).(*widget.Entry)
 		return z3.AsLispBool(e.AcceptsTab())
 	})
 
+	fnGetEntryCursorPos := pre("get-entry-cursor-pos")
 	// (get-entry-cursor-pos <entry>) => li
-	interp.Def(pre("get-entry-cursor-pos"), 1, func(a []any) any {
-		e := mustGet(pre("get-entry-cursor-pos"), "GUI entry ID", a, 0).(*widget.Entry)
+	interp.Def(fnGetEntryCursorPos, 1, func(a []any) any {
+		e := mustGet(fnGetEntryCursorPos, "GUI entry ID", a, 0).(*widget.Entry)
 		row := e.CursorRow
 		column := e.CursorColumn
 		return &z3.Cell{Car: goarith.AsNumber(row), Cdr: &z3.Cell{Car: goarith.AsNumber(column), Cdr: z3.Nil}}
 	})
 
+	fnSetEntryCursorRow := pre("set-entry-cursor-row")
 	// (set-entry-cursor-row <entry> <row>)
-	interp.Def(pre("set-entry-cursor-row"), 2, func(a []any) any {
-		e := mustGet(pre("set-entry-cursor-row"), "GUI entry ID", a, 0).(*widget.Entry)
-		n := z3.ToInt64(pre("set-entry-cursor-row"), a[1])
+	interp.Def(fnSetEntryCursorRow, 2, func(a []any) any {
+		e := mustGet(fnSetEntryCursorRow, "GUI entry ID", a, 0).(*widget.Entry)
+		n := z3.ToInt64(fnSetEntryCursorRow, a[1])
 		e.CursorRow = int(n)
 		return z3.Void
 	})
 
+	fnSetEntryCursorColumn := pre("set-entry-cursor-column")
 	// (set-entry-cursor-column <entry> <column>)
-	interp.Def(pre("set-entry-cursor-column"), 2, func(a []any) any {
-		e := mustGet(pre("set-entry-cursor-column"), "GUI entry ID", a, 0).(*widget.Entry)
-		n := z3.ToInt64(pre("set-entry-cursor-column"), a[1])
+	interp.Def(fnSetEntryCursorColumn, 2, func(a []any) any {
+		e := mustGet(fnSetEntryCursorColumn, "GUI entry ID", a, 0).(*widget.Entry)
+		n := z3.ToInt64(fnSetEntryCursorColumn, a[1])
 		e.CursorColumn = int(n)
 		return z3.Void
 	})
 
+	fnSetEntryOnCursorChangeCallback := pre("set-entry-on-cursor-change-callback")
 	// (set-entry-on-cursor-change-callback <entry> <proc>) where <proc> takes an entry ID as argument
-	interp.Def(pre("set-entry-on-cursor-change-callback"), 2, func(a []any) any {
-		e := mustGet(pre("set-entry-on-cursor-change-callback"), "GUI entry ID", a, 0).(*widget.Entry)
+	interp.Def(fnSetEntryOnCursorChangeCallback, 2, func(a []any) any {
+		e := mustGet(fnSetEntryOnCursorChangeCallback, "GUI entry ID", a, 0).(*widget.Entry)
 		proc := a[1].(*z3.Closure)
 		e.OnCursorChanged = func() {
 			interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: a[0], Cdr: z3.Nil}}, z3.Nil,
@@ -656,68 +690,77 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	fnGetEntryCursor := pre("get-entry-cursor")
 	// (get-entry-cursor <entry>) => sym
-	interp.Def(pre("get-entry-cursor"), 1, func(a []any) any {
-		e := mustGet(pre("get-entry-cursor"), "entry", a, 0).(*widget.Entry)
+	interp.Def(fnGetEntryCursor, 1, func(a []any) any {
+		e := mustGet(fnGetEntryCursor, "entry", a, 0).(*widget.Entry)
 		return CursorToSym(e.Cursor())
 	})
 
+	fnGetEntrySelectedText := pre("get-entry-selected-text")
 	// (get-entry-selected-text <entry>) => str
-	interp.Def(pre("get-entry-selected-text"), 1, func(a []any) any {
-		e := mustGet(pre("get-entry-selected-text"), "entry", a, 0).(*widget.Entry)
+	interp.Def(fnGetEntrySelectedText, 1, func(a []any) any {
+		e := mustGet(fnGetEntrySelectedText, "entry", a, 0).(*widget.Entry)
 		return e.SelectedText()
 	})
 
+	fnSetEntryMinRowsVisible := pre("set-entry-min-rows-visible")
 	// (set-entry-min-rows-visible <entry> <row>)
-	interp.Def(pre("set-entry-min-rows-visible"), 2, func(a []any) any {
-		e := mustGet(pre("set-entry-min-rows-visible"), "entry", a, 0).(*widget.Entry)
-		n := z3.ToInt64(pre("set-entry-min-rows-visible"), a[1])
+	interp.Def(fnSetEntryMinRowsVisible, 2, func(a []any) any {
+		e := mustGet(fnSetEntryMinRowsVisible, "entry", a, 0).(*widget.Entry)
+		n := z3.ToInt64(fnSetEntryMinRowsVisible, a[1])
 		e.SetMinRowsVisible(int(n))
 		return z3.Void
 	})
 
+	fnSetEntryPlaceHolder := pre("set-entry-place-holder")
 	// (set-entry-place-holder <entry> <str>)
-	interp.Def(pre("set-entry-place-holder"), 2, func(a []any) any {
-		e := mustGet(pre("set-entry-place-holder"), "entry", a, 0).(*widget.Entry)
+	interp.Def(fnSetEntryPlaceHolder, 2, func(a []any) any {
+		e := mustGet(fnSetEntryPlaceHolder, "entry", a, 0).(*widget.Entry)
 		e.SetPlaceHolder(a[1].(string))
 		return z3.Void
 	})
 
+	fnSetEntryText := pre("set-entry-text")
 	// (set-entry-text <entry> <str>)
-	interp.Def(pre("set-entry-text"), 2, func(a []any) any {
-		e := mustGet(pre("set-entry-text"), "entry", a, 0).(*widget.Entry)
+	interp.Def(fnSetEntryText, 2, func(a []any) any {
+		e := mustGet(fnSetEntryText, "entry", a, 0).(*widget.Entry)
 		e.SetText(a[1].(string))
 		return z3.Void
 	})
 
 	// VALIDATORS
 
+	fnNewCombinedStringValidator := pre("new-combined-string-validator")
 	// (new-combined-string-validators <validator> [<validators>...]) => validator ID
-	interp.Def(pre("new-combined-string-validator"), -1, func(a []any) any {
+	interp.Def(fnNewCombinedStringValidator, -1, func(a []any) any {
 		li := a[0].(*z3.Cell)
 		validators := make([]fyne.StringValidator, 0)
 		for li != z3.Nil {
-			validator := mustGet1(pre("new-combined-string-validator"), "GUI string validator ID", li.Car)
+			validator := mustGet1(fnNewCombinedStringValidator, "GUI string validator ID", li.Car)
 			validators = append(validators, validator.(fyne.StringValidator))
 			li = li.CdrCell()
 		}
 		return put(&validatorWrapper{fn: validation.NewAllStrings(validators...)})
 	})
 
+	fnNewRegexpValidator := pre("new-regexp-validator")
 	// (new-regexp-validator <regexp-str> <reason>) => validator ID
-	interp.Def(pre("new-regexp-validator"), 2, func(a []any) any {
+	interp.Def(fnNewRegexpValidator, 2, func(a []any) any {
 		return put(&validatorWrapper{validation.NewRegexp(a[0].(string), a[1].(string))})
 	})
 
+	fnNewTimeValidator := pre("new-time-validator")
 	// (new-time-validator <time-format-str>) => validator ID
-	interp.Def(pre("new-time-validator"), 1, func(a []any) any {
+	interp.Def(fnNewTimeValidator, 1, func(a []any) any {
 		return put(&validatorWrapper{fn: validation.NewTime(a[0].(string))})
 	})
 
+	fnNewValidator := pre("new-validator")
 	// (new-validator <proc>) => validator ID, where <proc> is a function that takes a string
 	// and returns a string. If the return string is not "", the validation fails with the reason
 	// given in the string. If <proc> panics, validation also fails.
-	interp.Def(pre("new-validator"), 1, func(a []any) any {
+	interp.Def(fnNewValidator, 1, func(a []any) any {
 		proc := a[0].(*z3.Closure)
 		fn := func(s string) error {
 			result, err := interp.SafeEval(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: s, Cdr: z3.Nil}}, z3.Nil)
@@ -736,10 +779,11 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(&validatorWrapper{fn: fyne.StringValidator(fn)})
 	})
 
+	fnSetObjectOnValidationChangeCallback := pre("set-object-on-validation-change-callback")
 	// (set-object-on-validation-change-callback <obj> <proc>) where <proc> takes a string as error message
 	// and this argument is Nil if validation succeeds.
-	interp.Def(pre("set-object-on-validation-change-callback"), 2, func(a []any) any {
-		e := mustGet(pre("set-object-on-validation-change-callback"), "GUI validatable ID", a, 0).(fyne.Validatable)
+	interp.Def(fnSetObjectOnValidationChangeCallback, 2, func(a []any) any {
+		e := mustGet(fnSetObjectOnValidationChangeCallback, "GUI validatable ID", a, 0).(fyne.Validatable)
 		proc := a[1].(*z3.Closure)
 		e.SetOnValidationChanged(func(e error) {
 			var arg any
@@ -754,9 +798,10 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	fnValidateObject := pre("validate-object")
 	// (validate-object <obj>) => error message string or ""
-	interp.Def(pre("validate-object"), 1, func(a []any) any {
-		e := mustGet(pre("validate-object"), "GUI validatable ID", a, 0).(fyne.Validatable)
+	interp.Def(fnValidateObject, 1, func(a []any) any {
+		e := mustGet(fnValidateObject, "GUI validatable ID", a, 0).(fyne.Validatable)
 		err := e.Validate()
 		if err == nil {
 			return ""
@@ -766,8 +811,9 @@ func DefGUI(interp *z3.Interp, config Config) {
 
 	// TEXTGRID
 
+	fnNewTextGrid := pre("new-text-grid")
 	// (new-text-grid [<string>] [show-line-numbers|show-whitespace|tab-width <int>]) => int
-	interp.Def(pre("new-text-grid"), -1, func(a []any) any {
+	interp.Def(fnNewTextGrid, -1, func(a []any) any {
 		grid := widget.NewTextGrid()
 		li := a[0].(*z3.Cell)
 		if li != z3.Nil {
@@ -783,12 +829,13 @@ func DefGUI(interp *z3.Interp, config Config) {
 					case "tab-width":
 						li = li.CdrCell()
 						if li == z3.Nil {
-							panic(pre("new-text-grid: expected a width integer after 'tab-width, but it is missing!"))
+							panic(fnNewTextGrid + ": expected a width integer after 'tab-width, but it is missing!")
 						}
 						grid.TabWidth = int(z3.ToInt64(pre("new-text-grid"), li.Car))
 					}
 				} else {
-					panic(fmt.Sprintf(pre("new-text-grid: expected an initial string as content and/or a selector in '(show-line-numbers show-whitespace tab-width), given %v"),
+					panic(fmt.Sprintf(fnNewTextGrid+
+						": expected an initial string as content and/or a selector in '(show-line-numbers show-whitespace tab-width), given %v",
 						z3.Str(li.Car)))
 				}
 				li = li.CdrCell()
@@ -797,11 +844,12 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(grid)
 	})
 
+	fnGetTextGridCellSize := pre("get-text-grid-cell-size")
 	// (get-text-grid-cell-size grid) => li
-	interp.Def(pre("get-text-grid-cell-size"), 1, func(a []any) any {
-		_, ok = mustGet(pre("get-text-grid-cell-size"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+	interp.Def(fnGetTextGridCellSize, 1, func(a []any) any {
+		_, ok = mustGet(fnGetTextGridCellSize, "GUI text grid ID", a, 0).(*widget.TextGrid)
 		if !ok {
-			panic(fmt.Sprintf(pre("get-text-grid-cell-size: expected text grid as argument, given %v"), z3.Str(a[0])))
+			panic(fmt.Sprintf(fnGetTextGridCellSize+"get-text-grid-cell-size: expected text grid as argument, given %v", z3.Str(a[0])))
 		}
 		// unfortunately text-grid cell size and line calculations are internal, as of Fyne v2.4
 		// the following is taken from textgrid.go: (t *TextGridRenderer) updateCellSize():
@@ -812,52 +860,59 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return &z3.Cell{Car: goarith.AsNumber(w), Cdr: &z3.Cell{Car: goarith.AsNumber(h), Cdr: z3.Nil}}
 	})
 
+	fnTextGridShowLineNumbers := pre("text-grid-show-line-numbers?")
 	// (text-grid-show-line-numbers? <grid>) => bool
-	interp.Def(pre("text-grid-show-line-numbers?"), 1, func(a []any) any {
-		grid := mustGet(pre("text-grid-show-line-numbers?"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+	interp.Def(fnTextGridShowLineNumbers, 1, func(a []any) any {
+		grid := mustGet(fnTextGridShowLineNumbers, "GUI text grid ID", a, 0).(*widget.TextGrid)
 		return z3.AsLispBool(grid.ShowLineNumbers)
 	})
 
+	fnTextGridShowWhitespace := pre("text-grid-show-whitespace?")
 	// (text-grid-show-whitespace? <grid>) => bool
-	interp.Def(pre("text-grid-show-whitespace?"), 1, func(a []any) any {
-		grid := mustGet(pre("text-grid-show-whitespace?"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+	interp.Def(fnTextGridShowWhitespace, 1, func(a []any) any {
+		grid := mustGet(fnTextGridShowWhitespace, "GUI text grid ID", a, 0).(*widget.TextGrid)
 		return z3.AsLispBool(grid.ShowWhitespace)
 	})
 
+	fnTextGridTabWidth := pre("get-text-grid-tab-width")
 	// (text-grid-tab-width <grid>) => num
-	interp.Def(pre("get-text-grid-tab-width"), 1, func(a []any) any {
-		grid := mustGet(pre("get-text-grid-tab-width"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+	interp.Def(fnTextGridTabWidth, 1, func(a []any) any {
+		grid := mustGet(fnTextGridTabWidth, "GUI text grid ID", a, 0).(*widget.TextGrid)
 		return goarith.AsNumber(grid.TabWidth)
 	})
 
+	fnSetTextGridTabWidth := pre("set-text-grid-tab-width")
 	// (set-text-grid-tab-width <grid> <n>)
-	interp.Def(pre("set-text-grid-tab-width"), 2, func(a []any) any {
-		grid := mustGet(pre("set-text-grid-tab-width"), "GUI text grid ID", a, 0).(*widget.TextGrid)
-		grid.TabWidth = int(z3.ToInt64(pre("set-text-grid-tab-width"), a[1]))
+	interp.Def(fnSetTextGridTabWidth, 2, func(a []any) any {
+		grid := mustGet(fnSetTextGridTabWidth, "GUI text grid ID", a, 0).(*widget.TextGrid)
+		grid.TabWidth = int(z3.ToInt64(fnSetTextGridTabWidth, a[1]))
 		return z3.Void
 	})
 
+	fnSetTextGridShowLineNumbers := pre("set-text-grid-show-line-numbers")
 	// (set-text-grid-show-line-numbers <grid> <show?>)
-	interp.Def(pre("set-text-grid-show-line-numbers"), 2, func(a []any) any {
-		grid := mustGet(pre("set-text-grid-show-line-numbers"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+	interp.Def(fnSetTextGridShowLineNumbers, 2, func(a []any) any {
+		grid := mustGet(fnSetTextGridShowLineNumbers, "GUI text grid ID", a, 0).(*widget.TextGrid)
 		grid.ShowLineNumbers = z3.ToBool(a[1])
 		return z3.Void
 	})
 
+	fnSetTextGridShowWhitespace := pre("set-text-grid-show-whitespace")
 	// (set-text-grid-show-whitespace <grid> <show?>)
-	interp.Def(pre("set-text-grid-show-whitespace"), 2, func(a []any) any {
-		grid := mustGet(pre("set-text-grid-show-whitespace"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+	interp.Def(fnSetTextGridShowWhitespace, 2, func(a []any) any {
+		grid := mustGet(fnSetTextGridShowWhitespace, "GUI text grid ID", a, 0).(*widget.TextGrid)
 		grid.ShowWhitespace = z3.ToBool(a[1])
 		return z3.Void
 	})
 
+	fnGetTextGridRow := pre("get-text-grid-row")
 	// (get-text-grid-row <grid> <row>) => li
 	// The list consists of an array of cells and a style list. The array of cells contains lists
 	// consisting of a rune string and a style list. Style lists consist of a list of foreground color
 	// values and a list of background color values.
-	interp.Def(pre("get-text-grid-row"), 2, func(a []any) any {
-		grid := mustGet(pre("get-text-grid-row"), "GUI text grid ID", a, 0).(*widget.TextGrid)
-		row := grid.Row(int(z3.ToInt64(pre("get-text-grid-row"), a[1])))
+	interp.Def(fnGetTextGridRow, 2, func(a []any) any {
+		grid := mustGet(fnGetTextGridRow, "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := grid.Row(int(z3.ToInt64(fnGetTextGridRow, a[1])))
 		cells := make([]any, 0)
 		for _, cell := range row.Cells {
 			elem := &z3.Cell{Car: string(cell.Rune), Cdr: &z3.Cell{Car: TextGridStyleToList(cell.Style),
@@ -867,19 +922,21 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return &z3.Cell{Car: cells, Cdr: &z3.Cell{Car: TextGridStyleToList(row.Style), Cdr: z3.Nil}}
 	})
 
+	fnGetTextGridRowText := pre("get-text-grid-row-text")
 	// (get-text-grid-row-text <grid> <row>) => str
-	interp.Def(pre("get-text-grid-row-text"), 2, func(a []any) any {
-		grid := mustGet(pre("get-text-grid-row-text"), "GUI text grid ID", a, 0).(*widget.TextGrid)
-		s := grid.RowText(int(z3.ToInt64(pre("get-text-grid-row-text"), a[1])))
+	interp.Def(fnGetTextGridRowText, 2, func(a []any) any {
+		grid := mustGet(fnGetTextGridRowText, "GUI text grid ID", a, 0).(*widget.TextGrid)
+		s := grid.RowText(int(z3.ToInt64(fnGetTextGridRowText, a[1])))
 		return s
 	})
 
+	fnSetTextGridCell := pre("set-text-grid-cell")
 	// (set-text-grid-cell <grid> <row> <column> <cell>) where <cell> is a list consisting
 	// of a rune string and a text grid style list.
-	interp.Def(pre("set-text-grid-cell"), 4, func(a []any) any {
-		grid := mustGet(pre("set-text-grid-cell"), "GUI text grid ID", a, 0).(*widget.TextGrid)
-		row := int(z3.ToInt64(pre("set-text-grid-cell"), a[1]))
-		column := int(z3.ToInt64(pre("set-text-grid-cell"), a[2]))
+	interp.Def(fnSetTextGridCell, 4, func(a []any) any {
+		grid := mustGet(fnSetTextGridCell, "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := int(z3.ToInt64(fnSetTextGridCell, a[1]))
+		column := int(z3.ToInt64(fnSetTextGridCell, a[2]))
 		li := a[3].(*z3.Cell)
 		r := []rune(li.Car.(string))[0]
 		li = li.CdrCell()
@@ -888,32 +945,35 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	fnGetTextGridCell := pre("get-text-grid-cell")
 	// (get-text-grid-cell <grid> <row> <column>) => li
-	interp.Def(pre("get-text-grid-cell"), 3, func(a []any) any {
-		grid := mustGet(pre("get-text-grid-cell"), "GUI text grid ID", a, 0).(*widget.TextGrid)
-		row := int(z3.ToInt64(pre("get-text-grid-cell"), a[1]))
-		column := int(z3.ToInt64(pre("get-text-grid-cell"), a[2]))
+	interp.Def(fnGetTextGridCell, 3, func(a []any) any {
+		grid := mustGet(fnGetTextGridCell, "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := int(z3.ToInt64(fnGetTextGridCell, a[1]))
+		column := int(z3.ToInt64(fnGetTextGridCell, a[2]))
 		gridRow := grid.Rows[row]
 		cell := gridRow.Cells[column]
 		return &z3.Cell{Car: string(cell.Rune), Cdr: &z3.Cell{Car: TextGridStyleToList(cell.Style),
 			Cdr: z3.Nil}}
 	})
 
+	fnGetTextGridRune := pre("get-text-grid-rune")
 	// (get-text-grid-rune grid row column) => str
-	interp.Def(pre("get-text-grid-rune"), 3, func(a []any) any {
-		grid := mustGet(pre("get-text-grid-cell"), "GUI text grid ID", a, 0).(*widget.TextGrid)
-		row := int(z3.ToInt64(pre("get-text-grid-cell"), a[1]))
-		column := int(z3.ToInt64(pre("get-text-grid-cell"), a[2]))
+	interp.Def(fnGetTextGridRune, 3, func(a []any) any {
+		grid := mustGet(fnGetTextGridRune, "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := int(z3.ToInt64(fnGetTextGridRune, a[1]))
+		column := int(z3.ToInt64(fnGetTextGridRune, a[2]))
 		gridRow := grid.Rows[row]
 		cell := gridRow.Cells[column]
 		return string(cell.Rune)
 	})
 
+	fnSetTextGridRow := pre("set-text-grid-row")
 	// (set-text-grid-row <grid> <row> <rowspec>) where <rowspec> has the same format as is returned
 	// by get-text-grid-row, i.e. it is an array of cell lists containing a rune string and a style list.
-	interp.Def(pre("set-text-grid-row"), 3, func(a []any) any {
-		grid := mustGet(pre("set-text-grid-row"), "GUI text grid ID", a, 0).(*widget.TextGrid)
-		row := int(z3.ToInt64(pre("set-text-grid-row"), a[1]))
+	interp.Def(fnSetTextGridRow, 3, func(a []any) any {
+		grid := mustGet(fnSetTextGridRow, "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := int(z3.ToInt64(fnSetTextGridRow, a[1]))
 		li := a[2].(*z3.Cell)
 		columns := li.Car.([]any)
 		li = li.CdrCell()
@@ -930,18 +990,19 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	fnWrapDeleteTextGrid := pre("wrap-delete-text-grid")
 	// (wrap-delete-text-grid grid range-list wrapcol soft-wrap? hard-lf-rune soft-lf-rune cursor-row cursor-column) => li
 	// Delete the given range of the form (startrow endrow endrow endcol) (all inclusive) while ensuring
 	// that all paragraphs in the range are word wrapped. Returns a new cursor position.
-	interp.Def(pre("wrap-delete-text-grid"), 8, func(a []any) any {
-		grid := mustGet(pre("wrap-delete-text-grid"), "GUI text grid ID", a, 0).(*widget.TextGrid)
-		startRow, startCol, endRow, endCol := TextGridRangeListToRange(pre("wrap-delete-text-grid"), a[1].(*z3.Cell))
-		wrapCol := z3.ToInt(pre("wrap-delete-text-grid"), a[2])
+	interp.Def(fnWrapDeleteTextGrid, 8, func(a []any) any {
+		grid := mustGet(fnWrapDeleteTextGrid, "GUI text grid ID", a, 0).(*widget.TextGrid)
+		startRow, startCol, endRow, endCol := TextGridRangeListToRange(fnWrapDeleteTextGrid, a[1].(*z3.Cell))
+		wrapCol := z3.ToInt(fnWrapDeleteTextGrid, a[2])
 		softWrap := z3.ToBool(a[3])
 		hardLF := []rune(a[4].(string))[0]
 		softLF := []rune(a[5].(string))[0]
-		cursorRow := z3.ToInt(pre("wrap-delete-text-grid"), a[6])
-		cursorColumn := z3.ToInt(pre("wrap-delete-text-grid"), a[7])
+		cursorRow := z3.ToInt(fnWrapDeleteTextGrid, a[6])
+		cursorColumn := z3.ToInt(fnWrapDeleteTextGrid, a[7])
 		// delete the range from startRow to endRow in the grid
 		var underflow []widget.TextGridCell
 		for i := endRow; i >= startRow; i-- {
@@ -1006,13 +1067,14 @@ func DefGUI(interp *z3.Interp, config Config) {
 			Cdr: &z3.Cell{Car: goarith.AsNumber(newCursorCol), Cdr: z3.Nil}}
 	})
 
+	fnWrapInsertTextGrid := pre("wrap-insert-text-grid")
 	// (wrap-insert-text-grid grid cells row col wrapcol soft-wrap? hard-lf-rune soft-lf-rune) => li
 	// Soft or hard wrap a paragraph in which row, col is located, based on hard-lf-rune and soft-lf-rune
 	// markers for end-of-line (since "\n" is not a good candidate for this, other markers are normally used).
 	// The function returns a list of the form (row col) that represents the new cursor position if
 	// row and col are the old cursor positions.
-	interp.Def(pre("wrap-insert-text-grid"), 8, func(a []any) any {
-		grid := mustGet(pre("wrap-insert-text-grid"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+	interp.Def(fnWrapInsertTextGrid, 8, func(a []any) any {
+		grid := mustGet(fnWrapInsertTextGrid, "GUI text grid ID", a, 0).(*widget.TextGrid)
 		// cells are an array of any containing lists of the form (rune text-grid-style-list)
 		// these are converted to an array of TextGridCell like in a TextGridRow
 		cells := a[1].([]any)
@@ -1020,9 +1082,9 @@ func DefGUI(interp *z3.Interp, config Config) {
 		for i := range cells {
 			tgCells[i] = ListToTextGridCell(cells[i])
 		}
-		row := int(z3.ToInt64(pre("wrap-insert-text-grid"), a[2]))
-		col := int(z3.ToInt64(pre("wrap-insert-text-grid"), a[3]))
-		wrapCol := int(z3.ToInt64(pre("wrap-insert-text-grid"), a[4]))
+		row := int(z3.ToInt64(fnWrapInsertTextGrid, a[2]))
+		col := int(z3.ToInt64(fnWrapInsertTextGrid, a[3]))
+		wrapCol := int(z3.ToInt64(fnWrapInsertTextGrid, a[4]))
 		softWrap := z3.ToBool(a[5])
 		hardLF := []rune(a[6].(string))[0]
 		softLF := []rune(a[7].(string))[0]
@@ -1077,18 +1139,20 @@ func DefGUI(interp *z3.Interp, config Config) {
 			Cdr: &z3.Cell{Car: goarith.AsNumber(newCursorCol), Cdr: z3.Nil}}
 	})
 
+	fnRemoveTextGridRow := pre("remove-text-grid-row")
 	// (remove-text-grid-row grid row)
-	interp.Def(pre("remove-text-grid-row"), 2, func(a []any) any {
-		grid := mustGet(pre("remove-text-grid-row"), "GUI text grid ID", a, 0).(*widget.TextGrid)
-		row := int(z3.ToInt64(pre("remove-text-grid-row"), a[1]))
+	interp.Def(fnRemoveTextGridRow, 2, func(a []any) any {
+		grid := mustGet(fnRemoveTextGridRow, "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := int(z3.ToInt64(fnRemoveTextGridRow, a[1]))
 		grid.Rows = append(grid.Rows[:row], grid.Rows[row+1:]...)
 		return z3.Void
 	})
 
+	fnInsertTextGridRow := pre("insert-text-grid-row")
 	// (insert-text-grid-row grid row)
-	interp.Def(pre("insert-text-grid-row"), 2, func(a []any) any {
-		grid := mustGet(pre("insert-text-grid-row"), "GUI text grid ID", a, 0).(*widget.TextGrid)
-		row := int(z3.ToInt64(pre("insert-text-grid-row"), a[1]))
+	interp.Def(fnInsertTextGridRow, 2, func(a []any) any {
+		grid := mustGet(fnInsertTextGridRow, "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := int(z3.ToInt64(fnInsertTextGridRow, a[1]))
 		if row == len(grid.Rows) {
 			grid.Rows = append(grid.Rows, widget.TextGridRow{})
 			return z3.Void
@@ -1099,60 +1163,66 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	fnSetTextGridRowStyle := pre("set-text-grid-row-style")
 	// (set-text-grid-row-style <grid> <row> <style-list>) sets the whole row to the style list,
 	// which contains a foreground color and a background color list.
-	interp.Def(pre("set-text-grid-row-style"), 3, func(a []any) any {
-		grid := mustGet(pre("set-text-grid-row-style"), "GUI text grid ID", a, 0).(*widget.TextGrid)
-		row := int(z3.ToInt64(pre("set-text-grid-row-style"), a[1]))
+	interp.Def(fnSetTextGridRowStyle, 3, func(a []any) any {
+		grid := mustGet(fnSetTextGridRowStyle, "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := int(z3.ToInt64(fnSetTextGridRowStyle, a[1]))
 		li := a[2].(*z3.Cell)
 		style := ListToTextGridStyle(li)
 		grid.SetRowStyle(row, style)
 		return z3.Void
 	})
 
+	fnSetTextGridRune := pre("set-text-grid-rune")
 	// (set-text-grid-rune <grid> <row> <column> <str>)
-	interp.Def(pre("set-text-grid-rune"), 4, func(a []any) any {
-		grid := mustGet(pre("set-text-grid-rune"), "GUI text grid ID", a, 0).(*widget.TextGrid)
-		row := int(z3.ToInt64(pre("set-text-grid-rune"), a[1]))
-		column := int(z3.ToInt64(pre("set-text-grid-rune"), a[2]))
+	interp.Def(fnSetTextGridRune, 4, func(a []any) any {
+		grid := mustGet(fnSetTextGridRune, "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := int(z3.ToInt64(fnSetTextGridRune, a[1]))
+		column := int(z3.ToInt64(fnSetTextGridRune, a[2]))
 		r := []rune(a[3].(string))[0]
 		grid.SetRune(row, column, r)
 		return z3.Void
 	})
 
+	fnSetTextGridStyle := pre("set-text-grid-style")
 	// (set-text-grid-style <grid> <row> <column> <style-list>)
-	interp.Def(pre("set-text-grid-style"), 4, func(a []any) any {
-		grid := mustGet(pre("set-text-grid-style"), "GUI text grid ID", a, 0).(*widget.TextGrid)
-		row := int(z3.ToInt64(pre("set-text-grid-style"), a[1]))
-		column := int(z3.ToInt64(pre("set-text-grid-style"), a[2]))
+	interp.Def(fnSetTextGridStyle, 4, func(a []any) any {
+		grid := mustGet(fnSetTextGridStyle, "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := int(z3.ToInt64(fnSetTextGridStyle, a[1]))
+		column := int(z3.ToInt64(fnSetTextGridStyle, a[2]))
 		style := ListToTextGridStyle(a[3])
 		grid.SetStyle(row, column, style)
 		return z3.Void
 	})
 
+	fnSetTextGridStyleRange := pre("set-text-grid-style-range")
 	// (set-text-grid-style-range <grid> <start-row> <start-column> <end-row> <end-column> <style-list>)
-	interp.Def(pre("set-text-grid-style-range"), 6, func(a []any) any {
-		grid := mustGet(pre("set-text-grid-style-range"), "GUI text grid ID", a, 0).(*widget.TextGrid)
-		row1 := int(z3.ToInt64(pre("set-text-grid-style-range"), a[1]))
-		column1 := int(z3.ToInt64(pre("set-text-grid-style-range"), a[2]))
-		row2 := int(z3.ToInt64(pre("set-text-grid-style-range"), a[3]))
-		column2 := int(z3.ToInt64(pre("set-text-grid-style-range"), a[4]))
+	interp.Def(fnSetTextGridStyleRange, 6, func(a []any) any {
+		grid := mustGet(fnSetTextGridStyleRange, "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row1 := int(z3.ToInt64(fnSetTextGridStyleRange, a[1]))
+		column1 := int(z3.ToInt64(fnSetTextGridStyleRange, a[2]))
+		row2 := int(z3.ToInt64(fnSetTextGridStyleRange, a[3]))
+		column2 := int(z3.ToInt64(fnSetTextGridStyleRange, a[4]))
 		style := ListToTextGridStyle(a[5])
 		grid.SetStyleRange(row1, column1, row2, column2, style)
 		return z3.Void
 	})
 
+	fnSetTextGridText := pre("set-text-grid-text")
 	// (set-text-grid-text <grid> <str>)
-	interp.Def(pre("set-text-grid-text"), 2, func(a []any) any {
-		grid := mustGet(pre("set-text-grid-text"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+	interp.Def(fnSetTextGridText, 2, func(a []any) any {
+		grid := mustGet(fnSetTextGridText, "GUI text grid ID", a, 0).(*widget.TextGrid)
 		s := a[1].(string)
 		grid.SetText(s)
 		return z3.Void
 	})
 
+	fnGetTextGridText := pre("get-text-grid-text")
 	// (get-text-grid-text <grid>) => str
-	interp.Def(pre("get-text-grid-text"), 1, func(a []any) any {
-		grid := mustGet(pre("get-text-grid-text"), "GUI text grid ID", a, 0).(*widget.TextGrid)
+	interp.Def(fnGetTextGridText, 1, func(a []any) any {
+		grid := mustGet(fnGetTextGridText, "GUI text grid ID", a, 0).(*widget.TextGrid)
 		return grid.Text()
 	})
 
@@ -1162,17 +1232,19 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return goarith.AsNumber(len(grid.Rows))
 	})
 
+	fnCountTextGridRowColumns := pre("count-text-grid-row-columns")
 	// (count-text-grid-row-columns grid row) => int
-	interp.Def(pre("count-text-grid-row-columns"), 2, func(a []any) any {
-		grid := mustGet(pre("count-text-grid-row-columns"), "GUI text grid ID", a, 0).(*widget.TextGrid)
-		row := int(z3.ToInt64(pre("count-text-grid-row-columns"), a[1]))
+	interp.Def(fnCountTextGridRowColumns, 2, func(a []any) any {
+		grid := mustGet(fnCountTextGridRowColumns, "GUI text grid ID", a, 0).(*widget.TextGrid)
+		row := int(z3.ToInt64(fnCountTextGridRowColumns, a[1]))
 		return goarith.AsNumber(len(grid.Rows[row].Cells))
 	})
 
 	// CHECK
 
+	fnNewCheck := pre("new-check")
 	// (new-check <title-string> (lambda (bool) ...))
-	interp.Def(pre("new-check"), 2, func(a []any) any {
+	interp.Def(fnNewCheck, 2, func(a []any) any {
 		title := a[0].(string)
 		proc := a[1].(*z3.Closure)
 		id, zid := newID()
@@ -1187,8 +1259,9 @@ func DefGUI(interp *z3.Interp, config Config) {
 
 	// CHOICE
 
+	fnNewChoice := pre("new-choice")
 	// (new-choice <selector> <string-list> (lambda (str) ...))
-	interp.Def(pre("new-choice"), 3, func(a []any) any {
+	interp.Def(fnNewChoice, 3, func(a []any) any {
 		sort := "select"
 		if s, ok := a[0].(string); ok {
 			sort = s
@@ -1214,50 +1287,54 @@ func DefGUI(interp *z3.Interp, config Config) {
 		case "radio", "radio-group":
 			putWithID(id, widget.NewRadioGroup(s, changed))
 		default:
-			panic(fmt.Sprintf("new-choice: the first argument must be one of '(select radio-group), given %v", sort))
+			panic(fmt.Sprintf(fnNewChoice+": the first argument must be one of '(select radio-group), given %v", sort))
 		}
 		return zid
 	})
 
 	// FORM
 
+	fnNewForm := pre("new-form")
 	// (new-form)
-	interp.Def(pre("new-form"), 0, func(a []any) any {
+	interp.Def(fnNewForm, 0, func(a []any) any {
 		return put(widget.NewForm())
 	})
 
+	fnAppendForm := pre("append-form")
 	// (append-form <form> <string> <canvas-object>)
-	interp.Def(pre("append-form"), 3, func(a []any) any {
-		form := mustGet(pre("append-form"), "form", a, 0)
-		obj := mustGet(pre("append-form"), "canvas-object", a, 2)
+	interp.Def(fnAppendForm, 3, func(a []any) any {
+		form := mustGet(fnAppendForm, "form", a, 0)
+		obj := mustGet(fnAppendForm, "canvas-object", a, 2)
 		form.(*widget.Form).Append(a[1].(string), obj.(fyne.CanvasObject))
 		return z3.Void
 	})
 
 	// HYPERLINK
 
+	fnNewHyperlink := pre("new-hyperlink")
 	// (new-hyperlink label url) => int
-	interp.Def(pre("new-hyperlink"), 2, func(a []any) any {
+	interp.Def(fnNewHyperlink, 2, func(a []any) any {
 		if !cfg.HyperlinksAllowed {
-			panic(pre("new-hyperlink: hyperlinks are not permitted!"))
+			panic(fnNewHyperlink + ": hyperlinks are not permitted!")
 		}
 		url, err := url.Parse(a[1].(string))
 		if err != nil {
-			panic(fmt.Errorf(pre(`new-hyperlink: %w, given %v`), err, a[1].(string)))
+			panic(fmt.Errorf(fnNewHyperlink+`: %w, given %v`, err, a[1].(string)))
 		}
 		if cfg.CheckHyperlinks != nil {
 			url = cfg.CheckHyperlinks(url)
 		}
 		if url == nil {
-			panic(fmt.Sprintf(pre(`new-hyperlink:the link URL "%v" is not permitted!`), a[1].(string)))
+			panic(fmt.Sprintf(fnNewHyperlink+`new-hyperlink:the link URL "%v" is not permitted!`, a[1].(string)))
 		}
 		return put(widget.NewHyperlink(a[0].(string), url))
 	})
 
 	// BUTTON
 
+	fnNewButton := pre("new-button")
 	// (new-button str proc) => int
-	interp.Def(pre("new-button"), 2, func(a []any) any {
+	interp.Def(fnNewButton, 2, func(a []any) any {
 		proc := a[1].(*z3.Closure)
 		id, zid := newID()
 		b := widget.NewButton(a[0].(string), func() {
@@ -1269,8 +1346,9 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return zid
 	})
 
-	interp.Def(pre("new-button-with-icon"), 3, func(a []any) any {
-		icon := mustGet(pre("new-button-with-icon"), "GUI icon resource ID", a, 1).(fyne.Resource)
+	fnNewButtonWithIcon := pre("new-button-with-icon")
+	interp.Def(fnNewButtonWithIcon, 3, func(a []any) any {
+		icon := mustGet(fnNewButtonWithIcon, "GUI icon resource ID", a, 1).(fyne.Resource)
 		proc := a[2].(*z3.Closure)
 		id, zid := newID()
 		b := widget.NewButtonWithIcon(a[0].(string), icon, func() {
@@ -1284,8 +1362,9 @@ func DefGUI(interp *z3.Interp, config Config) {
 
 	// LIST
 
+	fnNewList := pre("new-list")
 	// (new-list <len-proc> <prepare-proc> <update-proc>)
-	interp.Def(pre("new-list"), 3, func(a []any) any {
+	interp.Def(fnNewList, 3, func(a []any) any {
 		lproc := a[0].(*z3.Closure)
 		pproc := a[1].(*z3.Closure)
 		uproc := a[2].(*z3.Closure)
@@ -1298,7 +1377,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 		prepCB := func() fyne.CanvasObject {
 			result, _ := interp.SafeEvalWithInfo(&z3.Cell{Car: pproc, Cdr: z3.Nil}, z3.Nil,
 				"%v\n"+fmt.Sprintf("IN list %v preparation callback", z3.Str(zid)))
-			obj := mustGet1(pre("new-list"), "GUI canvas object ID (result from list preparation callback)", result)
+			obj := mustGet1(fnNewList, "GUI canvas object ID (result from list preparation callback)", result)
 			return obj.(fyne.CanvasObject)
 		}
 		updCB := func(i widget.ListItemID, o fyne.CanvasObject) {
@@ -1314,8 +1393,9 @@ func DefGUI(interp *z3.Interp, config Config) {
 
 	// TABLE
 
+	fnNewTable := pre("new-table")
 	// (new-table <len-proc> <prepare-proc> <update-proc>)
-	interp.Def(pre("new-table"), 3, func(a []any) any {
+	interp.Def(fnNewTable, 3, func(a []any) any {
 		lproc := a[0].(*z3.Closure)
 		pproc := a[1].(*z3.Closure)
 		uproc := a[2].(*z3.Closure)
@@ -1332,7 +1412,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 		prepCB := func() fyne.CanvasObject {
 			result, _ := interp.SafeEvalWithInfo(&z3.Cell{Car: pproc, Cdr: z3.Nil}, z3.Nil,
 				"%v\n"+fmt.Sprintf("IN table %v preparation callback", z3.Str(zid)))
-			obj := mustGet1(pre("new-table"), "GUI canvas object ID (result from table preparation callback)", result)
+			obj := mustGet1(fnNewTable, "GUI canvas object ID (result from table preparation callback)", result)
 			return obj.(fyne.CanvasObject)
 		}
 		updCB := func(id widget.TableCellID, o fyne.CanvasObject) {
@@ -1349,8 +1429,9 @@ func DefGUI(interp *z3.Interp, config Config) {
 
 	// TREE
 
+	fnNewTree := pre("new-tree")
 	// (new-tree <child-uid-proc> <is-branch-proc> <create-node-proc> <update-note-proc)
-	interp.Def(pre("new-tree"), 4, func(a []any) any {
+	interp.Def(fnNewTree, 4, func(a []any) any {
 		proc1 := a[0].(*z3.Closure)
 		proc2 := a[1].(*z3.Closure)
 		proc3 := a[2].(*z3.Closure)
@@ -1377,7 +1458,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 		fn3 := func(branch bool) fyne.CanvasObject {
 			result, _ := interp.SafeEvalWithInfo(&z3.Cell{Car: proc3, Cdr: &z3.Cell{Car: z3.AsLispBool(branch), Cdr: z3.Nil}}, z3.Nil,
 				"%v\n"+fmt.Sprintf("IN tree %v creation callback", z3.Str(zid)))
-			obj := mustGet1(pre("new-tree"), "GUI tree creation callback canvas object ID", result)
+			obj := mustGet1(fnNewTree, "GUI tree creation callback canvas object ID", result)
 			return obj.(fyne.CanvasObject)
 		}
 		fn4 := func(id widget.TreeNodeID, branch bool, o fyne.CanvasObject) {
@@ -1392,8 +1473,9 @@ func DefGUI(interp *z3.Interp, config Config) {
 
 	// MENU
 
+	fnNewMenuItem := pre("new-menu-item")
 	// (new-menu-item <str> <proc> [<selector>...]) => menu item ID
-	interp.Def(pre("new-menu-item"), -1, func(a []any) any {
+	interp.Def(fnNewMenuItem, -1, func(a []any) any {
 		li := a[0].(*z3.Cell)
 		label := li.Car.(string)
 		li = li.CdrCell()
@@ -1416,7 +1498,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 			case CheckedSym:
 				item.Checked = true
 			default:
-				panic(fmt.Sprintf(pre("new-menu-item: expected a symbol in '(is-quit is-separator disabled checked) but given %v"), z3.Str(li.Car)))
+				panic(fmt.Sprintf(fnNewMenuItem+": expected a symbol in '(is-quit is-separator disabled checked) but given %v", z3.Str(li.Car)))
 			}
 			li = li.CdrCell()
 		}
@@ -1424,123 +1506,139 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return zid
 	})
 
+	fnSetMenuItemChecked := pre("set-menu-item-checked")
 	// (set-menu-item-checked <item> <bool>)
-	interp.Def(pre("set-menu-item-checked"), 2, func(a []any) any {
-		item := mustGet(pre("set-menu-item-checked"), "GUI menu item ID", a, 0).(*fyne.MenuItem)
+	interp.Def(fnSetMenuItemChecked, 2, func(a []any) any {
+		item := mustGet(fnSetMenuItemChecked, "GUI menu item ID", a, 0).(*fyne.MenuItem)
 		b := z3.ToBool(a[1])
 		item.Checked = b
 		return z3.Void
 	})
 
+	fnMenuItemChecked := pre("menu-item-checked?")
 	// (menu-item-checked? <item>) => bool
-	interp.Def(pre("menu-item-checked?"), 1, func(a []any) any {
-		item := mustGet(pre("menu-item-checked?"), "GUI menu item ID", a, 0).(*fyne.MenuItem)
+	interp.Def(fnMenuItemChecked, 1, func(a []any) any {
+		item := mustGet(fnMenuItemChecked, "GUI menu item ID", a, 0).(*fyne.MenuItem)
 		return z3.AsLispBool(item.Checked)
 	})
 
+	fnSetMenuItemDisabled := pre("set-menu-item-disabled")
 	// (set-menu-item-disabled <item> <bool>)
-	interp.Def(pre("set-menu-item-disabled"), 2, func(a []any) any {
-		item := mustGet(pre("set-menu-item-disabled"), "GUI menu item ID", a, 0).(*fyne.MenuItem)
+	interp.Def(fnSetMenuItemDisabled, 2, func(a []any) any {
+		item := mustGet(fnSetMenuItemDisabled, "GUI menu item ID", a, 0).(*fyne.MenuItem)
 		b := z3.ToBool(a[1])
 		item.Disabled = b
 		return z3.Void
 	})
 
+	fnMenuItemDisabled := pre("menu-item-disabled?")
 	// (menu-item-disabled? <item>) => bool
-	interp.Def(pre("menu-item-disabled?"), 1, func(a []any) any {
-		item := mustGet(pre("menu-item-disabled?"), "GUI menu item ID", a, 0).(*fyne.MenuItem)
+	interp.Def(fnMenuItemDisabled, 1, func(a []any) any {
+		item := mustGet(fnMenuItemDisabled, "GUI menu item ID", a, 0).(*fyne.MenuItem)
 		return z3.AsLispBool(item.Disabled)
 	})
 
+	fnGetMenuItemLabel := pre("get-menu-item-label")
 	// (get-menu-item-label <item>) => str
-	interp.Def(pre("get-menu-item-label"), 1, func(a []any) any {
-		item := mustGet(pre("get-menu-item-label"), "GUI menu item ID", a, 0).(*fyne.MenuItem)
+	interp.Def(fnGetMenuItemLabel, 1, func(a []any) any {
+		item := mustGet(fnGetMenuItemLabel, "GUI menu item ID", a, 0).(*fyne.MenuItem)
 		return item.Label
 	})
 
+	fnSetMenuItemLabel := pre("set-menu-item-label")
 	// (set-menu-item-label <item> <str>)
-	interp.Def(pre("set-menu-item-label"), 2, func(a []any) any {
-		item := mustGet(pre("set-menu-item-label"), "GUI menu item ID", a, 0).(*fyne.MenuItem)
+	interp.Def(fnSetMenuItemLabel, 2, func(a []any) any {
+		item := mustGet(fnSetMenuItemLabel, "GUI menu item ID", a, 0).(*fyne.MenuItem)
 		item.Label = a[1].(string)
 		return z3.Void
 	})
 
+	fnNewMenuItemSeparator := pre("new-menu-item-separator")
 	// (new-menu-item-separator) => menu item ID
-	interp.Def(pre("new-menu-item-separator"), 0, func(a []any) any {
+	interp.Def(fnNewMenuItemSeparator, 0, func(a []any) any {
 		return put(fyne.NewMenuItemSeparator())
 	})
 
+	fnNewMenuAlt := pre("new-menu*")
 	// (new-menu* <str> [<item>...]) => menu* ID
-	interp.Def(pre("new-menu*"), -1, func(a []any) any {
+	interp.Def(fnNewMenuAlt, -1, func(a []any) any {
 		li := a[0].(*z3.Cell)
 		label := li.Car.(string)
 		li = li.CdrCell()
 		items := make([]*fyne.MenuItem, 0)
-		fname := pre("new-menu*")
 		for li != z3.Nil {
-			item := mustGet1(fname, "GUI menu item ID", li.Car).(*fyne.MenuItem)
+			item := mustGet1(fnNewMenuAlt, "GUI menu item ID", li.Car).(*fyne.MenuItem)
 			items = append(items, item)
 			li = li.CdrCell()
 		}
 		return put(fyne.NewMenu(label, items...))
 	})
 
+	fnRefreshMenuAlt := pre("refresh-menu*")
 	// (refresh-menu* <menu>)
-	interp.Def(pre("refresh-menu*"), 1, func(a []any) any {
-		menu := mustGet(pre("refresh-menu"), "GUI menu item ID", a, 0).(*fyne.Menu)
+	interp.Def(fnRefreshMenuAlt, 1, func(a []any) any {
+		menu := mustGet(fnRefreshMenuAlt, "GUI menu item ID", a, 0).(*fyne.Menu)
 		menu.Refresh()
 		return z3.Void
 	})
 
+	fnNewMenu := pre("new-menu")
 	// (new-menu <menu>) => menu ID
-	interp.Def(pre("new-menu"), 1, func(a []any) any {
-		m := mustGet(pre("new-menu"), "GUI menu* ID", a, 0).(*fyne.Menu)
+	interp.Def(fnNewMenu, 1, func(a []any) any {
+		m := mustGet(fnNewMenu, "GUI menu* ID", a, 0).(*fyne.Menu)
 		return put(widget.NewMenu(m))
 	})
 
+	fnActivateMenuLastSubmenu := pre("activate-menu-last-submenu")
 	// (activate-menu-last-submenu <menu>) => bool
-	interp.Def(pre("activate-menu-last-submenu"), 1, func(a []any) any {
-		menu := mustGet(pre("activate-menu-last-submenu"), "GUI menu ID", a, 0).(*widget.Menu)
+	interp.Def(fnActivateMenuLastSubmenu, 1, func(a []any) any {
+		menu := mustGet(fnActivateMenuLastSubmenu, "GUI menu ID", a, 0).(*widget.Menu)
 		return z3.AsLispBool(menu.ActivateLastSubmenu())
 	})
 
-	// (activate-meno u-next <menu>)
-	interp.Def(pre("activate-menu-next"), 1, func(a []any) any {
-		menu := mustGet(pre("activate-menu-next"), "GUI menu ID", a, 0).(*widget.Menu)
+	fnActivateMenuNext := pre("activate-menu-next")
+	// (activate-menu-next <menu>)
+	interp.Def(fnActivateMenuNext, 1, func(a []any) any {
+		menu := mustGet(fnActivateMenuNext, "GUI menu ID", a, 0).(*widget.Menu)
 		menu.ActivateNext()
 		return z3.Void
 	})
 
+	fnActivateMenuPrevious := pre("activate-menu-previous")
 	// (activate-menu-previous <menu>)
-	interp.Def(pre("activate-menu-previous"), 1, func(a []any) any {
-		menu := mustGet(pre("activate-menu-previous"), "GUI menu ID", a, 0).(*widget.Menu)
+	interp.Def(fnActivateMenuPrevious, 1, func(a []any) any {
+		menu := mustGet(fnActivateMenuPrevious, "GUI menu ID", a, 0).(*widget.Menu)
 		menu.ActivatePrevious()
 		return z3.Void
 	})
 
+	fnDeactivateMenuChild := pre("deactivate-menu-child")
 	// (deactivate-menu-child <menu>)
-	interp.Def(pre("deactivate-menu-child"), 1, func(a []any) any {
-		menu := mustGet(pre("deactivate-menu-child"), "GUI menu ID", a, 0).(*widget.Menu)
+	interp.Def(fnDeactivateMenuChild, 1, func(a []any) any {
+		menu := mustGet(fnDeactivateMenuChild, "GUI menu ID", a, 0).(*widget.Menu)
 		menu.DeactivateChild()
 		return z3.Void
 	})
 
+	fnDeactivateMenuLastSubmenu := pre("deactivate-menu-last-submenu")
 	// (deactivate-menu-last-submenu <menu>)
-	interp.Def(pre("deactivate-menu-last-submenu"), 1, func(a []any) any {
-		menu := mustGet(pre("deactivate-menu-last-submenu"), "GUI menu ID", a, 0).(*widget.Menu)
+	interp.Def(fnDeactivateMenuLastSubmenu, 1, func(a []any) any {
+		menu := mustGet(fnDeactivateMenuLastSubmenu, "GUI menu ID", a, 0).(*widget.Menu)
 		menu.DeactivateLastSubmenu()
 		return z3.Void
 	})
 
+	fnTriggerMenuLast := pre("trigger-menu-last")
 	// (trigger-menu-last <menu>)
-	interp.Def(pre("trigger-menu-last"), 1, func(a []any) any {
-		menu := mustGet(pre("trigger-menu-last"), "GUI menu ID", a, 0).(*widget.Menu)
+	interp.Def(fnTriggerMenuLast, 1, func(a []any) any {
+		menu := mustGet(fnTriggerMenuLast, "GUI menu ID", a, 0).(*widget.Menu)
 		menu.TriggerLast()
 		return z3.Void
 	})
 
+	fnNewMainMenu := pre("new-main-menu")
 	// (new-main-menu <menu> ...) => main menu ID
-	interp.Def(pre("new-main-menu"), -1, func(a []any) any {
+	interp.Def(fnNewMainMenu, -1, func(a []any) any {
 		items := make([]*fyne.Menu, 0)
 		li := a[0].(*z3.Cell)
 		for li != z3.Nil {
@@ -1551,23 +1649,26 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(fyne.NewMainMenu(items...))
 	})
 
+	fnRefreshMainMenu := pre("refresh-main-menu")
 	// (refresh-main-menu <menu>)
-	interp.Def(pre("refresh-main-menu"), 1, func(a []any) any {
-		menu := mustGet(pre("refresh-main-menu"), "GUI main menu ID", a, 0).(*fyne.MainMenu)
+	interp.Def(fnRefreshMainMenu, 1, func(a []any) any {
+		menu := mustGet(fnRefreshMainMenu, "GUI main menu ID", a, 0).(*fyne.MainMenu)
 		menu.Refresh()
 		return z3.Void
 	})
 
 	// IMAGE
 
+	fnNewImageFromResource := pre("new-image-from-resource")
 	// (new-image-from-resource <resource>)
-	interp.Def(pre("new-image-from-resource"), 1, func(a []any) any {
-		res := mustGet(pre("new-image-from-resource"), "GUI resource ID", a, 0)
+	interp.Def(fnNewImageFromResource, 1, func(a []any) any {
+		res := mustGet(fnNewImageFromResource, "GUI resource ID", a, 0)
 		return put(canvas.NewImageFromResource(res.(fyne.Resource)))
 	})
 
+	fnNewImageFromFile := pre("new-image-from-file")
 	// (new-image-from-file <path-string>)
-	interp.Def(pre("new-image-from-file"), 1, func(a []any) any {
+	interp.Def(fnNewImageFromFile, 1, func(a []any) any {
 		return put(canvas.NewImageFromFile(a[0].(string)))
 	})
 
@@ -1575,8 +1676,9 @@ func DefGUI(interp *z3.Interp, config Config) {
 
 	// color helpers
 
+	fnRGBA := pre("nrgba")
 	// (nrgba r g b a) => NRGBA color
-	interp.Def(pre("nrgba"), 4, func(a []any) any {
+	interp.Def(fnRGBA, 4, func(a []any) any {
 		r := z3.ToUInt8(a[0])
 		g := z3.ToUInt8(a[1])
 		b := z3.ToUInt8(a[2])
@@ -1584,8 +1686,9 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(color.NRGBA{R: r, G: g, B: b, A: alpha})
 	})
 
+	fnNRGBA := pre("nrgba64")
 	// (nrgba64 r g b a) => NRGBA64 color
-	interp.Def(pre("nrgba64"), 4, func(a []any) any {
+	interp.Def(fnNRGBA, 4, func(a []any) any {
 		r := z3.ToUInt16(a[0])
 		g := z3.ToUInt16(a[1])
 		b := z3.ToUInt16(a[2])
@@ -1593,10 +1696,11 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(color.NRGBA64{R: r, G: g, B: b, A: alpha})
 	})
 
+	fnNewRectangle := pre("new-rectangle")
 	// (new-rectangle <fill-color> [<width> <height>] [<position>] [<stroke-color>] [<stroke-width>] [<corner-radius>])
-	interp.Def(pre("new-rectangle"), -1, func(a []any) any {
+	interp.Def(fnNewRectangle, -1, func(a []any) any {
 		li := a[0].(*z3.Cell)
-		fillColor := mustGet1(pre("new-rectangle"), "GUI nrgba color ID", li.Car).(color.Color)
+		fillColor := mustGet1(fnNewRectangle, "GUI nrgba color ID", li.Car).(color.Color)
 		rect := canvas.NewRectangle(fillColor)
 		li = li.CdrCell()
 		if li == z3.Nil {
@@ -1610,7 +1714,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 		if li == z3.Nil {
 			return put(rect)
 		}
-		pos, ok := MustGetPosition(pre("new-rectangle"), 3, li.Car)
+		pos, ok := MustGetPosition(fnNewRectangle, 3, li.Car)
 		if ok {
 			rect.Move(pos)
 		}
@@ -1618,7 +1722,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 		if li == z3.Nil {
 			return put(rect)
 		}
-		strokeColor := mustGet1(pre("new-rectangle"), "GUI nrgba color ID", li.Car).(color.Color)
+		strokeColor := mustGet1(fnNewRectangle, "GUI nrgba color ID", li.Car).(color.Color)
 		rect.StrokeColor = strokeColor
 		li = li.CdrCell()
 		if li == z3.Nil {
@@ -1633,24 +1737,26 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(rect)
 	})
 
-	interp.Def(pre("set-rectangle-min-size"), 3, func(a []any) any {
-		r := mustGet1(pre("set-rectangle-min-size"), "GUI rectangle ID", a[0])
+	fnSetRectangleMinSize := pre("set-rectangle-min-size")
+	interp.Def(fnSetRectangleMinSize, 3, func(a []any) any {
+		r := mustGet1(fnSetRectangleMinSize, "GUI rectangle ID", a[0])
 		w := z3.ToFloat64(a[1])
 		h := z3.ToFloat64(a[2])
 		r.(*canvas.Rectangle).SetMinSize(fyne.NewSize(float32(w), float32(h)))
 		return z3.Void
 	})
 
+	fnNewCircle := pre("new-circle")
 	// (new-circle <fill-color> [<pos1>] [<pos2>] [<stroke-color>] [<stroke-width>])
-	interp.Def(pre("new-circle"), -1, func(a []any) any {
+	interp.Def(fnNewCircle, -1, func(a []any) any {
 		li := a[0].(*z3.Cell)
-		fillColor := mustGet1(pre("new-circle"), "GUI nrgba color ID", li.Car).(color.Color)
+		fillColor := mustGet1(fnNewCircle, "GUI nrgba color ID", li.Car).(color.Color)
 		circle := canvas.NewCircle(fillColor)
 		li = li.CdrCell()
 		if li == z3.Nil {
 			return put(circle)
 		}
-		pos1, ok := MustGetPosition(pre("new-circle"), 0, li.Car)
+		pos1, ok := MustGetPosition(fnNewCircle, 0, li.Car)
 		if ok {
 			circle.Position1 = pos1
 		}
@@ -1658,7 +1764,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 		if li == z3.Nil {
 			return put(circle)
 		}
-		pos2, ok := MustGetPosition(pre("new-circle"), 1, li.Car)
+		pos2, ok := MustGetPosition(fnNewCircle, 1, li.Car)
 		if ok {
 			circle.Position2 = pos2
 		}
@@ -1666,7 +1772,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 		if li == z3.Nil {
 			return put(circle)
 		}
-		strokeColor := mustGet1(pre("new-circle"), "GUI nrgba color ID", li.Car).(color.Color)
+		strokeColor := mustGet1(fnNewCircle, "GUI nrgba color ID", li.Car).(color.Color)
 		circle.StrokeColor = strokeColor
 		li = li.CdrCell()
 		if li == z3.Nil {
@@ -1676,16 +1782,17 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(circle)
 	})
 
+	fnNewLine := pre("new-line")
 	// (new-line <fill-color> [<pos1>] [<pos2>] [<stroke-color>] [<stroke-width>])
-	interp.Def(pre("new-line"), -1, func(a []any) any {
+	interp.Def(fnNewLine, -1, func(a []any) any {
 		li := a[0].(*z3.Cell)
-		fillColor := mustGet1(pre("new-line"), "GUI nrgba color ID", li.Car).(color.Color)
+		fillColor := mustGet1(fnNewLine, "GUI nrgba color ID", li.Car).(color.Color)
 		line := canvas.NewLine(fillColor)
 		li = li.CdrCell()
 		if li == z3.Nil {
 			return put(line)
 		}
-		pos1, ok := MustGetPosition(pre("new-line"), 0, li.Car)
+		pos1, ok := MustGetPosition(fnNewLine, 0, li.Car)
 		if ok {
 			line.Position1 = pos1
 		}
@@ -1693,7 +1800,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 		if li == z3.Nil {
 			return put(line)
 		}
-		pos2, ok := MustGetPosition(pre("new-line"), 1, li.Car)
+		pos2, ok := MustGetPosition(fnNewLine, 1, li.Car)
 		if ok {
 			line.Position2 = pos2
 		}
@@ -1701,7 +1808,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 		if li == z3.Nil {
 			return put(line)
 		}
-		strokeColor := mustGet1(pre("new-line"), "GUI nrgba color ID", li.Car).(color.Color)
+		strokeColor := mustGet1(fnNewLine, "GUI nrgba color ID", li.Car).(color.Color)
 		line.StrokeColor = strokeColor
 		li = li.CdrCell()
 		if li == z3.Nil {
@@ -1711,37 +1818,42 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(line)
 	})
 
-	interp.Def(pre("new-text"), 2, func(a []any) any {
+	fnNewText := pre("new-text")
+	interp.Def(fnNewText, 2, func(a []any) any {
 		s := a[0].(string)
-		color := mustGet1(pre("new-text"), "GUI nrgba color ID", a[1]).(color.Color)
+		color := mustGet1(fnNewText, "GUI nrgba color ID", a[1]).(color.Color)
 		return put(canvas.NewText(s, color))
 	})
 
-	interp.Def(pre("set-text-alignment"), 2, func(a []any) any {
-		text := mustGet1(pre("set-text-alignment"), "GUI text ID", a[0])
-		align, ok := MustGetTextAlign(pre("set-text-alignment"), 1, a[1])
+	fnSetTextAlignment := pre("set-text-alignment")
+	interp.Def(fnSetTextAlignment, 2, func(a []any) any {
+		text := mustGet1(fnSetTextAlignment, "GUI text ID", a[0])
+		align, ok := MustGetTextAlign(fnSetTextAlignment, 1, a[1])
 		if ok {
 			text.(*canvas.Text).Alignment = align
 		}
 		return z3.Void
 	})
 
-	interp.Def(pre("set-text-size"), 2, func(a []any) any {
-		text := mustGet1(pre("set-text-size"), "GUI text ID", a[0])
+	fnSetTextSize := pre("set-text-size")
+	interp.Def(fnSetTextSize, 2, func(a []any) any {
+		text := mustGet1(fnSetTextSize, "GUI text ID", a[0])
 		text.(*canvas.Text).TextSize = float32(z3.ToFloat64(a[1]))
 		return z3.Void
 	})
 
-	interp.Def(pre("set-text-style"), 2, func(a []any) any {
-		text := mustGet1(pre("set-text-style"), "GUI text ID", a[0]).(*canvas.Text)
-		style := MustGetTextStyle(pre("set-text-style"), 1, a[1])
+	fnSetTextStyle := pre("set-text-style")
+	interp.Def(fnSetTextStyle, 2, func(a []any) any {
+		text := mustGet1(fnSetTextStyle, "GUI text ID", a[0]).(*canvas.Text)
+		style := MustGetTextStyle(fnSetTextStyle, 1, a[1])
 		text.TextStyle = style
 		return z3.Void
 	})
 
+	fnNewRasterWithPixels := pre("new-raster-with-pixels")
 	// (new-raster-with-pixels <pixel-proc>) where <pixel-proc> takes x, y, w, h and returns
 	// a color list (NOT an nrgba64 color, for performance reasons this is created at the Go side).
-	interp.Def(pre("new-raster-with-pixels"), 1, func(a []any) any {
+	interp.Def(fnNewRasterWithPixels, 1, func(a []any) any {
 		proc := a[0].(*z3.Closure)
 		id, zid := newID()
 		raster := canvas.NewRasterWithPixels(func(x, y, w, h int) color.Color {
@@ -1759,10 +1871,11 @@ func DefGUI(interp *z3.Interp, config Config) {
 
 	// CANVAS
 
+	fnAddCanvasShortcut := pre("add-canvas-shortcut")
 	// (add-canvas-shortcut canvas shortcut proc)
-	interp.Def(pre("add-canvas-shortcut"), 3, func(a []any) any {
-		canvas := mustGet(pre("add-canvas-shortcut"), "GUI canvas ID", a, 0).(fyne.Canvas)
-		key, modifier := MustGetShortcut(pre("add-canvas-shortcut"), a[1].(*z3.Cell))
+	interp.Def(fnAddCanvasShortcut, 3, func(a []any) any {
+		canvas := mustGet(fnAddCanvasShortcut, "GUI canvas ID", a, 0).(fyne.Canvas)
+		key, modifier := MustGetShortcut(fnAddCanvasShortcut, a[1].(*z3.Cell))
 		proc := a[2].(*z3.Closure)
 		shortcut := &desktop.CustomShortcut{KeyName: key, Modifier: modifier}
 		canvas.AddShortcut(shortcut, func(sc fyne.Shortcut) {
@@ -1772,18 +1885,20 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	fnRemoveCanvasShortcut := pre("remove-canvas-shortcut")
 	// (remove-canvas-shortcut canvas shortcut)
-	interp.Def(pre("remove-canvas-shortcut"), 2, func(a []any) any {
-		canvas := mustGet(pre("remove-canvas-shortcut"), "GUI canvas ID", a, 0).(fyne.Canvas)
-		key, modifier := MustGetShortcut(pre("remove-canvas-shortcut"), a[1].(*z3.Cell))
+	interp.Def(fnRemoveCanvasShortcut, 2, func(a []any) any {
+		canvas := mustGet(fnRemoveCanvasShortcut, "GUI canvas ID", a, 0).(fyne.Canvas)
+		key, modifier := MustGetShortcut(fnRemoveCanvasShortcut, a[1].(*z3.Cell))
 		shortcut := &desktop.CustomShortcut{KeyName: key, Modifier: modifier}
 		canvas.RemoveShortcut(shortcut)
 		return z3.Void
 	})
 
+	fnSetCanvasOnTypedKey := pre("set-canvas-on-typed-key")
 	// (set-canvas-on-typed-key canvas proc)
-	interp.Def(pre("set-canvas-on-typed-key"), 2, func(a []any) any {
-		canvas := mustGet(pre("set-canvas-on-typed-key"), "GUI canvas ID", a, 0).(fyne.Canvas)
+	interp.Def(fnSetCanvasOnTypedKey, 2, func(a []any) any {
+		canvas := mustGet(fnSetCanvasOnTypedKey, "GUI canvas ID", a, 0).(fyne.Canvas)
 		proc := a[1].(*z3.Closure)
 		canvas.SetOnTypedKey(func(evt *fyne.KeyEvent) {
 			qq := z3.QqQuote(KeyNameToSymbol(evt.Name))
@@ -1794,9 +1909,10 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	fnSetCanvasOnTypedRune := pre("set-canvas-on-typed-rune")
 	// (set-canvas-on-typed-rune canvas proc)
-	interp.Def(pre("set-canvas-on-typed-rune"), 2, func(a []any) any {
-		canvas := mustGet(pre("set-canvas-on-typed-rune"), "GUI canvas ID", a, 0).(fyne.Canvas)
+	interp.Def(fnSetCanvasOnTypedRune, 2, func(a []any) any {
+		canvas := mustGet(fnSetCanvasOnTypedRune, "GUI canvas ID", a, 0).(fyne.Canvas)
 		proc := a[1].(*z3.Closure)
 		canvas.SetOnTypedRune(func(r rune) {
 			li := &z3.Cell{Car: proc, Cdr: &z3.Cell{Car: string(r), Cdr: z3.Nil}}
@@ -1806,10 +1922,11 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	fnFocusCanvasObject := pre("focus-canvas-object")
 	// (focus-canvas-object canvas object)
-	interp.Def(pre("focus-canvas-object"), 2, func(a []any) any {
-		canvas := mustGet(pre("focus-canvas-object"), "GUI canvas ID", a, 0).(fyne.Canvas)
-		obj, ok := mustGet(pre("focus-canvas-object"), "GUI focusable canvas object ID", a, 1).(fyne.Focusable)
+	interp.Def(fnFocusCanvasObject, 2, func(a []any) any {
+		canvas := mustGet(fnFocusCanvasObject, "GUI canvas ID", a, 0).(fyne.Canvas)
+		obj, ok := mustGet(fnFocusCanvasObject, "GUI focusable canvas object ID", a, 1).(fyne.Focusable)
 		if !ok {
 			panic(fmt.Sprintf("%v: expected a focusable canvas object as second argument, but the given canvas object cannot take focus: %v", pre("focus-canvas-object"), a[1]))
 		}
@@ -1817,30 +1934,34 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	fnFocusNextCanvasObject := pre("focus-next-canvas-object")
 	// (focus-next-canvas-object canvas)
-	interp.Def(pre("focus-next-canvas-object"), 1, func(a []any) any {
-		canvas := mustGet(pre("focus-next-canvas-object"), "GUI canvas ID", a, 0).(fyne.Canvas)
+	interp.Def(fnFocusNextCanvasObject, 1, func(a []any) any {
+		canvas := mustGet(fnFocusNextCanvasObject, "GUI canvas ID", a, 0).(fyne.Canvas)
 		canvas.FocusNext()
 		return z3.Void
 	})
 
+	fnUnfocusCanvasObjects := pre("unfocus-canvas-objects")
 	// (unfocus-canvas-objects canvas)
-	interp.Def(pre("unfocus-canvas-objects"), 1, func(a []any) any {
-		canvas := mustGet(pre("unfocus-canvas-objects"), "GUI canvas ID", a, 0).(fyne.Canvas)
+	interp.Def(fnUnfocusCanvasObjects, 1, func(a []any) any {
+		canvas := mustGet(fnUnfocusCanvasObjects, "GUI canvas ID", a, 0).(fyne.Canvas)
 		canvas.Unfocus()
 		return z3.Void
 	})
 
+	fnFocusPreviousCanvasObject := pre("focus-previous-canvas-object")
 	// (focus-previous-canvas-object canvas)
-	interp.Def(pre("focus-previous-canvas-object"), 1, func(a []any) any {
-		canvas := mustGet(pre("focus-previous-canvas-object"), "GUI canvas ID", a, 0).(fyne.Canvas)
+	interp.Def(fnFocusPreviousCanvasObject, 1, func(a []any) any {
+		canvas := mustGet(fnFocusPreviousCanvasObject, "GUI canvas ID", a, 0).(fyne.Canvas)
 		canvas.FocusPrevious()
 		return z3.Void
 	})
 
+	fnGetFocusedCanvasObject := pre("get-focused-canvas-object")
 	// (get-focused-canvas-object canvas) => int or nil
-	interp.Def(pre("get-focused-canvas-object"), 1, func(a []any) any {
-		canvas := mustGet(pre("get-focused-canvas-object"), "GUI canvas ID", a, 0).(fyne.Canvas)
+	interp.Def(fnGetFocusedCanvasObject, 1, func(a []any) any {
+		canvas := mustGet(fnGetFocusedCanvasObject, "GUI canvas ID", a, 0).(fyne.Canvas)
 		focused := canvas.Focused()
 		if focused == nil {
 			return z3.Nil
@@ -1857,44 +1978,50 @@ func DefGUI(interp *z3.Interp, config Config) {
 
 	// CANVAS OBJECT (polymorphic methods)
 
+	fnDisableObject := pre("disable-object")
 	// (disable-object <obj>)
-	interp.Def(pre("disable-object"), 2, func(a []any) any {
-		obj := mustGet(pre("disable-object"), "GUI disableable object ID", a, 0)
+	interp.Def(fnDisableObject, 2, func(a []any) any {
+		obj := mustGet(fnDisableObject, "GUI disableable object ID", a, 0)
 		obj.(fyne.Disableable).Disable()
 		return z3.Void
 	})
 
+	fnEnableObject := pre("enable-object")
 	// (enable-object <obj>)
-	interp.Def(pre("enable-object"), 2, func(a []any) any {
-		obj := mustGet(pre("enable-object"), "GUI disableable object ID", a, 0)
+	interp.Def(fnEnableObject, 2, func(a []any) any {
+		obj := mustGet(fnEnableObject, "GUI disableable object ID", a, 0)
 		obj.(fyne.Disableable).Enable()
 		return z3.Void
 	})
 
+	fnHideObject := pre("hide-object")
 	// (hide-object <obj>)
-	interp.Def(pre("hide-object"), 2, func(a []any) any {
-		obj := mustGet(pre("hide-object"), "GUI widget ID", a, 0)
+	interp.Def(fnHideObject, 2, func(a []any) any {
+		obj := mustGet(fnHideObject, "GUI widget ID", a, 0)
 		obj.(fyne.Widget).Hide()
 		return z3.Void
 	})
 
+	fnShowObject := pre("show-object")
 	// (show-object <obj>)
-	interp.Def(pre("show-object"), 2, func(a []any) any {
-		obj := mustGet(pre("show-object"), "GUI widget ID", a, 0)
+	interp.Def(fnShowObject, 2, func(a []any) any {
+		obj := mustGet(fnShowObject, "GUI widget ID", a, 0)
 		obj.(fyne.Widget).Show()
 		return z3.Void
 	})
 
+	fnObjectDisabled := pre("object-disabled?")
 	// (object-disabled? <obj>) => bool
-	interp.Def(pre("object-disabled?"), 2, func(a []any) any {
-		obj := mustGet(pre("object-disabled?"), "GUI disableable object ID", a, 0)
+	interp.Def(fnObjectDisabled, 2, func(a []any) any {
+		obj := mustGet(fnObjectDisabled, "GUI disableable object ID", a, 0)
 		return z3.AsLispBool(obj.(fyne.Disableable).Disabled())
 	})
 
+	fnMoveObject := pre("move-object")
 	// (move-object <obj> <pos>) attempts to move a GUI object (polymorphic)
-	interp.Def(pre("move-object"), 2, func(a []any) any {
-		obj := mustGet(pre("move-object"), "GUI canvas object ID", a, 0)
-		pos, ok := MustGetPosition(pre("gui-move"), 1, a[1])
+	interp.Def(fnMoveObject, 2, func(a []any) any {
+		obj := mustGet(fnMoveObject, "GUI canvas object ID", a, 0)
+		pos, ok := MustGetPosition(fnMoveObject, 1, a[1])
 		if !ok {
 			return z3.Void
 		}
@@ -1902,68 +2029,77 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	fnResizeObject := pre("resize-object")
 	// (resize-object <obj> <w> <h>) attempts to resize a GUI object (polymorphic)
-	interp.Def(pre("resize-object"), 3, func(a []any) any {
-		obj := mustGet(pre("resize-object"), "GUI canvas object ID", a, 0)
+	interp.Def(fnResizeObject, 3, func(a []any) any {
+		obj := mustGet(fnResizeObject, "GUI canvas object ID", a, 0)
 		w := float32(z3.ToFloat64(a[1]))
 		h := float32(z3.ToFloat64(a[2]))
 		obj.(fyne.CanvasObject).Resize(fyne.NewSize(w, h))
 		return z3.Void
 	})
 
+	fnGetObjectSize := pre("get-object-size")
 	// (get-object-size <obj>) => li
-	interp.Def(pre("get-object-size"), 1, func(a []any) any {
-		obj := mustGet(pre("get-object-size"), "GUI canvas object ID", a, 0)
+	interp.Def(fnGetObjectSize, 1, func(a []any) any {
+		obj := mustGet(fnGetObjectSize, "GUI canvas object ID", a, 0)
 		size := obj.(fyne.CanvasObject).Size()
 		return &z3.Cell{Car: goarith.AsNumber(float64(size.Width)),
 			Cdr: &z3.Cell{Car: goarith.AsNumber(float64(size.Height)), Cdr: z3.Nil}}
 	})
 
+	fnGetObjectMinSize := pre("get-object-min-size")
 	// (get-object-min-size <obj>) => li
-	interp.Def(pre("get-object-min-size"), 1, func(a []any) any {
-		obj := mustGet(pre("get-object-min-size"), "GUI canvas object ID", a, 0)
+	interp.Def(fnGetObjectMinSize, 1, func(a []any) any {
+		obj := mustGet(fnGetObjectMinSize, "GUI canvas object ID", a, 0)
 		size := obj.(fyne.CanvasObject).MinSize()
 		return &z3.Cell{Car: goarith.AsNumber(float64(size.Width)),
 			Cdr: &z3.Cell{Car: goarith.AsNumber(float64(size.Height)), Cdr: z3.Nil}}
 	})
 
+	fnGetObjectPosition := pre("get-object-position")
 	// (get-object-position <obj>) => li
-	interp.Def(pre("get-object-position"), 1, func(a []any) any {
-		obj := mustGet(pre("get-object-position"), "GUI canvas object ID", a, 0)
+	interp.Def(fnGetObjectPosition, 1, func(a []any) any {
+		obj := mustGet(fnGetObjectPosition, "GUI canvas object ID", a, 0)
 		pos := obj.(fyne.CanvasObject).Position()
 		return &z3.Cell{Car: goarith.AsNumber(float64(pos.X)),
 			Cdr: &z3.Cell{Car: goarith.AsNumber(float64(pos.Y)), Cdr: z3.Nil}}
 	})
 
+	fnObjectVisible := pre("object-visible?")
 	// (object-visible? <obj>) => bool
-	interp.Def(pre("object-visible?"), 1, func(a []any) any {
-		obj := mustGet(pre("object-visible?"), "GUI canvas object ID", a, 0)
+	interp.Def(fnObjectVisible, 1, func(a []any) any {
+		obj := mustGet(fnObjectVisible, "GUI canvas object ID", a, 0)
 		return z3.AsLispBool(obj.(fyne.CanvasObject).Visible())
 	})
 
+	fnRefreshObject := pre("refresh-object")
 	// (refresh-object <obj>)
-	interp.Def(pre("refresh-object"), 1, func(a []any) any {
-		obj := mustGet(pre("refresh-object"), "GUI canvas object ID", a, 0)
+	interp.Def(fnRefreshObject, 1, func(a []any) any {
+		obj := mustGet(fnRefreshObject, "GUI canvas object ID", a, 0)
 		obj.(fyne.CanvasObject).Refresh()
 		return z3.Void
 	})
 
 	// PROGRESSBAR
 
+	fnNewProgressBar := pre("new-progress-bar")
 	// (new-progress-bar)
-	interp.Def(pre("new-progress-bar"), 0, func(a []any) any {
+	interp.Def(fnNewProgressBar, 0, func(a []any) any {
 		return put(widget.NewProgressBar())
 	})
 
+	fnNewInfiniteProgressBar := pre("new-infinite-progress-bar")
 	// (new-infinite-progress-bar)
-	interp.Def(pre("new-infinite-progress-bar"), 0, func(a []any) any {
+	interp.Def(fnNewInfiniteProgressBar, 0, func(a []any) any {
 		return put(widget.NewProgressBarInfinite())
 	})
 
+	fnSetProgressBar := pre("set-progress-bar")
 	// (set-progress-bar <bar> <value>|[<selector> <value>])
-	interp.Def(pre("set-progress-bar"), -1, func(a []any) any {
+	interp.Def(fnSetProgressBar, -1, func(a []any) any {
 		li := a[0].(*z3.Cell)
-		bar := mustGet1(pre("set-progress-bar"), "GUI progress-bar ID", li.Car).(*widget.ProgressBar)
+		bar := mustGet1(fnSetProgressBar, "GUI progress-bar ID", li.Car).(*widget.ProgressBar)
 		li = li.CdrCell()
 		if sym, ok := li.Car.(*z3.Sym); ok {
 			li = li.CdrCell()
@@ -1983,11 +2119,11 @@ func DefGUI(interp *z3.Interp, config Config) {
 					if s, ok := result.(string); ok {
 						return s
 					}
-					panic(fmt.Sprintf(pre("set-progress-bar: formatter callback is expected to return a string but it returned %v"), z3.Str(result)))
+					panic(fmt.Sprintf(fnSetProgressBar+": formatter callback is expected to return a string but it returned %v", z3.Str(result)))
 				}
 				bar.TextFormatter = fn
 			default:
-				panic(fmt.Sprintf(pre("set-progress-bar: expected selector in '(value min max formatter), given %v"), sym.String()))
+				panic(fmt.Sprintf(fnSetProgressBar+": expected selector in '(value min max formatter), given %v", sym.String()))
 			}
 			return z3.Void
 		}
@@ -1995,17 +2131,19 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	fnGetProgressBarValue := pre("get-progress-bar-value")
 	// (get-progress-bar-value <bar>)
-	interp.Def(pre("get-progress-bar-value"), 1, func(a []any) any {
-		bar := mustGet(pre("get-progress-bar-value"), "GUI progress-bar ID", a, 0)
+	interp.Def(fnGetProgressBarValue, 1, func(a []any) any {
+		bar := mustGet(fnGetProgressBarValue, "GUI progress-bar ID", a, 0)
 		n := bar.(*widget.ProgressBar).Value
 		return goarith.AsNumber(n)
 	})
 
 	// SLIDER
 
+	fnNewSlider := pre("new-slider")
 	// (new-slider <min> <max> <change-cb>)
-	interp.Def(pre("new-slider"), 3, func(a []any) any {
+	interp.Def(fnNewSlider, 3, func(a []any) any {
 		proc := a[2].(*z3.Closure)
 		id, zid := newID()
 		fn := func(v float64) {
@@ -2018,27 +2156,30 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return zid
 	})
 
+	fnSetSliderValue := pre("set-slider-value")
 	// (set-slider-value <slider> <value>)
-	interp.Def(pre("set-slider-value"), 2, func(a []any) any {
-		slider := mustGet(pre("set-slider-value"), "GUI slider ID", a, 0).(*widget.Slider)
+	interp.Def(fnSetSliderValue, 2, func(a []any) any {
+		slider := mustGet(fnSetSliderValue, "GUI slider ID", a, 0).(*widget.Slider)
 		slider.SetValue(z3.ToFloat64(a[1]))
 		return z3.Void
 	})
 
 	// ICON
 
+	fnNewIcon := pre("new-icon")
 	// (new-icon <resource>)
-	interp.Def(pre("new-icon"), 1, func(a []any) any {
-		res := mustGet(pre("new-icon"), "GUI resource ID", a, 0)
+	interp.Def(fnNewIcon, 1, func(a []any) any {
+		res := mustGet(fnNewIcon, "GUI resource ID", a, 0)
 		return put(widget.NewIcon(res.(fyne.Resource)))
 	})
 
 	// MISC
 
-	interp.Def(pre("create-lorem-ipsum"), 3, func(a []any) any {
+	fnCreateLoremIpsum := pre("create-lorem-ipsum")
+	interp.Def(fnCreateLoremIpsum, 3, func(a []any) any {
 		sym := a[0].(*z3.Sym)
-		nmin := z3.ToInt(pre("create-lorem-ipsum"), a[1])
-		nmax := z3.ToInt(pre("create-lorem-ipsum"), a[2])
+		nmin := z3.ToInt(fnCreateLoremIpsum, a[1])
+		nmax := z3.ToInt(fnCreateLoremIpsum, a[2])
 		switch sym {
 		case LoremWord:
 			return lorem.Word(nmin, nmax)
@@ -2052,21 +2193,24 @@ func DefGUI(interp *z3.Interp, config Config) {
 		}
 	})
 
+	fnForgetGUIObject := pre("forget-gui-object")
 	// (forget-gui-object <id>) clears any internal association with the given GUI object
 	// but does not destroy resources associated with it. WARN: Internal use only, use with care!
-	interp.Def(pre("forget-gui-object"), 1, func(a []any) any {
+	interp.Def(fnForgetGUIObject, 1, func(a []any) any {
 		clear(a[0])
 		return z3.Void
 	})
 
+	fnCloseGUI := pre("close-gui")
 	// (close-gui) closes the GUI, none of its elements can be used again and the application
 	// must shut down all GUI activity. Open windows are closed.
-	interp.Def(pre("close-gui"), 0, func(a []any) any {
+	interp.Def(fnCloseGUI, 0, func(a []any) any {
 		CloseGUI()
 		return z3.Void
 	})
 
-	interp.Def(pre("get-clipboard-content"), 0, func(a []any) any {
+	fnGetClipboardContent := pre("get-clipboard-content")
+	interp.Def(fnGetClipboardContent, 0, func(a []any) any {
 		if !config.ClipboardGetAllowed {
 			panic("getting clipboard content is prohibited by security policy!")
 		}
@@ -2074,7 +2218,8 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return s
 	})
 
-	interp.Def(pre("set-clipboard-content"), 1, func(a []any) any {
+	fnSetClipboardContent := pre("set-clipboard-content")
+	interp.Def(fnSetClipboardContent, 1, func(a []any) any {
 		if !config.ClipboardSetAllowed {
 			panic("setting clipboard content is prohibited by security policy!")
 		}
@@ -2082,7 +2227,8 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
-	interp.Def(pre("get-device-info"), 0, func(a []any) any {
+	fnGetDeviceInfo := pre("get-device-info")
+	interp.Def(fnGetDeviceInfo, 0, func(a []any) any {
 		arr := make([]any, 0)
 		dev := fyne.CurrentDevice()
 		var sym *z3.Sym
@@ -2114,85 +2260,99 @@ func DefGUI(interp *z3.Interp, config Config) {
 
 	// LAYOUTS
 
-	interp.Def(pre("new-spacer"), 0, func(a []any) any {
+	fnNewSpacer := pre("new-spacer")
+	interp.Def(fnNewSpacer, 0, func(a []any) any {
 		return put(layout.NewSpacer())
 	})
 
-	interp.Def(pre("new-hbox-layout"), 0, func(a []any) any {
+	fnNewHBoxLayout := pre("new-hbox-layout")
+	interp.Def(fnNewHBoxLayout, 0, func(a []any) any {
 		return put(layout.NewHBoxLayout())
 	})
 
-	interp.Def(pre("new-vbox-layout"), 0, func(a []any) any {
+	fnNewVBoxLayout := pre("new-vbox-layout")
+	interp.Def(fnNewVBoxLayout, 0, func(a []any) any {
 		return put(layout.NewVBoxLayout())
 	})
 
-	interp.Def(pre("new-hscroll"), 1, func(a []any) any {
-		obj := mustGet1(pre("new-hscroll"), "GUI canvas object ID", a[0]).(fyne.CanvasObject)
+	fnNewHScroll := pre("new-hscroll")
+	interp.Def(fnNewHScroll, 1, func(a []any) any {
+		obj := mustGet1(fnNewHScroll, "GUI canvas object ID", a[0]).(fyne.CanvasObject)
 		return put(container.NewHScroll(obj))
 	})
 
-	interp.Def(pre("new-scroll"), 1, func(a []any) any {
-		obj := mustGet1(pre("new-scroll"), "GUI canvas object ID", a[0]).(fyne.CanvasObject)
+	fnNewScroll := pre("new-scroll")
+	interp.Def(fnNewScroll, 1, func(a []any) any {
+		obj := mustGet1(fnNewScroll, "GUI canvas object ID", a[0]).(fyne.CanvasObject)
 		return put(container.NewScroll(obj))
 	})
 
-	interp.Def(pre("new-vscroll"), 1, func(a []any) any {
-		obj := mustGet1(pre("new-vscroll"), "GUI canvas object ID", a[0]).(fyne.CanvasObject)
+	fnNewVScroll := pre("new-vscroll")
+	interp.Def(fnNewVScroll, 1, func(a []any) any {
+		obj := mustGet1(fnNewVScroll, "GUI canvas object ID", a[0]).(fyne.CanvasObject)
 		return put(container.NewVScroll(obj))
 	})
 
-	interp.Def(pre("get-scroll-offset"), 1, func(a []any) any {
-		obj := mustGet1(pre("get-scroll-offset"), "GUI scroll ID", a[0]).(*container.Scroll)
+	fnGetScrollOffset := pre("get-scroll-offset")
+	interp.Def(fnGetScrollOffset, 1, func(a []any) any {
+		obj := mustGet1(fnGetScrollOffset, "GUI scroll ID", a[0]).(*container.Scroll)
 		offset := obj.Offset
 		return &z3.Cell{Car: goarith.AsNumber(float64(offset.X)),
 			Cdr: &z3.Cell{Car: goarith.AsNumber(float64(offset.Y)), Cdr: z3.Nil}}
 	})
 
-	interp.Def(pre("set-scroll-offset"), 2, func(a []any) any {
-		obj := mustGet1(pre("get-scroll-offset"), "GUI scroll ID", a[0]).(*container.Scroll)
-		offset, ok := MustGetPosition(pre("set-scroll-offset"), 1, a[1])
+	fnSetScrollOffset := pre("set-scroll-offset")
+	interp.Def(fnSetScrollOffset, 2, func(a []any) any {
+		obj := mustGet1(fnSetScrollOffset, "GUI scroll ID", a[0]).(*container.Scroll)
+		offset, ok := MustGetPosition(fnSetScrollOffset, 1, a[1])
 		if !ok {
-			panic(fmt.Sprintf(pre("get-scroll-offset: expected valid position as second argument, given %v"),
+			panic(fmt.Sprintf(fnSetScrollOffset+": expected valid position as second argument, given %v",
 				z3.Str(a[1])))
 		}
 		obj.Offset = offset
 		return z3.Void
 	})
 
-	interp.Def(pre("new-grid-layout"), 1, func(a []any) any {
-		n := z3.ToInt64(pre("new-grid-layout"), a[0])
+	fnNewGridLayout := pre("new-grid-layout")
+	interp.Def(fnNewGridLayout, 1, func(a []any) any {
+		n := z3.ToInt64(fnNewGridLayout, a[0])
 		return put(layout.NewGridLayout(int(n)))
 	})
 
-	interp.Def(pre("new-grid-wrap-layout"), 2, func(a []any) any {
+	fnNewGridWrapLayout := pre("new-grid-wrap-layout")
+	interp.Def(fnNewGridWrapLayout, 2, func(a []any) any {
 		w := z3.ToFloat64(a[0])
 		h := z3.ToFloat64(a[1])
 		return put(layout.NewGridWrapLayout(fyne.NewSize(float32(w), float32(h))))
 	})
 
-	interp.Def(pre("new-form-layout"), 0, func(a []any) any {
+	fnNewFormLayout := pre("new-form-layout")
+	interp.Def(fnNewFormLayout, 0, func(a []any) any {
 		return put(layout.NewFormLayout())
 	})
 
-	interp.Def(pre("new-center-layout"), 0, func(a []any) any {
+	fnNewCenterLayout := pre("new-center-layout")
+	interp.Def(fnNewCenterLayout, 0, func(a []any) any {
 		return put(layout.NewCenterLayout())
 	})
 
-	interp.Def(pre("new-stack-layout"), 0, func(a []any) any {
+	fnNewStackLayout := pre("new-stack-layout")
+	interp.Def(fnNewStackLayout, 0, func(a []any) any {
 		return put(layout.NewStackLayout())
 	})
 
 	// CONTAINER
 
-	interp.Def(pre("new-container"), -1, func(a []any) any {
+	fnNewContainer := pre("new-container")
+	interp.Def(fnNewContainer, -1, func(a []any) any {
 		li := a[0].(*z3.Cell)
-		layout := mustGet1(pre("new-container"), "layout", li.Car)
+		layout := mustGet1(fnNewContainer, "layout", li.Car)
 		li = li.CdrCell()
 		objs := make([]fyne.CanvasObject, 0, len(a)-1)
 		for li != z3.Nil {
 			obj, ok := get(li.Car)
 			if !ok {
-				panic(fmt.Sprintf(pre("new-container: unknown GUI object ID, given %v"), z3.Str(li.Car)))
+				panic(fmt.Sprintf(fnNewContainer+": unknown GUI object ID, given %v", z3.Str(li.Car)))
 			}
 			objs = append(objs, obj.(fyne.CanvasObject))
 			li = li.CdrCell()
@@ -2201,13 +2361,14 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(c)
 	})
 
-	interp.Def(pre("new-container-without-layout"), -1, func(a []any) any {
+	fnNewContainerWithoutLayout := pre("new-container-without-layout")
+	interp.Def(fnNewContainerWithoutLayout, -1, func(a []any) any {
 		li := a[0].(*z3.Cell)
 		objs := make([]fyne.CanvasObject, 0, len(a)-1)
 		for li != z3.Nil {
 			obj, ok := get(li.Car)
 			if !ok {
-				panic(fmt.Sprintf(pre("new-container: unknown GUI object ID, given %v"), z3.Str(li.Car)))
+				panic(fmt.Sprintf(fnNewContainerWithoutLayout+": unknown GUI object ID, given %v", z3.Str(li.Car)))
 			}
 			objs = append(objs, obj.(fyne.CanvasObject))
 			li = li.CdrCell()
@@ -2216,17 +2377,18 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(c)
 	})
 
-	interp.Def(pre("new-border"), -1, func(a []any) any {
+	fnNewBorder := pre("new-border")
+	interp.Def(fnNewBorder, -1, func(a []any) any {
 		arr := make([]fyne.CanvasObject, 0)
 		args := z3.ListToArray(a[0].(*z3.Cell))
 		if len(args) < 4 {
-			panic(fmt.Sprintf("new-border requires at least top, bottom, left, right arguments, given: %v",
+			panic(fmt.Sprintf(fnNewBorder+": requires at least top, bottom, left, right arguments, given: %v",
 				a[0].(*z3.Cell)))
 		}
 		for _, arg := range args {
 			if cell, ok := arg.(*z3.Cell); ok {
 				if cell != z3.Nil {
-					panic(fmt.Sprintf(pre("new-border: expected a valid GUI object ID or nil, given a non-nil list: %v"),
+					panic(fmt.Sprintf(fnNewBorder+": expected a valid GUI object ID or nil, given a non-nil list: %v",
 						z3.Str(arg)))
 				}
 				arr = append(arr, nil)
@@ -2234,80 +2396,87 @@ func DefGUI(interp *z3.Interp, config Config) {
 			}
 			obj, ok := get(arg)
 			if !ok {
-				panic(fmt.Sprintf(pre("new-border: expected a valid GUI object ID or nil, given: %v"),
+				panic(fmt.Sprintf(fnNewBorder+": expected a valid GUI object ID or nil, given: %v",
 					z3.Str(arg)))
 			}
 			if canvas, ok := obj.(fyne.CanvasObject); ok {
 				arr = append(arr, canvas)
 				continue
 			}
-			panic(fmt.Sprintf(pre("new-border: expected a valid GUI canvas object, but the given %v is not a canvas object"), z3.Str(arg)))
+			panic(fmt.Sprintf(fnNewBorder+": expected a valid GUI canvas object, but the given %v is not a canvas object", z3.Str(arg)))
 		}
 		return put(container.NewBorder(arr[0], arr[1], arr[2], arr[3], arr[4:]...))
 	})
 
-	interp.Def(pre("new-tabitem"), 2, func(a []any) any {
+	fnNewTabitem := pre("new-tabitem")
+	interp.Def(fnNewTabitem, 2, func(a []any) any {
 		title := a[0].(string)
-		arg := mustGet1(pre("new-tabitem"), "GUI canvas object ID", a[1])
+		arg := mustGet1(fnNewTabitem, "GUI canvas object ID", a[1])
 		obj, ok := arg.(fyne.CanvasObject)
 		if !ok {
-			panic(fmt.Sprintf(pre("new-tabitem argument must be a canvas object, given %v"), z3.Str(arg)))
+			panic(fmt.Sprintf(fnNewTabitem+": argument must be a canvas object, given %v", z3.Str(arg)))
 		}
 		return put(container.NewTabItem(title, obj))
 	})
 
-	interp.Def(pre("new-tabitem-with-icon"), 3, func(a []any) any {
+	fnNewTabitemWithIcon := pre("new-tabitem-with-icon")
+	interp.Def(fnNewTabitemWithIcon, 3, func(a []any) any {
 		title := a[0].(string)
-		icon := mustGet(pre("new-tabitem-with-icon"), "GUI icon resource ID", a, 1)
+		icon := mustGet(fnNewTabitemWithIcon, "GUI icon resource ID", a, 1)
 		ics, ok := icon.(fyne.Resource)
 		if !ok {
-			panic(fmt.Sprintf(pre("new-tabitem-with-icon expected an icon resource as second argument, received: %v"), z3.Str(a[1])))
+			panic(fmt.Sprintf(fnNewTabitemWithIcon+": expected an icon resource as second argument, received: %v", z3.Str(a[1])))
 		}
-		canvas := mustGet(pre("new-tabitem-with-icon"), "GUI canvas object ID", a, 2)
+		canvas := mustGet(fnNewTabitemWithIcon, "GUI canvas object ID", a, 2)
 		return put(container.NewTabItemWithIcon(title, ics, canvas.(fyne.CanvasObject)))
 	})
 
+	fnNewAppTabs := pre("new-app-tabs")
 	// (new-app-tabs tab-item ...) => int
-	interp.Def(pre("new-app-tabs"), -1, func(a []any) any {
+	interp.Def(fnNewAppTabs, -1, func(a []any) any {
 		li := a[0].(*z3.Cell)
 		arr := make([]*container.TabItem, 0)
 		for li != z3.Nil {
-			tab := mustGet1(pre("new-app-tabs"), "GUI tabitem ID", li.Car)
+			tab := mustGet1(fnNewAppTabs, "GUI tabitem ID", li.Car)
 			arr = append(arr, tab.(*container.TabItem))
 			li = li.CdrCell()
 		}
 		return put(container.NewAppTabs(arr...))
 	})
 
+	fnNewDocTabs := pre("new-doc-tabs")
 	// (new-doc-tabs tab-item ...) => int
-	interp.Def(pre("new-doc-tabs"), -1, func(a []any) any {
+	interp.Def(fnNewDocTabs, -1, func(a []any) any {
 		li := a[0].(*z3.Cell)
 		arr := make([]*container.TabItem, 0)
 		for li != z3.Nil {
-			tab := mustGet1(pre("new-app-tabs"), "GUI tabitem ID", li.Car)
+			tab := mustGet1(fnNewDocTabs, "GUI tabitem ID", li.Car)
 			arr = append(arr, tab.(*container.TabItem))
 			li = li.CdrCell()
 		}
 		return put(container.NewDocTabs(arr...))
 	})
 
+	fnNewHSplit := pre("new-hsplit")
 	// (new-hsplit leading trailing) => int
-	interp.Def(pre("new-hsplit"), 2, func(a []any) any {
-		lead := mustGet(pre("new-hsplit"), "GUI canvas object ID", a, 0).(fyne.CanvasObject)
-		trail := mustGet(pre("new-hsplit"), "GUI canvas object ID", a, 1).(fyne.CanvasObject)
+	interp.Def(fnNewHSplit, 2, func(a []any) any {
+		lead := mustGet(fnNewHSplit, "GUI canvas object ID", a, 0).(fyne.CanvasObject)
+		trail := mustGet(fnNewHSplit, "GUI canvas object ID", a, 1).(fyne.CanvasObject)
 		return put(container.NewHSplit(lead, trail))
 	})
 
+	fnNewVSplit := pre("new-vsplit")
 	// (new-vsplit leading trailing) => int
-	interp.Def(pre("new-vsplit"), 2, func(a []any) any {
-		top := mustGet(pre("new-vsplit"), "GUI canvas object ID", a, 0).(fyne.CanvasObject)
-		bottom := mustGet(pre("new-vsplit"), "GUI canvas object ID", a, 1).(fyne.CanvasObject)
+	interp.Def(fnNewVSplit, 2, func(a []any) any {
+		top := mustGet(fnNewVSplit, "GUI canvas object ID", a, 0).(fyne.CanvasObject)
+		bottom := mustGet(fnNewVSplit, "GUI canvas object ID", a, 1).(fyne.CanvasObject)
 		return put(container.NewVSplit(top, bottom))
 	})
 
+	fnSetSplitOffset := pre("set-split-offset")
 	// (set-split-offset split fl)
-	interp.Def(pre("set-split-offset"), 2, func(a []any) any {
-		split := mustGet(pre("set-split-offset"), "GUI split ID", a, 0).(*container.Split)
+	interp.Def(fnSetSplitOffset, 2, func(a []any) any {
+		split := mustGet(fnSetSplitOffset, "GUI split ID", a, 0).(*container.Split)
 		fl := z3.ToFloat64(a[1])
 		split.SetOffset(fl)
 		return z3.Void
@@ -2315,8 +2484,9 @@ func DefGUI(interp *z3.Interp, config Config) {
 
 	// THEME
 
+	fnThemeColor := pre("theme-color")
 	// (theme-color selector) => li
-	interp.Def(pre("theme-color"), 1, func(a []any) any {
+	interp.Def(fnThemeColor, 1, func(a []any) any {
 		sym := a[0].(*z3.Sym)
 		var c color.Color
 		switch sym {
@@ -2369,20 +2539,22 @@ func DefGUI(interp *z3.Interp, config Config) {
 		case TextGridBackgroundColor:
 			c = widget.TextGridStyleDefault.BackgroundColor()
 		default:
-			panic(fmt.Sprintf(pre("theme-color: theme color selector must be one of '(foreground background button disabled-button disabled disabled-text error focus hover input-background input-border menu-background overlay-background place-holder pressed primary scroll-bar selection separator shadow success warning text-grid-foreground text-grid-background), given %v"), z3.Str(sym)))
+			panic(fmt.Sprintf(fnThemeColor+": theme color selector must be one of '(foreground background button disabled-button disabled disabled-text error focus hover input-background input-border menu-background overlay-background place-holder pressed primary scroll-bar selection separator shadow success warning text-grid-foreground text-grid-background), given %v", z3.Str(sym)))
 		}
 		return ColorToList(c)
 	})
 
+	fnThemeIsDark := pre("theme-is-dark?")
 	// (theme-is-dark?) => bool
-	interp.Def(pre("theme-is-dark?"), 0, func(a []any) any {
+	interp.Def(fnThemeIsDark, 0, func(a []any) any {
 		return z3.AsLispBool(fyne.CurrentApp().Settings().ThemeVariant() == theme.VariantDark)
 	})
 
 	// RESOURCES
 
+	fnThemeIcon := pre("theme-icon")
 	// THEME ICONS
-	interp.Def(pre("theme-icon"), 1, func(a []any) any {
+	interp.Def(fnThemeIcon, 1, func(a []any) any {
 		var name string
 		if sym, ok := a[0].(*z3.Sym); ok {
 			name = sym.String()
@@ -2570,7 +2742,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 		case "warning", "WarningIcon":
 			res = theme.WarningIcon()
 		default:
-			panic(fmt.Sprintf(pre("theme-icon: unknown theme icon name, given %v"), z3.Str(a[0])))
+			panic(fmt.Sprintf(fnThemeIcon+": unknown theme icon name, given %v", z3.Str(a[0])))
 		}
 		return put(res)
 	})
