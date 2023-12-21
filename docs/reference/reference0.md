@@ -2,9 +2,9 @@
 title: Z3S5 Lisp Reference Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: Version 2.4+cc12d90-gui.fyne2
+footer-left: Version 2.4+668efb0-gui.fyne2
 author: by Erich Rast and all Help system contributors
-date: 2023-12-21 10:33
+date: 2023-12-21 10:42
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -13,7 +13,7 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
-For Z3S5 Lisp Version 2.4+cc12d90-gui.fyne2 with installed modules (gui fyne2 oop lib kvdb zimage tasks help beep unicode db fileio decimal ling float console base).
+For Z3S5 Lisp Version 2.4+668efb0-gui.fyne2 with installed modules (gui fyne2 oop lib kvdb zimage tasks help beep unicode db fileio decimal ling float console base).
 
 # Introduction
 
@@ -2373,7 +2373,7 @@ Return the number of the last row in grid, 0 if there are none.
 
 See also: [`count-text-grid-row-columns`](#link636f756e742d746578742d677269642d726f772d636f6c756d6e73), [`get-text-grid-cell`](#link6765742d746578742d677269642d63656c6c), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77).	 [→index](#idx)
 
-### `create-lorem-ipsum` : procedure/1
+### `create-lorem-ipsum` : procedure/3
 
 Usage: `(create-lorem-ipsum selector min max) => str`
 
@@ -7883,7 +7883,7 @@ See also: [`sys`](#link737973).	 [→index](#idx)
 
 **Warning: This function also counts virtual cores on the emulator. The original Z3S5 machine did not have virtual cpu cores.** [→topic](#concurrency)
 
-## `create-lorem-ipsum` : procedure/1 {#link6372656174652d6c6f72656d2d697073756d}
+## `create-lorem-ipsum` : procedure/3 {#link6372656174652d6c6f72656d2d697073756d}
 
 Usage: `(create-lorem-ipsum selector min max) => str`
 

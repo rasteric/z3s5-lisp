@@ -1386,7 +1386,7 @@
     (use "(create-lorem-ipsum selector min max) => str")
   (info "Create random Lorem Ipsum fill text based on #selector. If #selector is 'word, then a word with at least #min letters and at most #max letters is created. If #selector is 'sentence, then a sentence with at least #min words and at most #max words is created. If #selector is 'paragraph, then a paragraph with at least #min sentences and at most #max sentences is created.")
   (type proc)
-  (arity 1)
+  (arity 3)
   (topic (gui sequences))
   (see (new-text-grid new-entry))) 
   

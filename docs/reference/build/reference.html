@@ -20,9 +20,9 @@
 <header id="title-block-header">
 <h1 class="title">Z3S5 Lisp Reference Manual</h1>
 <p class="author">by Erich Rast and all Help system contributors</p>
-<p class="date">2023-12-21 10:33</p>
+<p class="date">2023-12-21 10:42</p>
 </header>
-<p>For Z3S5 Lisp Version 2.4+cc12d90-gui.fyne2 with installed modules (gui fyne2 oop lib kvdb zimage tasks help beep unicode db fileio decimal ling float console base).</p>
+<p>For Z3S5 Lisp Version 2.4+668efb0-gui.fyne2 with installed modules (gui fyne2 oop lib kvdb zimage tasks help beep unicode db fileio decimal ling float console base).</p>
 <h1 data-number="1" id="introduction"><span class="header-section-number">1</span> Introduction</h1>
 <p>This is the reference manual for Z3S5 Lisp. This manual has been automatically generated from the entries of the online help system. The reference manual is divided into two large sections. Section <a href="#topics">By Topics</a> lists functions and symbols organized by topics. Within each topic, entries are sorted alphabetically. Section <a href="#reference">Complete Reference</a> lists all functions and symbols alphabetically. Please consult the <em>User Manual</em> and the <em>Readme</em> document for more general information about Z3S5 Lisp, an introduction to its use, and how to embedd it into Go programs.</p>
 <p>Incorrect documentation strings are bugs. Please report bugs using the corresponding <a href="https://github.com/rasteric/z3s5-lisp/issues">Github issue tracker for Z3S5 Lisp</a> and be as precise as possible. Superfluous and missing documentation entries are misfeatures and may also be reported.</p>
@@ -1183,7 +1183,7 @@
 <p>Usage: <code>(count-text-grid-rows grid) =&gt; int</code></p>
 <p>Return the number of the last row in grid, 0 if there are none.</p>
 <p>See also: <a href="#link636f756e742d746578742d677269642d726f772d636f6c756d6e73"><code>count-text-grid-row-columns</code></a>, <a href="#link6765742d746578742d677269642d63656c6c"><code>get-text-grid-cell</code></a>, <a href="#link6765742d746578742d677269642d726f77"><code>get-text-grid-row</code></a>. <a href="#idx">→index</a></p>
-<h3 data-number="3.13.13" id="create-lorem-ipsum-procedure1"><span class="header-section-number">3.13.13</span> <code>create-lorem-ipsum</code> : procedure/1</h3>
+<h3 data-number="3.13.13" id="create-lorem-ipsum-procedure3"><span class="header-section-number">3.13.13</span> <code>create-lorem-ipsum</code> : procedure/3</h3>
 <p>Usage: <code>(create-lorem-ipsum selector min max) =&gt; str</code></p>
 <p>Create random Lorem Ipsum fill text based on <code>selector</code>. If <code>selector</code> is ’word, then a word with at least <code>min</code> letters and at most <code>max</code> letters is created. If <code>selector</code> is ’sentence, then a sentence with at least <code>min</code> words and at most <code>max</code> words is created. If <code>selector</code> is ’paragraph, then a paragraph with at least <code>min</code> sentences and at most <code>max</code> sentences is created.</p>
 <p>See also: <a href="#link6e65772d746578742d67726964"><code>new-text-grid</code></a>, <a href="#link6e65772d656e747279"><code>new-entry</code></a>. <a href="#idx">→index</a></p>
@@ -3900,7 +3900,7 @@
 <p>Return the number of cpu cores of this machine.</p>
 <p>See also: <a href="#link737973"><code>sys</code></a>. <a href="#idx">→index</a></p>
 <p><strong>Warning: This function also counts virtual cores on the emulator. The original Z3S5 machine did not have virtual cpu cores.</strong> <a href="#concurrency">→topic</a></p>
-<h2 data-number="4.139" id="link6372656174652d6c6f72656d2d697073756d"><span class="header-section-number">4.139</span> <code>create-lorem-ipsum</code> : procedure/1</h2>
+<h2 data-number="4.139" id="link6372656174652d6c6f72656d2d697073756d"><span class="header-section-number">4.139</span> <code>create-lorem-ipsum</code> : procedure/3</h2>
 <p>Usage: <code>(create-lorem-ipsum selector min max) =&gt; str</code></p>
 <p>Create random Lorem Ipsum fill text based on <code>selector</code>. If <code>selector</code> is ’word, then a word with at least <code>min</code> letters and at most <code>max</code> letters is created. If <code>selector</code> is ’sentence, then a sentence with at least <code>min</code> words and at most <code>max</code> words is created. If <code>selector</code> is ’paragraph, then a paragraph with at least <code>min</code> sentences and at most <code>max</code> sentences is created.</p>
 <p>See also: <a href="#link6e65772d746578742d67726964"><code>new-text-grid</code></a>, <a href="#link6e65772d656e747279"><code>new-entry</code></a>. <a href="#idx">→index</a> <a href="#gui">→topic</a></p>
