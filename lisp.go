@@ -1965,19 +1965,6 @@ func (interp *Interp) Boot() error {
 			return errors.New(`Z3S5 Lisp could not read the version information`)
 		}
 	}
-	if p.LoadUserInit {
-		file, err := os.Open(`init.lisp`)
-		if err != nil {
-			if !os.IsNotExist(err) {
-				return fmt.Errorf("Z3S5 Lisp could not open the init.lisp file: %w", err)
-			}
-			return nil
-		}
-		defer file.Close()
-		if !interp.Run(file, NewFileSource("init.lisp")) {
-			return errors.New(`Z3S5 Lisp encountered an error in init.lisp.`)
-		}
-	}
 	return nil
 }
 

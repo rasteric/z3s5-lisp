@@ -4,6 +4,8 @@
 ;;; 
 ;;; Errors in this file are bugs and should be reported.
 
+(setq _startup-delta0 (now-ns))
+
 (defmacro when-permission (perm &rest body)
   `(cond
      ((permission? ,perm) ,@body)))
@@ -5556,9 +5558,25 @@
 	   (state 0)
 	   (proc  _action-testproc)))
 
+(setq _startup-delta1 (now-ns))
+
+(defun global-startup-time ()
+  (let ((x (/ (- _startup-delta1 _startup-delta0) 1000000)))
+    (if (<= x 1)
+	x
+	(/ (fl.round (* x 100)) 100))))
+
+(defhelp global-startup-time
+    (use "(global-startup-time) => num")
+  (info "Return the global startup time in milliseconds. This is the time that the initial embedded init.lisp system required for booting, rounded to two decimal places unless it is 1 or less.")
+  (arity 0)
+  (topic (system time))
+  (type proc)
+  (see (now-ns time now)))
+
 ;;; PREAMBLE END
 
-;;;  Copyright (c) 2019-2022 Erich Rast
+;;;  Copyright (c) Erich Rast
 ;;;
 ;;;  The above copyright notice and this permission notice shall be included in
 ;;;  all copies or substantial portions of the Software.

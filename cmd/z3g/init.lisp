@@ -1,5 +1,5 @@
 ;;; local init.lisp file
-;;; This file is loaded when it is in the same directory as the z3 executable.
+;;; This file is loaded when it is in the same directory as the z3g executable.
 ;;; Feel free to hack this file as you like!
 
 (init-remember) ;; initializes the remember system, slows down start-up, remove if not needed
@@ -18,12 +18,12 @@
      (out " on \"")(out (5th (sys 'version nil) "localhost"))(out "\" (")(out (caddr (sys 'version nil)))(out ")")(out " with ")
      (out (cadr (sys 'version nil)))
      (out " cores!\n")
-     (out "The session started on ")(out (datestr (now)))(out " UTC.\n")
+     (out "The session started on ")(out (datestr (now)))(out " UTC in ")(out (global-startup-time))(out " milliseconds.\n")
      (out "Enter (exit) to close the session. Happy hacking!\n")))
 
 (when *interactive-session* (print-start-banner) (include "demo.lisp"))
 
-;;;  Copyright (c) 2019-2022 Erich Rast
+;;;  Copyright (c) by Erich Rast
 ;;;
 ;;;  The above copyright notice and this permission notice shall be included in
 ;;;  all copies or substantial portions of the Software.
