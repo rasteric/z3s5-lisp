@@ -7,6 +7,8 @@ import (
 	"strings"
 	"sync"
 
+	"runtime/pprof"
+
 	"github.com/rasteric/hooks"
 	z3 "github.com/rasteric/z3s5-lisp"
 	z3ui "github.com/rasteric/z3s5-lisp/gui"
@@ -17,7 +19,17 @@ func run() int {
 	exec := flag.String("e", "", "execute the expression(s) given as argument at startup")
 	interactive := flag.Bool("i", false, "run the interpreter interactively even if a file is loaded with -l")
 	silent := flag.Bool("s", false, "set *interactive-session* false even if -i is specified to prevent printing a start banner")
+	profile := flag.Bool("p", false, "turn on profiling, storing the profile in default.pgo")
 	flag.Parse()
+	if *profile {
+		f, err := os.Create("default.pgo")
+		if err != nil {
+			fmt.Fprintf(os.Stderr, `Warning, profiler could not create file "default.pgo": %v\n`, err)
+		}
+		defer f.Close()
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
 	interp, err := z3.NewInterp(z3.NewBasicRuntime(z3.FullPermissions))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Z3S5 Lisp failed to start: %v\n", err)

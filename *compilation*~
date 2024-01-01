@@ -1,0 +1,11 @@
+-*- mode: compilation; default-directory: "~/go/src/github.com/rasteric/z3s5-lisp/" -*-
+Compilation started at Mon Jan  1 13:14:48
+
+go build -v && go test -v -bench=. && go vet
+github.com/rasteric/z3s5-lisp
+=== RUN   TestDistribution
+--- PASS: TestDistribution (4.12s)
+PASS
+ok  	github.com/rasteric/z3s5-lisp	4.124s
+
+Compilation finished at Mon Jan  1 13:14:54

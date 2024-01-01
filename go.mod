@@ -12,6 +12,7 @@ require (
 	github.com/jirenius/taskqueue v1.2.0
 	github.com/loov/hrtime v1.0.3
 	github.com/mattn/go-sqlite3 v1.14.17
+	github.com/mhmtszr/concurrent-swiss-map v1.0.5
 	github.com/nukata/goarith v0.3.0
 	github.com/rasteric/hooks v0.0.6
 	github.com/shopspring/decimal v1.3.1
@@ -43,6 +44,7 @@ require (
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/puzpuzpuz/xsync/v3 v3.0.2 // indirect
 	github.com/srwiley/oksvg v0.0.0-20221011165216-be6e8873101c // indirect
 	github.com/srwiley/rasterx v0.0.0-20220730225603-2ab79fcdd4ef // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
