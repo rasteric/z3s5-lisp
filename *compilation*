@@ -1,10 +1,8 @@
--*- mode: compilation; default-directory: "~/go/src/github.com/rasteric/z3s5-lisp/cmd/z3/" -*-
-Compilation started at Mon Jan  1 13:30:41
+-*- mode: compilation; default-directory: "~/go/src/github.com/rasteric/z3s5-lisp/cmd/z3g/" -*-
+Compilation started at Tue Jan  2 09:47:33
 
 go build -v && go test -v && go vet
-github.com/rasteric/z3s5-lisp/cmd/z3
-# github.com/rasteric/z3s5-lisp/cmd/z3
-/home/nemo/go/src/github.com/rasteric/z3s5-lisp/cmd/z3/z3_test.go:18:1: wrong signature for BenchmarkDistribution, must be: func BenchmarkDistribution(b *testing.B)
-FAIL	github.com/rasteric/z3s5-lisp/cmd/z3 [setup failed]
+z3g.go:10:2: no required module provides package github.com/pkg/profile; to add it:
+	go get github.com/pkg/profile
 
-Compilation exited abnormally with code 1 at Mon Jan  1 13:30:42
+Compilation exited abnormally with code 1 at Tue Jan  2 09:47:33

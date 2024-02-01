@@ -326,7 +326,29 @@
     (add-canvas-shortcut canvas '(ctrl f) (lambda () (set-label-text info "Ctrl-F")))
     (show-window win)))
 
+(defun demo23 ()
+  (letrec ((win (new-window "Demo 23: Approximate Pi"))
+	   (lbl (new-label "This program approximates pi."))
+	   (steps (new-entry))
+	   (result (new-entry))
+	   (button (new-button "Calculate!" (lambda () (void))))
+	   (form (new-form))
+	   (border (new-border lbl button nil nil form)))
+    (set-entry-text steps 100000)
+    (append-form form "Steps: " steps)
+    (append-form form "Result: " result)
+    (set-window-content win border)
+    (show-window win)))
+
+(defun demo24 ()
+  (letrec ((win (new-window "Demo 24: ZGrid"))
+	   (s (apply str+ (build-list 1000 (lambda (x) (str+ (create-lorem-ipsum 'sentence 3 20) "\n")))))
+           (tg (new-zgrid 80 40 s 'show-line-numbers)))
+    (set-window-content win tg)
+    (show-window win)))
+
+
 (include "editor.lisp")
 
-(out "Use (demo1) ... (demo22) to run GUI demos.\n")
+(out "Use (demo1) ... (demo24) to run GUI demos.\n")
 

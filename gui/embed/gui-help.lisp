@@ -349,9 +349,9 @@
   (type proc)
   (arity -1)
   (topic (gui text-grid))
-  (see (text-grid-show-line-numbers? text-grid-show-whitespace? get-text-grid-tab-width set-text-grid-tab-width set-text-grid-show-line-numbers set-text-grid-show-whitespace get-text-grid-row get-text-grid-row-text
-				     set-text-grid-cell get-text-grid-cell set-text-grid-row set-text-grid-row-style set-text-grid-rune set-text-grid-style set-text-grid-style-range set-text-grid-text
-				     get-text-grid-text remove-text-grid-row insert-text-grid-row)))
+  (see (new-zgrid text-grid-show-line-numbers? text-grid-show-whitespace? get-text-grid-tab-width set-text-grid-tab-width set-text-grid-show-line-numbers set-text-grid-show-whitespace get-text-grid-row get-text-grid-row-text
+		  set-text-grid-cell get-text-grid-cell set-text-grid-row set-text-grid-row-style set-text-grid-rune set-text-grid-style set-text-grid-style-range set-text-grid-text
+		  get-text-grid-text remove-text-grid-row insert-text-grid-row)))
 
 (defhelp get-text-grid-cell-size
     (use "(get-text-grid-cell-size grid) => li")
@@ -571,6 +571,235 @@
   (arity 8)
   (topic (gui text-grid))
   (see (wrap-delete-text-grid new-text-grid)))
+
+(defhelp new-zgrid
+    (use "(new-zgrid columns lines [<string>] [show-line-numbers|show-whitespace|tab-width <int>]) => int")
+  (info "Create a new extended text grid widget called a zgrid. This widget is similar to text-grid and has most of its methods, but additionally displays a vertical scroll bar, handles many lines more efficiently than text-grid (though still sometimes slow), and provides a number of other extensions for syntax coloring and tagging of arbitrary text ranges. The optional #string argument is the initial text of the grid without formatting. The following symbols might be #'show-line-numbers to turn the line number display on and #'show-whitespace to display white space characters by special unicode symbols. If the selector #'tab-width occurs, then it must be immediately followed by an integer for the tabulator width of the zgrid in space characters.")
+  (type proc)
+  (arity -1)
+  (topic (gui zgrid))
+  (see (zgrid-show-line-numbers? zgrid-show-whitespace? get-zgrid-tab-width set-zgrid-tab-width set-zgrid-show-line-numbers set-zgrid-show-whitespace get-zgrid-row get-zgrid-row-text
+				     set-zgrid-cell get-zgrid-cell set-zgrid-row set-zgrid-row-style set-zgrid-rune set-zgrid-style set-zgrid-style-range set-zgrid-text
+				     get-zgrid-text remove-zgrid-row insert-zgrid-row)))
+
+(defhelp get-zgrid-cell-size
+    (use "(get-zgrid-cell-size grid) => li")
+  (info "Return the size of one zgrid cell as a list of floats (w h) where #w is the width and #h is the height.")
+  (type proc)
+  (arity 1)
+  (topic (gui zgrid))
+  (see (new-zgrid)))
+
+(defhelp zgrid-show-line-numbers?
+    (use "(zgrid-show-line-numbers? grid) => bool")
+  (info "Return true if the text #grid shows line numbers, nil otherwise.")
+  (type proc)
+  (arity 1)
+  (topic (gui zgrid))
+  (see (new-zgrid zgrid-show-whitespace? get-zgrid-tab-width set-zgrid-tab-width set-zgrid-show-line-numbers set-zgrid-show-whitespace get-zgrid-row get-zgrid-row-text
+		      set-zgrid-cell get-zgrid-cell set-zgrid-row set-zgrid-row-style set-zgrid-rune set-zgrid-style set-zgrid-style-range set-zgrid-text
+		      get-zgrid-text)))
+
+(defhelp zgrid-show-whitespace?
+    (use "(zgrid-show-whitespace? grid) => bool")
+  (info "Return true if the text #grid shows whitespace glyphs, nil otherwise.")
+  (type proc)
+  (arity 1)
+  (topic (gui zgrid))
+  (see (new-zgrid zgrid-show-line-numbers? get-zgrid-tab-width set-zgrid-tab-width set-zgrid-show-line-numbers set-zgrid-show-whitespace get-zgrid-row get-zgrid-row-text
+		      set-zgrid-cell get-zgrid-cell set-zgrid-row set-zgrid-row-style set-zgrid-rune set-zgrid-style set-zgrid-style-range set-zgrid-text
+		      get-zgrid-text)))
+
+(defhelp get-zgrid-tab-width
+    (use "(get-zgrid-tab-width grid) => int")
+  (info "Return the current tabulator width of #grid in space characters.")
+  (type proc)
+  (arity 1)
+  (topic (gui zgrid))
+  (see (new-zgrid zgrid-show-line-numbers? zgrid-show-whitespace? set-zgrid-tab-width set-zgrid-show-line-numbers set-zgrid-show-whitespace get-zgrid-row get-zgrid-row-text
+		      set-zgrid-cell get-zgrid-cell set-zgrid-row set-zgrid-row-style set-zgrid-rune set-zgrid-style set-zgrid-style-range set-zgrid-text
+		      get-zgrid-text)))
+
+(defhelp set-zgrid-tab-width
+    (use "(set-zgrid-tab-width grid width)")
+  (info "Set the tabulator width of #grid to integer #width space characters.")
+  (type proc)
+  (arity 2)
+  (topic (gui zgrid))
+  (see (new-zgrid zgrid-show-line-numbers? zgrid-show-whitespace? get-zgrid-tab-width set-zgrid-show-line-numbers set-zgrid-show-whitespace get-zgrid-row get-zgrid-row-text
+		      set-zgrid-cell get-zgrid-cell set-zgrid-row set-zgrid-row-style set-zgrid-rune set-zgrid-style set-zgrid-style-range set-zgrid-text
+		      get-zgrid-text)))
+
+(defhelp set-zgrid-show-line-numbers
+    (use "(set-zgrid-show-line-numbers grid show?)")
+  (info "Set whether #grid shows line numbers. If #show? is not nil, then line numbers are shown, otherwise they are not shown.")
+  (type proc)
+  (arity 2)
+  (topic (gui zgrid))
+  (see (new-zgrid zgrid-show-line-numbers? zgrid-show-whitespace? get-zgrid-tab-width set-zgrid-tab-width set-zgrid-show-whitespace get-zgrid-row get-zgrid-row-text
+		      set-zgrid-cell get-zgrid-cell set-zgrid-row set-zgrid-row-style set-zgrid-rune set-zgrid-style set-zgrid-style-range set-zgrid-text
+		      get-zgrid-text)))
+
+(defhelp set-zgrid-show-whitespace
+    (use "(set-zgrid-show-whitespace grid show?)")
+  (info "Set whether #grid shows whitespace characters. If #show? is not nil, then whitespace characters are shown, otherwise they are not shown.")
+  (type proc)
+  (arity 2)
+  (topic (gui zgrid))
+  (see (new-zgrid zgrid-show-line-numbers? zgrid-show-whitespace? get-zgrid-tab-width set-zgrid-tab-width set-zgrid-show-line-numbers get-zgrid-row get-zgrid-row-text
+		      set-zgrid-cell get-zgrid-cell set-zgrid-row set-zgrid-row-style set-zgrid-rune set-zgrid-style set-zgrid-style-range set-zgrid-text
+		      get-zgrid-text)))
+
+(defhelp get-zgrid-row
+    (use "(get-zgrid-row grid row) => li")
+  (info "Obtain a #row of a text #grid, where #row is a 0-based index. This function returns a list of the form '(row style), where #style is a grid style list and #row is an array of lists consisting each of a unicode string containing one rune and a grid style list. Each entry of the #row array represents an individual unicode glyph with a style, whereas the #style list in the return argument represents an optional style of the whole row.")
+  (type proc)
+  (arity 2)
+  (topic (gui zgrid))
+  (see  (set-zgrid-row get-zgrid-row-text get-zgrid-cell new-zgrid zgrid-show-line-numbers? zgrid-show-whitespace?
+			   get-zgrid-tab-width set-zgrid-tab-width set-zgrid-show-line-numbers set-zgrid-show-whitespace  
+			   set-zgrid-cell  set-zgrid-row-style set-zgrid-rune set-zgrid-style set-zgrid-style-range set-zgrid-text
+			   get-zgrid-text remove-zgrid-row insert-zgrid-row)))
+
+(defhelp get-zgrid-row-text
+    (use "(get-zgrid-row-text grid row) => str")
+  (info "Return the text of #row in #grid as a string without any style information.")
+  (type proc)
+  (arity 2)
+  (topic (gui zgrid))
+  (see  (set-zgrid-rune  get-zgrid-row get-zgrid-cell set-zgrid-row new-zgrid zgrid-show-line-numbers? zgrid-show-whitespace?
+			     get-zgrid-tab-width set-zgrid-tab-width set-zgrid-show-line-numbers set-zgrid-show-whitespace  
+			     set-zgrid-cell  set-zgrid-row-style set-zgrid-rune set-zgrid-style set-zgrid-style-range set-zgrid-text
+			     get-zgrid-text)))
+
+(defhelp set-zgrid-cell
+    (use "(set-zgrid-cell grid row column li)")
+  (info "Set the text #grid cell at #row and #column (both 0-indexed) to the list #li, where #li must consist of a unicode string containing one rune and a valid grid style list.")
+  (type proc)
+  (arity 4)
+  (topic (gui zgrid))
+  (see (get-zgrid-cell set-zgrid-rune get-zgrid-row set-zgrid-row)))
+
+
+(defhelp get-zgrid-cell
+    (use "(get-zgrid-cell grid row column) => li")
+  (info "Return the cell of #grid at #row and #column. The result is a list consisting of a string containing one unicode rune and a grid style list. The style might be nil. If it is not nil, then the list contains a foreground and a background color list.")
+  (type proc)
+  (arity 3)
+  (topic (gui zgrid))
+  (see (get-zgrid-rune set-zgrid-cell get-zgrid-row set-zgrid-rune set-zgrid-style-range get-zgrid-style)))
+
+(defhelp remove-zgrid-row
+    (use "(remove-zgrid-row grid row)")
+  (info "Remove the #row from the given text #grid. An incorrect #row index will result in an error.")
+  (type proc)
+  (arity 2)
+  (topic (gui zgrid))
+  (see (insert-zgrid-row new-zgrid get-zgrid-row)))
+
+(defhelp insert-zgrid-row
+    (use "(insert-zgrid-row grid row)")
+  (info "Insert a new zgrid row before #row in the given text #grid. If #row is the number of rows, a new row is appended to the end of the zgrid.")
+  (type proc)
+  (arity 2)
+  (topic (gui zgrid))
+  (see (remove-zgrid-row count-zgrid-rows new-zgrid get-zgrid-row)))
+
+(defhelp get-zgrid-rune
+    (use "(get-zgrid-rune grid row column) => str")
+  (info "Return the string containing a single rune at the cell in #row and #column of #grid.")
+  (type proc)
+  (arity 3)
+  (topic (gui zgrid))
+  (see (get-zgrid-cell get-zgrid-style get-zgrid-row)))
+
+(defhelp count-zgrid-rows
+    (use "(count-zgrid-rows grid) => int")
+  (info "Return the number of the last row in grid, 0 if there are none.")
+  (type proc)
+  (arity 1)
+  (topic (gui zgrid))
+  (see (count-zgrid-row-columns get-zgrid-cell get-zgrid-row)))
+
+(defhelp count-zgrid-row-columns
+    (use "(count-zgrid-row-columns grid row) => int")
+  (info "Return the number of columns in #row of #grid, 0 if there are none.")
+  (type proc)
+  (arity 2)
+  (topic (gui zgrid))
+  (see (count-zgrid-rows get-zgrid-cell get-zgrid-row)))
+
+(defhelp set-zgrid-row
+    (use "(set-zgrid-row grid row row-spec)")
+  (info "Set the #row of #grid to the given #row-spec, which is a list containing an array of grid cells like in the return value of #get-zgrid-row and a grid style for the row as a whole.")
+  (type proc)
+  (arity 3)
+  (topic (gui zgrid))
+  (see (get-zgrid-row set-zgrid-row-style set-zgrid-cell set-zgrid-rune set-zgrid-style-range)))
+
+(defhelp set-zgrid-row-style
+    (use "(set-zgrid-row-style grid row style)")
+  (info "Set the style of text #grid at #row to the given grid #style.")
+  (type proc)
+  (arity 3)
+  (topic (gui zgrid))
+  (see (set-zgrid-row set-zgrid-cell get-zgrid-row set-zgrid-rune set-zgrid-style-range)))
+
+(defhelp set-zgrid-rune
+    (use "(set-zgrid-rune grid row column str)")
+  (info "Set the rune of #grid at #row and #column to the unicode glyph in string #str.")
+  (type proc)
+  (arity 4)
+  (topic (gui zgrid))
+  (see (set-zgrid-style set-zgrid-cell get-zgrid-cell)))
+
+(defhelp set-zgrid-style
+    (use "(set-zgrid-style grid row column style)")
+  (info "Set the grid style of #grid at #row and #column to the list #style.")
+  (type proc)
+  (arity 4)
+  (topic (gui zgrid))
+  (see (set-zgrid-cell set-zgrid-rune set-zgrid-style-range)))
+
+(defhelp set-zgrid-style-range
+    (use "(set-zgrid-style-range grid start-row start-column end-row end-column style)")
+  (info "Set the grid style of #grid starting at #start-row and #start-column and ending at #end-row and #end-column (all inclusive) to the grid #style.")
+  (type proc)
+  (arity 6)
+  (topic (gui zgrid))
+  (see (set-zgrid-style set-zgrid-cell set-zgrid-row-style)))
+
+(defhelp set-zgrid-text
+    (use "(set-zgrid-text grid str)")
+  (info "Set the text of the text #grid to the given #str.")
+  (type proc)
+  (arity 2)
+  (topic (gui zgrid))
+  (see (get-zgrid-text new-zgrid set-zgrid-rune set-zgrid-row)))
+
+(defhelp get-zgrid-text
+    (use "(get-zgrid-text grid) => str")
+  (info "Return the text of #grid as a string without style information.")
+  (type proc)
+  (arity 1)
+  (topic (gui zgrid))
+  (see (set-zgrid-text new-zgrid get-zgrid-row get-zgrid-rune get-zgrid-cell)))
+
+(defhelp wrap-delete-zgrid
+    (use "(wrap-delete-zgrid grid range-list wrapcol soft-wrap? hard-lf-rune soft-lf-rune cursor-row cursor-column) => li")
+  (info "This helper implements deletion with word wrapping in #grid. The #range-list must contain integers of the form (start-row start-colum end-row end-column), which must be within the grid's maximum row and column ranges. #wrapcol is an integer indicating the number of chars per line; any more chars are wrapped. If #soft-wrap? is not nil, then the paragraphs in which deletion takes place are soft-wrapped. #hard-lf-rune is a string containing the rune for a hard line feed, whereas #soft-lf-rune is a string containing the rune for soft line feeds. The current #cursor-row and #cursor-column must be provided as well; when the function wraps the deleted paragraphs, their values are updated and returned in the list #li, which is of the form (new-cursor-row new-cursor-column).")
+  (type proc)
+  (arity 8)
+  (topic (gui zgrid))
+  (see (wrap-insert-zgrid new-zgrid)))
+
+(defhelp wrap-insert-zgrid
+    (use "(wrap-insert-zgrid grid cells row col wrapcol soft-wrap? hard-lf-rune soft-lf-rune) => li")
+  (info "This helper implements inserting styled text with word wrapping in #grid. #cells must be a list of zgrid cells, each of which consists of a rune string, and a list containing a foreground and background color, or nil. #row and #col are the line and column in #grid before which the text is inserted. The number of characters per line is indicated with #wrapcol. If #soft-wrap? is true, then the paragraph into which it is inserted is soft-word-wrapped, using soft-lf-rune as a line ending. Otherwise, #hard-lf-rune is used for line-endings, which is also used for the last line of a paragraph. The returned list of the form (new-cursor-row new-cursor-column) reflects the updated cursor position if #row and #col are the current cursor position.")
+  (type proc)
+  (arity 8)
+  (topic (gui zgrid))
+  (see (wrap-delete-zgrid new-zgrid)))
 
 (defhelp new-check
     (use "(new-check title proc) => int")
@@ -1388,6 +1617,6 @@
   (type proc)
   (arity 3)
   (topic (gui sequences))
-  (see (new-text-grid new-entry))) 
+  (see (new-zgrid new-text-grid new-entry))) 
   
   

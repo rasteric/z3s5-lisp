@@ -7,8 +7,6 @@ import (
 	"strings"
 	"sync"
 
-	"runtime/pprof"
-
 	"github.com/rasteric/hooks"
 	z3 "github.com/rasteric/z3s5-lisp"
 	z3ui "github.com/rasteric/z3s5-lisp/gui"
@@ -19,17 +17,8 @@ func run() int {
 	exec := flag.String("e", "", "execute the expression(s) given as argument at startup")
 	interactive := flag.Bool("i", false, "run the interpreter interactively even if a file is loaded with -l")
 	silent := flag.Bool("s", false, "set *interactive-session* false even if -i is specified to prevent printing a start banner")
-	profile := flag.Bool("p", false, "turn on profiling, storing the profile in default.pgo")
 	flag.Parse()
-	if *profile {
-		f, err := os.Create("default.pgo")
-		if err != nil {
-			fmt.Fprintf(os.Stderr, `Warning, profiler could not create file "default.pgo": %v\n`, err)
-		}
-		defer f.Close()
-		pprof.StartCPUProfile(f)
-		defer pprof.StopCPUProfile()
-	}
+
 	interp, err := z3.NewInterp(z3.NewBasicRuntime(z3.FullPermissions))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Z3S5 Lisp failed to start: %v\n", err)
@@ -52,51 +41,59 @@ func run() int {
 		return 3
 	}
 
-	// Maybe load the user init file.
-	if err := interp.MaybeLoadUserInit(); err != nil {
-		fmt.Fprintf(os.Stderr, err.Error())
-		return 4
-	}
+	errValue := 0
 
-	interp.SafeEval(&z3.Cell{Car: z3.NewSym("protect-toplevel-symbols"), Cdr: z3.Nil}, z3.Nil)
-
-	//	hooks.Exec(z3.StartupHook, nil)
-	defer hooks.Exec(z3.ShutdownHook, nil)
-	if *load != "" {
-		file, err := os.Open(*load)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Z3S5 Lisp error, failed to open file \"%v\" given with -l flag: %v\n", *load, err)
-			return 6
-		}
-		defer file.Close()
-		if !interp.Run(file, z3.NewFileSource(*load)) {
-			fmt.Fprintf(os.Stderr, "Z3S5 Lisp error in input file \"%v\" given with -l flag.\n", *load)
-			return 4
-		}
-		if !(*interactive) && *exec == "" {
-			return 0
-		}
-	}
-	if *exec != "" {
-		ss := strings.NewReader(*exec)
-		if !interp.Run(ss, z3.NewInternalSource("cmdline-exec-string", *exec)) {
-			fmt.Fprintf(os.Stderr, "Z3S5 Lisp error in input expression given with -e flag.\n")
-			return 5
-		}
-		if !(*interactive) {
-			return 0
-		}
-	}
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		interp.Run(nil, z3.NewInternalSource("repl", ""))
-	}()
-	z3ui.RunGUI()
 	defer z3ui.ShutDownGUI()
+	z3ui.RunGUI(func() {
+
+		interp.SafeEval(&z3.Cell{Car: z3.NewSym("protect-toplevel-symbols"), Cdr: z3.Nil}, z3.Nil)
+
+		// Maybe load the user init file.
+		if err := interp.MaybeLoadUserInit(); err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+			errValue = 3
+			return
+		}
+
+		if *load != "" {
+			file, err := os.Open(*load)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Z3S5 Lisp error, failed to open file \"%v\" given with -l flag: %v\n", *load, err)
+				errValue = 6
+				return
+			}
+			defer file.Close()
+			if !interp.Run(file, z3.NewFileSource(*load)) {
+				fmt.Fprintf(os.Stderr, "Z3S5 Lisp error in input file \"%v\" given with -l flag.\n", *load)
+				errValue = 4
+				return
+			}
+			if !(*interactive) && *exec == "" {
+				return
+			}
+		}
+		if *exec != "" {
+			ss := strings.NewReader(*exec)
+			if !interp.Run(ss, z3.NewInternalSource("cmdline-exec-string", *exec)) {
+				fmt.Fprintf(os.Stderr, "Z3S5 Lisp error in input expression given with -e flag.\n")
+				errValue = 5
+				return
+			}
+			if !(*interactive) {
+				return
+			}
+		}
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			defer hooks.Exec(z3.ShutdownHook, nil)
+			hooks.Exec(z3.StartupHook, nil)
+			interp.Run(nil, z3.NewInternalSource("repl", ""))
+		}()
+	})
 	wg.Wait()
-	return 0
+	return errValue
 }
 
 func main() {
@@ -106,7 +103,7 @@ func main() {
 /*
   Copyright (c) 2015, 2016 OKI Software Co., Ltd.
   Copyright (c) 2019 SUZUKI Hisao
-  Copyright (c) 2022-2023 Erich Rast
+  Copyright (c) 2022-2024 Erich Rast
 
   The above copyright notice and this permission notice shall be included in
   all copies or substantial portions of the Software.
