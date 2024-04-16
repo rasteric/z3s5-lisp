@@ -341,14 +341,20 @@
     (show-window win)))
 
 (defun demo24 ()
-  (letrec ((win (new-window "Demo 24: ZGrid"))
+  (letrec ((win (new-window "Demo 24: Text-grid"))
 	   (s (apply str+ (build-list 1000 (lambda (x) (str+ (create-lorem-ipsum 'sentence 3 20) "\n")))))
-           (tg (new-zgrid 80 40 s 'show-line-numbers)))
+           (tg (new-text-grid 80 40 s 'show-line-numbers)))
     (set-window-content win tg)
     (show-window win)))
 
+(defun demo25 ()
+  (letrec ((win (new-window "Demo 25: ZEdit"))
+	   (s (apply str+ (build-list 1000 (lambda (x) (str+ (create-lorem-ipsum 'sentence 3 20) "\n")))))
+           (ed (new-zedit 80 40 (get-window-canvas win))))
+    (set-window-content win ed)
+    (set-zedit-show-line-numbers ed true)
+    (set-zedit-text ed s)
+    (show-window win)))
 
-(include "editor.lisp")
-
-(out "Use (demo1) ... (demo24) to run GUI demos.\n")
+(out "Use (demo1) ... (demo25) to run GUI demos.\n")
 

@@ -1243,441 +1243,306 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return goarith.AsNumber(len(grid.Rows[row].Cells))
 	})
 
-	// ZGRID
+	// ZEDIT
 
-	fnNewZGrid := pre("new-zgrid")
-	// (new-zgrid columns lines [<string>] [show-line-numbers|show-whitespace|tab-width <int>]) => int
-	interp.Def(fnNewZGrid, -1, func(a []any) any {
-		li := a[0].(*z3.Cell)
-		columns := z3.ToInt(fnNewZGrid, li.Car)
-		li = li.CdrCell()
-		lines := z3.ToInt(fnNewZGrid, li.Car)
-		li = li.CdrCell()
-		grid := zedit.NewZGrid(columns, lines)
-		if li != z3.Nil {
-			for li != z3.Nil {
-				if s, ok := li.Car.(string); ok {
-					grid.SetText(s)
-				} else if sym, ok := li.Car.(*z3.Sym); ok {
-					switch sym.String() {
-					case "show-line-numbers":
-						grid.ShowLineNumbers = true
-					case "show-whitespace":
-						grid.ShowWhitespace = true
-					case "tab-width":
-						li = li.CdrCell()
-						if li == z3.Nil {
-							panic(fnNewZGrid + ": expected a width integer after 'tab-width, but it is missing!")
-						}
-						grid.TabWidth = int(z3.ToInt64(pre("new-zgrid"), li.Car))
-					}
-				} else {
-					panic(fmt.Sprintf(fnNewZGrid+
-						": expected an initial string as content and/or a selector in '(show-line-numbers show-whitespace tab-width), given %v",
-						z3.Str(li.Car)))
-				}
-				li = li.CdrCell()
-			}
-		}
-		grid.Refresh()
-		return put(grid)
+	fnNewZedit := pre("new-zedit")
+	// (new-zedit columns lines canvas) => int
+	interp.Def(fnNewZedit, 3, func(a []any) any {
+		columns := z3.ToInt(fnNewZedit, a[0])
+		lines := z3.ToInt(fnNewZedit, a[1])
+		canvas := mustGet(fnNewZedit, "GUI canvas ID", a, 2).(fyne.Canvas)
+		editor := zedit.NewEditor(columns, lines, canvas)
+		editor.Refresh()
+		return put(editor)
 	})
 
-	fnGetZGridCellSize := pre("get-zgrid-cell-size")
-	// (get-zgrid-cell-size grid) => li
-	interp.Def(fnGetZGridCellSize, 1, func(a []any) any {
-		_, ok = mustGet(fnGetZGridCellSize, "GUI zgrid ID", a, 0).(*zedit.ZGrid)
-		if !ok {
-			panic(fmt.Sprintf(fnGetZGridCellSize+"get-zgrid-cell-size: expected text grid as argument, given %v", z3.Str(a[0])))
-		}
-		// unfortunately zgrid cell size and line calculations are internal, as of Fyne v2.4
-		// the following is taken from textgrid.go: (t *ZGridRenderer) updateCellSize():
-		size := fyne.MeasureText("M", theme.TextSize(), fyne.TextStyle{Monospace: true})
-		// round it for seamless background
-		w := math.Round(float64((size.Width)))
-		h := math.Round(float64((size.Height)))
-		return &z3.Cell{Car: goarith.AsNumber(w), Cdr: &z3.Cell{Car: goarith.AsNumber(h), Cdr: z3.Nil}}
+	fnZeditShowLineNumbers := pre("zedit-show-line-numbers?")
+	// (zedit-show-line-numbers? <editor>) => bool
+	interp.Def(fnZeditShowLineNumbers, 1, func(a []any) any {
+		editor := mustGet(fnZeditShowLineNumbers, "GUI zedit ID", a, 0).(*zedit.Editor)
+		return z3.AsLispBool(editor.ShowLineNumbers)
 	})
 
-	fnZGridShowLineNumbers := pre("zgrid-show-line-numbers?")
-	// (zgrid-show-line-numbers? <grid>) => bool
-	interp.Def(fnZGridShowLineNumbers, 1, func(a []any) any {
-		grid := mustGet(fnZGridShowLineNumbers, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		return z3.AsLispBool(grid.ShowLineNumbers)
+	fnZeditShowWhitespace := pre("zedit-show-whitespace?")
+	// (zedit-show-whitespace? <editor>) => bool
+	interp.Def(fnZeditShowWhitespace, 1, func(a []any) any {
+		editor := mustGet(fnZeditShowWhitespace, "GUI zedit ID", a, 0).(*zedit.Editor)
+		return z3.AsLispBool(editor.ShowWhitespace)
 	})
 
-	fnZGridShowWhitespace := pre("zgrid-show-whitespace?")
-	// (zgrid-show-whitespace? <grid>) => bool
-	interp.Def(fnZGridShowWhitespace, 1, func(a []any) any {
-		grid := mustGet(fnZGridShowWhitespace, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		return z3.AsLispBool(grid.ShowWhitespace)
-	})
-
-	fnZGridTabWidth := pre("get-zgrid-tab-width")
-	// (zgrid-tab-width <grid>) => num
-	interp.Def(fnZGridTabWidth, 1, func(a []any) any {
-		grid := mustGet(fnZGridTabWidth, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		return goarith.AsNumber(grid.TabWidth)
-	})
-
-	fnSetZGridTabWidth := pre("set-zgrid-tab-width")
-	// (set-zgrid-tab-width <grid> <n>)
-	interp.Def(fnSetZGridTabWidth, 2, func(a []any) any {
-		grid := mustGet(fnSetZGridTabWidth, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		grid.TabWidth = int(z3.ToInt64(fnSetZGridTabWidth, a[1]))
+	fnSetZeditShowLineNumbers := pre("set-zedit-show-line-numbers")
+	// (set-zedit-show-line-numbers <editor> <show?>)
+	interp.Def(fnSetZeditShowLineNumbers, 2, func(a []any) any {
+		editor := mustGet(fnSetZeditShowLineNumbers, "GUI zedit ID", a, 0).(*zedit.Editor)
+		editor.ShowLineNumbers = z3.ToBool(a[1])
 		return z3.Void
 	})
 
-	fnSetZGridShowLineNumbers := pre("set-zgrid-show-line-numbers")
-	// (set-zgrid-show-line-numbers <grid> <show?>)
-	interp.Def(fnSetZGridShowLineNumbers, 2, func(a []any) any {
-		grid := mustGet(fnSetZGridShowLineNumbers, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		grid.ShowLineNumbers = z3.ToBool(a[1])
+	fnSetZeditShowWhitespace := pre("set-zedit-show-whitespace")
+	// (set-zedit-show-whitespace <editor> <show?>)
+	interp.Def(fnSetZeditShowWhitespace, 2, func(a []any) any {
+		editor := mustGet(fnSetZeditShowWhitespace, "GUI zedit ID", a, 0).(*zedit.Editor)
+		editor.ShowWhitespace = z3.ToBool(a[1])
 		return z3.Void
 	})
 
-	fnSetZGridShowWhitespace := pre("set-zgrid-show-whitespace")
-	// (set-zgrid-show-whitespace <grid> <show?>)
-	interp.Def(fnSetZGridShowWhitespace, 2, func(a []any) any {
-		grid := mustGet(fnSetZGridShowWhitespace, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		grid.ShowWhitespace = z3.ToBool(a[1])
-		return z3.Void
-	})
-
-	fnGetZGridRow := pre("get-zgrid-row")
-	// (get-zgrid-row <grid> <row>) => li
-	// The list consists of an array of cells and a style list. The array of cells contains lists
-	// consisting of a rune string and a style list. Style lists consist of a list of foreground color
-	// values and a list of background color values.
-	interp.Def(fnGetZGridRow, 2, func(a []any) any {
-		grid := mustGet(fnGetZGridRow, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		row := grid.Row(int(z3.ToInt64(fnGetZGridRow, a[1])))
-		cells := make([]any, 0)
-		for _, cell := range row.Cells {
-			elem := &z3.Cell{Car: string(cell.Rune), Cdr: &z3.Cell{Car: TextGridStyleToList(cell.Style),
-				Cdr: z3.Nil}}
-			cells = append(cells, elem)
-		}
-		return &z3.Cell{Car: cells, Cdr: &z3.Cell{Car: TextGridStyleToList(row.Style), Cdr: z3.Nil}}
-	})
-
-	fnGetZGridRowText := pre("get-zgrid-row-text")
-	// (get-zgrid-row-text <grid> <row>) => str
-	interp.Def(fnGetZGridRowText, 2, func(a []any) any {
-		grid := mustGet(fnGetZGridRowText, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		s := grid.RowText(int(z3.ToInt64(fnGetZGridRowText, a[1])))
-		return s
-	})
-
-	fnSetZGridCell := pre("set-zgrid-cell")
-	// (set-zgrid-cell <grid> <row> <column> <cell>) where <cell> is a list consisting
-	// of a rune string and a text grid style list.
-	interp.Def(fnSetZGridCell, 4, func(a []any) any {
-		grid := mustGet(fnSetZGridCell, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		row := int(z3.ToInt64(fnSetZGridCell, a[1]))
-		column := int(z3.ToInt64(fnSetZGridCell, a[2]))
-		li := a[3].(*z3.Cell)
-		r := []rune(li.Car.(string))[0]
-		li = li.CdrCell()
-		style := ListToTextGridStyle(li)
-		grid.SetCell(zedit.CharPos{Line: row, Column: column}, widget.TextGridCell{Rune: r, Style: style})
-		return z3.Void
-	})
-
-	fnGetZGridCell := pre("get-zgrid-cell")
-	// (get-zgrid-cell <grid> <row> <column>) => li
-	interp.Def(fnGetZGridCell, 3, func(a []any) any {
-		grid := mustGet(fnGetZGridCell, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		row := int(z3.ToInt64(fnGetZGridCell, a[1]))
-		column := int(z3.ToInt64(fnGetZGridCell, a[2]))
-		gridRow := grid.Rows[row]
-		cell := gridRow.Cells[column]
-		return &z3.Cell{Car: string(cell.Rune), Cdr: &z3.Cell{Car: TextGridStyleToList(cell.Style),
-			Cdr: z3.Nil}}
-	})
-
-	fnGetZGridRune := pre("get-zgrid-rune")
-	// (get-zgrid-rune grid row column) => str
-	interp.Def(fnGetZGridRune, 3, func(a []any) any {
-		grid := mustGet(fnGetZGridRune, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		row := int(z3.ToInt64(fnGetZGridRune, a[1]))
-		column := int(z3.ToInt64(fnGetZGridRune, a[2]))
-		gridRow := grid.Rows[row]
-		cell := gridRow.Cells[column]
-		return string(cell.Rune)
-	})
-
-	fnSetZGridRow := pre("set-zgrid-row")
-	// (set-zgrid-row <grid> <row> <rowspec>) where <rowspec> has the same format as is returned
-	// by get-zgrid-row, i.e. it is an array of cell lists containing a rune string and a style list.
-	interp.Def(fnSetZGridRow, 3, func(a []any) any {
-		grid := mustGet(fnSetZGridRow, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		row := int(z3.ToInt64(fnSetZGridRow, a[1]))
-		li := a[2].(*z3.Cell)
-		columns := li.Car.([]any)
-		li = li.CdrCell()
-		style := ListToTextGridStyle(li.Car)
-		cells := make([]widget.TextGridCell, 0, len(columns))
-		for i := range columns {
-			li = columns[i].(*z3.Cell)
-			r := []rune(li.Car.(string))[0]
-			li = li.CdrCell()
-			sty := ListToTextGridStyle(li.Car)
-			cells = append(cells, widget.TextGridCell{Rune: r, Style: sty})
-		}
-		grid.SetRow(row, widget.TextGridRow{Cells: cells, Style: style})
-		return z3.Void
-	})
-
-	fnWrapDeleteZGrid := pre("wrap-delete-zgrid")
-	// (wrap-delete-zgrid grid range-list wrapcol soft-wrap? hard-lf-rune soft-lf-rune cursor-row cursor-column) => li
-	// Delete the given range of the form (startrow endrow endrow endcol) (all inclusive) while ensuring
-	// that all paragraphs in the range are word wrapped. Returns a new cursor position.
-	interp.Def(fnWrapDeleteZGrid, 8, func(a []any) any {
-		grid := mustGet(fnWrapDeleteZGrid, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		startRow, startCol, endRow, endCol := TextGridRangeListToRange(fnWrapDeleteZGrid, a[1].(*z3.Cell))
-		wrapCol := z3.ToInt(fnWrapDeleteZGrid, a[2])
-		softWrap := z3.ToBool(a[3])
-		hardLF := []rune(a[4].(string))[0]
-		softLF := []rune(a[5].(string))[0]
-		cursorRow := z3.ToInt(fnWrapDeleteZGrid, a[6])
-		cursorColumn := z3.ToInt(fnWrapDeleteZGrid, a[7])
-		// delete the range from startRow to endRow in the grid
-		var underflow []widget.TextGridCell
-		for i := endRow; i >= startRow; i-- {
-			if startRow < i && i < endRow {
-				grid.Rows = slices.Delete(grid.Rows, i, i+1)
-				continue
-			}
-			row := grid.Rows[i]
-			if i == startRow && i == endRow {
-				row.Cells = slices.Delete(row.Cells, startCol, endCol)
-				if cursorRow == i && cursorColumn >= startCol {
-					cursorColumn = startCol
-				}
-			} else if i == startRow {
-				row.Cells = slices.Delete(row.Cells, startCol, len(row.Cells))
-				if underflow != nil {
-					row.Cells = append(row.Cells, underflow...)
-					grid.SetRow(i, row)
-					cursorColumn = len(row.Cells) - len(underflow)
-					grid.Rows = slices.Delete(grid.Rows, i, i+1)
-					underflow = nil
-				}
-				if len(row.Cells) == 0 && i > 0 {
-					grid.Rows = slices.Delete(grid.Rows, i, i+1)
-					cursorColumn = 0
-					cursorRow = i
-				} else if inSelectionRange(startRow, startCol, endRow, endCol, cursorRow, cursorColumn) {
-					cursorColumn = startCol
-					cursorRow = i
-				}
-			} else if i == endRow {
-				if endCol < len(row.Cells) {
-					underflow = slices.Clone(row.Cells[endCol:])
-				}
-				row.Cells = slices.Delete(row.Cells, 0, endCol)
-			}
-			grid.SetRow(i, row)
-		}
-		// now we reflow with word wrap like in wrap-insert-zgrid
-		paraStart := grid.FindParagraphStart(startRow, hardLF)
-		paraEnd := grid.FindParagraphEnd(startRow, hardLF)
-		rows := make([]widget.TextGridRow, paraEnd-paraStart+1)
-		for i := range rows {
-			rows[i] = grid.Row(i + paraStart)
-		}
-		newCursorRow := cursorRow
-		newCursorCol := cursorColumn
-		rows, newCursorRow, newCursorCol = WordWrapTextGridRows(rows, wrapCol, softWrap, hardLF, softLF, newCursorRow-paraStart, newCursorCol)
-		// check if we need to delete rows
-		if len(rows) < paraEnd-paraStart+1 {
-			grid.Rows = slices.Delete(grid.Rows, paraStart+len(rows), paraEnd+1)
-		}
-		// check if we need to insert additional rows
-		if len(rows) > paraEnd-paraStart+1 {
-			newRows := make([]widget.TextGridRow, len(rows)-(paraEnd-paraStart+1))
-			grid.Rows = slices.Insert(grid.Rows, paraEnd+1, newRows...)
-		}
-		for i := range rows {
-			grid.SetRow(i+paraStart, rows[i])
-		}
-		return &z3.Cell{Car: goarith.AsNumber(paraStart + newCursorRow),
-			Cdr: &z3.Cell{Car: goarith.AsNumber(newCursorCol), Cdr: z3.Nil}}
-	})
-
-	fnWrapInsertZGrid := pre("wrap-insert-zgrid")
-	// (wrap-insert-zgrid grid cells row col wrapcol soft-wrap? hard-lf-rune soft-lf-rune) => li
-	// Soft or hard wrap a paragraph in which row, col is located, based on hard-lf-rune and soft-lf-rune
-	// markers for end-of-line (since "\n" is not a good candidate for this, other markers are normally used).
-	// The function returns a list of the form (row col) that represents the new cursor position if
-	// row and col are the old cursor positions.
-	interp.Def(fnWrapInsertZGrid, 8, func(a []any) any {
-		grid := mustGet(fnWrapInsertZGrid, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		// cells are an array of any containing lists of the form (rune zgrid-style-list)
-		// these are converted to an array of TextGridCell like in a TextGridRow
-		cells := a[1].([]any)
-		tgCells := make([]widget.TextGridCell, len(cells))
-		for i := range cells {
-			tgCells[i] = ListToTextGridCell(cells[i])
-		}
-		row := int(z3.ToInt64(fnWrapInsertTextGrid, a[2]))
-		col := int(z3.ToInt64(fnWrapInsertTextGrid, a[3]))
-		wrapCol := int(z3.ToInt64(fnWrapInsertTextGrid, a[4]))
-		softWrap := z3.ToBool(a[5])
-		hardLF := []rune(a[6].(string))[0]
-		softLF := []rune(a[7].(string))[0]
-		// we now obtain the paragraph start and end row and store the rows in an array
-		// these are wrapped and the new wrapped rows replace the original rows
-		// what we do in what follows has heavy performance implications
-		startRow := grid.FindParagraphStart(row, hardLF)
-		endRow := grid.FindParagraphEnd(row, hardLF)
-		// log.Printf("startRow=%v, endRow=%v\n", startRow, endRow)
-		rows := make([]widget.TextGridRow, (endRow-startRow)+1)
-		for i := range rows {
-			rows[i] = grid.Row(i + startRow)
-		}
-		k := row - startRow // the row into which we insert
-		line := rows[k].Cells
-		lenLine := len(line)
-		lenInsert := len(tgCells)
-		n := lenLine + lenInsert
-		newLine := make([]widget.TextGridCell, 0, n)
-		if col >= lenLine {
-			newLine = append(newLine, line...)
-			newLine = append(newLine, tgCells...)
-		} else if col == 0 {
-			newLine = append(newLine, tgCells...)
-			newLine = append(newLine, line...)
-		} else {
-			newLine = append(newLine, line[:col]...)
-			newLine = append(newLine, tgCells...)
-			newLine = append(newLine, line[col:lenLine]...)
-		}
-		rows[k] = widget.TextGridRow{Cells: newLine, Style: rows[k].Style}
-		// We now have rows with the text insert correctly into rows[k].
-		// To achieve this, we extract all cells into one array, work on this
-		// and then put the cells back into the rows. This is obviously not very efficient,
-		// but correctness is more important for now.
-		newCursorRow := row
-		newCursorCol := col
-		rows, newCursorRow, newCursorCol = WordWrapTextGridRows(rows, wrapCol, softWrap, hardLF, softLF, row-startRow, col)
-		// check if we need to delete rows
-		if len(rows) < endRow-startRow+1 {
-			grid.Rows = slices.Delete(grid.Rows, startRow+len(rows), endRow+1)
-		}
-		// check if we need to insert additional rows
-		if len(rows) > endRow-startRow+1 {
-			newRows := make([]widget.TextGridRow, len(rows)-(endRow-startRow+1))
-			grid.Rows = slices.Insert(grid.Rows, endRow+1, newRows...)
-		}
-		for i := range rows {
-			grid.SetRow(i+startRow, rows[i])
-		}
-		return &z3.Cell{Car: goarith.AsNumber(startRow + newCursorRow),
-			Cdr: &z3.Cell{Car: goarith.AsNumber(newCursorCol), Cdr: z3.Nil}}
-	})
-
-	fnRemoveZGridRow := pre("remove-zgrid-row")
-	// (remove-zgrid-row grid row)
-	interp.Def(fnRemoveZGridRow, 2, func(a []any) any {
-		grid := mustGet(fnRemoveZGridRow, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		row := int(z3.ToInt64(fnRemoveZGridRow, a[1]))
-		grid.Rows = append(grid.Rows[:row], grid.Rows[row+1:]...)
-		return z3.Void
-	})
-
-	fnInsertZGridRow := pre("insert-zgrid-row")
-	// (insert-zgrid-row grid row)
-	interp.Def(fnInsertZGridRow, 2, func(a []any) any {
-		grid := mustGet(fnInsertZGridRow, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		row := int(z3.ToInt64(fnInsertZGridRow, a[1]))
-		if row == len(grid.Rows) {
-			grid.Rows = append(grid.Rows, widget.TextGridRow{})
-			return z3.Void
-		}
-		grid.Rows = append(grid.Rows, widget.TextGridRow{})
-		copy(grid.Rows[row+1:], grid.Rows[row:])
-		grid.Rows[row] = widget.TextGridRow{}
-		return z3.Void
-	})
-
-	fnSetZGridRowStyle := pre("set-zgrid-row-style")
-	// (set-zgrid-row-style <grid> <row> <style-list>) sets the whole row to the style list,
-	// which contains a foreground color and a background color list.
-	interp.Def(fnSetZGridRowStyle, 3, func(a []any) any {
-		grid := mustGet(fnSetZGridRowStyle, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		row := int(z3.ToInt64(fnSetZGridRowStyle, a[1]))
-		li := a[2].(*z3.Cell)
-		style := ListToTextGridStyle(li)
-		grid.SetRowStyle(row, style)
-		return z3.Void
-	})
-
-	fnSetZGridRune := pre("set-zgrid-rune")
-	// (set-zgrid-rune <grid> <row> <column> <str>)
-	interp.Def(fnSetZGridRune, 4, func(a []any) any {
-		grid := mustGet(fnSetZGridRune, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		row := int(z3.ToInt64(fnSetZGridRune, a[1]))
-		column := int(z3.ToInt64(fnSetZGridRune, a[2]))
-		r := []rune(a[3].(string))[0]
-		grid.SetRune(zedit.CharPos{Line: row, Column: column}, r)
-		return z3.Void
-	})
-
-	fnSetZGridStyle := pre("set-zgrid-style")
-	// (set-zgrid-style <grid> <row> <column> <style-list>)
-	interp.Def(fnSetZGridStyle, 4, func(a []any) any {
-		grid := mustGet(fnSetZGridStyle, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		row := int(z3.ToInt64(fnSetZGridStyle, a[1]))
-		column := int(z3.ToInt64(fnSetZGridStyle, a[2]))
-		style := ListToTextGridStyle(a[3])
-		grid.SetStyle(zedit.CharPos{Line: row, Column: column}, style)
-		return z3.Void
-	})
-
-	fnSetZGridStyleRange := pre("set-zgrid-style-range")
-	// (set-zgrid-style-range <grid> <start-row> <start-column> <end-row> <end-column> <style-list>)
-	interp.Def(fnSetZGridStyleRange, 6, func(a []any) any {
-		grid := mustGet(fnSetZGridStyleRange, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		row1 := int(z3.ToInt64(fnSetZGridStyleRange, a[1]))
-		column1 := int(z3.ToInt64(fnSetZGridStyleRange, a[2]))
-		row2 := int(z3.ToInt64(fnSetZGridStyleRange, a[3]))
-		column2 := int(z3.ToInt64(fnSetZGridStyleRange, a[4]))
-		style := ListToTextGridStyle(a[5])
-		grid.SetStyleRange(zedit.CharInterval{Start: zedit.CharPos{Line: row1, Column: column1}, End: zedit.CharPos{Line: row2, Column: column2}},
-			style)
-		return z3.Void
-	})
-
-	fnSetZGridText := pre("set-zgrid-text")
-	// (set-zgrid-text <grid> <str>)
-	interp.Def(fnSetZGridText, 2, func(a []any) any {
-		grid := mustGet(fnSetZGridText, "GUI text grid ID", a, 0).(*zedit.ZGrid)
+	fnSetZeditText := pre("set-zedit-text")
+	// (set-zedit-text <editor> <str>)
+	interp.Def(fnSetZeditText, 2, func(a []any) any {
+		editor := mustGet(fnSetZeditText, "GUI zedit ID", a, 0).(*zedit.Editor)
 		s := a[1].(string)
-		grid.SetText(s)
+		editor.SetText(s)
 		return z3.Void
 	})
 
-	fnGetZGridText := pre("get-zgrid-text")
-	// (get-zgrid-text <grid>) => str
-	interp.Def(fnGetZGridText, 1, func(a []any) any {
-		grid := mustGet(fnGetZGridText, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		return grid.Text()
+	fnGetZeditText := pre("get-zedit-text")
+	// (get-zedit-text <editor>) => str
+	interp.Def(fnGetZeditText, 1, func(a []any) any {
+		editor := mustGet(fnGetZeditText, "GUI zedit ID", a, 0).(*zedit.Editor)
+		return editor.Text()
 	})
 
-	// (count-zgrid-rows grid) => int
-	interp.Def(pre("count-zgrid-rows"), 1, func(a []any) any {
-		grid := mustGet(pre("count-zgrid-rows"), "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		return goarith.AsNumber(len(grid.Rows))
+	fnGetZeditLastLine := pre("get-zedit-last-line")
+	// (get-zedit-last-line editor) => int
+	interp.Def(fnGetZeditLastLine, 1, func(a []any) any {
+		editor := mustGet(fnGetZeditLastLine, "GUI zedit ID", a, 0).(*zedit.Editor)
+		return goarith.AsNumber(len(editor.Rows))
 	})
 
-	fnCountZGridRowColumns := pre("count-zgrid-row-columns")
-	// (count-zgrid-row-columns grid row) => int
-	interp.Def(fnCountZGridRowColumns, 2, func(a []any) any {
-		grid := mustGet(fnCountZGridRowColumns, "GUI text grid ID", a, 0).(*zedit.ZGrid)
-		row := int(z3.ToInt64(fnCountZGridRowColumns, a[1]))
-		return goarith.AsNumber(len(grid.Rows[row].Cells))
+	fnGetZeditLastColumn := pre("get-zedit-last-column")
+	// (get-zedit-last-column grid line) => int
+	interp.Def(fnGetZeditLastColumn, 2, func(a []any) any {
+		editor := mustGet(fnGetZeditLastColumn, "GUI zedit ID", a, 0).(*zedit.Editor)
+		row := int(z3.ToInt64(fnGetZeditLastColumn, a[1]))
+		return goarith.AsNumber(editor.LastColumn(row))
+	})
+
+	fnSetZeditLineNUmberStyle := pre("set-zedit-line-number-style")
+	// (set-zedit-line-number-style editor style)
+	interp.Def(fnSetZeditLineNUmberStyle, 2, func(a []any) any {
+		editor := mustGet(fnSetZeditLineNUmberStyle, "GUI zedit ID", a, 0).(*zedit.Editor)
+		style := ListToZeditStyle(a[1].(*z3.Cell))
+		editor.SetLineNumberStyle(style)
+		return z3.Void
+	})
+
+	fnSetZeditTopLine := pre("set-zedit-top-line")
+	// (set-zedit-top-line editor n)
+	interp.Def(fnSetZeditTopLine, 2, func(a []any) any {
+		editor := mustGet(fnSetZeditTopLine, "GUI zedit ID", a, 0).(*zedit.Editor)
+		n := z3.ToInt(fnSetZeditTopLine, a[1])
+		editor.SetTopLine(n)
+		return z3.Void
+	})
+
+	fnCenterZeditLineOnCaret := pre("center-zedit-line-on-caret")
+	// (center-zedit-line-on-caret editor)
+	interp.Def(fnCenterZeditLineOnCaret, 1, func(a []any) any {
+		editor := mustGet(fnCenterZeditLineOnCaret, "GUI zedit ID", a, 0).(*zedit.Editor)
+		editor.CenterLineOnCaret()
+		return z3.Void
+	})
+
+	fnGetZeditLineText := pre("get-zedit-line-text")
+	// (get-zedit-line-text editor n) => str
+	interp.Def(fnGetZeditLineText, 2, func(a []any) any {
+		editor := mustGet(fnGetZeditLineText, "GUI zedit ID", a, 0).(*zedit.Editor)
+		n := z3.ToInt(fnGetZeditLineText, a[1])
+		return editor.LineText(n)
+	})
+
+	fnSetZeditLineText := pre("set-zedit-line-text")
+	// (set-zedit-line-text editor n s) => str
+	interp.Def(fnSetZeditLineText, 3, func(a []any) any {
+		editor := mustGet(fnSetZeditLineText, "GUI zedit ID", a, 0).(*zedit.Editor)
+		n := z3.ToInt(fnSetZeditLineText, a[1])
+		s := a[2].(string)
+		editor.SetLine(n, []rune(s))
+		return z3.Void
+	})
+
+	fnFindZeditParagraphStart := pre("find-zedit-paragraph-start")
+	// (find-zedit-paragraph-start editor line lf) => num
+	interp.Def(fnFindZeditParagraphStart, 3, func(a []any) any {
+		editor := mustGet(fnFindZeditParagraphStart, "GUI zedit ID", a, 0).(*zedit.Editor)
+		n := z3.ToInt(fnFindZeditParagraphStart, a[1])
+		s := a[2].(string)
+		return goarith.AsNumber(editor.FindParagraphStart(n, []rune(s)[0]))
+	})
+
+	fnFindZeditParagraphEnd := pre("find-zedit-paragraph-end")
+	// (find-zedit-paragraph-end editor line lf) => num
+	interp.Def(fnFindZeditParagraphEnd, 3, func(a []any) any {
+		editor := mustGet(fnFindZeditParagraphEnd, "GUI zedit ID", a, 0).(*zedit.Editor)
+		n := z3.ToInt(fnFindZeditParagraphEnd, a[1])
+		s := a[2].(string)
+		return goarith.AsNumber(editor.FindParagraphEnd(n, []rune(s)[0]))
+	})
+
+	fnSetZeditMark := pre("set-zedit-mark")
+	// (set-zedit-mark editor n)
+	interp.Def(fnSetZeditMark, 2, func(a []any) any {
+		editor := mustGet(fnSetZeditMark, "GUI zedit ID", a, 0).(*zedit.Editor)
+		n := z3.ToInt(fnSetZeditMark, a[1])
+		if n < 0 || n >= len(editor.MarkTags) {
+			panic(fmt.Sprintf("%v: zedit mark index out of bounds, should be in [0...%v], given %v", fnSetZeditMark, len(editor.MarkTags)-1, n))
+		}
+		editor.SetMark(n)
+		return z3.Void
+	})
+
+	fnCutZedit := pre("cut-zedit")
+	// (cut-zedit editor)
+	interp.Def(fnCutZedit, 1, func(a []any) any {
+		editor := mustGet(fnCutZedit, "GUI zedit ID", a, 0).(*zedit.Editor)
+		editor.Cut()
+		return z3.Void
+	})
+
+	fnScrollZeditDown := pre("scroll-zedit-down")
+	// (scroll-zedit-down editor)
+	interp.Def(fnScrollZeditDown, 1, func(a []any) any {
+		editor := mustGet(fnScrollZeditDown, "GUI zedit ID", a, 0).(*zedit.Editor)
+		editor.ScrollDown()
+		return z3.Void
+	})
+
+	fnScrollZeditUp := pre("scroll-zedit-up")
+	// (scroll-zedit-up editor)
+	interp.Def(fnScrollZeditUp, 1, func(a []any) any {
+		editor := mustGet(fnScrollZeditUp, "GUI zedit ID", a, 0).(*zedit.Editor)
+		editor.ScrollUp()
+		return z3.Void
+	})
+
+	fnScrollZeditLeft := pre("scroll-zedit-left")
+	// (scroll-zedit-left editor n)
+	interp.Def(fnScrollZeditLeft, 2, func(a []any) any {
+		editor := mustGet(fnScrollZeditLeft, "GUI zedit ID", a, 0).(*zedit.Editor)
+		n := z3.ToInt(fnScrollZeditLeft, a[1])
+		editor.ScrollLeft(n)
+		return z3.Void
+	})
+
+	fnScrollZeditRight := pre("scroll-zedit-right")
+	// (scroll-zedit-left editor n)
+	interp.Def(fnScrollZeditRight, 2, func(a []any) any {
+		editor := mustGet(fnScrollZeditRight, "GUI zedit ID", a, 0).(*zedit.Editor)
+		n := z3.ToInt(fnScrollZeditRight, a[1])
+		editor.ScrollRight(n)
+		return z3.Void
+	})
+
+	fnGetZeditCurrentSelection := pre("get-zedit-current-selection")
+	// (get-zedit-current-selection editor) => li
+	interp.Def(fnGetZeditCurrentSelection, 1, func(a []any) any {
+		editor := mustGet(fnGetZeditCurrentSelection, "GUI zedit ID", a, 0).(*zedit.Editor)
+		sel, ok := editor.CurrentSelection()
+		if !ok {
+			return z3.Nil
+		}
+		return CharIntervalToList(sel)
+	})
+
+	fnSelectZeditWord := pre("select-zedit-word")
+	// (select-zedit-word editor line column) => li
+	interp.Def(fnSelectZeditWord, 3, func(a []any) any {
+		editor := mustGet(fnSelectZeditWord, "GUI zedit ID", a, 0).(*zedit.Editor)
+		line := z3.ToInt(fnSelectZeditWord, a[1])
+		column := z3.ToInt(fnSelectZeditWord, a[2])
+		editor.SelectWord(zedit.CharPos{Line: line, Column: column})
+		return z3.Void
+	})
+
+	fnRemoveZeditSelection := pre("remove-zedit-selection")
+	// (remove-zedit-selection editor)
+	interp.Def(fnRemoveZeditSelection, 1, func(a []any) any {
+		editor := mustGet(fnRemoveZeditSelection, "GUI zedit ID", a, 0).(*zedit.Editor)
+		editor.RemoveSelection()
+		return z3.Void
+	})
+
+	fnConvertPosToCharPos := pre("convert-pos-to-zedit-charpos")
+	// (convert-pos-to-zedit-charpos editor x y) => li
+	interp.Def(fnConvertPosToCharPos, 3, func(a []any) any {
+		editor := mustGet(fnConvertPosToCharPos, "GUI zedit ID", a, 0).(*zedit.Editor)
+		x := z3.ToFloat64(a[1])
+		y := z3.ToFloat64(a[2])
+		pos := editor.PosToCharPos(fyne.Position{X: float32(x), Y: float32(y)})
+		return CharPosToList(pos)
+	})
+
+	fnAddZeditShortcut := pre("add-zedit-shortcut")
+	// (add-zedit-shortcut editor shortcut proc)
+	interp.Def(fnAddZeditShortcut, 3, func(a []any) any {
+		editor := mustGet(fnAddZeditShortcut, "GUI zedit ID", a, 0).(*zedit.Editor)
+		key, modifier := MustGetShortcut(fnAddZeditShortcut, a[1].(*z3.Cell))
+		proc := a[2].(*z3.Closure)
+		shortcut := &desktop.CustomShortcut{KeyName: key, Modifier: modifier}
+		editor.AddShortcutHandler(shortcut, func(z *zedit.Editor) {
+			interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: z3.Nil}, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN canvas %v shortcut handler", z3.Str(a[0])))
+		})
+		return z3.Void
+	})
+
+	fnRemoveZeditShortcut := pre("remove-zedit-shortcut")
+	// (remove-zedit-shortcut editor s)
+	interp.Def(fnRemoveZeditShortcut, 2, func(a []any) any {
+		editor := mustGet(fnRemoveZeditShortcut, "GUI zedit ID", a, 0).(*zedit.Editor)
+		name := a[1].(string)
+		editor.RemoveShortcutHandler(name)
+		return z3.Void
+	})
+
+	fnAddZeditKeyHandler := pre("add-zedit-key")
+	// (add-zedit-key editor key proc)
+	interp.Def(fnAddZeditKeyHandler, 3, func(a []any) any {
+		editor := mustGet(fnAddZeditKeyHandler, "GUI zedit ID", a, 0).(*zedit.Editor)
+		var key string
+		sym, ok := a[1].(*z3.Sym)
+		if ok {
+			key = sym.String()
+		} else {
+			key = a[1].(string)
+		}
+		proc := a[2].(*z3.Closure)
+		editor.AddKeyHandler(fyne.KeyName(key), func(z *zedit.Editor) {
+			interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: z3.Nil}, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN canvas %v shortcut handler", z3.Str(a[0])))
+		})
+		return z3.Void
+	})
+
+	fnRemoveZeditKey := pre("remove-zedit-key")
+	// (remove-zedit-key editor key)
+	interp.Def(fnRemoveZeditKey, 2, func(a []any) any {
+		editor := mustGet(fnRemoveZeditKey, "GUI zedit ID", a, 0).(*zedit.Editor)
+		var key string
+		sym, ok := a[1].(*z3.Sym)
+		if ok {
+			key = sym.String()
+		} else {
+			key = a[1].(string)
+		}
+		editor.RemoveKeyHandler(fyne.KeyName(key))
+		return z3.Void
+	})
+
+	fnRefreshZedit := pre("refresh-zedit")
+	// (refresh-zedit editor)
+	interp.Def(fnRefreshZedit, 1, func(a []any) any {
+		editor := mustGet(fnRefreshZedit, "GUI zedit ID", a, 0).(*zedit.Editor)
+		editor.Refresh()
+		return z3.Void
+	})
+
+	fnBlinkZeditCaret := pre("blink-zedit-caret")
+	// (blink-zedit-caret editor on?)
+	interp.Def(fnBlinkZeditCaret, 2, func(a []any) any {
+		editor := mustGet(fnBlinkZeditCaret, "GUI zedit ID", a, 0).(*zedit.Editor)
+		editor.BlinkCaret(z3.ToBool(a[1]))
+		return z3.Void
 	})
 
 	// CHECK
@@ -4035,6 +3900,22 @@ func ListToTextGridStyle(arg any) widget.TextGridStyle {
 	return widget.TextGridStyleDefault
 }
 
+// ListToZeditStyle converts a list of colors to a zedit.EditorStyle used by zedit.Editor.
+func ListToZeditStyle(arg any) zedit.EditorStyle {
+	if li, ok := arg.(*z3.Cell); ok {
+		if li == z3.Nil {
+			return &zedit.CustomEditorStyle{FGColor: color.RGBA{R: 255, G: 255, B: 255, A: 255},
+				BGColor: color.RGBA{R: 0, G: 0, B: 0, A: 255}}
+		}
+		fg := ListToColor(li.Car.(*z3.Cell))
+		li = li.CdrCell()
+		bg := ListToColor(li.Car.(*z3.Cell))
+		return &zedit.CustomEditorStyle{FGColor: fg, BGColor: bg}
+	}
+	return &zedit.CustomEditorStyle{FGColor: color.RGBA{R: 255, G: 255, B: 255, A: 255},
+		BGColor: color.RGBA{R: 0, G: 0, B: 0, A: 255}}
+}
+
 // ListToTextGridCell converts a list in the format (rune style-list) to a text grid
 // TextGridCell.
 func ListToTextGridCell(arg any) widget.TextGridCell {
@@ -4273,4 +4154,52 @@ func TextGridRangeListToRange(caller string, li *z3.Cell) (int, int, int, int) {
 // false otherwise.
 func inSelectionRange(startRow, startCol, endRow, endCol, row, col int) bool {
 	return (row == startRow && col >= startCol) || (row == endRow && col <= endCol) || (row > startRow && row < endRow)
+}
+
+// CharIntervalToList converts a zedit char interval to a Z3S5 list of lists.
+func CharIntervalToList(interval zedit.CharInterval) *z3.Cell {
+	return &z3.Cell{Car: CharPosToList(interval.Start), Cdr: &z3.Cell{Car: CharPosToList(interval.End),
+		Cdr: z3.Nil}}
+}
+
+// CharPosToList converts a zedit char position to a Z3S5 list of integers.
+func CharPosToList(pos zedit.CharPos) *z3.Cell {
+	return &z3.Cell{Car: goarith.AsNumber(pos.Line), Cdr: &z3.Cell{Car: goarith.AsNumber(pos.Column),
+		Cdr: &z3.Cell{Car: z3.AsLispBool(pos.IsLineNumber), Cdr: z3.Nil}}}
+}
+
+// ListToCharPos converts a Z3S5 Lisp to a zedit char position, panicking if the list is malformed.
+// The parsing is permissive, a list (n) returns a line number position, (n m) returns a non-line number position,
+// and (n m b) returns a position where b is interpreted as bool.
+func ListToCharPos(caller string, li *z3.Cell) zedit.CharPos {
+	if li == z3.Nil {
+		panic(fmt.Errorf("%v: not a valid zedit char position, given %v", caller, z3.Str(li)))
+	}
+	line := z3.ToInt(caller, li.Car)
+	li = li.CdrCell()
+	if li == z3.Nil {
+		return zedit.CharPos{Line: line, Column: 0, IsLineNumber: true}
+	}
+	column := z3.ToInt(caller, li.Car)
+	li = li.CdrCell()
+	if li == z3.Nil {
+		return zedit.CharPos{Line: line, Column: column, IsLineNumber: false}
+	}
+	return zedit.CharPos{Line: line, Column: column, IsLineNumber: z3.ToBool(li.Car)}
+}
+
+// ListToCharInterval converts a Z3S5 Lisp to a zedit char interval, panicking if the list is malformed.
+// The parsing is permissive, if only one char position is given as list, the point interval (pos1...pos1)
+// is returned. (Zedit char intervals are right-end inclusive, so this make sense.)
+func ListToCharInterval(caller string, li *z3.Cell) zedit.CharInterval {
+	if li == z3.Nil {
+		panic(fmt.Errorf("%v: not a valid zedit char interval, given %v", caller, z3.Str(li)))
+	}
+	pos1 := ListToCharPos(caller, li.Car.(*z3.Cell))
+	li = li.CdrCell()
+	if li == z3.Nil {
+		return zedit.CharInterval{Start: pos1, End: pos1}
+	}
+	pos2 := ListToCharPos(caller, li.Car.(*z3.Cell))
+	return zedit.CharInterval{Start: pos1, End: pos2}
 }
