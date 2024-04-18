@@ -166,6 +166,25 @@ var LoremWord = z3.NewSym("word")
 var LoremSentence = z3.NewSym("sentence")
 var LoremParagraph = z3.NewSym("paragraph")
 
+// zedit caret movement selectors
+var CaretDown = z3.NewSym("down")
+var CaretUp = z3.NewSym("up")
+var CaretLeft = z3.NewSym("left")
+var CaretRight = z3.NewSym("right")
+var CaretHome = z3.NewSym("home")
+var CaretEnd = z3.NewSym("end")
+var CaretLineStart = z3.NewSym("line-start")
+var CaretLineEnd = z3.NewSym("line-end")
+var CaretHalfPageDown = z3.NewSym("half-page-down")
+var CaretHalfPageUp = z3.NewSym("half-page-up")
+var CaretPageDown = z3.NewSym("page-down")
+var CaretPageUp = z3.NewSym("page-up")
+
+// zedit tag events
+var TagEvtCaretEnter = z3.NewSym("caret-enter")
+var TagEvtCaretLeave = z3.NewSym("caret-leave")
+var TagEvtUnknown = z3.NewSym("unknown")
+
 // used to work around Go prohibition to hash functions
 type validatorWrapper struct {
 	fn fyne.StringValidator
@@ -1445,12 +1464,11 @@ func DefGUI(interp *z3.Interp, config Config) {
 	})
 
 	fnSelectZeditWord := pre("select-zedit-word")
-	// (select-zedit-word editor line column) => li
-	interp.Def(fnSelectZeditWord, 3, func(a []any) any {
+	// (select-zedit-word editor pos) => li
+	interp.Def(fnSelectZeditWord, 2, func(a []any) any {
 		editor := mustGet(fnSelectZeditWord, "GUI zedit ID", a, 0).(*zedit.Editor)
-		line := z3.ToInt(fnSelectZeditWord, a[1])
-		column := z3.ToInt(fnSelectZeditWord, a[2])
-		editor.SelectWord(zedit.CharPos{Line: line, Column: column})
+		pos := ListToCharPos(fnSelectZeditWord, a[1].(*z3.Cell))
+		editor.SelectWord(pos)
 		return z3.Void
 	})
 
@@ -1542,6 +1560,305 @@ func DefGUI(interp *z3.Interp, config Config) {
 	interp.Def(fnBlinkZeditCaret, 2, func(a []any) any {
 		editor := mustGet(fnBlinkZeditCaret, "GUI zedit ID", a, 0).(*zedit.Editor)
 		editor.BlinkCaret(z3.ToBool(a[1]))
+		return z3.Void
+	})
+
+	fnHasBlinkZeditCaret := pre("zedit-caret-blinking?")
+	// (zedit-caret-blinking? editor) => bool
+	interp.Def(fnHasBlinkZeditCaret, 1, func(a []any) any {
+		editor := mustGet(fnBlinkZeditCaret, "GUI zedit ID", a, 0).(*zedit.Editor)
+		return z3.AsLispBool(editor.HasBlinkingCaret())
+	})
+
+	fnZeditCaretOff := pre("switch-zedit-caret-off")
+	// (switch-zedit-caret-off editor) => bool
+	interp.Def(fnZeditCaretOff, 1, func(a []any) any {
+		editor := mustGet(fnZeditCaretOff, "GUI zedit ID", a, 0).(*zedit.Editor)
+		blinking := editor.CaretOff()
+		return z3.AsLispBool(blinking)
+	})
+
+	fnZeditCaretOn := pre("switch-zedit-caret-on")
+	// (switch-zedit-caret-on editor on?)
+	interp.Def(fnZeditCaretOn, 2, func(a []any) any {
+		editor := mustGet(fnZeditCaretOn, "GUI zedit ID", a, 0).(*zedit.Editor)
+		editor.CaretOn(z3.ToBool(a[1]))
+		return z3.Void
+	})
+
+	fnSetZeditCaret := pre("set-zedit-caret")
+	// (set-zedit-caret editor pos)
+	interp.Def(fnSetZeditCaret, 2, func(a []any) any {
+		editor := mustGet(fnSetZeditCaret, "GUI zedit ID", a, 0).(*zedit.Editor)
+		pos := ListToCharPos(fnSetZeditCaret, a[1].(*z3.Cell))
+		editor.SetCaret(pos)
+		return z3.Void
+	})
+
+	fnGetZeditCaret := pre("get-zedit-caret")
+	// (get-zedit-caret editor) => li
+	interp.Def(fnGetZeditCaret, 1, func(a []any) any {
+		editor := mustGet(fnGetZeditCaret, "GUI zedit ID", a, 0).(*zedit.Editor)
+		return CharPosToList(editor.CaretPos)
+	})
+
+	fnMoveZeditCaret := pre("move-zedit-caret")
+	// (move-zedit-caret editor selector)
+	interp.Def(fnMoveZeditCaret, 2, func(a []any) any {
+		editor := mustGet(fnMoveZeditCaret, "GUI zedit ID", a, 0).(*zedit.Editor)
+		editor.MoveCaret(CaretMovementSymToCaretMovement(fnMoveZeditCaret, a[1].(*z3.Sym)))
+		return z3.Void
+	})
+
+	fnInsertZeditAt := pre("insert-zedit-at")
+	// (insert-zedit-at editor s pos)
+	interp.Def(fnInsertZeditAt, 3, func(a []any) any {
+		editor := mustGet(fnInsertZeditAt, "GUI zedit ID", a, 0).(*zedit.Editor)
+		s := a[1].(string)
+		pos := ListToCharPos(fnInsertZeditAt, a[2].(*z3.Cell))
+		editor.Insert([]rune(s), pos)
+		return z3.Void
+	})
+
+	fnDeleteZeditRange := pre("delete-zedit-range")
+	// (delete-zedit-range editor range)
+	interp.Def(fnDeleteZeditRange, 2, func(a []any) any {
+		editor := mustGet(fnDeleteZeditRange, "GUI zedit ID", a, 0).(*zedit.Editor)
+		interval := ListToCharInterval(fnDeleteZeditRange, a[1].(*z3.Cell))
+		editor.Delete(interval)
+		return z3.Void
+	})
+
+	fnCompleteZeditToEnd := pre("complete-zedit-to-end")
+	// (complete-zedit-to-end editor start)
+	interp.Def(fnCompleteZeditToEnd, 2, func(a []any) any {
+		editor := mustGet(fnCompleteZeditToEnd, "GUI zedit ID", a, 0).(*zedit.Editor)
+		pos := ListToCharPos(fnCompleteZeditToEnd, a[1].(*z3.Cell))
+		interval := editor.ToEnd(pos)
+		return CharIntervalToList(interval)
+	})
+
+	fnGetZeditLastPos := pre("get-zedit-last-pos")
+	// (get-zedit-last-pos editor) => li
+	interp.Def(fnGetZeditLastPos, 1, func(a []any) any {
+		editor := mustGet(fnGetZeditLastPos, "GUI zedit ID", a, 0).(*zedit.Editor)
+		pos := editor.LastPos()
+		return CharPosToList(pos)
+	})
+
+	fnGetZeditPrevPos := pre("get-zedit-prev-pos")
+	// (get-zedit-prev-pos editor pos) => li
+	interp.Def(fnGetZeditPrevPos, 2, func(a []any) any {
+		editor := mustGet(fnGetZeditPrevPos, "GUI zedit ID", a, 0).(*zedit.Editor)
+		pos := ListToCharPos(fnGetZeditPrevPos, a[1].(*z3.Cell))
+		prev, ok := editor.PrevPos(pos)
+		return &z3.Cell{Car: CharPosToList(prev), Cdr: &z3.Cell{Car: z3.AsLispBool(ok), Cdr: z3.Nil}}
+	})
+
+	fnGetZeditNextPos := pre("get-zedit-next-pos")
+	// (get-zedit-next-pos editor pos) => li
+	interp.Def(fnGetZeditNextPos, 2, func(a []any) any {
+		editor := mustGet(fnGetZeditNextPos, "GUI zedit ID", a, 0).(*zedit.Editor)
+		pos := ListToCharPos(fnGetZeditNextPos, a[1].(*z3.Cell))
+		next, ok := editor.NextPos(pos)
+		return &z3.Cell{Car: CharPosToList(next), Cdr: &z3.Cell{Car: z3.AsLispBool(ok), Cdr: z3.Nil}}
+	})
+
+	fnZeditBackspace := pre("zedit-backspace")
+	// (zedit-backspace editor)
+	interp.Def(fnZeditBackspace, 1, func(a []any) any {
+		editor := mustGet(fnZeditBackspace, "GUI zedit ID", a, 0).(*zedit.Editor)
+		editor.Backspace()
+		return z3.Void
+	})
+
+	fnZeditDelete1 := pre("zedit-delete1")
+	// (zedit-delete1 editor)
+	interp.Def(fnZeditDelete1, 1, func(a []any) any {
+		editor := mustGet(fnZeditDelete1, "GUI zedit ID", a, 0).(*zedit.Editor)
+		editor.Delete1()
+		return z3.Void
+	})
+
+	fnZeditReturn := pre("zedit-return")
+	// (zedit-return editor)
+	interp.Def(fnZeditReturn, 1, func(a []any) any {
+		editor := mustGet(fnZeditReturn, "GUI zedit ID", a, 0).(*zedit.Editor)
+		editor.Return()
+		return z3.Void
+	})
+
+	fnNewTag := pre("new-tag")
+	// (new-tag name [index] [user-data])
+	interp.Def(fnNewTag, -1, func(a []any) any {
+		li := a[0].(*z3.Cell)
+		name := li.Car.(string)
+		li = li.CdrCell()
+		if li == z3.Nil {
+			return put(zedit.NewTag(name))
+		}
+		index := z3.ToInt(fnNewTag, li.Car)
+		li = li.CdrCell()
+		return put(zedit.NewTagWithUserData(name, index, li.Car))
+	})
+
+	fnGetTagName := pre("get-tag-name")
+	// (get-tag-name tag) => str
+	interp.Def(fnGetTagName, 1, func(a []any) any {
+		tag := mustGet(fnGetTagName, "GUI tag ID", a, 0).(zedit.Tag)
+		return tag.Name()
+	})
+
+	fnGetTagIndex := pre("get-tag-index")
+	// (get-tag-index tag) => int
+	interp.Def(fnGetTagIndex, 1, func(a []any) any {
+		tag := mustGet(fnGetTagIndex, "GUI tag ID", a, 0).(zedit.Tag)
+		return goarith.AsNumber(tag.Index())
+	})
+
+	fnGetTagUserData := pre("get-tag-user-data")
+	// (get-tag-user-data tag) => any
+	interp.Def(fnGetTagUserData, 1, func(a []any) any {
+		tag := mustGet(fnGetTagUserData, "GUI tag ID", a, 0).(zedit.Tag)
+		data := tag.UserData()
+		if data == nil {
+			return z3.Nil
+		}
+		return data
+	})
+
+	fnSetTagUserData := pre("set-tag-user-data")
+	// (set-tag-user-data tag datum)
+	interp.Def(fnSetTagUserData, 2, func(a []any) any {
+		tag := mustGet(fnSetTagUserData, "GUI tag ID", a, 0).(zedit.Tag)
+		tag.SetUserData(a[1])
+		return z3.Void
+	})
+
+	fnSetTagCallback := pre("set-tag-callback")
+	// (set-tag-callback tag proc)
+	interp.Def(fnSetTagCallback, 2, func(a []any) any {
+		tag := mustGet(fnSetTagCallback, "GUI tag ID", a, 0).(zedit.Tag)
+		proc := a[1].(*z3.Closure)
+		tag.SetCallback(zedit.TagFunc(func(evt zedit.TagEvent, tag zedit.Tag,
+			interval zedit.CharInterval) {
+			evtSym := TagEventToTagEventSymbol(evt)
+			tagID, _ := getID(tag)
+			li := CharIntervalToList(interval)
+			interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: evtSym,
+				Cdr: &z3.Cell{Car: tagID, Cdr: &z3.Cell{Car: li, Cdr: z3.Nil}}}}, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN canvas %v shortcut handler", z3.Str(a[0])))
+		}))
+		return z3.Void
+	})
+
+	fnAddZeditTags := pre("add-zedit-tags")
+	// (add-zedit-tags editor range tags...)
+	interp.Def(fnAddZeditTags, -1, func(a []any) any {
+		arr := z3.ListToArray(a[0].(*z3.Cell))
+		editor := mustGet(fnAddZeditTags, "GUI zedit ID", arr, 0).(*zedit.Editor)
+		interval := ListToCharInterval(fnAddZeditTags, arr[1].(*z3.Cell))
+		tags := make([]zedit.Tag, 0, len(arr)-2)
+		for i := 2; i < len(arr); i++ {
+			tag := mustGet(fnAddZeditTags, "GUI tag ID", arr, i)
+			tags = append(tags, tag.(zedit.Tag))
+		}
+		editor.Tags.Add(interval, tags...)
+		return z3.Void
+	})
+
+	fnDeleteZeditTag := pre("delete-zedit-tag")
+	// (delete-zedit-tag editor tag)
+	interp.Def(fnDeleteZeditTag, 2, func(a []any) any {
+		editor := mustGet(fnDeleteZeditTag, "GUI zedit ID", a, 0).(*zedit.Editor)
+		tag := mustGet(fnDeleteZeditTag, "GUI tag ID", a, 1).(zedit.Tag)
+		editor.Tags.Delete(tag)
+		return z3.Void
+	})
+
+	fnUpsertZeditTag := pre("upsert-zedit-tag")
+	// (upsert-zedit-tag editor tag range)
+	interp.Def(fnUpsertZeditTag, 3, func(a []any) any {
+		editor := mustGet(fnUpsertZeditTag, "GUI zedit ID", a, 0).(*zedit.Editor)
+		tag := mustGet(fnUpsertZeditTag, "GUI tag ID", a, 1).(zedit.Tag)
+		interval := ListToCharInterval(fnUpsertZeditTag, a[2].(*z3.Cell))
+		editor.Tags.Upsert(tag, interval)
+		return z3.Void
+	})
+
+	fnGetZeditTagsByName := pre("get-zedit-tags-by-name")
+	// (get-zedit-tags-by-name editor name)
+	interp.Def(fnGetZeditTagsByName, 2, func(a []any) any {
+		editor := mustGet(fnGetZeditTagsByName, "GUI zedit ID", a, 0).(*zedit.Editor)
+		name := a[1].(string)
+		set, ok := editor.Tags.TagsByName(name)
+		if !ok {
+			return z3.Nil
+		}
+		tags := set.Values()
+		arr := make([]any, 0, len(tags))
+		for i := range tags {
+			id, ok := getID(tags[i])
+			if ok {
+				arr = append(arr, id)
+			}
+		}
+		return z3.ArrayToList(arr)
+	})
+
+	fnCloneZeditTag := pre("clone-zedit-tag")
+	// (clone-zedit-tag editor tag)
+	interp.Def(fnCloneZeditTag, 2, func(a []any) any {
+		editor := mustGet(fnCloneZeditTag, "GUI zedit ID", a, 0).(*zedit.Editor)
+		tag := mustGet(fnCloneZeditTag, "GUI tag ID", a, 1).(zedit.Tag)
+		return put(editor.Tags.CloneTag(tag))
+	})
+
+	fnNewZeditStyle := pre("new-zedit-style")
+	// (new-style editor tag-name style blend? draw-full-line?)
+	interp.Def(fnNewZeditStyle, 5, func(a []any) any {
+		editor := mustGet(fnNewZeditStyle, "GUI zedit ID", a, 0).(*zedit.Editor)
+		name := a[1].(string)
+		style := ListToZeditStyle(a[2].(*z3.Cell))
+		blend := z3.ToBool(a[3])
+		drawFullLine := z3.ToBool(a[4])
+		fn := zedit.TagStyleFunc(func(tag zedit.Tag, c widget.TextGridCell) widget.TextGridCell {
+			fg := style.TextColor()
+			bg := style.BackgroundColor()
+			if blend && c.Style != nil {
+				if c.Style.TextColor() != nil {
+					fg = zedit.BlendColors(editor.BlendFG, editor.BlendFGSwitched,
+						c.Style.TextColor(), fg)
+				}
+				if c.Style.BackgroundColor() != nil {
+					bg = zedit.BlendColors(editor.BlendBG, editor.BlendBGSwitched,
+						c.Style.BackgroundColor(), bg)
+				}
+			}
+			newStyle := &widget.CustomTextGridStyle{FGColor: fg, BGColor: bg}
+			return widget.TextGridCell{
+				Rune:  c.Rune,
+				Style: newStyle,
+			}
+		})
+		return put(zedit.TagStyler{TagName: name, StyleFunc: fn, DrawFullLine: drawFullLine})
+	})
+
+	fnAddZeditStyle := pre("add-zedit-style")
+	// (add-zedit-style editor styler)
+	interp.Def(fnAddZeditStyle, 2, func(a []any) any {
+		editor := mustGet(fnAddZeditStyle, "GUI zedit ID", a, 0).(*zedit.Editor)
+		styler := mustGet(fnAddZeditStyle, "GUI zedit style ID", a, 1).(zedit.TagStyler)
+		editor.Tags.AddStyler(styler)
+		return z3.Void
+	})
+
+	fnRemoveZeditStyle := pre("remove-zedit-style")
+	// (remove-zedit-style editor tag)
+	interp.Def(fnRemoveZeditStyle, 2, func(a []any) any {
+		editor := mustGet(fnRemoveZeditStyle, "GUI zedit ID", a, 0).(*zedit.Editor)
+		tag := mustGet(fnRemoveZeditStyle, "GUI zedit style ID", a, 1).(zedit.Tag)
+		editor.Tags.RemoveStyler(tag)
 		return z3.Void
 	})
 
@@ -4202,4 +4519,50 @@ func ListToCharInterval(caller string, li *z3.Cell) zedit.CharInterval {
 	}
 	pos2 := ListToCharPos(caller, li.Car.(*z3.Cell))
 	return zedit.CharInterval{Start: pos1, End: pos2}
+}
+
+// CaretMovementSymToCaretMovement converts a Z3S5 Lisp symbol for the caret movement to
+// a zedit CaretMovement int, panicking if the movement symbol is not supported.
+func CaretMovementSymToCaretMovement(caller string, sym *z3.Sym) zedit.CaretMovement {
+	var n zedit.CaretMovement
+	switch sym {
+	case CaretDown:
+		n = zedit.CaretDown
+	case CaretUp:
+		n = zedit.CaretUp
+	case CaretLeft:
+		n = zedit.CaretLeft
+	case CaretRight:
+		n = zedit.CaretRight
+	case CaretHome:
+		n = zedit.CaretHome
+	case CaretEnd:
+		n = zedit.CaretEnd
+	case CaretLineStart:
+		n = zedit.CaretLineStart
+	case CaretLineEnd:
+		n = zedit.CaretLineEnd
+	case CaretHalfPageDown:
+		n = zedit.CaretHalfPageDown
+	case CaretHalfPageUp:
+		n = zedit.CaretHalfPageUp
+	case CaretPageDown:
+		n = zedit.CaretPageDown
+	case CaretPageUp:
+		n = zedit.CaretPageUp
+	default:
+		panic(fmt.Errorf("%v: zedit caret movement selector must be one of '(down up left right home end line-start line-end half-page-down half-page-up page-down page-up), given %v", caller, z3.Str(sym)))
+	}
+	return n
+}
+
+func TagEventToTagEventSymbol(evt zedit.TagEvent) *z3.Sym {
+	switch evt {
+	case zedit.CaretEnterEvent:
+		return TagEvtCaretEnter
+	case zedit.CaretLeaveEvent:
+		return TagEvtCaretLeave
+	default:
+		return TagEvtUnknown
+	}
 }
