@@ -1,8 +1,0 @@
--*- mode: compilation; default-directory: "~/go/src/github.com/rasteric/z3s5-lisp/cmd/z3g/" -*-
-Compilation started at Tue Jan  2 09:47:33
-
-go build -v && go test -v && go vet
-z3g.go:10:2: no required module provides package github.com/pkg/profile; to add it:
-	go get github.com/pkg/profile
-
-Compilation exited abnormally with code 1 at Tue Jan  2 09:47:33

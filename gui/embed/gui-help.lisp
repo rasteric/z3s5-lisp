@@ -1398,26 +1398,21 @@
   (topic (gui))
   (see (new-text-grid new-entry)))
 
-(defhelp zedit-show-line-numbers?
-    (use "(zedit-show-line-numbers? zedit) => bool")
-  (info "Return true if the given zedit editor displays line numbers, nil otherwise.")
+(defhelp set-zedit-prop
+    (use "(set-zedit-prop zedit sel b)")
+  (info "Set a configuration property of the given #zedit to #b. The selector #sel can be one of the following: show-line-numbers? - show the line number display if true, show-whitespace? - show whitespace characters if true, line-wrap? - wrap lines to the size of the widget automatically, soft-wrap? - do not end lines in a hard line feed when line wrapping (default), draw-caret? - draw the caret if true, supress caret drawing if false, highlight-parens? - automatically highlight the matching opening paren while typing and moving the caret after a closing paren, highlight-paren-range? - automatically highlight the range of characters between the opening and closing paren when hightlight-parens? is true.")
   (type proc)
-  (arity 1)
-  (see (new-zedit set-zedit-show-line-numbers)))
+  (arity 3)
+  (topic (gui))
+  (see (new-zedit get-zedit-prop)))
 
-(defhelp zedit-show-whitespace?
-    (use "(zedit-show-whitespace? zedit) => bool")
-  (info "Return true if the given zedit editor displays white space characters as special glyphs, nil otherwise.")
-  (type proc)
-  (arity 1)
-  (see (new-zedit)))
-
-(defhelp set-zedit-show-line-numbers
-    (use "(set-zedit-show-line-numbers zedit show?)")
-  (info "Enable the line number display if #show? is true, disable it otherwise.")
+(defhelp get-zedit-prop
+    (use "(get-zedit-prop zedit sel) => any")
+  (info "Get a configuration property of the given #zedit based on selector #sel. The selector #sel can be one of the following: show-line-numbers? - show the line number display if true, show-whitespace? - show whitespace characters if true, line-wrap? - wrap lines to the size of the widget automatically, soft-wrap? - do not end lines in a hard line feed when line wrapping (default), draw-caret? - draw the caret if true, supress caret drawing if false, highlight-parens? - automatically highlight the matching opening paren while typing and moving the caret after a closing paren, highlight-paren-range? - automatically highlight the range of characters between the opening and closing paren when hightlight-parens? is true.")
   (type proc)
   (arity 2)
-  (see (new-zedit zedit-show-line-numbers?)))
+  (topic (gui))
+  (see (new-zedit set-zedit-prop)))
 
 (defhelp set-zedit-text
     (use "(set-zedit-text zedit str)")

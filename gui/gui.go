@@ -1284,17 +1284,17 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(editor)
 	})
 
-	fnZeditSetProp := pre("set-zedit-prop")
+	fnSetZeditProp := pre("set-zedit-prop")
 	// (set-zedit-prop editor selector prop)
-	interp.Def(fnZeditSetProp, 3, func(a []any) any {
-		editor := mustGet(fnZeditSetProp, "GUI zedit ID", a, 0).(*zedit.Editor)
-		SetZeditProp(fnZeditSetProp, editor, a[1], a[2])
+	interp.Def(fnSetZeditProp, 3, func(a []any) any {
+		editor := mustGet(fnSetZeditProp, "GUI zedit ID", a, 0).(*zedit.Editor)
+		SetZeditProp(fnSetZeditProp, editor, a[1], a[2])
 		return z3.Void
 	})
 
 	fnGetZeditProp := pre("get-zedit-prop")
 	// (get-zedit-prop editor selector) => any
-	interp.Def(fnZeditSetProp, 2, func(a []any) any {
+	interp.Def(fnGetZeditProp, 2, func(a []any) any {
 		editor := mustGet(fnGetZeditProp, "GUI zedit ID", a, 0).(*zedit.Editor)
 		return GetZeditProp(fnGetZeditProp, editor, a[1])
 	})
