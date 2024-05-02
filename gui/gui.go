@@ -185,6 +185,15 @@ var TagEvtCaretEnter = z3.NewSym("caret-enter")
 var TagEvtCaretLeave = z3.NewSym("caret-leave")
 var TagEvtUnknown = z3.NewSym("unknown")
 
+// zedit properties
+var ZeditShowlineNumbers = z3.NewSym("show-line-numbers?")
+var ZeditShowWhitespace = z3.NewSym("show-whitespace?")
+var ZeditLineWrap = z3.NewSym("line-wrap?")
+var ZeditSoftWrap = z3.NewSym("soft-wrap?")
+var ZeditDrawCaret = z3.NewSym("draw-caret?")
+var ZeditHighlightParens = z3.NewSym("highlight-parens?")
+var ZeditHighlightParenRange = z3.NewSym("highlight-paren-range?")
+
 // used to work around Go prohibition to hash functions
 type validatorWrapper struct {
 	fn fyne.StringValidator
@@ -1275,34 +1284,19 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(editor)
 	})
 
-	fnZeditShowLineNumbers := pre("zedit-show-line-numbers?")
-	// (zedit-show-line-numbers? <editor>) => bool
-	interp.Def(fnZeditShowLineNumbers, 1, func(a []any) any {
-		editor := mustGet(fnZeditShowLineNumbers, "GUI zedit ID", a, 0).(*zedit.Editor)
-		return z3.AsLispBool(editor.ShowLineNumbers)
-	})
-
-	fnZeditShowWhitespace := pre("zedit-show-whitespace?")
-	// (zedit-show-whitespace? <editor>) => bool
-	interp.Def(fnZeditShowWhitespace, 1, func(a []any) any {
-		editor := mustGet(fnZeditShowWhitespace, "GUI zedit ID", a, 0).(*zedit.Editor)
-		return z3.AsLispBool(editor.ShowWhitespace)
-	})
-
-	fnSetZeditShowLineNumbers := pre("set-zedit-show-line-numbers")
-	// (set-zedit-show-line-numbers <editor> <show?>)
-	interp.Def(fnSetZeditShowLineNumbers, 2, func(a []any) any {
-		editor := mustGet(fnSetZeditShowLineNumbers, "GUI zedit ID", a, 0).(*zedit.Editor)
-		editor.ShowLineNumbers = z3.ToBool(a[1])
+	fnZeditSetProp := pre("set-zedit-prop")
+	// (set-zedit-prop editor selector prop)
+	interp.Def(fnZeditSetProp, 3, func(a []any) any {
+		editor := mustGet(fnZeditSetProp, "GUI zedit ID", a, 0).(*zedit.Editor)
+		SetZeditProp(fnZeditSetProp, editor, a[1], a[2])
 		return z3.Void
 	})
 
-	fnSetZeditShowWhitespace := pre("set-zedit-show-whitespace")
-	// (set-zedit-show-whitespace <editor> <show?>)
-	interp.Def(fnSetZeditShowWhitespace, 2, func(a []any) any {
-		editor := mustGet(fnSetZeditShowWhitespace, "GUI zedit ID", a, 0).(*zedit.Editor)
-		editor.ShowWhitespace = z3.ToBool(a[1])
-		return z3.Void
+	fnGetZeditProp := pre("get-zedit-prop")
+	// (get-zedit-prop editor selector) => any
+	interp.Def(fnZeditSetProp, 2, func(a []any) any {
+		editor := mustGet(fnGetZeditProp, "GUI zedit ID", a, 0).(*zedit.Editor)
+		return GetZeditProp(fnGetZeditProp, editor, a[1])
 	})
 
 	fnSetZeditText := pre("set-zedit-text")
@@ -1497,11 +1491,12 @@ func DefGUI(interp *z3.Interp, config Config) {
 		key, modifier := MustGetShortcut(fnAddZeditShortcut, a[1].(*z3.Cell))
 		proc := a[2].(*z3.Closure)
 		shortcut := &desktop.CustomShortcut{KeyName: key, Modifier: modifier}
+		s := zedit.GetKeyboardShortcutKey(shortcut)
 		editor.AddShortcutHandler(shortcut, func(z *zedit.Editor) {
 			interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: z3.Nil}, z3.Nil,
 				"%v\n"+fmt.Sprintf("IN canvas %v shortcut handler", z3.Str(a[0])))
 		})
-		return z3.Void
+		return s
 	})
 
 	fnRemoveZeditShortcut := pre("remove-zedit-shortcut")
@@ -1849,7 +1844,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 	interp.Def(fnAddZeditStyle, 2, func(a []any) any {
 		editor := mustGet(fnAddZeditStyle, "GUI zedit ID", a, 0).(*zedit.Editor)
 		styler := mustGet(fnAddZeditStyle, "GUI zedit style ID", a, 1).(zedit.TagStyler)
-		editor.Tags.AddStyler(styler)
+		editor.Styles.AddStyler(styler)
 		return z3.Void
 	})
 
@@ -1858,7 +1853,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 	interp.Def(fnRemoveZeditStyle, 2, func(a []any) any {
 		editor := mustGet(fnRemoveZeditStyle, "GUI zedit ID", a, 0).(*zedit.Editor)
 		tag := mustGet(fnRemoveZeditStyle, "GUI zedit style ID", a, 1).(zedit.Tag)
-		editor.Tags.RemoveStyler(tag)
+		editor.Styles.RemoveStyler(tag)
 		return z3.Void
 	})
 
@@ -4564,5 +4559,55 @@ func TagEventToTagEventSymbol(evt zedit.TagEvent) *z3.Sym {
 		return TagEvtCaretLeave
 	default:
 		return TagEvtUnknown
+	}
+}
+
+func SetZeditProp(caller string, z *zedit.Editor, sel, prop any) {
+	sym, ok := sel.(*z3.Sym)
+	if !ok {
+		panic(fmt.Errorf("%v: expected valid property selector, given %v", caller, z3.Str(sel)))
+	}
+	switch sym {
+	case ZeditDrawCaret:
+		z.DrawCaret = z3.ToBool(prop)
+	case ZeditHighlightParenRange:
+		z.HighlightParenRange = z3.ToBool(prop)
+	case ZeditHighlightParens:
+		z.HighlightParens = z3.ToBool(prop)
+	case ZeditLineWrap:
+		z.LineWrap = z3.ToBool(prop)
+	case ZeditSoftWrap:
+		z.SoftWrap = z3.ToBool(prop)
+	case ZeditShowlineNumbers:
+		z.ShowLineNumbers = z3.ToBool(prop)
+	case ZeditShowWhitespace:
+		z.ShowWhitespace = z3.ToBool(prop)
+	default:
+		panic(fmt.Errorf("%v: expected valid property selector, given %v", caller, z3.Str(sel)))
+	}
+}
+
+func GetZeditProp(caller string, z *zedit.Editor, sel any) any {
+	sym, ok := sel.(*z3.Sym)
+	if !ok {
+		panic(fmt.Errorf("%v: expected valid property selector, given %v", caller, z3.Str(sel)))
+	}
+	switch sym {
+	case ZeditDrawCaret:
+		return z3.AsLispBool(z.DrawCaret)
+	case ZeditHighlightParenRange:
+		return z3.AsLispBool(z.HighlightParenRange)
+	case ZeditHighlightParens:
+		return z3.AsLispBool(z.HighlightParens)
+	case ZeditLineWrap:
+		return z3.AsLispBool(z.LineWrap)
+	case ZeditSoftWrap:
+		return z3.AsLispBool(z.SoftWrap)
+	case ZeditShowlineNumbers:
+		return z3.AsLispBool(z.ShowLineNumbers)
+	case ZeditShowWhitespace:
+		return z3.AsLispBool(z.ShowWhitespace)
+	default:
+		panic(fmt.Errorf("%v: expected valid property selector, given %v", caller, z3.Str(sel)))
 	}
 }

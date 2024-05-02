@@ -1,1 +1,1 @@
-(setq *z3s5-version* (str+ "2.4+" "29fced1"))
+(setq *z3s5-version* (str+ "2.4+" "dc0c501"))

@@ -2370,6 +2370,11 @@ var Prelude = strings.Replace(`
     ~(letrec ((,loop (lambda () (cond (,test ,@body (,loop))(t (void))))))
        (,loop))))
 
+(defmacro until (test &rest body)
+  (let ((loop (gensym)))
+    ~(letrec ((,loop (lambda () (progn ,@body (cond ((not ,test) (,loop))(t (void)))))))
+       (,loop))))
+
 (defmacro dolist (spec &rest body) ; (dolist (name list [result]) body...)
   (let ((name (car spec))
         (list (gensym)))

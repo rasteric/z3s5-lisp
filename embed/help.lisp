@@ -2211,12 +2211,20 @@
   (see (append)))
 
 (defhelp while
-    (use "(while test body ...) => any")
+    (use "(while test body ...)")
   (info "Evaluate the expressions in #body while #test is not nil.")
   (type macro)
   (topic (lisp))
   (arity -2)
-  (see (letrec dotimes dolist)))
+  (see (until letrec dotimes dolist)))
+
+(defhelp until
+    (use "(until test body ...)")
+  (info "Evaluate the expressions in #body until #test is nil. Unlike a while loop, until executes the body expressions at least once.")
+  (type macro)
+  (topic (lisp))
+  (arity -2)
+  (see (while letrec dotimes dolist)))
 
 (defhelp dolist
     (use "(dolist (name list [result]) body ...) => li")
