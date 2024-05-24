@@ -1,5 +1,15 @@
 # Version History
 
+## Version 2.4.2 
+
+Build tags: `db fts5` for Sqlite3 support, `fileio` for file access.
+
+- Some additions to the Fyne GUI support. It is now fairly complete.
+
+- Various bug fixes.
+
+- Initial support for the zedit editor, which will pave the way for embedded editing in `z3g` and later use in the Z3S5 Lisp machine.
+
 ## Version 2.4
 
 Build tags: `db fts5` for Sqlite3 support, `fileio` for file access.
