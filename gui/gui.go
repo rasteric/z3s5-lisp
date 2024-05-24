@@ -17,6 +17,7 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/validation"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
@@ -301,8 +302,9 @@ func clear(n any) {
 // RunGUI initializes the user interface and starts running it. The function blocks until the application
 // is quit, e.g. via ShutDownUI. Since it blocks, the Lisp interpreter must be started in parallel. The onStarted
 // function is called when the application has been started. This can be used for synchronization, for example.
-func RunGUI(onStarted func()) {
-	apl = app.New()
+// The provided ID should be unique if the executable is duplicated.
+func RunGUI(id string, onStarted func()) {
+	apl = app.NewWithID(id)
 	apl.Lifecycle().SetOnStarted(onStarted)
 	mainWin = apl.NewWindow("")
 	mainWin.SetMaster()
@@ -349,12 +351,8 @@ func DefGUIAdditions(interp *z3.Interp) error {
 	return nil
 }
 
-// DefGUI defines the user interface functions. If you want to avoid polluting the namespace, use
-// a config with a custom Prefix. Use DefaultConfig for a maximally permissive default configuration.
-// Various security-sensitive settings such as allowing or disallowing creation of new windows can be adjusted
-// in the Config. If you set these, be sure to also restrict the language using Z3S5 Lisp standard security tools,
-// such as unbinding certain functions and then protecting them and disallowing unprotecting them again.
-func DefGUI(interp *z3.Interp, config Config) {
+// defGUINoFileIO defines the part of the GUI that does not involve or require file IO and stream ports.
+func defGUINoFileIO(interp *z3.Interp, config Config) {
 
 	// register this module
 	reflect, ok := interp.GetGlobalVar(z3.ReflectSym)
@@ -376,6 +374,25 @@ func DefGUI(interp *z3.Interp, config Config) {
 		}
 		return cfg.Prefix + "." + s
 	}
+
+	// APP
+
+	fnSetAppMetadata := pre("set-app-metadata")
+	// (set-app-metadata id name version build icon release? custom)
+	interp.Def(fnSetAppMetadata, 7, func(a []any) any {
+		icon := mustGet(fnSetAppMetadata, "GUI icon resource ID", a, 4).(fyne.Resource)
+		custom := a[6].(*z3.Dict)
+		m := make(map[string]string)
+		custom.Data.Range(func(k, v any) bool {
+			m[k.(string)] = v.(string)
+			return true
+		})
+		build := z3.ToInt(fnSetAppMetadata, a[3])
+		app.SetMetadata(fyne.AppMetadata{ID: a[0].(string), Name: a[1].(string), Version: a[2].(string),
+			Build: build, Icon: icon, Release: z3.ToBool(a[5]), Custom: m})
+		return z3.Void
+	})
+
 	// WINDOW
 
 	fnNewWindow := pre("new-window")
@@ -552,7 +569,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 	// (set-window-icon <win> <icon>)
 	interp.Def(fnSetWindowIcon, 2, func(a []any) any {
 		win := mustGet(fnSetWindowIcon, "GUI window ID", a, 0).(fyne.Window)
-		icon := mustGet(fnSetWindowIcon, "GUI window ID", a, 1).(fyne.Resource)
+		icon := mustGet(fnSetWindowIcon, "GUI resource ID", a, 1).(fyne.Resource)
 		win.SetIcon(icon)
 		return z3.Void
 	})
@@ -1284,19 +1301,19 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(editor)
 	})
 
-	fnSetZeditProp := pre("set-zedit-prop")
-	// (set-zedit-prop editor selector prop)
-	interp.Def(fnSetZeditProp, 3, func(a []any) any {
-		editor := mustGet(fnSetZeditProp, "GUI zedit ID", a, 0).(*zedit.Editor)
-		SetZeditProp(fnSetZeditProp, editor, a[1], a[2])
+	fnSetZeditConfig := pre("set-zedit-config")
+	// (set-zedit-config editor selector prop)
+	interp.Def(fnSetZeditConfig, 3, func(a []any) any {
+		editor := mustGet(fnSetZeditConfig, "GUI zedit ID", a, 0).(*zedit.Editor)
+		SetZeditConfig(fnSetZeditConfig, editor, a[1], a[2])
 		return z3.Void
 	})
 
-	fnGetZeditProp := pre("get-zedit-prop")
+	fnGetZeditConfig := pre("get-zedit-config")
 	// (get-zedit-prop editor selector) => any
-	interp.Def(fnGetZeditProp, 2, func(a []any) any {
-		editor := mustGet(fnGetZeditProp, "GUI zedit ID", a, 0).(*zedit.Editor)
-		return GetZeditProp(fnGetZeditProp, editor, a[1])
+	interp.Def(fnGetZeditConfig, 2, func(a []any) any {
+		editor := mustGet(fnGetZeditConfig, "GUI zedit ID", a, 0).(*zedit.Editor)
+		return GetZeditConfig(fnGetZeditConfig, editor, a[1])
 	})
 
 	fnSetZeditText := pre("set-zedit-text")
@@ -1397,8 +1414,9 @@ func DefGUI(interp *z3.Interp, config Config) {
 	interp.Def(fnSetZeditMark, 2, func(a []any) any {
 		editor := mustGet(fnSetZeditMark, "GUI zedit ID", a, 0).(*zedit.Editor)
 		n := z3.ToInt(fnSetZeditMark, a[1])
-		if n < 0 || n >= len(editor.MarkTags) {
-			panic(fmt.Sprintf("%v: zedit mark index out of bounds, should be in [0...%v], given %v", fnSetZeditMark, len(editor.MarkTags)-1, n))
+		if n < 0 || n >= len(editor.Config.MarkTags) {
+			panic(fmt.Sprintf("%v: zedit mark index out of bounds, should be in [0...%v], given %v", fnSetZeditMark,
+				len(editor.Config.MarkTags)-1, n))
 		}
 		editor.SetMark(n)
 		return z3.Void
@@ -1594,7 +1612,7 @@ func DefGUI(interp *z3.Interp, config Config) {
 	// (get-zedit-caret editor) => li
 	interp.Def(fnGetZeditCaret, 1, func(a []any) any {
 		editor := mustGet(fnGetZeditCaret, "GUI zedit ID", a, 0).(*zedit.Editor)
-		return CharPosToList(editor.CaretPos)
+		return CharPosToList(editor.GetCaret())
 	})
 
 	fnMoveZeditCaret := pre("move-zedit-caret")
@@ -1822,11 +1840,11 @@ func DefGUI(interp *z3.Interp, config Config) {
 			bg := style.BackgroundColor()
 			if blend && c.Style != nil {
 				if c.Style.TextColor() != nil {
-					fg = zedit.BlendColors(editor.BlendFG, editor.BlendFGSwitched,
+					fg = zedit.BlendColors(editor.Config.BlendFG, editor.Config.BlendFGSwitched,
 						c.Style.TextColor(), fg)
 				}
 				if c.Style.BackgroundColor() != nil {
-					bg = zedit.BlendColors(editor.BlendBG, editor.BlendBGSwitched,
+					bg = zedit.BlendColors(editor.Config.BlendBG, editor.Config.BlendBGSwitched,
 						c.Style.BackgroundColor(), bg)
 				}
 			}
@@ -2482,6 +2500,106 @@ func DefGUI(interp *z3.Interp, config Config) {
 		})
 		putWithID(id, raster)
 		return zid
+	})
+
+	// DIALOG
+
+	fnShowColorPicker := pre("show-color-picker")
+	// (show-color-picker title message proc win)
+	interp.Def(fnShowColorPicker, -1, func(a []any) any {
+		li := a[0].(*z3.Cell)
+		title := li.Car.(string)
+		li = li.CdrCell()
+		msg := li.Car.(string)
+		li = li.CdrCell()
+		proc := li.Car.(*z3.Closure)
+		li = li.CdrCell()
+		win := mainWin
+		if li != nil {
+			w, ok := get(li.Car)
+			if !ok {
+				panic(fmt.Sprintf(fnShowColorPicker+": no window found for %v", z3.Str(li.Car)))
+			}
+			win = w.(fyne.Window)
+		}
+		dialog.ShowColorPicker(title, msg, func(c color.Color) {
+			li2 := ColorToList(c)
+			interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: z3.QqQuote(li2), Cdr: z3.Nil}}, z3.Nil,
+				"%v\n IN show-color-picker callback")
+		}, win)
+		return z3.Void
+	})
+
+	fnShowConfirm := pre("show-confirm")
+	// (show-confirm title message proc win)
+	interp.Def(fnShowConfirm, 4, func(a []any) any {
+		proc := a[2].(*z3.Closure)
+		win := mustGet(fnShowConfirm, "GUI window ID", a, 3).(fyne.Window)
+		dialog.ShowConfirm(a[0].(string), a[1].(string), func(confirm bool) {
+			b := z3.AsLispBool(confirm)
+			interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: b, Cdr: z3.Nil}}, z3.Nil,
+				"%v\n IN "+fnShowConfirm+" callback")
+		}, win)
+		return z3.Void
+	})
+
+	fnShowCustom := pre("show-custom")
+	// (show-custom title dismiss content win)
+	interp.Def(fnShowCustom, 4, func(a []any) any {
+		content := mustGet(fnShowCustom, "GUI canvas object ID", a, 2).(fyne.CanvasObject)
+		win := mustGet(fnShowCustom, "GUI window ID", a, 3).(fyne.Window)
+		dialog.ShowCustom(a[0].(string), a[1].(string), content, win)
+		return z3.Void
+	})
+
+	fnShowCustomConfirm := pre("show-custom-confirm")
+	// (show-custom-confirm title confirm dismiss content callback win)
+	interp.Def(fnShowCustomConfirm, 6, func(a []any) any {
+		content := mustGet(fnShowCustomConfirm, "GUI canvas object ID", a, 3).(fyne.CanvasObject)
+		proc := a[4].(*z3.Closure)
+		win := mustGet(fnShowCustomConfirm, "GUI window ID", a, 4).(fyne.Window)
+		dialog.ShowCustomConfirm(a[0].(string), a[1].(string), a[2].(string), content,
+			func(confirm bool) {
+				b := z3.AsLispBool(confirm)
+				interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: b, Cdr: z3.Nil}}, z3.Nil,
+					"%v\n IN "+fnShowCustomConfirm+" callback")
+			}, win)
+		return z3.Void
+	})
+
+	fnShowCustomWithoutButtons := pre("show-custom-without-buttons")
+	// (show-custom-without-buttons title content win)
+	interp.Def(fnShowCustomWithoutButtons, 3, func(a []any) any {
+		content := mustGet(fnShowCustomWithoutButtons, "GUI canvas object ID", a, 1).(fyne.CanvasObject)
+		win := mustGet(fnShowCustomWithoutButtons, "GUI window ID", a, 2).(fyne.Window)
+		dialog.ShowCustomWithoutButtons(a[0].(string), content, win)
+		return z3.Void
+	})
+
+	fnShowInformation := pre("show-information")
+	// (show-information title message win)
+	interp.Def(fnShowInformation, 3, func(a []any) any {
+		win := mustGet(fnShowCustomWithoutButtons, "GUI window ID", a, 2).(fyne.Window)
+		dialog.ShowInformation(a[0].(string), a[1].(string), win)
+		return z3.Void
+	})
+
+	fnShowForm := pre("show-form")
+	// (show-form title confirm dismiss li proc win)
+	interp.Def(fnShowForm, 6, func(a []any) any {
+		forms := a[3].(*z3.Cell)
+		items := make([]*widget.FormItem, 0)
+		for forms != z3.Nil {
+			items = append(items, forms.Car.(*widget.FormItem))
+			forms = forms.CdrCell()
+		}
+		win := mustGet(fnShowForm, "GUI window ID", a, 5).(fyne.Window)
+		proc := a[4].(*z3.Closure)
+		dialog.ShowForm(a[0].(string), a[1].(string), a[2].(string), items, func(validated bool) {
+			interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: validated, Cdr: z3.Nil}}, z3.Nil,
+				"%v\n IN "+fnShowForm+" callback")
+		}, win)
+		return z3.Void
 	})
 
 	// KEYBOARD
@@ -3364,9 +3482,6 @@ func DefGUI(interp *z3.Interp, config Config) {
 		return put(res)
 	})
 
-	if err := DefGUIAdditions(interp); err != nil {
-		panic(fmt.Sprintf("Z3S5 Lisp internal error, failed to boot embedded GUI additions: %v", err))
-	}
 }
 
 // MustGetPosition expects a position in argument a at argument index argIdx and returns it,
@@ -4562,51 +4677,51 @@ func TagEventToTagEventSymbol(evt zedit.TagEvent) *z3.Sym {
 	}
 }
 
-func SetZeditProp(caller string, z *zedit.Editor, sel, prop any) {
+func SetZeditConfig(caller string, z *zedit.Editor, sel, prop any) {
 	sym, ok := sel.(*z3.Sym)
 	if !ok {
 		panic(fmt.Errorf("%v: expected valid property selector, given %v", caller, z3.Str(sel)))
 	}
 	switch sym {
 	case ZeditDrawCaret:
-		z.DrawCaret = z3.ToBool(prop)
+		z.Config.DrawCaret = z3.ToBool(prop)
 	case ZeditHighlightParenRange:
-		z.HighlightParenRange = z3.ToBool(prop)
+		z.Config.HighlightParenRange = z3.ToBool(prop)
 	case ZeditHighlightParens:
-		z.HighlightParens = z3.ToBool(prop)
+		z.Config.HighlightParens = z3.ToBool(prop)
 	case ZeditLineWrap:
-		z.LineWrap = z3.ToBool(prop)
+		z.Config.LineWrap = z3.ToBool(prop)
 	case ZeditSoftWrap:
-		z.SoftWrap = z3.ToBool(prop)
+		z.Config.SoftWrap = z3.ToBool(prop)
 	case ZeditShowlineNumbers:
-		z.ShowLineNumbers = z3.ToBool(prop)
+		z.Config.ShowLineNumbers = z3.ToBool(prop)
 	case ZeditShowWhitespace:
-		z.ShowWhitespace = z3.ToBool(prop)
+		z.Config.ShowWhitespace = z3.ToBool(prop)
 	default:
 		panic(fmt.Errorf("%v: expected valid property selector, given %v", caller, z3.Str(sel)))
 	}
 }
 
-func GetZeditProp(caller string, z *zedit.Editor, sel any) any {
+func GetZeditConfig(caller string, z *zedit.Editor, sel any) any {
 	sym, ok := sel.(*z3.Sym)
 	if !ok {
 		panic(fmt.Errorf("%v: expected valid property selector, given %v", caller, z3.Str(sel)))
 	}
 	switch sym {
 	case ZeditDrawCaret:
-		return z3.AsLispBool(z.DrawCaret)
+		return z3.AsLispBool(z.Config.DrawCaret)
 	case ZeditHighlightParenRange:
-		return z3.AsLispBool(z.HighlightParenRange)
+		return z3.AsLispBool(z.Config.HighlightParenRange)
 	case ZeditHighlightParens:
-		return z3.AsLispBool(z.HighlightParens)
+		return z3.AsLispBool(z.Config.HighlightParens)
 	case ZeditLineWrap:
-		return z3.AsLispBool(z.LineWrap)
+		return z3.AsLispBool(z.Config.LineWrap)
 	case ZeditSoftWrap:
-		return z3.AsLispBool(z.SoftWrap)
+		return z3.AsLispBool(z.Config.SoftWrap)
 	case ZeditShowlineNumbers:
-		return z3.AsLispBool(z.ShowLineNumbers)
+		return z3.AsLispBool(z.Config.ShowLineNumbers)
 	case ZeditShowWhitespace:
-		return z3.AsLispBool(z.ShowWhitespace)
+		return z3.AsLispBool(z.Config.ShowWhitespace)
 	default:
 		panic(fmt.Errorf("%v: expected valid property selector, given %v", caller, z3.Str(sel)))
 	}

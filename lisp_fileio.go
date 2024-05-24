@@ -23,6 +23,7 @@ var ErrNoPort = errors.New("invalid port or operation not supported")
 
 var BoxedFilePort = NewSym("file-port")
 var BoxedStringPort = NewSym("str-port")
+var BoxedURIPort = NewSym("uri-port")
 
 var PortTypes []*Sym
 var fileIOMutex sync.Mutex
@@ -34,6 +35,7 @@ func init() {
 	PortTypes = make([]*Sym, 0)
 	AddPortType(BoxedFilePort)
 	AddPortType(BoxedStringPort)
+	AddPortType(BoxedURIPort)
 }
 
 // AddPortType adds a foreign port type to the system so port? knows about it.
@@ -61,6 +63,7 @@ func (interp *Interp) Define_FileIO() {
 	// register boxed values
 	interp.DefBoxed(BoxedFilePort)
 	interp.DefBoxed(BoxedStringPort)
+	interp.DefBoxed(BoxedURIPort)
 
 	// (open file [flags] [permissions]) => port open a file for reading or writing.
 	// If the file does not exist, it is created. The given file path must be a slash path

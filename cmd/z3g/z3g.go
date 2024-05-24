@@ -10,13 +10,21 @@ import (
 	"github.com/rasteric/hooks"
 	z3 "github.com/rasteric/z3s5-lisp"
 	z3ui "github.com/rasteric/z3s5-lisp/gui"
+	sid "github.com/teris-io/shortid"
 )
 
 func run() int {
+	defaultID, err := sid.Generate()
+	if err != nil {
+		defaultID = "Z3S5"
+	} else {
+		defaultID = "Z3S5-" + defaultID
+	}
 	load := flag.String("l", "", "load the specified file and execute it in a non-interactive session")
 	exec := flag.String("e", "", "execute the expression(s) given as argument at startup")
 	interactive := flag.Bool("i", false, "run the interpreter interactively even if a file is loaded with -l")
 	silent := flag.Bool("s", false, "set *interactive-session* false even if -i is specified to prevent printing a start banner")
+	id := flag.String("u", "Z3S5-"+defaultID, "the application ID; if not specified, an uninformative random ID is used")
 	flag.Parse()
 
 	interp, err := z3.NewInterp(z3.NewBasicRuntime(z3.FullPermissions))
@@ -34,18 +42,19 @@ func run() int {
 		return 2
 	}
 
-	// Load GUI functions and their help definitions.
-	z3ui.DefGUI(interp, z3ui.DefaultConfig)
-	if err := z3ui.DefGUIHelp(interp); err != nil {
-		fmt.Fprintf(os.Stderr, err.Error())
-		return 3
-	}
-
 	errValue := 0
 
 	var wg sync.WaitGroup
 	defer z3ui.ShutDownGUI()
-	z3ui.RunGUI(func() {
+	z3ui.RunGUI(*id, func() {
+
+		// Load GUI functions and their help definitions.
+		z3ui.DefGUI(interp, z3ui.DefaultConfig)
+		if err := z3ui.DefGUIHelp(interp); err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+			errValue = 3
+			return
+		}
 
 		interp.SafeEval(&z3.Cell{Car: z3.NewSym("protect-toplevel-symbols"), Cdr: z3.Nil}, z3.Nil)
 

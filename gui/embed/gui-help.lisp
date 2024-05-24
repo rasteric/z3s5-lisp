@@ -1418,6 +1418,7 @@
     (use "(set-zedit-text zedit str)")
   (info "Sets the text in the zedit editor to #str.")
   (type proc)
+  (topic (gui zedit))
   (arity 2)
   (see (new-zedit get-zedit-text)))
 
@@ -1425,6 +1426,7 @@
     (use "(get-zedit-text zedit)")
   (info "Get the text in editor #zedit.")
   (type proc)
+  (topic (gui zedit))
   (arity 1)
   (see (new-zedit get-zedit-text)))
 
@@ -1439,6 +1441,7 @@
     (use "(get-zedit-last-column zedit line) => num")
   (info "Get the 0-based column number of the last column of the given #line in editor #zedit.")
   (type proc)
+  (topic (gui zedit))
   (arity 2)
   (see (new-zedit get-zedit-last-line)))
 
@@ -1446,5 +1449,109 @@
     (use "(set-zedit-line-number-style zedit li)")
   (info "Set the style of the line number display in #zedit, even when the line number display is off. The style list is for en editor style, consisting of a list for the foreground color and a color list for the background color.")
   (type proc)
+  (topic (gui zedit))
   (arity 2)
   (see (new-zedit set-text-grid-style)))
+
+(defhelp show-color-picker
+    (use "(show-color-picker title message proc [win]")
+  (info "Show a color picker dialog with given #title and #message. The callback #proc takes a color list and is called when a color is chosen. The optional #win argument specifies the parent window.")
+  (type proc)
+  (topic (gui dialog))
+  (arity -4)
+  (see (nrgba nrgba64 color the-color theme-color)))
+
+(defhelp show-confirm
+    (use "(show-confirm title message proc win)")
+  (info "Show a simple confirmation dialog with Yes and No as options and #title and #message. The callback #proc takes a bool that is true if the dialog has been confirmed, nil otherwise. The #win argument specifies the parent window.")
+  (type proc)
+  (topic (gui dialog))
+  (arity 4)
+  (see (show-custom-confirm show-custom show-custom-without-buttons show-information show-form)))
+
+(defhelp show-custom
+    (use "(show-custom title dismiss content win)")
+  (info "Show a custom info dialog, where #title is the title of the dialog, #dismiss is a string for the button text to dismiss the dialog, #content is a valid canvas object ID for the content of the dialog such as the ID of an entry or form, and #win is the parent window.")
+  (type proc)
+  (topic (gui dialog))
+  (arity 4)
+  (see (show-confirm show-custom-confirm show-custom-without-buttons show-information show-form)))
+
+(defhelp show-custom-confirm
+    (use "(show-custom-confirm title confirm dismiss content proc win)")
+  (info "Show a custom confirm dialog, where #title is the dialog's title, #confirm is the text of the confirm button, #dismiss is the text of the dismiss button, content is a valid canvas object ID for the content of the dialog such as an ID for an entry or form, #proc is a callback procedure that takes one argument that is true if the dialog was confirmed, nil otherwise, and #win is the parent window.")
+  (type proc)
+  (topic (gui dialog))
+  (arity 6)
+  (see (show-confirm show-custom show-custom-without-buttons show-information show-form)))
+
+(defhelp show-custom-without-buttons
+    (use "(show-custom-without-buttons title content win)")
+  (info "Show a custom dialog without buttons, where #title is the dialog's title, #content is a valid canvas object ID for the content of the dialog such as an ID for an entry or form, and #win is the parent window.")
+  (topic (gui dialog))
+  (arity 3)
+  (see (show-custom show-custom-confirm show-confirm show-information show-form)))
+
+(defhelp set-app-metadata
+    (use "(set-app-metadata id name version build icon release? custom)")
+  (info "Set the metadata of the application to the #id string, #name string, #version string, #build integer, #icon resource ID, #release? bool if this version is a release rather than for testing, and a #custom dict containing string to string key-value mappings.")
+  (topic (gui app))
+  (arity 7)
+  (see (new-window)))
+
+(defhelp show-folder-open
+    (use "(show-folder-open proc win)")
+  (info "Show an open folder dialog to select a folder. The procedure #proc takes two arguments. The first argument is an URI string if a folder was chosen, nil otherwise. The second argument is nil if no error occurred, and an error string if an error occurred. Notice that URI can be not-nil and the error string can be non-empty at the same time, indicating that a folder was chosen but some I/O error occurred.")
+  (topic (gui dialog))
+  (arity 2)
+  (see (list-uri listable-uri? uri?)))
+
+(defhelp list-uri
+    (use "(list-uri uri) => vec")
+  (info "List a listable URI string #uri if possible. If the URI string is not valid or valid but not listable, an error occurs. A listable URI is a file URI pointing to a folder, for example.")
+  (topic (gui file))
+  (arity 1)
+  (see (show-folder-open listable-uri? uri?)))
+
+(defhelp uri?
+    (use "(uri? s) => bool")
+  (info "Return true if string #s represents a valid URI, nil otherwise.")
+  (topic (gui file))
+  (arity 1)
+  (see (list-uri listable-uri?)))
+
+(defhelp listable-uri?
+    (use "(listable-uri? s) => bool")
+  (info "Return true if the string #s represents a listable URI such as one pointing to a folder on the filesystem; otherwise, nil is returned.")
+  (topic (gui file))
+  (arity 1)
+  (see (uri? list-uri)))
+
+(defhelp show-information
+    (use "(show-information title message win)")
+  (info "Show a dialog with #title and information #message strings, where #win is the parent window.")
+  (topic (gui dialog))
+  (arity 3)
+  (see (show-custom show-custom-without-buttons show-confirm show-custom-confirm show-form)))
+
+(defhelp show-form
+    (use "(show-form title confirm dismiss li proc win)")
+  (info "Show a list of form items whose ID must reside in #li and check these items are validated. The #title is the dialog's title, #confirm is the text of the confirm button, #dismiss the text of the dismiss button, #proc is a procedure that takes a boolean argument that is true if all form items have been validated and confirmed, nil otherwise, and #win is the parent window. The form items in #li must be widgets with validators that can be added to a form.")
+  (topic (gui dialog))
+  (arity 6)
+  (see (show-custom show-custom-without-buttons show-confirm show-custom-confirm)))
+
+(defhelp show-file-save
+    (use "(show-file-save proc win)")
+  (info "Show a standard file save dialog that allows the user to chose a save file. If the chosen file already exists, the user is asked whether they want to overwrite the file. The procedure #proc takes two arguments. The first argument is a writeable port if the user chose a file, nil if the user canceled. The second argument is nil if no error occurred, and an error string if an error occurred. Notice that the port can be not-nil and the error string can be non-empty at the same time, indicating that a file for saving was chosen but some I/O error occurred.")
+  (topic (gui dialog))
+  (arity 2)
+  (see (show-file-open)))
+
+(defhelp show-file-open
+    (use "(show-file-open proc win)")
+  (info "Show a standard file open dialog that allows the user to select an existing file. The procedure #proc takes two arguments. The first argument is a readable port if the user chose a file, nil if the user canceled. The second argument is nil if no error occurred, and an error string if an error occurred. Notice that the port can be not-nil and the error string can be non-empty at the same time, indicating that a file for opening was chosen but some I/O error occurred.")
+  (topic (gui dialog))
+  (arity 2)
+  (see (show-file-open)))
+
