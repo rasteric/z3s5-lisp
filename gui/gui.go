@@ -2557,7 +2557,7 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 	interp.Def(fnShowCustomConfirm, 6, func(a []any) any {
 		content := mustGet(fnShowCustomConfirm, "GUI canvas object ID", a, 3).(fyne.CanvasObject)
 		proc := a[4].(*z3.Closure)
-		win := mustGet(fnShowCustomConfirm, "GUI window ID", a, 4).(fyne.Window)
+		win := mustGet(fnShowCustomConfirm, "GUI window ID", a, 5).(fyne.Window)
 		dialog.ShowCustomConfirm(a[0].(string), a[1].(string), a[2].(string), content,
 			func(confirm bool) {
 				b := z3.AsLispBool(confirm)
@@ -2590,16 +2590,31 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		forms := a[3].(*z3.Cell)
 		items := make([]*widget.FormItem, 0)
 		for forms != z3.Nil {
-			items = append(items, forms.Car.(*widget.FormItem))
+			item := mustGet1(fnShowForm, "GUI form item ID", forms.Car).(*widget.FormItem)
+			items = append(items, item)
 			forms = forms.CdrCell()
 		}
 		win := mustGet(fnShowForm, "GUI window ID", a, 5).(fyne.Window)
 		proc := a[4].(*z3.Closure)
 		dialog.ShowForm(a[0].(string), a[1].(string), a[2].(string), items, func(validated bool) {
-			interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: validated, Cdr: z3.Nil}}, z3.Nil,
+			interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: z3.AsLispBool(validated), Cdr: z3.Nil}}, z3.Nil,
 				"%v\n IN "+fnShowForm+" callback")
 		}, win)
 		return z3.Void
+	})
+
+	fnNewFormItem := pre("new-form-item")
+	// (new-form-item text widget hint) => int
+	interp.Def(fnNewFormItem, 3, func(a []any) any {
+		text := a[0].(string)
+		content := mustGet(fnShowCustomWithoutButtons, "GUI canvas object ID", a, 1).(fyne.CanvasObject)
+		hint := a[2].(string)
+		item := &widget.FormItem{
+			Text:     text,
+			Widget:   content,
+			HintText: hint,
+		}
+		return put(item)
 	})
 
 	// KEYBOARD

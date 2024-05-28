@@ -604,6 +604,14 @@
   (topic (gui form))
   (see (new-form)))
 
+(defhelp new-form-item
+    (use "(new-form-item text widget hint-text) => int")
+  (info "Create a new form item. Such an item can be used in #show-form dialogs to display forms. For adding items to a form based on #new-form, use #append-form to append text and strings to forms instead.")
+  (type proc)
+  (arity 3)
+  (topic (gui form dialog))
+  (see (show-form)))
+
 (defhelp new-hyperlink
     (use "(new-hyperlink label url) => int")
   (info "Create a new hyperlink with given #label string and an #url string as embedded link. A hyperlink looks like a label with link style; when it is clicked, the #url is called by the default operating system mechanism for opening urls. Using hyperlinks might be disallowed by the host system configuration HyperlinksAllowed and may be re-written by the host system using the CheckHyperlinks function. If HyperlinksAllowed is false in the active GUI config of the host, this function raises an error. It also parses the given #url and will raise an error if it does not represent a valid URL.")

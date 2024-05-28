@@ -386,12 +386,43 @@
 							       (cond
 								 (uri 
 								  (out (list-uri uri))
-								  (nl))
+								  (nl)
+								  (close uri))
 								 (t (out "canceled"))))
-							     win)))))
+							     win))))
+	   (b4 (new-button "Save" (lambda ()
+				    (show-file-save (lambda (uri err)
+						      (cond
+							(uri
+							 (out uri)(nl)
+							 (close uri))
+							(t (out "canceled")(nl))))
+						    win))))
+	   (b5 (new-button "Show Info" (lambda ()
+					 (show-information "Some Information"
+							   "This is some information dialog to show, as the name implies,\nsome information to the user."
+							   win))))
+	   (b6 (new-button "Show Form" (lambda ()
+					 (show-form "Hire New Employee"
+						    "Hire"
+						    "Cancel"
+						    `(,(new-form-item "Name" (new-entry) "e.g. John Smith") ,(new-form-item "Age" (new-entry) "e.g. 21")
+						       ,(new-form-item "Role" (new-entry) "e.g. accountant"))
+						    (lambda (confirmed?)
+						      (out confirmed?)(nl))
+						    win))))
+	   (b7 (new-button "Show Custom" (lambda ()
+					   (show-custom "Enter Code" "OK" (new-entry) win))))
+	   (b8 (new-button "Show Custom Confirm" (lambda ()
+						   (show-custom-confirm "Enter Something" "OK" "Cancel" (new-entry) (lambda (ok) (out ok)(nl)) win)))))
     (append-form form "(show-confirm title msg proc win)" b1)
     (append-form form "(show-file-open proc win)" b2)
     (append-form form "(show-folder-open proc win)" b3)
+    (append-form form "(show-file-save proc win)" b4)
+    (append-form form "(show-information title message win)" b5)
+    (append-form form "(show-form title confirm dismiss items proc win)" b6)
+    (append-form form "(show-custom title dismiss widget win)" b7)
+    (append-form form "(show-custom-confirm title confirm dismiss widget proc win)" b8)
     (set-window-content win form)
     (set-window-size win 800 400)
     (show-window win)))
