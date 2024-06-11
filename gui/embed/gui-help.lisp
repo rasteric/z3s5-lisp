@@ -1406,6 +1406,28 @@
   (topic (gui))
   (see (new-text-grid new-entry)))
 
+(defhelp print-zedit
+    (use "(print-zedit zedit s tags)")
+  (info "Print text #s at the current caret position and apply #tags to the printed text.")
+  (type proc)
+  (arity 3)
+  (topic (gui zedit))
+  (see (new-zedit insert-zedit delete-zedit)))
+
+(defhelp set-zedit-event-handler
+    (use "(set-zedit-event-handler editor sel proc)")
+  (info "Set the event handler for #sel and the given #event to #proc. The handler #proc is a function that takes an event and an editor as argument. The selector #sel must be one of '(caret-move).")
+  (topic (gui zedit))
+  (arity 3)
+  (see (new-zedit remove-zedit-event-handler)))
+
+(defhelp remove-zedit-event-handler
+    (use "(remove-zedit-event-handler editor sel)")
+  (info "Remove the event handler for #sel in #editor, do nothing if no handler has been set for the event. The selector #sel must be one of '(caret-move).")
+  (topic (gui zedit))
+  (arity 2)
+  (see (new-zedit set-zedit-event-handler)))
+
 (defhelp set-zedit-prop
     (use "(set-zedit-prop zedit sel b)")
   (info "Set a configuration property of the given #zedit to #b. The selector #sel can be one of the following: show-line-numbers? - show the line number display if true, show-whitespace? - show whitespace characters if true, line-wrap? - wrap lines to the size of the widget automatically, soft-wrap? - do not end lines in a hard line feed when line wrapping (default), draw-caret? - draw the caret if true, supress caret drawing if false, highlight-parens? - automatically highlight the matching opening paren while typing and moving the caret after a closing paren, highlight-paren-range? - automatically highlight the range of characters between the opening and closing paren when hightlight-parens? is true.")
@@ -1562,4 +1584,5 @@
   (topic (gui dialog))
   (arity 2)
   (see (show-file-open)))
+
 

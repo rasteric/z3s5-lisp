@@ -3,13 +3,17 @@ package ui
 import (
 	"bytes"
 	_ "embed"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"image/color"
 	"math"
 	"net/url"
+	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
+	"time"
 	"unicode"
 
 	"fyne.io/fyne/v2"
@@ -51,6 +55,9 @@ var CheckedSym = z3.NewSym("checked")
 var WrapOffSym = z3.NewSym("none")
 var WrapBreakSym = z3.NewSym("break")
 var WrapWordSym = z3.NewSym("word")
+
+// editor events
+var EditorCaretMove = z3.NewSym("caret-move")
 
 // theme selectors
 var ForegroundColor = z3.NewSym("foreground")
@@ -194,6 +201,43 @@ var ZeditSoftWrap = z3.NewSym("soft-wrap?")
 var ZeditDrawCaret = z3.NewSym("draw-caret?")
 var ZeditHighlightParens = z3.NewSym("highlight-parens?")
 var ZeditHighlightParenRange = z3.NewSym("highlight-paren-range?")
+var ZeditParagraphLineNumbers = z3.NewSym("paragraph-line-numbers?")
+
+var ZeditSelectionTag = z3.NewSym("selection-tag")
+var ZeditSelectionStyle = z3.NewSym("selection-style")
+var ZeditHighlightTag = z3.NewSym("highlight-tag")
+var ZeditHighlightStyle = z3.NewSym("highlight-style")
+var ZeditMarkTag = z3.NewSym("mark-tag")
+var ZeditMarkTags = z3.NewSym("mark-tags")
+var ZeditMarkStyle = z3.NewSym("mark-style")
+var ZeditErrorTag = z3.NewSym("error-tag")
+var ZeditErrorStyle = z3.NewSym("error-style")
+var ZeditParenErrorTag = z3.NewSym("paren-error-tag")
+var ZeditBlendFG = z3.NewSym("blend-fg")
+var ZeditBlendFGSwitched = z3.NewSym("blend-fg-switched?")
+var ZeditBlendBG = z3.NewSym("blend-bg")
+var ZeditBlendBGSwitched = z3.NewSym("blend-bg-switched?")
+var ZeditSoftLF = z3.NewSym("soft-lf")
+var ZeditHardLF = z3.NewSym("hard-lf")
+var ZeditScrollFactor = z3.NewSym("scroll-factor")
+var ZeditTabWidth = z3.NewSym("tab-width")
+var ZeditMinRefreshInterval = z3.NewSym("min-refresh-interval")
+var ZeditCharDrift = z3.NewSym("char-drift")
+var ZeditCaretBlinkDelay = z3.NewSym("caret-blink-delay")
+var ZeditCaretOnDuration = z3.NewSym("caret-on-duration")
+var ZeditCaretOffDuration = z3.NewSym("caret-off-duration")
+var ZeditTagPreWrite = z3.NewSym("tag-pre-write")
+var ZeditTagPostRead = z3.NewSym("tag-post-read")
+var ZeditCustomLoader = z3.NewSym("custom-loader")
+var ZeditCustomSave = z3.NewSym("custom-save")
+var ZeditMaxLines = z3.NewSym("max-lines")
+var ZeditMaxColumns = z3.NewSym("max-columns")
+var ZeditMaxTags = z3.NewSym("max-tags")
+var ZeditMaxPrintLines = z3.NewSym("max-print-lines")
+var ZeditTagPreWriteIntrinsic = z3.NewSym("*gui-tag-pre-write*")
+var ZeditTagPostReadIntrinsic = z3.NewSym("*gui-tag-post-read*")
+var ZeditCustomSaveIntrinsic = z3.NewSym("*gui-zedit-custom-save*")
+var ZeditCustomLoadIntrinsic = z3.NewSym("*gui-zedit-custom-load*")
 
 // used to work around Go prohibition to hash functions
 type validatorWrapper struct {
@@ -268,6 +312,16 @@ func getID(obj any) (any, bool) {
 		return goarith.AsNumber(-1), false
 	}
 	return goarith.AsNumber(int64(n.(uint64))), true
+}
+
+// getIDOrPut is a combination of getID and put, it gets an objects'd ID if it is stored, puts the object
+// and returns the new ID otherwise.
+func getIDOrPut(obj any) any {
+	n, ok := revstore.Load(obj)
+	if !ok {
+		return put(obj)
+	}
+	return goarith.AsNumber(int64(n.(uint64)))
 }
 
 // mustGet attempts to get the object by number stored in array a at index n, panics otherwise.
@@ -1301,11 +1355,36 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		return put(editor)
 	})
 
+	fnSetZeditEventHandler := pre("set-zedit-event-handler")
+	// (set-zedit-event-handler editor sel proc)
+	interp.Def(fnSetZeditEventHandler, 3, func(a []any) any {
+		editor := mustGet(fnSetZeditEventHandler, "GUI zedit ID", a, 0).(*zedit.Editor)
+		event := SymToEditorEvent(fnSetZeditEventHandler, a[1])
+		proc := a[2].(*z3.Closure)
+		editor.SetEventHandler(event, zedit.EventHandler(func(event zedit.EditorEvent, editor *zedit.Editor) {
+			evt := goarith.AsNumber(int(event))
+			ed := getIDOrPut(editor)
+			interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: evt, Cdr: &z3.Cell{Car: ed,
+				Cdr: z3.Nil}}}, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN zedit %v event handler for event %v", z3.Str(ed), z3.Str(evt)))
+		}))
+		return z3.Void
+	})
+
+	fnRemoveZeditEventHandler := pre("remove-zedit-event-handler")
+	// (remove-zedit-event-handler editor sel)
+	interp.Def(fnRemoveZeditEventHandler, 2, func(a []any) any {
+		editor := mustGet(fnRemoveZeditEventHandler, "GUI zedit ID", a, 0).(*zedit.Editor)
+		event := SymToEditorEvent(fnRemoveZeditEventHandler, a[1])
+		editor.RemoveEventHandler(event)
+		return z3.Void
+	})
+
 	fnSetZeditConfig := pre("set-zedit-config")
 	// (set-zedit-config editor selector prop)
 	interp.Def(fnSetZeditConfig, 3, func(a []any) any {
 		editor := mustGet(fnSetZeditConfig, "GUI zedit ID", a, 0).(*zedit.Editor)
-		SetZeditConfig(fnSetZeditConfig, editor, a[1], a[2])
+		SetZeditConfig(interp, fnSetZeditConfig, editor, a[1], a[2])
 		return z3.Void
 	})
 
@@ -1313,7 +1392,7 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 	// (get-zedit-prop editor selector) => any
 	interp.Def(fnGetZeditConfig, 2, func(a []any) any {
 		editor := mustGet(fnGetZeditConfig, "GUI zedit ID", a, 0).(*zedit.Editor)
-		return GetZeditConfig(fnGetZeditConfig, editor, a[1])
+		return GetZeditConfig(interp, fnGetZeditConfig, editor, a[1])
 	})
 
 	fnSetZeditText := pre("set-zedit-text")
@@ -1642,6 +1721,26 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	fnPrintZedit := pre("print-zedit")
+	// (print-zedit editor text tagli)
+	interp.Def(fnPrintZedit, 3, func(a []any) any {
+		ed := mustGet1(fnPrintZedit, "GUI zedit ID", a[0]).(*zedit.Editor)
+		s := a[1].(string)
+		li := a[2].(*z3.Cell)
+		if li == z3.Nil {
+			ed.Print(s, nil)
+			return z3.Void
+		}
+		tags := make([]zedit.Tag, 0)
+		for li != z3.Nil {
+			tag := mustGet1(fnPrintZedit, "GUI tag ID", li.Car).(zedit.Tag)
+			tags = append(tags, tag)
+			li = li.CdrCell()
+		}
+		ed.Print(s, tags)
+		return z3.Void
+	})
+
 	fnCompleteZeditToEnd := pre("complete-zedit-to-end")
 	// (complete-zedit-to-end editor start)
 	interp.Def(fnCompleteZeditToEnd, 2, func(a []any) any {
@@ -1835,21 +1934,21 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		style := ListToZeditStyle(a[2].(*z3.Cell))
 		blend := z3.ToBool(a[3])
 		drawFullLine := z3.ToBool(a[4])
-		fn := zedit.TagStyleFunc(func(tag zedit.Tag, c widget.TextGridCell) widget.TextGridCell {
-			fg := style.TextColor()
-			bg := style.BackgroundColor()
-			if blend && c.Style != nil {
-				if c.Style.TextColor() != nil {
+		fn := zedit.TagStyleFunc(func(tag zedit.Tag, c zedit.Cell) zedit.Cell {
+			fg := style.FGColor
+			bg := style.BGColor
+			if blend && c.Style != zedit.EmptyStyle {
+				if c.Style.FGColor != nil {
 					fg = zedit.BlendColors(editor.Config.BlendFG, editor.Config.BlendFGSwitched,
-						c.Style.TextColor(), fg)
+						c.Style.FGColor, fg)
 				}
-				if c.Style.BackgroundColor() != nil {
+				if c.Style.BGColor != nil {
 					bg = zedit.BlendColors(editor.Config.BlendBG, editor.Config.BlendBGSwitched,
-						c.Style.BackgroundColor(), bg)
+						c.Style.BGColor, bg)
 				}
 			}
-			newStyle := &widget.CustomTextGridStyle{FGColor: fg, BGColor: bg}
-			return widget.TextGridCell{
+			newStyle := zedit.Style{FGColor: fg, BGColor: bg}
+			return zedit.Cell{
 				Rune:  c.Rune,
 				Style: newStyle,
 			}
@@ -4343,18 +4442,18 @@ func ListToTextGridStyle(arg any) widget.TextGridStyle {
 }
 
 // ListToZeditStyle converts a list of colors to a zedit.EditorStyle used by zedit.Editor.
-func ListToZeditStyle(arg any) zedit.EditorStyle {
+func ListToZeditStyle(arg any) zedit.Style {
 	if li, ok := arg.(*z3.Cell); ok {
 		if li == z3.Nil {
-			return &zedit.CustomEditorStyle{FGColor: color.RGBA{R: 255, G: 255, B: 255, A: 255},
+			return zedit.Style{FGColor: color.RGBA{R: 255, G: 255, B: 255, A: 255},
 				BGColor: color.RGBA{R: 0, G: 0, B: 0, A: 255}}
 		}
 		fg := ListToColor(li.Car.(*z3.Cell))
 		li = li.CdrCell()
 		bg := ListToColor(li.Car.(*z3.Cell))
-		return &zedit.CustomEditorStyle{FGColor: fg, BGColor: bg}
+		return zedit.Style{FGColor: fg, BGColor: bg}
 	}
-	return &zedit.CustomEditorStyle{FGColor: color.RGBA{R: 255, G: 255, B: 255, A: 255},
+	return zedit.Style{FGColor: color.RGBA{R: 255, G: 255, B: 255, A: 255},
 		BGColor: color.RGBA{R: 0, G: 0, B: 0, A: 255}}
 }
 
@@ -4692,7 +4791,9 @@ func TagEventToTagEventSymbol(evt zedit.TagEvent) *z3.Sym {
 	}
 }
 
-func SetZeditConfig(caller string, z *zedit.Editor, sel, prop any) {
+// zedit Config properties
+
+func SetZeditConfig(interp *z3.Interp, caller string, z *zedit.Editor, sel, prop any) {
 	sym, ok := sel.(*z3.Sym)
 	if !ok {
 		panic(fmt.Errorf("%v: expected valid property selector, given %v", caller, z3.Str(sel)))
@@ -4712,12 +4813,129 @@ func SetZeditConfig(caller string, z *zedit.Editor, sel, prop any) {
 		z.Config.ShowLineNumbers = z3.ToBool(prop)
 	case ZeditShowWhitespace:
 		z.Config.ShowWhitespace = z3.ToBool(prop)
+	case ZeditParagraphLineNumbers:
+		z.Config.ParagraphLineNumbers = z3.ToBool(prop)
+	case ZeditSelectionTag:
+		tag := mustGet1(caller, "GUI tag ID", prop).(zedit.Tag)
+		z.Config.SelectionTag = tag
+	case ZeditSelectionStyle:
+		styler := mustGet1(caller, "GUI zedit style ID", prop).(zedit.TagStyler)
+		z.Config.SelectionStyler = styler
+	case ZeditHighlightTag:
+		tag := mustGet1(caller, "GUI tag ID", prop).(zedit.Tag)
+		z.Config.HighlightTag = tag
+	case ZeditHighlightStyle:
+		styler := mustGet1(caller, "GUI zedit style ID", prop).(zedit.TagStyler)
+		z.Config.HighlightStyler = styler
+	case ZeditMarkTag:
+		tag := mustGet1(caller, "GUI tag ID", prop).(zedit.Tag)
+		z.Config.MarkTag = tag
+	case ZeditMarkTags:
+		li := prop.(*z3.Cell)
+		tags := make([]zedit.Tag, 0)
+		for li != z3.Nil {
+			tags = append(tags, li.Car.(zedit.Tag))
+			li = li.CdrCell()
+		}
+		z.Config.MarkTags = tags
+	case ZeditMarkStyle:
+		styler := mustGet1(caller, "GUI zedit style ID", prop).(zedit.TagStyler)
+		z.Config.MarkStyler = styler
+	case ZeditErrorTag:
+		tag := mustGet1(caller, "GUI tag ID", prop).(zedit.Tag)
+		z.Config.ErrorTag = tag
+	case ZeditErrorStyle:
+		styler := mustGet1(caller, "GUI zedit style ID", prop).(zedit.TagStyler)
+		z.Config.ErrorStyler = styler
+	case ZeditParenErrorTag:
+		tag := mustGet1(caller, "GUI tag ID", prop).(zedit.Tag)
+		z.Config.ParenErrorTag = tag
+	case ZeditBlendFG:
+		n := z3.ToInt(caller, prop)
+		z.Config.BlendFG = zedit.BlendMode(n)
+	case ZeditBlendBG:
+		n := z3.ToInt(caller, prop)
+		z.Config.BlendBG = zedit.BlendMode(n)
+	case ZeditBlendFGSwitched:
+		z.Config.BlendFGSwitched = z3.ToBool(prop)
+	case ZeditBlendBGSwitched:
+		z.Config.BlendBGSwitched = z3.ToBool(prop)
+	case ZeditSoftLF:
+		z.Config.SoftLF = rune(prop.(string)[0])
+	case ZeditHardLF:
+		z.Config.HardLF = rune(prop.(string)[0])
+	case ZeditScrollFactor:
+		z.Config.ScrollFactor = float32(z3.ToFloat64(prop))
+	case ZeditTabWidth:
+		z.Config.TabWidth = z3.ToInt(caller, prop)
+	case ZeditMinRefreshInterval:
+		z.Config.MinRefreshInterval = time.Duration(z3.ToInt64(caller, prop))
+	case ZeditCharDrift:
+		z.Config.CharDrift = float32(z3.ToFloat64(prop))
+	case ZeditCaretBlinkDelay:
+		z.Config.CaretBlinkDelay = time.Duration(z3.ToInt64(caller, prop))
+	case ZeditCaretOnDuration:
+		z.Config.CaretOnDuration = time.Duration(z3.ToInt64(caller, prop))
+	case ZeditCaretOffDuration:
+		z.Config.CaretOffDuration = time.Duration(z3.ToInt64(caller, prop))
+	case ZeditMaxLines:
+		z.Config.MaxLines = z3.ToInt64(caller, prop)
+	case ZeditMaxColumns:
+		z.Config.MaxColumns = z3.ToInt64(caller, prop)
+	case ZeditMaxPrintLines:
+		z.Config.MaxPrintLines = z3.ToInt(caller, prop)
+	case ZeditTagPreWrite:
+		proc := prop.(*z3.Closure)
+		z.Config.TagPreWrite = zedit.TagPreWriteFunc(func(tag zedit.TagWithInterval) error {
+			lTag := getIDOrPut(tag.Tag)
+			lInterval := CharIntervalToList(tag.Interval)
+			li := &z3.Cell{Car: proc, Cdr: &z3.Cell{Car: lTag, Cdr: &z3.Cell{Car: z3.QqQuote(lInterval), Cdr: z3.Nil}}}
+			interp.SafeEvalWithInfo(li, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN zedit config '"+z3.Str(ZeditTagPreWrite)))
+			return nil
+		})
+	case ZeditTagPostRead:
+		proc := prop.(*z3.Closure)
+		z.Config.TagPostRead = zedit.TagPostReadFunc(func(tag zedit.TagWithInterval) error {
+			lTag := getIDOrPut(tag.Tag)
+			lInterval := CharIntervalToList(tag.Interval)
+			li := &z3.Cell{Car: proc, Cdr: &z3.Cell{Car: lTag, Cdr: &z3.Cell{Car: z3.QqQuote(lInterval), Cdr: z3.Nil}}}
+			interp.SafeEvalWithInfo(li, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN zedit config '"+z3.Str(ZeditTagPostRead)))
+			return nil
+		})
+	case ZeditCustomSave:
+		proc := prop.(*z3.Closure)
+		z.Config.CustomSaver = zedit.CustomSaveFunc(func(enc *json.Encoder) error {
+			result, _ := interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: z3.Nil}, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN zedit config '"+z3.Str(ZeditCustomSave)))
+			s := fmt.Sprintf("%v", z3.Str2(result, true))
+			return enc.Encode(s)
+		})
+	case ZeditCustomLoader:
+		proc := prop.(*z3.Closure)
+		z.Config.CustomLoader = zedit.CustomLoadFunc(func(dec *json.Decoder) error {
+			var s string
+			err := dec.Decode(&s)
+			if err != nil {
+				return err
+			}
+			reader := z3.NewReader(strings.NewReader(s),
+				z3.NewInternalSource("str->expr/"+ZeditCustomLoader.String(), s))
+			x, ex := reader.Read()
+			if ex != nil {
+				return ex.(error)
+			}
+			interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: x, Cdr: z3.Nil}}, z3.Nil,
+				"%v\n"+fmt.Sprintf("IN zedit config '%v", z3.Str(ZeditCustomLoader)))
+			return nil
+		})
 	default:
 		panic(fmt.Errorf("%v: expected valid property selector, given %v", caller, z3.Str(sel)))
 	}
 }
 
-func GetZeditConfig(caller string, z *zedit.Editor, sel any) any {
+func GetZeditConfig(interp *z3.Interp, caller string, z *zedit.Editor, sel any) any {
 	sym, ok := sel.(*z3.Sym)
 	if !ok {
 		panic(fmt.Errorf("%v: expected valid property selector, given %v", caller, z3.Str(sel)))
@@ -4737,7 +4955,118 @@ func GetZeditConfig(caller string, z *zedit.Editor, sel any) any {
 		return z3.AsLispBool(z.Config.ShowLineNumbers)
 	case ZeditShowWhitespace:
 		return z3.AsLispBool(z.Config.ShowWhitespace)
+	case ZeditParagraphLineNumbers:
+		return z3.AsLispBool(z.Config.ParagraphLineNumbers)
+	case ZeditSelectionTag:
+		return getIDOrPut(z.Config.SelectionTag)
+	case ZeditSelectionStyle:
+		return getIDOrPut(z.Config.SelectionStyler)
+	case ZeditHighlightTag:
+		return getIDOrPut(z.Config.HighlightTag)
+	case ZeditSelectionStyle:
+		return getIDOrPut(z.Config.HighlightStyler)
+	case ZeditMarkTag:
+		return getIDOrPut(z.Config.MarkTag)
+	case ZeditMarkTags:
+		arr := make([]any, len(z.Config.MarkTags))
+		for i := range z.Config.MarkTags {
+			id := getIDOrPut(z.Config.MarkTags[i])
+			arr[i] = id
+		}
+		return z3.ArrayToList(arr)
+	case ZeditMarkStyle:
+		return getIDOrPut(z.Config.MarkStyler)
+	case ZeditErrorTag:
+		return getIDOrPut(z.Config.ErrorTag)
+	case ZeditErrorStyle:
+		return getIDOrPut(z.Config.ErrorStyler)
+	case ZeditParenErrorTag:
+		return getIDOrPut(z.Config.ErrorTag)
+	case ZeditBlendFG:
+		return goarith.AsNumber(z.Config.BlendFG)
+	case ZeditBlendBG:
+		return goarith.AsNumber(z.Config.BlendBG)
+	case ZeditBlendFGSwitched:
+		return z3.AsLispBool(z.Config.BlendFGSwitched)
+	case ZeditBlendBGSwitched:
+		return z3.AsLispBool(z.Config.BlendBGSwitched)
+	case ZeditSoftLF:
+		return strconv.QuoteRune(z.Config.SoftLF)
+	case ZeditHardLF:
+		return strconv.QuoteRune(z.Config.HardLF)
+	case ZeditScrollFactor:
+		return goarith.AsNumber(float64(z.Config.ScrollFactor))
+	case ZeditTabWidth:
+		return goarith.AsNumber(z.Config.TabWidth)
+	case ZeditMinRefreshInterval:
+		return goarith.AsNumber(int64(z.Config.MinRefreshInterval))
+	case ZeditCharDrift:
+		return goarith.AsNumber(float64(z.Config.CharDrift))
+	case ZeditCaretBlinkDelay:
+		return goarith.AsNumber(int64(z.Config.CaretBlinkDelay))
+	case ZeditCaretOnDuration:
+		return goarith.AsNumber(int64(z.Config.CaretOnDuration))
+	case ZeditCaretOffDuration:
+		return goarith.AsNumber(int64(z.Config.CaretOffDuration))
+	case ZeditMaxLines:
+		return goarith.AsNumber(int64(z.Config.MaxLines))
+	case ZeditMaxColumns:
+		return goarith.AsNumber(int64(z.Config.MaxColumns))
+	case ZeditMaxPrintLines:
+		return goarith.AsNumber(int64(z.Config.MaxPrintLines))
+	case ZeditTagPreWrite:
+		if v, ok := interp.GetGlobalVar(ZeditTagPreWrite); ok {
+			return v
+		}
+		interp.Def(ZeditTagPreWriteIntrinsic.String(), 2, func(a []any) any {
+			tag := mustGet(ZeditTagPreWriteIntrinsic.String(), "GUI tag ID", a, 0).(zedit.Tag)
+			interval := ListToCharInterval(ZeditTagPreWriteIntrinsic.String(), a[1].(*z3.Cell))
+			result := z.Config.TagPreWrite(zedit.TagWithInterval{Tag: tag, Interval: interval})
+			if result != nil {
+				panic(fmt.Sprintf(ZeditTagPreWriteIntrinsic.String()+": %v", z3.Str(result)))
+			}
+			return z3.Void
+		})
+		result, _ := interp.SafeEvalWithInfo(ZeditTagPreWriteIntrinsic, z3.Nil,
+			"%v\n"+fmt.Sprintf("IN zedit config '"+z3.Str(ZeditTagPreWrite)))
+		return result
+	case ZeditTagPostRead:
+		if v, ok := interp.GetGlobalVar(ZeditTagPostRead); ok {
+			return v
+		}
+		interp.Def(ZeditTagPostReadIntrinsic.String(), 2, func(a []any) any {
+			tag := mustGet(ZeditTagPostReadIntrinsic.String(), "GUI tag ID", a, 0).(zedit.Tag)
+			interval := ListToCharInterval(ZeditTagPostReadIntrinsic.String(), a[1].(*z3.Cell))
+			result := z.Config.TagPostRead(zedit.TagWithInterval{Tag: tag, Interval: interval})
+			if result != nil {
+				panic(fmt.Sprintf(ZeditTagPostReadIntrinsic.String()+": %v", z3.Str(result)))
+			}
+			return z3.Void
+		})
+		result, _ := interp.SafeEvalWithInfo(ZeditTagPostReadIntrinsic, z3.Nil,
+			"%v\n"+fmt.Sprintf("IN zedit config '"+z3.Str(ZeditTagPostRead)))
+		return result
+	case ZeditCustomSave:
+		if v, ok := interp.GetGlobalVar(ZeditCustomSaveIntrinsic); ok {
+			return v
+		}
+		return z3.Nil
+	case ZeditCustomLoader:
+		if v, ok := interp.GetGlobalVar(ZeditCustomLoadIntrinsic); ok {
+			return v
+		}
+		return z3.Nil
 	default:
 		panic(fmt.Errorf("%v: expected valid property selector, given %v", caller, z3.Str(sel)))
+	}
+}
+
+func SymToEditorEvent(caller string, s any) zedit.EditorEvent {
+	sym := s.(*z3.Sym)
+	switch sym {
+	case EditorCaretMove:
+		return zedit.CaretMoveEvent
+	default:
+		panic(fmt.Sprintf("%v: unknown editor event '%v", caller, z3.Str(sym)))
 	}
 }
