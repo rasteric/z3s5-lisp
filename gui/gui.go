@@ -360,9 +360,17 @@ func clear(n any) {
 func RunGUI(id string, onStarted func()) {
 	apl = app.NewWithID(id)
 	apl.Lifecycle().SetOnStarted(onStarted)
-	mainWin = apl.NewWindow("")
+	mainWin = apl.NewWindow("Application")
+	mainWin.SetPadded(false)
+	lbl := widget.NewLabel("( Z3S5 Lisp )")
+	mainWin.SetContent(lbl)
 	mainWin.SetMaster()
-	apl.Run()
+	mainWin.CenterOnScreen()
+	go func() {
+		time.Sleep(1 * time.Second)
+		mainWin.Hide()
+	}()
+	mainWin.ShowAndRun()
 }
 
 // ShutdownGUI shuts down the user interface. Any attempt to use it afterwards may result in a panic. This should

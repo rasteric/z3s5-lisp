@@ -2,9 +2,9 @@
 title: Z3S5 Lisp Reference Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: Version 2.4.2+a6db905-gui.fyne2
+footer-left: Version 2.4.2+13e931e-gui.fyne2
 author: by Erich Rast and all Help system contributors
-date: 2024-6-11 15:31
+date: 2024-6-11 17:25
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -13,7 +13,7 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
-For Z3S5 Lisp Version 2.4.2+a6db905-gui.fyne2 with installed modules (gui-fileio gui fyne2 oop lib kvdb zimage tasks help beep unicode db fileio decimal ling float console base).
+For Z3S5 Lisp Version 2.4.2+13e931e-gui.fyne2 with installed modules (gui-fileio gui fyne2 oop lib kvdb zimage tasks help beep unicode db fileio decimal ling float console base).
 
 # Introduction
 

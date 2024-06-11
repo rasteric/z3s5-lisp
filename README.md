@@ -7,7 +7,7 @@
 
 ## Usage
 
-Check out the basic lisp interpreter `z3.go` in folder `cmd/z3/` for an example of how to use Z3S5 Lisp in the Go language. You may also use the interpreter from the command line by running the `z3` binary. There is a version with GUI support in `z3g.go` in folder `cmd/z3g/`. This integrates [Fyne](https://fyne.io/) for building graphical user interfaces. The startup with GUI is a bit more complicated since the GUI loop runs concurrently. You can find an example in `z3g.go`. See the file `cmd/z3g/demo.lisp` for GUI demos. You need to `(exit)` the interpreter after running a demo since currently ending a demo ends the GUI thread. This will be fixed in the future.
+Check out the basic lisp interpreter `z3.go` in folder `cmd/z3/` for an example of how to use Z3S5 Lisp in the Go language. You may also use the interpreter from the command line by running the `z3` binary. There is a version with GUI support in `z3g.go` in folder `cmd/z3g/`. This integrates [Fyne](https://fyne.io/) for building graphical user interfaces. The startup with GUI is a bit more complicated since the GUI loop runs concurrently. You can find an example in `z3g.go`. See the file `cmd/z3g/demo.lisp` for GUI demos.
 
 There is a build tag `nosound` you may use to leave out sound support. If this option is not specified, then the `beep` command produces a few basic sounds which are embedded into the executable and do slightly increase its size.
 
