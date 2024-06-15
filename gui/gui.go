@@ -362,14 +362,15 @@ func RunGUI(id string, onStarted func()) {
 	apl.Lifecycle().SetOnStarted(onStarted)
 	mainWin = apl.NewWindow("Application")
 	mainWin.SetPadded(false)
-	lbl := widget.NewLabel("( Z3S5 Lisp )")
-	mainWin.SetContent(lbl)
 	mainWin.SetMaster()
 	mainWin.CenterOnScreen()
-	go func() {
-		time.Sleep(1 * time.Second)
-		mainWin.Hide()
-	}()
+	apl.Lifecycle().SetOnEnteredForeground(func() {
+		go func() {
+			if mainWin != nil {
+				mainWin.Hide()
+			}
+		}()
+	})
 	mainWin.ShowAndRun()
 }
 
