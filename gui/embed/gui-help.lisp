@@ -1324,7 +1324,7 @@
   (type proc)
   (arity 2)
   (topic (gui canvas canvas-object))
-  (see (get-window-canvas get-focused-canvas-object focus-next-canvas-object focus-previous-canvas-object unfocus-canvas-objects)))
+  (see (focus-zedit get-window-canvas get-focused-canvas-object focus-next-canvas-object focus-previous-canvas-object unfocus-canvas-objects)))
 
 (defhelp focus-next-canvas-object
     (use "(focus-next-canvas-object canvas)")
@@ -1414,9 +1414,41 @@
   (topic (gui zedit))
   (see (new-zedit insert-zedit delete-zedit)))
 
+(defhelp make-or-get-zedit-color-tag
+    (use "(make-or-get-zedit-color-tag editor color background? draw-full-line?) => int")
+  (info "Create a new tag or get an existing tag for marking the color of text. The #color is a list of 16-bit (r g b a) values like in #nrgba. If #background? is not nil, the color is for the background of the text. If #draw-full-line? is not nil, then the full line is drawn (like in a selection) when multiple lines are drawn; otherwise, only actual text is drawn with the color and not whitespace at the end of a line. The function returns a tag ID and automatically adds the corresponding style function to render the text in the given color.")
+  (type proc)
+  (arity 4)
+  (topic (gui zedit))
+  (see (new-zedit color64->color color->color64 theme-color the-color *colors*)))
+
+(defhelp delete-zedit-all
+    (use "(delete-zedit-all editor)")
+  (info "Delete all text in the editor and corresponding tags. Tag stylers are preserved.")
+  (type proc)
+  (arity 1)
+  (topic (gui zedit))
+  (see (delete-zedit)))
+
+(defhelp get-zedit-lines
+    (use "(get-zedit-lines editor) => int")
+  (info "Get the number of lines in the editor.")
+  (type proc)
+  (arity 1)
+  (topic (gui zedit))
+  (see (get-zedit-columns)))
+
+(defhelp get-zedit-columns
+    (use "(get-zedit-columns editor) => int")
+  (info "Get the number of columns in the editor. These are the columns that are displayed. If word wrapping is off, lines may have more columns.")
+  (type proc)
+  (arity 1)
+  (topic (gui zedit))
+  (see (get-zedit-lines)))
+
 (defhelp set-zedit-event-handler
     (use "(set-zedit-event-handler editor sel proc)")
-  (info "Set the event handler for #sel and the given #event to #proc. The handler #proc is a function that takes an event and an editor as argument. The selector #sel must be one of '(caret-move).")
+  (info "Set the event handler for #sel and the given #event to #proc. The handler #proc is a function that takes an event selector and an editor as argument. The selector #sel must be one of '(caret-move word-change).")
   (topic (gui zedit))
   (arity 3)
   (see (new-zedit remove-zedit-event-handler)))
@@ -1428,21 +1460,28 @@
   (arity 2)
   (see (new-zedit set-zedit-event-handler)))
 
-(defhelp set-zedit-prop
-    (use "(set-zedit-prop zedit sel b)")
+(defhelp focus-zedit
+    (use "(focus-zedit editor)")
+  (info "Set the focus to the given #editor. This needs to be used instead of #focus-canvas-object because a zedit is internally a complex widget and not a canvas object.")
+  (topic (gui zedit))
+  (arity 1)
+  (see (new-zedit focus-canvas-object)))
+
+(defhelp set-zedit-config
+    (use "(set-zedit-config zedit sel b)")
   (info "Set a configuration property of the given #zedit to #b. The selector #sel can be one of the following: show-line-numbers? - show the line number display if true, show-whitespace? - show whitespace characters if true, line-wrap? - wrap lines to the size of the widget automatically, soft-wrap? - do not end lines in a hard line feed when line wrapping (default), draw-caret? - draw the caret if true, supress caret drawing if false, highlight-parens? - automatically highlight the matching opening paren while typing and moving the caret after a closing paren, highlight-paren-range? - automatically highlight the range of characters between the opening and closing paren when hightlight-parens? is true.")
   (type proc)
   (arity 3)
   (topic (gui))
-  (see (new-zedit get-zedit-prop)))
+  (see (new-zedit get-zedit-config)))
 
-(defhelp get-zedit-prop
-    (use "(get-zedit-prop zedit sel) => any")
+(defhelp get-zedit-config
+    (use "(get-zedit-config zedit sel) => any")
   (info "Get a configuration property of the given #zedit based on selector #sel. The selector #sel can be one of the following: show-line-numbers? - show the line number display if true, show-whitespace? - show whitespace characters if true, line-wrap? - wrap lines to the size of the widget automatically, soft-wrap? - do not end lines in a hard line feed when line wrapping (default), draw-caret? - draw the caret if true, supress caret drawing if false, highlight-parens? - automatically highlight the matching opening paren while typing and moving the caret after a closing paren, highlight-paren-range? - automatically highlight the range of characters between the opening and closing paren when hightlight-parens? is true.")
   (type proc)
   (arity 2)
   (topic (gui))
-  (see (new-zedit set-zedit-prop)))
+  (see (new-zedit set-zedit-config)))
 
 (defhelp set-zedit-text
     (use "(set-zedit-text zedit str)")

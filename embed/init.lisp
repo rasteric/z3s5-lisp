@@ -4690,7 +4690,7 @@
   (type proc)
   (topic (oop))
   (arity 2)
-  (see (new isa? setslot object? class-name supers props methods has-slot?)))
+  (see (new isa? setprop object? class-name supers props methods has-prop?)))
 
 (expect-ok (setq _obj1 (new _testclass1)))
 (expect-ok (setq _obj2 (new _testclass2 (x 10) (y 20) (a "hello world"))))

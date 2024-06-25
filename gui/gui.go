@@ -58,6 +58,8 @@ var WrapWordSym = z3.NewSym("word")
 
 // editor events
 var EditorCaretMove = z3.NewSym("caret-move")
+var EditorWordChange = z3.NewSym("word-change")
+var EditorUnknown = z3.NewSym("unknown")
 
 // theme selectors
 var ForegroundColor = z3.NewSym("foreground")
@@ -238,6 +240,7 @@ var ZeditTagPreWriteIntrinsic = z3.NewSym("*gui-tag-pre-write*")
 var ZeditTagPostReadIntrinsic = z3.NewSym("*gui-tag-post-read*")
 var ZeditCustomSaveIntrinsic = z3.NewSym("*gui-zedit-custom-save*")
 var ZeditCustomLoadIntrinsic = z3.NewSym("*gui-zedit-custom-load*")
+var ZeditGetWordAtLeft = z3.NewSym("get-word-at-left?")
 
 // used to work around Go prohibition to hash functions
 type validatorWrapper struct {
@@ -361,7 +364,6 @@ func RunGUI(id string, onStarted func()) {
 	apl = app.NewWithID(id)
 	apl.Lifecycle().SetOnStarted(onStarted)
 	mainWin = apl.NewWindow("Application")
-	mainWin.SetPadded(false)
 	mainWin.SetMaster()
 	mainWin.CenterOnScreen()
 	apl.Lifecycle().SetOnEnteredForeground(func() {
@@ -1371,9 +1373,9 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		event := SymToEditorEvent(fnSetZeditEventHandler, a[1])
 		proc := a[2].(*z3.Closure)
 		editor.SetEventHandler(event, zedit.EventHandler(func(event zedit.EditorEvent, editor *zedit.Editor) {
-			evt := goarith.AsNumber(int(event))
+			evt := EditorEventToSym(fnSetZeditEventHandler, event)
 			ed := getIDOrPut(editor)
-			interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: evt, Cdr: &z3.Cell{Car: ed,
+			interp.SafeEvalWithInfo(&z3.Cell{Car: proc, Cdr: &z3.Cell{Car: z3.QqQuote(evt), Cdr: &z3.Cell{Car: ed,
 				Cdr: z3.Nil}}}, z3.Nil,
 				"%v\n"+fmt.Sprintf("IN zedit %v event handler for event %v", z3.Str(ed), z3.Str(evt)))
 		}))
@@ -1387,6 +1389,38 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		event := SymToEditorEvent(fnRemoveZeditEventHandler, a[1])
 		editor.RemoveEventHandler(event)
 		return z3.Void
+	})
+
+	fnFocusZedit := pre("focus-zedit")
+	// (focus-zedit editor)
+	interp.Def(fnFocusZedit, 1, func(a []any) any {
+		editor := mustGet(fnFocusZedit, "GUI zedit ID", a, 0).(*zedit.Editor)
+		editor.Focus()
+		return z3.Void
+	})
+
+	fnMakeOrGetZeditColorTag := pre("make-or-get-zedit-color-tag")
+	// (make-or-get-zedit-color-tag editor color background? draw-full-line?)
+	interp.Def(fnMakeOrGetZeditColorTag, 4, func(a []any) any {
+		editor := mustGet(fnMakeOrGetZeditColorTag, "GUI zedit ID", a, 0).(*zedit.Editor)
+		li := a[1].(*z3.Cell)
+		c := ListToColor(li)
+		tag := editor.MakeOrGetColorTag(c, z3.ToBool(a[2]), z3.ToBool(a[3]))
+		return getIDOrPut(tag)
+	})
+
+	fnGetZeditLines := pre("get-zedit-lines")
+	// (get-zedit-lines editor) => int
+	interp.Def(fnGetZeditLines, 1, func(a []any) any {
+		editor := mustGet(fnGetZeditLines, "GUI zedit ID", a, 0).(*zedit.Editor)
+		return goarith.AsNumber(editor.Lines)
+	})
+
+	fnGetZeditColumns := pre("get-zedit-columns")
+	// (get-zedit-columns editor) => int
+	interp.Def(fnGetZeditColumns, 1, func(a []any) any {
+		editor := mustGet(fnGetZeditColumns, "GUI zedit ID", a, 0).(*zedit.Editor)
+		return goarith.AsNumber(editor.Columns)
 	})
 
 	fnSetZeditConfig := pre("set-zedit-config")
@@ -1711,6 +1745,13 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	fnGetZeditCurrentWord := pre("get-zedit-current-word")
+	// (get-zedit-current-word editor) => str
+	interp.Def(fnGetZeditCurrentWord, 1, func(a []any) any {
+		editor := mustGet(fnGetZeditCurrentWord, "GUI zedit ID", a, 0).(*zedit.Editor)
+		return editor.CurrentWord()
+	})
+
 	fnInsertZeditAt := pre("insert-zedit-at")
 	// (insert-zedit-at editor s pos)
 	interp.Def(fnInsertZeditAt, 3, func(a []any) any {
@@ -1727,6 +1768,14 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		editor := mustGet(fnDeleteZeditRange, "GUI zedit ID", a, 0).(*zedit.Editor)
 		interval := ListToCharInterval(fnDeleteZeditRange, a[1].(*z3.Cell))
 		editor.Delete(interval)
+		return z3.Void
+	})
+
+	fnDeleteZeditAll := pre("delete-zedit-all")
+	// (delete-zedit-all editor)
+	interp.Def(fnDeleteZeditAll, 1, func(a []any) any {
+		editor := mustGet(fnDeleteZeditAll, "GUI zedit ID", a, 0).(*zedit.Editor)
+		editor.DeleteAll()
 		return z3.Void
 	})
 
@@ -3236,6 +3285,7 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 	})
 
 	fnNewBorder := pre("new-border")
+	// (new-border top bottom left right obj...) => int
 	interp.Def(fnNewBorder, -1, func(a []any) any {
 		arr := make([]fyne.CanvasObject, 0)
 		args := z3.ListToArray(a[0].(*z3.Cell))
@@ -4869,6 +4919,8 @@ func SetZeditConfig(interp *z3.Interp, caller string, z *zedit.Editor, sel, prop
 		z.Config.BlendFGSwitched = z3.ToBool(prop)
 	case ZeditBlendBGSwitched:
 		z.Config.BlendBGSwitched = z3.ToBool(prop)
+	case ZeditGetWordAtLeft:
+		z.Config.GetWordAtLeft = z3.ToBool(prop)
 	case ZeditSoftLF:
 		z.Config.SoftLF = rune(prop.(string)[0])
 	case ZeditHardLF:
@@ -4966,6 +5018,8 @@ func GetZeditConfig(interp *z3.Interp, caller string, z *zedit.Editor, sel any) 
 		return z3.AsLispBool(z.Config.ShowWhitespace)
 	case ZeditParagraphLineNumbers:
 		return z3.AsLispBool(z.Config.ParagraphLineNumbers)
+	case ZeditGetWordAtLeft:
+		return z3.AsLispBool(z.Config.GetWordAtLeft)
 	case ZeditSelectionTag:
 		return getIDOrPut(z.Config.SelectionTag)
 	case ZeditSelectionStyle:
@@ -5075,7 +5129,20 @@ func SymToEditorEvent(caller string, s any) zedit.EditorEvent {
 	switch sym {
 	case EditorCaretMove:
 		return zedit.CaretMoveEvent
+	case EditorWordChange:
+		return zedit.WordChangeEvent
 	default:
 		panic(fmt.Sprintf("%v: unknown editor event '%v", caller, z3.Str(sym)))
+	}
+}
+
+func EditorEventToSym(caller string, evt zedit.EditorEvent) *z3.Sym {
+	switch evt {
+	case zedit.CaretMoveEvent:
+		return EditorCaretMove
+	case zedit.WordChangeEvent:
+		return EditorWordChange
+	default:
+		return EditorUnknown
 	}
 }

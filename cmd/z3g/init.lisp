@@ -4,6 +4,7 @@
 
 (init-remember) ;; initializes the remember system, slows down start-up, remove if not needed
 (include "test-gui.lisp") ;; include tests for GUI
+(include "editor.lisp") ;; include lisp-editor for testing
 
 (defun print-start-banner ()
    (let ((tc (color 'text))
