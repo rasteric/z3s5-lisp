@@ -59,6 +59,7 @@ var WrapWordSym = z3.NewSym("word")
 // editor events
 var EditorCaretMove = z3.NewSym("caret-move")
 var EditorWordChange = z3.NewSym("word-change")
+var EditorSelectWord = z3.NewSym("select-word")
 var EditorUnknown = z3.NewSym("unknown")
 
 // theme selectors
@@ -241,6 +242,7 @@ var ZeditTagPostReadIntrinsic = z3.NewSym("*gui-tag-post-read*")
 var ZeditCustomSaveIntrinsic = z3.NewSym("*gui-zedit-custom-save*")
 var ZeditCustomLoadIntrinsic = z3.NewSym("*gui-zedit-custom-load*")
 var ZeditGetWordAtLeft = z3.NewSym("get-word-at-left?")
+var ZeditLiberalGetWordAt = z3.NewSym("liberal-get-word-at?")
 
 // used to work around Go prohibition to hash functions
 type validatorWrapper struct {
@@ -1382,6 +1384,21 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	fnGetZeditTextRange := pre("get-zedit-text-range")
+	// (get-zedit-text-range editor range) => str
+	interp.Def(fnGetZeditTextRange, 2, func(a []any) any {
+		editor := mustGet(fnGetZeditTextRange, "GUI zedit ID", a, 0).(*zedit.Editor)
+		interval := ListToCharInterval(fnGetZeditTextRange, a[1].(*z3.Cell))
+		return editor.GetTextRange(interval)
+	})
+
+	fnZeditCurrentSelectionText := pre("zedit-current-selection-text")
+	// (zedit-current-selection-text editor) => str
+	interp.Def(fnZeditCurrentSelectionText, 1, func(a []any) any {
+		editor := mustGet(fnZeditCurrentSelectionText, "GUI zedit ID", a, 0).(*zedit.Editor)
+		return editor.CurrentSelectionText()
+	})
+
 	fnRemoveZeditEventHandler := pre("remove-zedit-event-handler")
 	// (remove-zedit-event-handler editor sel)
 	interp.Def(fnRemoveZeditEventHandler, 2, func(a []any) any {
@@ -1400,12 +1417,14 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 	})
 
 	fnMakeOrGetZeditColorTag := pre("make-or-get-zedit-color-tag")
-	// (make-or-get-zedit-color-tag editor color background? draw-full-line?)
+	// (make-or-get-zedit-color-tag editor fg-color bg-color draw-full-line?)
 	interp.Def(fnMakeOrGetZeditColorTag, 4, func(a []any) any {
 		editor := mustGet(fnMakeOrGetZeditColorTag, "GUI zedit ID", a, 0).(*zedit.Editor)
 		li := a[1].(*z3.Cell)
-		c := ListToColor(li)
-		tag := editor.MakeOrGetColorTag(c, z3.ToBool(a[2]), z3.ToBool(a[3]))
+		fg := ListToColor(li)
+		li = a[2].(*z3.Cell)
+		bg := ListToColor(li)
+		tag := editor.MakeOrGetColorTag(fg, bg, z3.ToBool(a[3]))
 		return getIDOrPut(tag)
 	})
 
@@ -2082,6 +2101,20 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 			panic(fmt.Sprintf(fnNewChoice+": the first argument must be one of '(select radio-group), given %v", sort))
 		}
 		return zid
+	})
+
+	fnSetSelectOptions := pre("set-select-options")
+	// (set-select-options select string-list)
+	interp.Def(fnSetSelectOptions, 2, func(a []any) any {
+		sel := mustGet(fnSetSelectOptions, "GUI select ID", a, 0).(*widget.Select)
+		li := a[1].(*z3.Cell)
+		s := make([]string, 0)
+		for li != z3.Nil {
+			s = append(s, li.Car.(string))
+			li = li.CdrCell()
+		}
+		sel.SetOptions(s)
+		return z3.Void
 	})
 
 	// FORM
@@ -4459,8 +4492,12 @@ func ColorToList(c color.Color) *z3.Cell {
 			Cdr: z3.Nil}}}}
 }
 
-// ListToColor converts a Z3S5 Lisp color list to a color.
+// ListToColor converts a Z3S5 Lisp color list to a color. A nil color interface is returned
+// if an empty list is given as argument.
 func ListToColor(li *z3.Cell) color.Color {
+	if li == z3.Nil {
+		return nil
+	}
 	r := z3.ToUInt16(li.Car)
 	li = li.CdrCell()
 	g := z3.ToUInt16(li.Car)
@@ -4921,6 +4958,8 @@ func SetZeditConfig(interp *z3.Interp, caller string, z *zedit.Editor, sel, prop
 		z.Config.BlendBGSwitched = z3.ToBool(prop)
 	case ZeditGetWordAtLeft:
 		z.Config.GetWordAtLeft = z3.ToBool(prop)
+	case ZeditLiberalGetWordAt:
+		z.Config.LiberalGetWordAt = z3.ToBool(prop)
 	case ZeditSoftLF:
 		z.Config.SoftLF = rune(prop.(string)[0])
 	case ZeditHardLF:
@@ -5020,6 +5059,8 @@ func GetZeditConfig(interp *z3.Interp, caller string, z *zedit.Editor, sel any) 
 		return z3.AsLispBool(z.Config.ParagraphLineNumbers)
 	case ZeditGetWordAtLeft:
 		return z3.AsLispBool(z.Config.GetWordAtLeft)
+	case ZeditLiberalGetWordAt:
+		return z3.AsLispBool(z.Config.LiberalGetWordAt)
 	case ZeditSelectionTag:
 		return getIDOrPut(z.Config.SelectionTag)
 	case ZeditSelectionStyle:
@@ -5131,6 +5172,8 @@ func SymToEditorEvent(caller string, s any) zedit.EditorEvent {
 		return zedit.CaretMoveEvent
 	case EditorWordChange:
 		return zedit.WordChangeEvent
+	case EditorSelectWord:
+		return zedit.SelectWordEvent
 	default:
 		panic(fmt.Sprintf("%v: unknown editor event '%v", caller, z3.Str(sym)))
 	}
@@ -5142,6 +5185,8 @@ func EditorEventToSym(caller string, evt zedit.EditorEvent) *z3.Sym {
 		return EditorCaretMove
 	case zedit.WordChangeEvent:
 		return EditorWordChange
+	case zedit.SelectWordEvent:
+		return EditorSelectWord
 	default:
 		return EditorUnknown
 	}

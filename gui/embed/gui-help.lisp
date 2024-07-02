@@ -586,7 +586,15 @@
   (type proc)
   (arity 3)
   (topic (gui choice))
-  (see (new-check)))
+  (see (set-select-options new-check)))
+
+(defhelp set-select-options
+    (use "(set-select-options select li)")
+  (info "Set the options of the given #select widget, which can be obtained using #new-choice with selector 'select.")
+  (type proc)
+  (arity 2)
+  (topic (gui choice))
+  (see (new-choice)))
 
 (defhelp new-form
     (use "(new-form)")
@@ -1469,7 +1477,7 @@
 
 (defhelp set-zedit-config
     (use "(set-zedit-config zedit sel b)")
-  (info "Set a configuration property of the given #zedit to #b. The selector #sel can be one of the following: show-line-numbers? - show the line number display if true, show-whitespace? - show whitespace characters if true, line-wrap? - wrap lines to the size of the widget automatically, soft-wrap? - do not end lines in a hard line feed when line wrapping (default), draw-caret? - draw the caret if true, supress caret drawing if false, highlight-parens? - automatically highlight the matching opening paren while typing and moving the caret after a closing paren, highlight-paren-range? - automatically highlight the range of characters between the opening and closing paren when hightlight-parens? is true.")
+  (info "Set a configuration property of the given #zedit to #b. The selector #sel can be one of the following: show-line-numbers? - show the line number display if true, show-whitespace? - show whitespace characters if true, line-wrap? - wrap lines to the size of the widget automatically, soft-wrap? - do not end lines in a hard line feed when line wrapping (default), draw-caret? - draw the caret if true, supress caret drawing if false, highlight-parens? - automatically highlight the matching opening paren while typing and moving the caret after a closing paren, highlight-paren-range? - automatically highlight the range of characters between the opening and closing paren when hightlight-parens? is true, get-word-at-left? - returns word left of caret if true, otherwise words are only triggered when the caret is on them, liberal-get-word-at? - words are parsed more like Z3S5 Lisp symbols, i.e., including all kinds of delimiters except for parentheses.")
   (type proc)
   (arity 3)
   (topic (gui))
@@ -1477,7 +1485,7 @@
 
 (defhelp get-zedit-config
     (use "(get-zedit-config zedit sel) => any")
-  (info "Get a configuration property of the given #zedit based on selector #sel. The selector #sel can be one of the following: show-line-numbers? - show the line number display if true, show-whitespace? - show whitespace characters if true, line-wrap? - wrap lines to the size of the widget automatically, soft-wrap? - do not end lines in a hard line feed when line wrapping (default), draw-caret? - draw the caret if true, supress caret drawing if false, highlight-parens? - automatically highlight the matching opening paren while typing and moving the caret after a closing paren, highlight-paren-range? - automatically highlight the range of characters between the opening and closing paren when hightlight-parens? is true.")
+  (info  "Set a configuration property of the given #zedit to #b. The selector #sel can be one of the following: show-line-numbers? - show the line number display if true, show-whitespace? - show whitespace characters if true, line-wrap? - wrap lines to the size of the widget automatically, soft-wrap? - do not end lines in a hard line feed when line wrapping (default), draw-caret? - draw the caret if true, supress caret drawing if false, highlight-parens? - automatically highlight the matching opening paren while typing and moving the caret after a closing paren, highlight-paren-range? - automatically highlight the range of characters between the opening and closing paren when hightlight-parens? is true, get-word-at-left? - returns word left of caret if true, otherwise words are only triggered when the caret is on them, liberal-get-word-at? - words are parsed more like Z3S5 Lisp symbols, i.e., including all kinds of delimiters except for parentheses.")
   (type proc)
   (arity 2)
   (topic (gui))
@@ -1492,12 +1500,28 @@
   (see (new-zedit get-zedit-text)))
 
 (defhelp get-zedit-text
-    (use "(get-zedit-text zedit)")
+    (use "(get-zedit-text zedit) => str")
   (info "Get the text in editor #zedit.")
   (type proc)
   (topic (gui zedit))
   (arity 1)
-  (see (new-zedit get-zedit-text)))
+  (see (new-zedit get-zedit-text get-zedit-text-range zedit-current-selection-text)))
+
+(defhelp get-zedit-text-range
+    (use "(get-zedit-text-range zedit interval) => str")
+  (info "Obtain the text in #zedit within range #interval consisting of a list of two lists for the start and end position each. The function returns an empty string if there is no text at the interval.")
+  (type proc)
+  (topic (gui zedit))
+  (arity 2)
+  (see (get-zedit-text zedit-current-selection-text)))
+
+(defhelp zedit-current-selection-text
+    (use "(zedit-current-selection-text editor) => str")
+  (info "Obtain the currently selected text in #editor, the empty string if no text is selected.")
+  (type proc)
+  (arity 1)
+  (topic (gui zedit))
+  (see (get-zedit-text get-zedit-text-range get-zedit-selection)))
 
 (defhelp get-zedit-last-line
     (use "(get-zedit-last-line zedit) => num")

@@ -2,8 +2,13 @@
 
 (setq *lisp-editor-info-bg-color*
       (if (theme-is-dark?)
-	  (color->color64 (the-color 'dark-blue))
-	  (color->color64 (the-color 'light-blue))))
+	  (color->color64 (the-color 'firebrick))
+	  (color->color64 (the-color 'light-salmon))))
+
+(setq *lisp-editor-info-fg-color*
+      (if (theme-is-dark?)
+	  (color->color64 (the-color 'white))
+	  (color->color64 (the-color 'black))))
 
 (setq *lisp-editor-arg-fg-color*
       (if (theme-is-dark?)
@@ -17,8 +22,9 @@
   (delete-zedit-all ed)
   (let ((heading (make-or-get-zedit-color-tag
 		  ed
+		  *lisp-editor-info-fg-color*
 		  *lisp-editor-info-bg-color*
-		  t t)))
+		  t)))
     (print-zedit ed
 		 (fmt "%v with %v in %v\n" 
 		      (_help-type-to-str (assoc1 'type entry))
@@ -41,7 +47,8 @@
 		      (list (make-or-get-zedit-color-tag
 			     ed
 			     *lisp-editor-arg-fg-color*
-			     nil nil)))
+			     nil
+			     nil)))
 	 (print-zedit ed (2nd x) nil)))))
 
 (defun _arity->info (x)
@@ -57,41 +64,27 @@
 				     0
 				     (sub1 (* x -1)))))))
 
-(defclass lisped nil zed iwin frame search prev next (search-terms nil) (search-idx 0))
+(defclass lisped nil zed iwin frame search choice (terms nil))
 
 (defmethod lisped-add-search-term (this term)
-  (setprop this 'search-terms (cons term (prop this 'search-terms)))
-  (setprop this 'search-idx (len (prop this 'search-terms))))
-
-(defmethod lisped-prev-search (this)
-  (setprop this 'search-idx (max (sub1 (prop this 'search-idx)) 0))
-  (lisped-current-search this))
-
-(defmethod lisped-next-search (this)
-  (setprop this 'search-idx (min (sub1 (len (prop this 'search-terms)))
-				 (add1 (prop this 'search-idx))))
-  (lisped-current-search this))
-
-(defmethod lisped-current-search (this)
-  (nthdef (prop this 'search-terms)(prop this 'search-idx) nil))
-   
+  (setprop this 'terms (remove-duplicates (cons term (prop this 'terms))))
+  (set-select-options (prop this 'choice) (prop this 'terms)))
+    
 (defmethod lisped-attach (this win canvas)
   (letrec ((ed (new-zedit 80 40 canvas))
-	   (info (new-zedit 80 38 canvas))
+	   (info (new-zedit 80 18 canvas))
 	   (search (new-entry))
-	   (back (new-button-with-icon "" 
-					 (theme-icon 'navigate-back)
-					 (lambda () (let ((term (lisped-prev-search this)))
-						      (when term (set-entry-text search term))))))
-	   (next (new-button-with-icon "" (theme-icon 'navigate-next)
-				       	 (lambda () (let ((term (lisped-next-search this)))
-						      (when term (set-entry-text search term))))))
+	   (choice (new-choice 'select '() (lambda (s) (set-entry-text search s))))
 	   (search-box (new-border nil nil nil
 				   (new-container
-				    (new-hbox-layout) back next) search))
+				    (new-hbox-layout) choice) search))
 	   (vb (new-container (new-vbox-layout) search-box info))
 	   (hb (new-container (new-hbox-layout) ed vb)))
     (set-zedit-config info 'draw-caret? nil)
+    (set-zedit-config info 'liberal-get-word-at? t)
+    (set-zedit-config ed 'show-line-numbers? t)
+    (set-zedit-config ed 'get-word-at-left? t)
+    (set-zedit-config ed 'liberal-get-word-at? t)
     (set-entry-on-change-callback
      search
      (lambda (s)
@@ -107,6 +100,13 @@
      (lambda (evt zedit)
        (set-entry-text search (get-zedit-current-word zedit))
        (focus-zedit zedit)))
+    (set-zedit-event-handler
+     info
+     'select-word
+     (lambda (evt zedit)
+       (set-entry-text search (zedit-current-selection-text zedit))
+       (focus-zedit ed)))
+    (setprop this 'choice choice)
     (setprop this 'zed ed)
     (setprop this 'iwin info)
     (setprop this 'frame hb)
