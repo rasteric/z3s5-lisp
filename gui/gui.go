@@ -1506,6 +1506,13 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	fnGetZeditTopLine := pre("get-zedit-top-line")
+	// (get-zedit-top-line editor) => int
+	interp.Def(fnGetZeditTopLine, 1, func(a []any) any {
+		editor := mustGet(fnGetZeditTopLine, "GUI zedit ID", a, 0).(*zedit.Editor)
+		return goarith.AsNumber(editor.TopLine())
+	})
+
 	fnCenterZeditLineOnCaret := pre("center-zedit-line-on-caret")
 	// (center-zedit-line-on-caret editor)
 	interp.Def(fnCenterZeditLineOnCaret, 1, func(a []any) any {
@@ -1707,6 +1714,18 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		editor := mustGet(fnRefreshZedit, "GUI zedit ID", a, 0).(*zedit.Editor)
 		editor.Refresh()
 		return z3.Void
+	})
+
+	fnGetZeditCharAt := pre("get-zedit-char-at")
+	// (get-zedit-char-at editor pos) => str
+	interp.Def(fnGetZeditCharAt, 2, func(a []any) any {
+		editor := mustGet(fnGetZeditCharAt, "GUI zedit ID", a, 0).(*zedit.Editor)
+		pos := ListToCharPos(fnGetZeditCharAt, a[1].(*z3.Cell))
+		c, ok := editor.CharAt(pos)
+		if !ok {
+			return ""
+		}
+		return string(c)
 	})
 
 	fnBlinkZeditCaret := pre("blink-zedit-caret")
@@ -3207,12 +3226,14 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 
 	fnNewHBoxLayout := pre("new-hbox-layout")
 	interp.Def(fnNewHBoxLayout, 0, func(a []any) any {
-		return put(layout.NewHBoxLayout())
+		l := layout.NewHBoxLayout()
+		return put(&l)
 	})
 
 	fnNewVBoxLayout := pre("new-vbox-layout")
 	interp.Def(fnNewVBoxLayout, 0, func(a []any) any {
-		return put(layout.NewVBoxLayout())
+		l := layout.NewVBoxLayout()
+		return put(&l)
 	})
 
 	fnNewHScroll := pre("new-hscroll")
@@ -3286,7 +3307,7 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 	fnNewContainer := pre("new-container")
 	interp.Def(fnNewContainer, -1, func(a []any) any {
 		li := a[0].(*z3.Cell)
-		layout := mustGet1(fnNewContainer, "layout", li.Car)
+		layout := mustGet1(fnNewContainer, "layout", li.Car).(*fyne.Layout)
 		li = li.CdrCell()
 		objs := make([]fyne.CanvasObject, 0, len(a)-1)
 		for li != z3.Nil {
@@ -3297,7 +3318,7 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 			objs = append(objs, obj.(fyne.CanvasObject))
 			li = li.CdrCell()
 		}
-		c := container.New(layout.(fyne.Layout), objs...)
+		c := container.New(*layout, objs...)
 		return put(c)
 	})
 

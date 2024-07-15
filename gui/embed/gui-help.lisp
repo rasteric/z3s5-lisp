@@ -1422,6 +1422,14 @@
   (topic (gui zedit))
   (see (new-zedit insert-zedit delete-zedit)))
 
+(defhelp get-zedit-char-at
+    (use "(get-zedit-char-at zedit li) => str")
+  (info "Return the character (unicode glyph) at position #li in #zedit as a string. The position #li may contain a line, a line and column, or a line, column, and bool (the latter is ignored).")
+  (type proc)
+  (arity 2)
+  (topic (gui zedit))
+  (see (get-zedit-text get-zedit-text-range get-zedit-next-pos get-zedit-prev-pos new-zedit insert-zedit delete-zedit)))
+
 (defhelp make-or-get-zedit-color-tag
     (use "(make-or-get-zedit-color-tag editor color background? draw-full-line?) => int")
   (info "Create a new tag or get an existing tag for marking the color of text. The #color is a list of 16-bit (r g b a) values like in #nrgba. If #background? is not nil, the color is for the background of the text. If #draw-full-line? is not nil, then the full line is drawn (like in a selection) when multiple lines are drawn; otherwise, only actual text is drawn with the color and not whitespace at the end of a line. The function returns a tag ID and automatically adds the corresponding style function to render the text in the given color.")
@@ -1507,6 +1515,22 @@
   (arity 1)
   (see (new-zedit get-zedit-text get-zedit-text-range zedit-current-selection-text)))
 
+(defhelp set-zedit-top-line
+    (use "(set-zedit-top-line zedit n)")
+  (info "Set the top visible line in #zedit to #n, scrolling the editor accordingly.")
+  (type proc)
+  (topic (gui zedit))
+  (arity 2)
+  (see (get-zedit-top-line)))
+
+(defhelp get-zedit-top-line
+    (use "(get-zedit-top-line zedit) => int")
+  (info "Get the currently topmost visible line in the editor #zedit.")
+  (type proc)
+  (topic (gui zedit))
+  (arity 1)
+  (see (set-zedit-top-line)))
+
 (defhelp get-zedit-text-range
     (use "(get-zedit-text-range zedit interval) => str")
   (info "Obtain the text in #zedit within range #interval consisting of a list of two lists for the start and end position each. The function returns an empty string if there is no text at the interval.")
@@ -1545,6 +1569,23 @@
   (topic (gui zedit))
   (arity 2)
   (see (new-zedit set-text-grid-style)))
+
+(defhelp get-zedit-next-pos
+    (use "(get-zedit-next-pos zedit pos) => li")
+  (info "Get the next position after #pos in editor #zedit. The returned list consists of a line, column, and a bool. The bool is true when the position is new and nil when #pos is already the last position, in case of which the position returned is also the same as #pos.")
+  (type proc)
+  (arity 2)
+  (topic (gui zedit))
+  (see (get-zedit-prev-pos get-zedit-char-at)))
+
+(defhelp get-zedit-prev-pos
+    (use "(get-zedit-prev-pos zedit pos) => li")
+  (info "Get the previous position after #pos in editor #zedit. The returned list consists of a line, column, and a bool. The bool is true when the position is new and nil when position (0 0) has been reached, in case of which the position returned is (0 0 nil).")
+  (type proc)
+  (arity 2)
+  (topic (gui zedit))
+  (see (get-zedit-next-pos get-zedit-char-at)))
+
 
 (defhelp show-color-picker
     (use "(show-color-picker title message proc [win]")
