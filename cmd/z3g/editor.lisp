@@ -20,10 +20,12 @@
 
 (defun display-zedit-help-entry (ed entry)
   (delete-zedit-all ed)
-  (let ((heading (make-or-get-zedit-color-tag
+  (let ((heading (make-or-get-zedit-style-tag
 		  ed
-		  *lisp-editor-info-fg-color*
-		  *lisp-editor-info-bg-color*
+		  (list
+		   (list 'bold t)
+		   (list 'text-color *lisp-editor-info-fg-color*)
+		   (list 'background-color *lisp-editor-info-bg-color*))
 		  t)))
     (print-zedit ed
 		 (fmt "%v with %v in %v\n" 
@@ -44,10 +46,11 @@
    (lambda (x)
      (if (1st x nil)
 	 (print-zedit ed (2nd x)
-		      (list (make-or-get-zedit-color-tag
+		      (list (make-or-get-zedit-style-tag
 			     ed
-			     *lisp-editor-arg-fg-color*
-			     nil
+			     (list
+			      (list 'italic t)
+			      (list 'text-color *lisp-editor-arg-fg-color*))
 			     nil)))
 	 (print-zedit ed (2nd x) nil)))))
 

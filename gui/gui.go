@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"image/color"
+	"log"
 	"math"
 	"net/url"
 	"strconv"
@@ -243,6 +244,11 @@ var ZeditCustomSaveIntrinsic = z3.NewSym("*gui-zedit-custom-save*")
 var ZeditCustomLoadIntrinsic = z3.NewSym("*gui-zedit-custom-load*")
 var ZeditGetWordAtLeft = z3.NewSym("get-word-at-left?")
 var ZeditLiberalGetWordAt = z3.NewSym("liberal-get-word-at?")
+var ZeditStyleBold = z3.NewSym("bold")
+var ZeditStyleItalic = z3.NewSym("italic")
+var ZeditStyleMonospace = z3.NewSym("monospace")
+var ZeditStyleTextColor = z3.NewSym("text-color")
+var ZeditStyleBackgroundColor = z3.NewSym("background-color")
 
 // used to work around Go prohibition to hash functions
 type validatorWrapper struct {
@@ -1055,7 +1061,7 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		li := a[3].(*z3.Cell)
 		r := []rune(li.Car.(string))[0]
 		li = li.CdrCell()
-		style := ListToTextGridStyle(li)
+		style := ListToTextGridStyle(fnSetTextGridCell, li)
 		grid.SetCell(row, column, widget.TextGridCell{Rune: r, Style: style})
 		return z3.Void
 	})
@@ -1092,13 +1098,13 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		li := a[2].(*z3.Cell)
 		columns := li.Car.([]any)
 		li = li.CdrCell()
-		style := ListToTextGridStyle(li.Car)
+		style := ListToTextGridStyle(fnSetTextGridRow, li.Car)
 		cells := make([]widget.TextGridCell, 0, len(columns))
 		for i := range columns {
 			li = columns[i].(*z3.Cell)
 			r := []rune(li.Car.(string))[0]
 			li = li.CdrCell()
-			sty := ListToTextGridStyle(li.Car)
+			sty := ListToTextGridStyle(fnSetTextGridRow, li.Car)
 			cells = append(cells, widget.TextGridCell{Rune: r, Style: sty})
 		}
 		grid.SetRow(row, widget.TextGridRow{Cells: cells, Style: style})
@@ -1195,7 +1201,7 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		cells := a[1].([]any)
 		tgCells := make([]widget.TextGridCell, len(cells))
 		for i := range cells {
-			tgCells[i] = ListToTextGridCell(cells[i])
+			tgCells[i] = ListToTextGridCell(fnWrapInsertTextGrid, cells[i])
 		}
 		row := int(z3.ToInt64(fnWrapInsertTextGrid, a[2]))
 		col := int(z3.ToInt64(fnWrapInsertTextGrid, a[3]))
@@ -1285,7 +1291,7 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		grid := mustGet(fnSetTextGridRowStyle, "GUI text grid ID", a, 0).(*widget.TextGrid)
 		row := int(z3.ToInt64(fnSetTextGridRowStyle, a[1]))
 		li := a[2].(*z3.Cell)
-		style := ListToTextGridStyle(li)
+		style := ListToTextGridStyle(fnSetTextGridRowStyle, li)
 		grid.SetRowStyle(row, style)
 		return z3.Void
 	})
@@ -1307,7 +1313,7 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		grid := mustGet(fnSetTextGridStyle, "GUI text grid ID", a, 0).(*widget.TextGrid)
 		row := int(z3.ToInt64(fnSetTextGridStyle, a[1]))
 		column := int(z3.ToInt64(fnSetTextGridStyle, a[2]))
-		style := ListToTextGridStyle(a[3])
+		style := ListToTextGridStyle(fnSetTextGridStyle, a[3])
 		grid.SetStyle(row, column, style)
 		return z3.Void
 	})
@@ -1320,7 +1326,7 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		column1 := int(z3.ToInt64(fnSetTextGridStyleRange, a[2]))
 		row2 := int(z3.ToInt64(fnSetTextGridStyleRange, a[3]))
 		column2 := int(z3.ToInt64(fnSetTextGridStyleRange, a[4]))
-		style := ListToTextGridStyle(a[5])
+		style := ListToTextGridStyle(fnSetTextGridStyleRange, a[5])
 		grid.SetStyleRange(row1, column1, row2, column2, style)
 		return z3.Void
 	})
@@ -1416,15 +1422,12 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
-	fnMakeOrGetZeditColorTag := pre("make-or-get-zedit-color-tag")
-	// (make-or-get-zedit-color-tag editor fg-color bg-color draw-full-line?)
-	interp.Def(fnMakeOrGetZeditColorTag, 4, func(a []any) any {
-		editor := mustGet(fnMakeOrGetZeditColorTag, "GUI zedit ID", a, 0).(*zedit.Editor)
-		li := a[1].(*z3.Cell)
-		fg := ListToColor(li)
-		li = a[2].(*z3.Cell)
-		bg := ListToColor(li)
-		tag := editor.MakeOrGetColorTag(fg, bg, z3.ToBool(a[3]))
+	fnMakeOrGetZeditStyleTag := pre("make-or-get-zedit-style-tag")
+	// (make-or-get-zedit-Style-tag editor style-list draw-full-line?)
+	interp.Def(fnMakeOrGetZeditStyleTag, 3, func(a []any) any {
+		editor := mustGet(fnMakeOrGetZeditStyleTag, "GUI zedit ID", a, 0).(*zedit.Editor)
+		sty := ListToZeditStyle(fnMakeOrGetZeditStyleTag, a[1])
+		tag := editor.MakeOrGetStyleTag(sty, z3.ToBool(a[2]))
 		return getIDOrPut(tag)
 	})
 
@@ -1488,11 +1491,11 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		return goarith.AsNumber(editor.LastColumn(row))
 	})
 
-	fnSetZeditLineNUmberStyle := pre("set-zedit-line-number-style")
+	fnSetZeditLineNumberStyle := pre("set-zedit-line-number-style")
 	// (set-zedit-line-number-style editor style)
-	interp.Def(fnSetZeditLineNUmberStyle, 2, func(a []any) any {
-		editor := mustGet(fnSetZeditLineNUmberStyle, "GUI zedit ID", a, 0).(*zedit.Editor)
-		style := ListToZeditStyle(a[1].(*z3.Cell))
+	interp.Def(fnSetZeditLineNumberStyle, 2, func(a []any) any {
+		editor := mustGet(fnSetZeditLineNumberStyle, "GUI zedit ID", a, 0).(*zedit.Editor)
+		style := ListToZeditStyle(fnSetZeditLineNumberStyle, a[1])
 		editor.SetLineNumberStyle(style)
 		return z3.Void
 	})
@@ -2027,7 +2030,7 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 	interp.Def(fnNewZeditStyle, 5, func(a []any) any {
 		editor := mustGet(fnNewZeditStyle, "GUI zedit ID", a, 0).(*zedit.Editor)
 		name := a[1].(string)
-		style := ListToZeditStyle(a[2].(*z3.Cell))
+		style := ListToZeditStyle(fnNewZeditStyle, a[2])
 		blend := z3.ToBool(a[3])
 		drawFullLine := z3.ToBool(a[4])
 		fn := zedit.TagStyleFunc(func(tag zedit.Tag, c zedit.Cell) zedit.Cell {
@@ -4536,52 +4539,122 @@ func ListToColor(li *z3.Cell) color.Color {
 
 // TextGridStyleToList converts a text grid style to a Z3S5 Lisp list.
 func TextGridStyleToList(s widget.TextGridStyle) *z3.Cell {
-	if s == nil || s == widget.TextGridStyleDefault || s.BackgroundColor() == nil || s.TextColor() == nil {
+	if s == nil || s == widget.TextGridStyleDefault {
 		return z3.Nil
 	}
-	return &z3.Cell{Car: ColorToList(s.TextColor()), Cdr: &z3.Cell{Car: ColorToList(s.BackgroundColor()),
-		Cdr: z3.Nil}}
+
+	arr := make([]any, 0, 5)
+
+	arr = append(arr, &z3.Cell{Car: ZeditStyleBold,
+		Cdr: &z3.Cell{Car: z3.AsLispBool(s.Style().Bold), Cdr: z3.Nil}})
+	arr = append(arr, &z3.Cell{Car: ZeditStyleItalic,
+		Cdr: &z3.Cell{Car: z3.AsLispBool(s.Style().Italic), Cdr: z3.Nil}})
+	arr = append(arr, &z3.Cell{Car: ZeditStyleMonospace,
+		Cdr: &z3.Cell{Car: z3.AsLispBool(s.Style().Monospace), Cdr: z3.Nil}})
+	arr = append(arr, &z3.Cell{Car: ZeditStyleTextColor,
+		Cdr: &z3.Cell{Car: ColorToList(s.TextColor()), Cdr: z3.Nil}})
+	arr = append(arr, &z3.Cell{Car: ZeditStyleBackgroundColor,
+		Cdr: &z3.Cell{Car: ColorToList(s.BackgroundColor()), Cdr: z3.Nil}})
+	return z3.ArrayToList(arr)
 }
 
 // ListToTextGridStyle converts a list in the format returned by TextGridStyleToList back to
 // a Fyne text grid style.
-func ListToTextGridStyle(arg any) widget.TextGridStyle {
+func ListToTextGridStyle(caller string, arg any) widget.TextGridStyle {
 	if li, ok := arg.(*z3.Cell); ok {
 		if li == z3.Nil {
 			return widget.TextGridStyleDefault
 		}
-		fg := ListToColor(li.Car.(*z3.Cell))
-		li = li.CdrCell()
-		bg := ListToColor(li.Car.(*z3.Cell))
-		return &widget.CustomTextGridStyle{FGColor: fg, BGColor: bg}
+		sty := &widget.CustomTextGridStyle{}
+		for {
+			if li == z3.Nil {
+				break
+			}
+			elem := li.Car
+			li2, ok := elem.(*z3.Cell)
+			if !ok {
+				panic(fmt.Sprintf("%v: expected an a-list with valid style information, given %v", caller, z3.Str(arg)))
+			}
+			head, ok := li2.Car.(*z3.Sym)
+			if !ok {
+				log.Printf("*WARN* %v: malformed text grid style %v in a-list %v (incompatible version?)\n", caller,
+					z3.Str(li2), z3.Str(li))
+				continue
+			}
+
+			switch head {
+			case ZeditStyleBold:
+				sty.TextStyle.Bold = z3.ToBool(li.CdrCell().Car)
+			case ZeditStyleItalic:
+				sty.TextStyle.Italic = z3.ToBool(li.CdrCell().Car)
+			case ZeditStyleMonospace:
+				sty.TextStyle.Monospace = z3.ToBool(li.CdrCell().Car)
+			case ZeditStyleTextColor:
+				sty.FGColor = ListToColor(li2.CdrCell().Car.(*z3.Cell))
+			case ZeditStyleBackgroundColor:
+				sty.BGColor = ListToColor(li2.CdrCell().Car.(*z3.Cell))
+			}
+
+			li = li.CdrCell()
+		}
+		return sty
 	}
 	return widget.TextGridStyleDefault
 }
 
 // ListToZeditStyle converts a list of colors to a zedit.EditorStyle used by zedit.Editor.
-func ListToZeditStyle(arg any) zedit.Style {
+func ListToZeditStyle(caller string, arg any) zedit.Style {
+	sty := zedit.Style{Monospace: true,
+		FGColor: theme.TextColor(),
+		BGColor: theme.InputBackgroundColor()}
 	if li, ok := arg.(*z3.Cell); ok {
-		if li == z3.Nil {
-			return zedit.Style{FGColor: color.RGBA{R: 255, G: 255, B: 255, A: 255},
-				BGColor: color.RGBA{R: 0, G: 0, B: 0, A: 255}}
+		for {
+			if li == z3.Nil {
+				break
+			}
+			elem := li.Car
+			li2, ok := elem.(*z3.Cell)
+			if !ok {
+				panic(fmt.Sprintf("%v: expected an a-list with valid style information, given %v", caller, z3.Str(arg)))
+			}
+			if li2 == z3.Nil {
+				break
+			}
+			head, ok := li2.Car.(*z3.Sym)
+			if !ok {
+				log.Printf("*WARN* %v: malformed zedit style %v in a-list %v (incompatible version?)\n", caller,
+					z3.Str(li2), z3.Str(li))
+				continue
+			}
+
+			switch head {
+			case ZeditStyleBold:
+				sty.Bold = z3.ToBool(li2.CdrCell().Car)
+			case ZeditStyleItalic:
+				sty.Italic = z3.ToBool(li2.CdrCell().Car)
+			case ZeditStyleMonospace:
+				sty.Monospace = z3.ToBool(li2.CdrCell().Car.(*z3.Cell))
+			case ZeditStyleTextColor:
+				sty.FGColor = ListToColor(li2.CdrCell().Car.(*z3.Cell))
+			case ZeditStyleBackgroundColor:
+				sty.BGColor = ListToColor(li2.CdrCell().Car.(*z3.Cell))
+			}
+
+			li = li.CdrCell()
 		}
-		fg := ListToColor(li.Car.(*z3.Cell))
-		li = li.CdrCell()
-		bg := ListToColor(li.Car.(*z3.Cell))
-		return zedit.Style{FGColor: fg, BGColor: bg}
+		return sty
 	}
-	return zedit.Style{FGColor: color.RGBA{R: 255, G: 255, B: 255, A: 255},
-		BGColor: color.RGBA{R: 0, G: 0, B: 0, A: 255}}
+	return sty
 }
 
 // ListToTextGridCell converts a list in the format (rune style-list) to a text grid
 // TextGridCell.
-func ListToTextGridCell(arg any) widget.TextGridCell {
+func ListToTextGridCell(caller string, arg any) widget.TextGridCell {
 	li := arg.(*z3.Cell)
 	var cell widget.TextGridCell
 	cell.Rune = []rune(li.Car.(string))[0]
 	li = li.CdrCell()
-	cell.Style = ListToTextGridStyle(li.Car)
+	cell.Style = ListToTextGridStyle(caller, li.Car)
 	return cell
 }
 

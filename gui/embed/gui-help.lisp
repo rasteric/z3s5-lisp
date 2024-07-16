@@ -526,7 +526,7 @@
 
 (defhelp set-text-grid-style
     (use "(set-text-grid-style grid row column style)")
-  (info "Set the grid style of #grid at #row and #column to the list #style.")
+  (info "Set the grid style of #grid at #row and #column to the a-list #style.")
   (type proc)
   (arity 4)
   (topic (gui text-grid))
@@ -1430,9 +1430,9 @@
   (topic (gui zedit))
   (see (get-zedit-text get-zedit-text-range get-zedit-next-pos get-zedit-prev-pos new-zedit insert-zedit delete-zedit)))
 
-(defhelp make-or-get-zedit-color-tag
-    (use "(make-or-get-zedit-color-tag editor color background? draw-full-line?) => int")
-  (info "Create a new tag or get an existing tag for marking the color of text. The #color is a list of 16-bit (r g b a) values like in #nrgba. If #background? is not nil, the color is for the background of the text. If #draw-full-line? is not nil, then the full line is drawn (like in a selection) when multiple lines are drawn; otherwise, only actual text is drawn with the color and not whitespace at the end of a line. The function returns a tag ID and automatically adds the corresponding style function to render the text in the given color.")
+(defhelp make-or-get-zedit-style-tag
+    (use "(make-or-get-zedit-style-tag editor style draw-full-line?) => int")
+  (info "Create a new tag or get an existing tag for marking the style of text. The style must be an a-list containing with boolean keys in '(bold italic monospace) followed by nil or non-nil, or keys 'text-color or 'background-color followed by a color list with 16-bit r g b a values. If #draw-full-line? is not nil, then the full line is drawn (like in a selection) when multiple lines are drawn; otherwise, only actual text is drawn with the color and not whitespace at the end of a line. The function returns a tag ID and automatically adds the corresponding style function to render the text in the given color.")
   (type proc)
   (arity 4)
   (topic (gui zedit))
@@ -1564,7 +1564,7 @@
 
 (defhelp set-zedit-line-number-style
     (use "(set-zedit-line-number-style zedit li)")
-  (info "Set the style of the line number display in #zedit, even when the line number display is off. The style list is for en editor style, consisting of a list for the foreground color and a color list for the background color.")
+  (info "Set the style of the line number display in #zedit, even when the line number display is off. The style list is for en editor style, an a-list containing boolean keys in '(bold italic monospace) followed by nil or t, and color keys 'text-color and 'background-color followed by a 16-bit (r g b a) color list.")
   (type proc)
   (topic (gui zedit))
   (arity 2)
