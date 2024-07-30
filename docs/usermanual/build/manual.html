@@ -7,15 +7,167 @@
   <meta name="author" content="by Erich Rast" />
   <title>Z3S5 Lisp User Manual</title>
   <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -50,7 +202,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -63,7 +215,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -84,80 +236,267 @@
 <p class="author">by Erich Rast</p>
 <p class="date">2023-9-24 16:00</p>
 </header>
-<p>for Z3S5 Lisp Version “2.4.2+c781d99”</p>
-<h1 data-number="1" id="introduction"><span class="header-section-number">1</span> Introduction</h1>
-<p>Z3S5 Lisp can be used as a standalone interpreter or as an extension language embedded into Go programs. It is a traditional Lisp-1 dialect, where the suffix 1 means that symbols hold one value and this value might either represent functions and closures or data. This is in contrast to Lisp-2 language like CommonLisp in which symbols may hold functions in a separate slot. Scheme dialects are also Lisp-1 and Z3S5 Lisp shares many similarities with Scheme while also having features of traditional Lisp systems.</p>
-<h2 data-number="1.1" id="invoking-lisp"><span class="header-section-number">1.1</span> Invoking Lisp</h2>
-<h3 data-number="1.1.1" id="the-standalone-interpreter"><span class="header-section-number">1.1.1</span> The Standalone Interpreter</h3>
-<p>In the directory <code>cmd/z3</code> there is an example standalone version <code>z3.go</code> that you can build on your system using <code>go build z3.go</code>. The interpreter is started in a terminal using <code>./z3</code>. The <code>z3</code> interpreter is fairly limited. It starts a read-eval-reply loop until it is quit with the command <code>(exit [n])</code> where the optional number <code>n</code> is an integer for the Unix return code of the program. It reads one line of input from the command line and returns the result of evaluating it. Better editing capabilities and parenthesis matching are planned for the future.</p>
-<p>When an interpreter starts either in a standalone executable or when the <code>interp.Boot()</code> function is called in a Go program, then it first loads the standard prelude and help files in directory <code>embed</code>. These are embedded into the executable and so the directory is not needed to run the interpreter. After this start sequence, the interpreter checks whether there is a file named <code>init.lisp</code> in the executable directory – that is, the <code>z3</code> directory for standalone or the directory of the program that includes Z3S5 Lisp as a package. If there is such a file, then it is loaded and executed.</p>
-<p>The <code>z3</code> interpreter also has a number of command-line options. If option <code>-l &lt;filename&gt;</code> is provided, then Z3S5 Lisp sets <code>*interactive-session*</code> to <code>nil</code> (which usually suppresses the start banner), loads and executes the specified file, and returns to the shell afterwards. The flag <code>-e</code> does the same but executes the expressions directly provided as string on the command-line. Special characters in the provided expressions have to be suitably escaped not to be interpreted by the shell, of course, and how to do this depends on the type of shell used to run the interpreter.</p>
-<p>If in addition to the <code>-e</code> or <code>-l</code> flags the <code>-i</code> option is provided, then <code>*interactive-session*</code> is set to true right from the start, the file is loaded and executed, and then an interactive session is started as if the interpreter had been started without any command-line options. By using the <code>-s</code> flag, <code>*interactive-session*</code> can be set to <code>nil</code> regardless of how the interpreter is started, and therefore printing a start banner is suppressed (and anything else that requires <code>*interactive-session*</code> to be non-nil.)</p>
-<p>Example 1: <code>./z3 -e "(out 'hello-world)(nl)" -i -s</code> starts the interpreter, does not print a start banner since <code>-s</code> is specified, prints <em>hello-world</em> and new line, and then enters an interactive session since <code>-i</code> is specified.</p>
-<p>Example 2: <code>./z3 -l /home/user/tests/test.lisp -s</code> starts the interpreter, loads and executes the file in directory <code>/home/tests/test.lisp</code> (an absolute Unix path) while suppressing the start-banner with the <code>-s</code> option, and returns to the shell.</p>
-<p>Example 3: <code>./z3 -i -l my_prelude.lisp</code> launches the interpreter and loads the file <code>my_prelude.lisp</code> in the same directory as the interpreter and then starts an interactive session</p>
+<p>for Z3S5 Lisp Version “2.4.2+563b9d3”</p>
+<h1 data-number="1" id="introduction"><span
+class="header-section-number">1</span> Introduction</h1>
+<p>Z3S5 Lisp can be used as a standalone interpreter or as an extension
+language embedded into Go programs. It is a traditional Lisp-1 dialect,
+where the suffix 1 means that symbols hold one value and this value
+might either represent functions and closures or data. This is in
+contrast to Lisp-2 language like CommonLisp in which symbols may hold
+functions in a separate slot. Scheme dialects are also Lisp-1 and Z3S5
+Lisp shares many similarities with Scheme while also having features of
+traditional Lisp systems.</p>
+<h2 data-number="1.1" id="invoking-lisp"><span
+class="header-section-number">1.1</span> Invoking Lisp</h2>
+<h3 data-number="1.1.1" id="the-standalone-interpreter"><span
+class="header-section-number">1.1.1</span> The Standalone
+Interpreter</h3>
+<p>In the directory <code>cmd/z3</code> there is an example standalone
+version <code>z3.go</code> that you can build on your system using
+<code>go build z3.go</code>. The interpreter is started in a terminal
+using <code>./z3</code>. The <code>z3</code> interpreter is fairly
+limited. It starts a read-eval-reply loop until it is quit with the
+command <code>(exit [n])</code> where the optional number <code>n</code>
+is an integer for the Unix return code of the program. It reads one line
+of input from the command line and returns the result of evaluating it.
+Better editing capabilities and parenthesis matching are planned for the
+future.</p>
+<p>When an interpreter starts either in a standalone executable or when
+the <code>interp.Boot()</code> function is called in a Go program, then
+it first loads the standard prelude and help files in directory
+<code>embed</code>. These are embedded into the executable and so the
+directory is not needed to run the interpreter. After this start
+sequence, the interpreter checks whether there is a file named
+<code>init.lisp</code> in the executable directory – that is, the
+<code>z3</code> directory for standalone or the directory of the program
+that includes Z3S5 Lisp as a package. If there is such a file, then it
+is loaded and executed.</p>
+<p>The <code>z3</code> interpreter also has a number of command-line
+options. If option <code>-l &lt;filename&gt;</code> is provided, then
+Z3S5 Lisp sets <code>*interactive-session*</code> to <code>nil</code>
+(which usually suppresses the start banner), loads and executes the
+specified file, and returns to the shell afterwards. The flag
+<code>-e</code> does the same but executes the expressions directly
+provided as string on the command-line. Special characters in the
+provided expressions have to be suitably escaped not to be interpreted
+by the shell, of course, and how to do this depends on the type of shell
+used to run the interpreter.</p>
+<p>If in addition to the <code>-e</code> or <code>-l</code> flags the
+<code>-i</code> option is provided, then
+<code>*interactive-session*</code> is set to true right from the start,
+the file is loaded and executed, and then an interactive session is
+started as if the interpreter had been started without any command-line
+options. By using the <code>-s</code> flag,
+<code>*interactive-session*</code> can be set to <code>nil</code>
+regardless of how the interpreter is started, and therefore printing a
+start banner is suppressed (and anything else that requires
+<code>*interactive-session*</code> to be non-nil.)</p>
+<p>Example 1: <code>./z3 -e "(out 'hello-world)(nl)" -i -s</code> starts
+the interpreter, does not print a start banner since <code>-s</code> is
+specified, prints <em>hello-world</em> and new line, and then enters an
+interactive session since <code>-i</code> is specified.</p>
+<p>Example 2: <code>./z3 -l /home/user/tests/test.lisp -s</code> starts
+the interpreter, loads and executes the file in directory
+<code>/home/tests/test.lisp</code> (an absolute Unix path) while
+suppressing the start-banner with the <code>-s</code> option, and
+returns to the shell.</p>
+<p>Example 3: <code>./z3 -i -l my_prelude.lisp</code> launches the
+interpreter and loads the file <code>my_prelude.lisp</code> in the same
+directory as the interpreter and then starts an interactive session</p>
 <p>See <code>./z3 -h</code> for a list of all command-line options.</p>
-<h3 data-number="1.1.2" id="using-the-interpreter-in-go"><span class="header-section-number">1.1.2</span> Using the Interpreter in Go</h3>
-<p>See <code>cmd/z3/z3.go</code> for an example of how to use Z3S5 Lisp in Go. It is best to include the package with <code>z3 "github.com/rasteric/z3s5-lisp"</code> so <code>z3</code> can be used as the package shortcut, since this has to be called often when writing extensions. The following snippet from <code>z3.go</code> imports the Lisp interpreter, boots the standard prelude, and runs an interactive read-eval-reply loop:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode Go"><code class="sourceCode go"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">import</span> (</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>    <span class="st">&quot;os&quot;</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>    z3 <span class="st">&quot;github.com/rasteric/z3s5-lisp&quot;</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="kw">func</span> main() {</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>    interp, err := z3.NewInterp(z3.NewBasicRuntime(z3.FullPermissions))</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>    <span class="kw">if</span> err != <span class="ot">nil</span> {</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>        fmt.Fprintf(os.Stderr, <span class="st">&quot;Z3S5 Lisp failed to start: %v</span><span class="ch">\n</span><span class="st">&quot;</span>, err)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>        os.Exit(<span class="dv">1</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>    }</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>    err = interp.Boot()</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>    <span class="kw">if</span> err != <span class="ot">nil</span> {</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>        fmt.Fprintf(os.Stderr, <span class="st">&quot;Z3S5 Lisp failed to boot the standard prelude: %v</span><span class="ch">\n</span><span class="st">&quot;</span>, err)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>        os.Exit(<span class="dv">2</span>)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>    }</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a>    interp.SafeEval(&amp;z3.Cell{Car: z3.NewSym(<span class="st">&quot;protect-toplevel-symbols&quot;</span>), Cdr: z3.Nil}, z3.Nil)</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a>    interp.Run(<span class="ot">nil</span>, z3.NewInternalSource(<span class="st">&quot;repl&quot;</span>,<span class="st">&quot;&quot;</span>))</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a>}</span></code></pre></div>
-<p>Calling <code>inter.Run</code> with <code>nil</code> as first argument starts the interpreter’s read-eval-reply loop. The second argument is a new source location (see <code>sourceloc.go</code> in the repository), in this case an internal source with name “repl” and no initial input line. If you would run a file, you could pass an <code>io.Reader</code> and a file source location obtained from <code>z3.NewFileSource</code> to the method. However, <code>interp.EvalFile(path string) bool</code> already does this for you, and likewise there is <code>interp.EvalStr(s string) (any, error)</code> for evaluating a string.</p>
-<p>What deserves a bit more explanation is the line starting with <code>interp.SafeEval</code>. This creates a list with the symbol <code>protect-toplevel-symbols</code> as car and an empty cdr and executes it within an empty environment. So it runs the equivalent of <code>(protect-toplevel-symbols)</code>, which is interpreted as a function call that applies <code>protect</code> to all toplevel symbols defined thus far. It is not put in the standard prelude because a common way to extend Z3S5 Lisp is to simply redefine some of its primitives. Once a symbol is protected, attempts of redefining or mutating it result in a security violation error. As long as the <code>Permissions</code> given to <code>NewBasicRuntime</code> have <code>AllowUnprotect</code> set to true, you may use <code>unprotect</code> to remove this safeguard again and redefine existing functions. Symbols are protected in the <code>z3</code> interpreter because it is easy to mess up the system with dynamic redefinitions. For example, you could redefine <code>(setq + -)</code> and <code>+</code> is suddenly interpreted as subtraction! However, redefining toplevel symbols is a very important feature. By using <code>unbind</code> on certain functions or setting them to something else like <code>(setq func (lambda () (error "not allowed to use func!")))</code> it is possible to create fine-grained access control to functions even when they are intrinsic or defined in the standard prelude. It is not possible to access an intrinsic function after it has been defined away in this manner. After you added all your toplevel symbols and removed or redefined the ones you do not like, you may thus protect all symbols and use <code>set-permissions</code> to revoke the privilege <code>AllowUnprotect</code>. This fixes the base vocabulary and any attempt to redefine it in the future will result in a security violation, since permissions can only be changed from less secure to more secure and never vice versa.</p>
-<p>See the Chapter <a href="#extending-z3s5-lisp">Extending Z3S5 Lisp</a> for information about how to define your own functions in Z3S5 Lisp.</p>
-<h2 data-number="1.2" id="data-types"><span class="header-section-number">1.2</span> Data Types</h2>
+<h3 data-number="1.1.2" id="using-the-interpreter-in-go"><span
+class="header-section-number">1.1.2</span> Using the Interpreter in
+Go</h3>
+<p>See <code>cmd/z3/z3.go</code> for an example of how to use Z3S5 Lisp
+in Go. It is best to include the package with
+<code>z3 "github.com/rasteric/z3s5-lisp"</code> so <code>z3</code> can
+be used as the package shortcut, since this has to be called often when
+writing extensions. The following snippet from <code>z3.go</code>
+imports the Lisp interpreter, boots the standard prelude, and runs an
+interactive read-eval-reply loop:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode Go"><code class="sourceCode go"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="op">(</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;os&quot;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    z3 <span class="st">&quot;github.com/rasteric/z3s5-lisp&quot;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> main<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    interp<span class="op">,</span> err <span class="op">:=</span> z3<span class="op">.</span>NewInterp<span class="op">(</span>z3<span class="op">.</span>NewBasicRuntime<span class="op">(</span>z3<span class="op">.</span>FullPermissions<span class="op">))</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> err <span class="op">!=</span> <span class="ot">nil</span> <span class="op">{</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        fmt<span class="op">.</span>Fprintf<span class="op">(</span>os<span class="op">.</span>Stderr<span class="op">,</span> <span class="st">&quot;Z3S5 Lisp failed to start: %v</span><span class="ch">\n</span><span class="st">&quot;</span><span class="op">,</span> err<span class="op">)</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        os<span class="op">.</span>Exit<span class="op">(</span><span class="dv">1</span><span class="op">)</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    err <span class="op">=</span> interp<span class="op">.</span>Boot<span class="op">()</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> err <span class="op">!=</span> <span class="ot">nil</span> <span class="op">{</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        fmt<span class="op">.</span>Fprintf<span class="op">(</span>os<span class="op">.</span>Stderr<span class="op">,</span> <span class="st">&quot;Z3S5 Lisp failed to boot the standard prelude: %v</span><span class="ch">\n</span><span class="st">&quot;</span><span class="op">,</span> err<span class="op">)</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        os<span class="op">.</span>Exit<span class="op">(</span><span class="dv">2</span><span class="op">)</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    interp<span class="op">.</span>SafeEval<span class="op">(&amp;</span>z3<span class="op">.</span>Cell<span class="op">{</span>Car<span class="op">:</span> z3<span class="op">.</span>NewSym<span class="op">(</span><span class="st">&quot;protect-toplevel-symbols&quot;</span><span class="op">),</span> Cdr<span class="op">:</span> z3<span class="op">.</span>Nil<span class="op">},</span> z3<span class="op">.</span>Nil<span class="op">)</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    interp<span class="op">.</span>Run<span class="op">(</span><span class="ot">nil</span><span class="op">,</span> z3<span class="op">.</span>NewInternalSource<span class="op">(</span><span class="st">&quot;repl&quot;</span><span class="op">,</span><span class="st">&quot;&quot;</span><span class="op">))</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Calling <code>inter.Run</code> with <code>nil</code> as first
+argument starts the interpreter’s read-eval-reply loop. The second
+argument is a new source location (see <code>sourceloc.go</code> in the
+repository), in this case an internal source with name “repl” and no
+initial input line. If you would run a file, you could pass an
+<code>io.Reader</code> and a file source location obtained from
+<code>z3.NewFileSource</code> to the method. However,
+<code>interp.EvalFile(path string) bool</code> already does this for
+you, and likewise there is
+<code>interp.EvalStr(s string) (any, error)</code> for evaluating a
+string.</p>
+<p>What deserves a bit more explanation is the line starting with
+<code>interp.SafeEval</code>. This creates a list with the symbol
+<code>protect-toplevel-symbols</code> as car and an empty cdr and
+executes it within an empty environment. So it runs the equivalent of
+<code>(protect-toplevel-symbols)</code>, which is interpreted as a
+function call that applies <code>protect</code> to all toplevel symbols
+defined thus far. It is not put in the standard prelude because a common
+way to extend Z3S5 Lisp is to simply redefine some of its primitives.
+Once a symbol is protected, attempts of redefining or mutating it result
+in a security violation error. As long as the <code>Permissions</code>
+given to <code>NewBasicRuntime</code> have <code>AllowUnprotect</code>
+set to true, you may use <code>unprotect</code> to remove this safeguard
+again and redefine existing functions. Symbols are protected in the
+<code>z3</code> interpreter because it is easy to mess up the system
+with dynamic redefinitions. For example, you could redefine
+<code>(setq + -)</code> and <code>+</code> is suddenly interpreted as
+subtraction! However, redefining toplevel symbols is a very important
+feature. By using <code>unbind</code> on certain functions or setting
+them to something else like
+<code>(setq func (lambda () (error "not allowed to use func!")))</code>
+it is possible to create fine-grained access control to functions even
+when they are intrinsic or defined in the standard prelude. It is not
+possible to access an intrinsic function after it has been defined away
+in this manner. After you added all your toplevel symbols and removed or
+redefined the ones you do not like, you may thus protect all symbols and
+use <code>set-permissions</code> to revoke the privilege
+<code>AllowUnprotect</code>. This fixes the base vocabulary and any
+attempt to redefine it in the future will result in a security
+violation, since permissions can only be changed from less secure to
+more secure and never vice versa.</p>
+<p>See the Chapter <a href="#extending-z3s5-lisp">Extending Z3S5
+Lisp</a> for information about how to define your own functions in Z3S5
+Lisp.</p>
+<h2 data-number="1.2" id="data-types"><span
+class="header-section-number">1.2</span> Data Types</h2>
 <p>Basic data types of Z3S5 Lisp are:</p>
 <ul>
-<li>Bools: <code>t</code> and <code>nil</code>. The empty list <code>nil</code> is interpreted as false and any non-nil value is true; the symbol <code>t</code> is predefined as non-nil and usually used for true.</li>
-<li>Symbols: <code>abracadabra</code>, <code>foo</code>, <code>bar</code>, <code>...hel%lo*_</code>. These have few restrictions, as the last example illustrates.</li>
-<li>Integers: <code>3</code>, <code>1</code>, <code>-28</code>. These are bignums with functions such as <code>+</code>, <code>-</code>, <code>sub</code>, <code>div</code>,…</li>
-<li>Floats: <code>3.14</code>, <code>1.92829</code> with a large range of functions with prefix <code>fl.</code>. Get a list with <code>(dump 'fl.)</code></li>
-<li>UTF-8 Strings: <code>"This is a test."</code> with functions such as <code>str+</code>, <code>str-empty?</code>, <code>str-forall?</code>, <code>str-join</code>,… Get an overview with <code>(dump 'str)</code>.</li>
-<li>Lists: <code>'(a b c d e f)</code> with functions such as <code>car</code>, <code>cdr</code>, <code>mapcar</code>, <code>1st</code>, <code>2nd</code>, <code>member</code>, <code>filter</code>,…</li>
-<li>Arrays: <code>#(a b c d e f)</code> with functions such as <code>array-ref</code>, <code>array-set</code>, <code>array-len</code>, …</li>
-<li>Dictionaries: <code>(dict)</code> with functions such as <code>get</code>, <code>set</code>, <code>dict-&gt;alist</code>, <code>dict-&gt;array</code>, <code>dict-&gt;values</code>, <code>dict-map</code>,…</li>
-<li>Blobs: These contain binary data with functions like <code>peek</code>, <code>poke</code>, <code>blob-&gt;base64</code>,…</li>
-<li>Boxed values with functions like <code>valid?</code>. Boxed values are used to embed foreign types like Go structures into the runtime system which cannot be automatically garbage collected. They typically require manual destruction to free memory. See the source code for <code>lisp_decimal.go</code> for an example of such an embedding.</li>
-<li>Futures: Futures encapsulate the result of a future computation and are returned by the special form <code>(future ...)</code> whose body evaluates to a future. The result of a future computation may be obtained with <code>(force &lt;future&gt;)</code>.</li>
-<li>Tasks: Tasks are heavyweight concurrency constructs similar to threads in other programming languages. See <code>(dump 'task)</code> for a list of functions.</li>
+<li>Bools: <code>t</code> and <code>nil</code>. The empty list
+<code>nil</code> is interpreted as false and any non-nil value is true;
+the symbol <code>t</code> is predefined as non-nil and usually used for
+true.</li>
+<li>Symbols: <code>abracadabra</code>, <code>foo</code>,
+<code>bar</code>, <code>...hel%lo*_</code>. These have few restrictions,
+as the last example illustrates.</li>
+<li>Integers: <code>3</code>, <code>1</code>, <code>-28</code>. These
+are bignums with functions such as <code>+</code>, <code>-</code>,
+<code>sub</code>, <code>div</code>,…</li>
+<li>Floats: <code>3.14</code>, <code>1.92829</code> with a large range
+of functions with prefix <code>fl.</code>. Get a list with
+<code>(dump 'fl.)</code></li>
+<li>UTF-8 Strings: <code>"This is a test."</code> with functions such as
+<code>str+</code>, <code>str-empty?</code>, <code>str-forall?</code>,
+<code>str-join</code>,… Get an overview with
+<code>(dump 'str)</code>.</li>
+<li>Lists: <code>'(a b c d e f)</code> with functions such as
+<code>car</code>, <code>cdr</code>, <code>mapcar</code>,
+<code>1st</code>, <code>2nd</code>, <code>member</code>,
+<code>filter</code>,…</li>
+<li>Arrays: <code>#(a b c d e f)</code> with functions such as
+<code>array-ref</code>, <code>array-set</code>, <code>array-len</code>,
+…</li>
+<li>Dictionaries: <code>(dict)</code> with functions such as
+<code>get</code>, <code>set</code>, <code>dict-&gt;alist</code>,
+<code>dict-&gt;array</code>, <code>dict-&gt;values</code>,
+<code>dict-map</code>,…</li>
+<li>Blobs: These contain binary data with functions like
+<code>peek</code>, <code>poke</code>,
+<code>blob-&gt;base64</code>,…</li>
+<li>Boxed values with functions like <code>valid?</code>. Boxed values
+are used to embed foreign types like Go structures into the runtime
+system which cannot be automatically garbage collected. They typically
+require manual destruction to free memory. See the source code for
+<code>lisp_decimal.go</code> for an example of such an embedding.</li>
+<li>Futures: Futures encapsulate the result of a future computation and
+are returned by the special form <code>(future ...)</code> whose body
+evaluates to a future. The result of a future computation may be
+obtained with <code>(force &lt;future&gt;)</code>.</li>
+<li>Tasks: Tasks are heavyweight concurrency constructs similar to
+threads in other programming languages. See <code>(dump 'task)</code>
+for a list of functions.</li>
 </ul>
-<p>Strings, lists, and arrays are also sequences testable with the <code>seq?</code> predicate. These support convenience successor functions like <code>map</code> and <code>foreach</code>. Check the <code>init.lisp</code> preamble in directory <code>embed/</code> for how these work.</p>
-<p>Numbers are generally one bignum type for which <code>num?</code> is true and they will extend and shrink in their representation as necessary. However, numbers larger than 64 bit only support basic arithmetics and floating point arithmetics is limited to values that fit into a Float64. There is also a built-in decimal arithmetics extension with prefix <code>dec</code> for correct accounting and banking arithmetics and rounding – see <code>(dump 'dec.)</code> for a list of available decimal arithmetics functions and <code>lisp_decimal.go</code> for implementation details.</p>
-<h1 data-number="2" id="writing-programs"><span class="header-section-number">2</span> Writing Programs</h1>
-<p>The <code>z3</code> interpreter loads and executes any file <code>init.lisp</code> in the same directory as the executable at startup. It is also possible to use the command-line option <code>-l &lt;filename&gt;</code> to load and execute it. This sets <code>*interactive-session*</code> to <code>nil</code>, executes the contents of the file and returns to the shell. This behavior can be overridden by specifying the <code>-i</code> flag on the command-line, which sets `<em>interactive-session</em> to true and ensures that an interactive session is started after the initial files are loaded.</p>
-<h2 data-number="2.1" id="finding-functions-and-online-help"><span class="header-section-number">2.1</span> Finding Functions and Online Help</h2>
-<p>Built-in help on functions can be obtained with <code>(help func)</code> where the function name is not quoted. For example, <code>(help help)</code> returns the help entry for the <code>help</code> function. A list of bound toplevel symbols can be obtained with <code>(dump [sym])</code> where the optional symbol <code>sym</code> must be a quoted prefix. For example, <code>(dump)</code> returns all toplevel bindings and <code>(dump 'str)</code> returns a list of all bound symbols starting with “str”. By convention, internal helper functions without help entry are prefixed with an underscore and omitted by <code>dump</code>. To get a list of all bindings, including those starting with an underscore, use <code>(dump-bindings)</code>.</p>
-<h2 data-number="2.2" id="peculiarities-of-z3s5-lisp"><span class="header-section-number">2.2</span> Peculiarities of Z3S5 Lisp</h2>
+<p>Strings, lists, and arrays are also sequences testable with the
+<code>seq?</code> predicate. These support convenience successor
+functions like <code>map</code> and <code>foreach</code>. Check the
+<code>init.lisp</code> preamble in directory <code>embed/</code> for how
+these work.</p>
+<p>Numbers are generally one bignum type for which <code>num?</code> is
+true and they will extend and shrink in their representation as
+necessary. However, numbers larger than 64 bit only support basic
+arithmetics and floating point arithmetics is limited to values that fit
+into a Float64. There is also a built-in decimal arithmetics extension
+with prefix <code>dec</code> for correct accounting and banking
+arithmetics and rounding – see <code>(dump 'dec.)</code> for a list of
+available decimal arithmetics functions and <code>lisp_decimal.go</code>
+for implementation details.</p>
+<h1 data-number="2" id="writing-programs"><span
+class="header-section-number">2</span> Writing Programs</h1>
+<p>The <code>z3</code> interpreter loads and executes any file
+<code>init.lisp</code> in the same directory as the executable at
+startup. It is also possible to use the command-line option
+<code>-l &lt;filename&gt;</code> to load and execute it. This sets
+<code>*interactive-session*</code> to <code>nil</code>, executes the
+contents of the file and returns to the shell. This behavior can be
+overridden by specifying the <code>-i</code> flag on the command-line,
+which sets `<em>interactive-session</em> to true and ensures that an
+interactive session is started after the initial files are loaded.</p>
+<h2 data-number="2.1" id="finding-functions-and-online-help"><span
+class="header-section-number">2.1</span> Finding Functions and Online
+Help</h2>
+<p>Built-in help on functions can be obtained with
+<code>(help func)</code> where the function name is not quoted. For
+example, <code>(help help)</code> returns the help entry for the
+<code>help</code> function. A list of bound toplevel symbols can be
+obtained with <code>(dump [sym])</code> where the optional symbol
+<code>sym</code> must be a quoted prefix. For example,
+<code>(dump)</code> returns all toplevel bindings and
+<code>(dump 'str)</code> returns a list of all bound symbols starting
+with “str”. By convention, internal helper functions without help entry
+are prefixed with an underscore and omitted by <code>dump</code>. To get
+a list of all bindings, including those starting with an underscore, use
+<code>(dump-bindings)</code>.</p>
+<h2 data-number="2.2" id="peculiarities-of-z3s5-lisp"><span
+class="header-section-number">2.2</span> Peculiarities of Z3S5 Lisp</h2>
 <ul>
-<li><p>Iterators over sequences use the order <code>(iterator sequence function)</code>, not sometimes one and sometimes the other. Exception: <code>memq</code> and <code>member</code> ask whether an element is a member of a list and have order <code>(member element list)</code>.</p></li>
-<li><p>There is no meaningful <code>eq</code>, equality is generally tested with <code>equal?</code>.</p></li>
-<li><p>Predicate names usually end in a question mark like in Scheme dialects, with a few exceptions like <code>=</code> for numeric equality. Example: <code>equal?</code>. There is no p-suffix like in other Lisps.</p></li>
-<li><p><code>dict</code> data structures are multi-threading safe.</p></li>
+<li><p>Iterators over sequences use the order
+<code>(iterator sequence function)</code>, not sometimes one and
+sometimes the other. Exception: <code>memq</code> and
+<code>member</code> ask whether an element is a member of a list and
+have order <code>(member element list)</code>.</p></li>
+<li><p>There is no meaningful <code>eq</code>, equality is generally
+tested with <code>equal?</code>.</p></li>
+<li><p>Predicate names usually end in a question mark like in Scheme
+dialects, with a few exceptions like <code>=</code> for numeric
+equality. Example: <code>equal?</code>. There is no p-suffix like in
+other Lisps.</p></li>
+<li><p><code>dict</code> data structures are multi-threading
+safe.</p></li>
 <li><p>There is support for futures and concurrent tasks.</p></li>
 </ul>
-<h2 data-number="2.3" id="basic-control-flow-and-examples"><span class="header-section-number">2.3</span> Basic Control Flow and Examples</h2>
-<p>When Z3S5 Lisp encounters an unquoted list, it attempts to interpret the first element of the list as a function call. Thus, if the symbol is bound to a function or macro, it calls the function with the remainder of the list as argument:</p>
+<h2 data-number="2.3" id="basic-control-flow-and-examples"><span
+class="header-section-number">2.3</span> Basic Control Flow and
+Examples</h2>
+<p>When Z3S5 Lisp encounters an unquoted list, it attempts to interpret
+the first element of the list as a function call. Thus, if the symbol is
+bound to a function or macro, it calls the function with the remainder
+of the list as argument:</p>
 <pre class="Lisp"><code>&gt; (+ 10 20 30 40 50)
 150</code></pre>
-<p>Symbols evaluate to their values and need to be quoted otherwise. They can be defined with <code>setq</code>:</p>
+<p>Symbols evaluate to their values and need to be quoted otherwise.
+They can be defined with <code>setq</code>:</p>
 <pre class="Lisp"><code>&gt; hello
 EvalError: void variable: hello
     hello
@@ -165,7 +504,9 @@ EvalError: void variable: hello
 world
 &gt; hello
 world</code></pre>
-<p>To define a function, the macro <code>defun</code> can be used as in other Lisp dialects. The syntax is the traditional one, not in Scheme dialects:</p>
+<p>To define a function, the macro <code>defun</code> can be used as in
+other Lisp dialects. The syntax is the traditional one, not in Scheme
+dialects:</p>
 <pre class="Lisp"><code>&gt; (defun fib (n)
     (if (or (= n 0) (= n 1))
         1
@@ -176,8 +517,25 @@ fib
 89
 &gt; (fib 30)
 1346269</code></pre>
-<p><code>(defun foo (bar) ...)</code> is really just a macro shortcut for <code>(setq foo (lambda (bar) ...))</code> like in most other Lisp dialects. Macros are expanded before a program is executed, which unfortunately makes error reporting in Z3S5 Lisp sometimes a bit obtuse. The system neither keeps track of source locations nor of original definitions and will present the expanded macros when an error occurs. This will not change in the future, so better get used to it! Changing this and turning Z3S5 Lisp into a real, full-fledged Lisp would be a gigantic task and not worth the effort, as there are already far more capable Lisp systems like <code>CommonLisp</code> and <code>Racket</code> out there.</p>
-<p>The above function demonstrates recursion, a feature that is often used in Lisp. Z3S5 Lisp eliminates tail recursion. The example also illustrates the use of <code>=</code> for numeric equality, <code>+</code> and <code>-</code> functions on (potential) bignums and the macro <code>(if &lt;condition&gt; &lt;then-clause&gt; &lt;else-clause&gt;)</code>. The more general <code>cond</code> construct is also available and in fact the primitive operation:</p>
+<p><code>(defun foo (bar) ...)</code> is really just a macro shortcut
+for <code>(setq foo (lambda (bar) ...))</code> like in most other Lisp
+dialects. Macros are expanded before a program is executed, which
+unfortunately makes error reporting in Z3S5 Lisp sometimes a bit obtuse.
+The system neither keeps track of source locations nor of original
+definitions and will present the expanded macros when an error occurs.
+This will not change in the future, so better get used to it! Changing
+this and turning Z3S5 Lisp into a real, full-fledged Lisp would be a
+gigantic task and not worth the effort, as there are already far more
+capable Lisp systems like <code>CommonLisp</code> and
+<code>Racket</code> out there.</p>
+<p>The above function demonstrates recursion, a feature that is often
+used in Lisp. Z3S5 Lisp eliminates tail recursion. The example also
+illustrates the use of <code>=</code> for numeric equality,
+<code>+</code> and <code>-</code> functions on (potential) bignums and
+the macro
+<code>(if &lt;condition&gt; &lt;then-clause&gt; &lt;else-clause&gt;)</code>.
+The more general <code>cond</code> construct is also available and in
+fact the primitive operation:</p>
 <pre class="Lisp"><code>&gt;  (defun day (n)
      (cond 
        ((= n 0) &#39;sunday)
@@ -194,16 +552,37 @@ late-in-the-week
 &gt; (day 5)
 late-in-the-week</code></pre>
 <p>Looks like some programmer was lazy there.</p>
-<p>In Lisp languages it is common to iterate over lists and other data structures either using recursive functions or by using some of the standard iteration constructs such as <code>map</code>, <code>foreach</code>, <code>mapcar</code>, and so on. Nesting calls of macros or functions like <code>map</code> and <code>filter</code> to achieve the desired data transformation is very common functional programming style and often desirable for performance. Here is an example:</p>
+<p>In Lisp languages it is common to iterate over lists and other data
+structures either using recursive functions or by using some of the
+standard iteration constructs such as <code>map</code>,
+<code>foreach</code>, <code>mapcar</code>, and so on. Nesting calls of
+macros or functions like <code>map</code> and <code>filter</code> to
+achieve the desired data transformation is very common functional
+programming style and often desirable for performance. Here is an
+example:</p>
 <pre class="Lisp"><code>&gt; (map &#39;(1 2 3 4 5 6) add1)
 (2 3 4 5 6 7)</code></pre>
-<p>Local variables are bound with <code>let</code> or with <code>letrec</code> in Z3S5 Lisp. The latter needs to be used whenever a variable in the form depends on the other variable, which is not possible with <code>let</code> since it makes the bindings only available in the body. Here is the definition of <code>apropos</code> from the preamble:</p>
+<p>Local variables are bound with <code>let</code> or with
+<code>letrec</code> in Z3S5 Lisp. The latter needs to be used whenever a
+variable in the form depends on the other variable, which is not
+possible with <code>let</code> since it makes the bindings only
+available in the body. Here is the definition of <code>apropos</code>
+from the preamble:</p>
 <pre class="Lisp"><code>(defun apropos (arg)
   (let ((info (get *help* arg nil)))
     (if info
       (cadr (assoc &#39;see info))
       nil)))</code></pre>
-<p>The variable <code>info</code> is bound to the result of <code>(get *help* arg nil)</code>, which evaluates to default <code>nil</code> if there is no help entry for <code>arg</code> in the global dictionary <code>*help*</code>. That avoids calling <code>(get *help* arg nil)</code> twice, once for the check to nil and once in the first <code>if</code> branch. But it can often be better to avoid uses of <code>let</code> and re-use accessors; it depends a bit on clarity and intent, and whether the initial computation is costly or not. Here is an example where <code>let</code> would not do and instead <code>letrec</code> has to be used:</p>
+<p>The variable <code>info</code> is bound to the result of
+<code>(get *help* arg nil)</code>, which evaluates to default
+<code>nil</code> if there is no help entry for <code>arg</code> in the
+global dictionary <code>*help*</code>. That avoids calling
+<code>(get *help* arg nil)</code> twice, once for the check to nil and
+once in the first <code>if</code> branch. But it can often be better to
+avoid uses of <code>let</code> and re-use accessors; it depends a bit on
+clarity and intent, and whether the initial computation is costly or
+not. Here is an example where <code>let</code> would not do and instead
+<code>letrec</code> has to be used:</p>
 <pre class="Lisp"><code>&gt; (letrec ((is-even? (lambda (n)
                        (or (= n 0)
                            (is-odd? (sub1 n)))))
@@ -212,31 +591,87 @@ late-in-the-week</code></pre>
                            (is-even? (sub1 n))))))
     (is-odd? 11))
 t</code></pre>
-<p>The reason this doesn’t work with <code>let</code> is that <code>is-even?</code> is not bound in the definition of <code>is-odd?</code> and vice versa when <code>let</code> is used, whereas <code>letrec</code> makes sure that these bindings are mutually available. Although the current implementation always uses <code>letrec</code> under the hood, it is best to use <code>let</code> whenever it is possible since at least in theory it could be implemented more efficiently. Notice that <code>setq</code> can be used to mutate local bindings, of course, and is not just intended for toplevel symbols. Although beginners should avoid it, sometimes mutating variables with <code>setq</code> can make definitions simpler at the cost of some elegance.</p>
-<h1 data-number="3" id="gui-programming"><span class="header-section-number">3</span> GUI Programming</h1>
-<p>Starting from version 2.4, Z3S5 Lisp has an optional GUI based on Go’s <a href="https://fyne.io">Fyne</a> framework. This allows users to write GUI applications in Z3S5 Lisp.</p>
-<h2 data-number="3.1" id="embedding-the-gui"><span class="header-section-number">3.1</span> Embedding the GUI</h2>
-<p>To activate the GUI in your own application embedding Z3S5 Lisp, you need to import the separate library <code>import z3ui "github.com/rasteric/z3s5-lisp/gui"</code>. After booting the interpreter during application startup, you may then call the GUI definitions and help declarations as follows:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode Go"><code class="sourceCode go"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>    z3ui.DefGUI(interp, z3ui.DefaultConfig)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>    <span class="kw">if</span> err := z3ui.DefGUIHelp(interp); err != <span class="ot">nil</span> {</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a>        fmt.Fprintf(os.Stderr, err.Error())</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>        <span class="kw">return</span> <span class="dv">3</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a>    }</span></code></pre></div>
-<p>Function <code>z3ui.DefGUI()</code> defines the GUI functions in the given interpreter and takes a Config structure defined in the GUI library. The default configuration provided above allows full access to all GUI functions. However, the GUI Config structure may be changed to prohibit access to certain functions. For example, links may be prohibited or creating new windows may raise an error. This will make it possible in the future to use the GUI in an environment where functions may only modify a particular window, e.g. to create some embedded GUI plugins.</p>
-<p>When the GUI is started using <code>z3ui.RunGUI()</code>, the call blocks and events are handled by the GUI and its respective callback functions. Therefore, the Z3S5 Lisp interpreter needs to be run concurrently using e.g. <code>interp.Run()</code> in a separate goroutine. See the implementation in <code>cmd/z3g/z3g.go</code> for an example of how to do this.</p>
-<h2 data-number="3.2" id="gui-basics"><span class="header-section-number">3.2</span> GUI Basics</h2>
-<p>Functions defined in Lisp are derived from corresponding functions of the <a href="https://fyne.io">Fyne</a> framework and listed under the ’gui label in the help system. If the GUI is present, the symbols <code>gui</code> and <code>fyne2</code> are present in the global list <code>*reflect*</code>.</p>
-<p>The names of Lisp functions roughly follow those of Fyne functions with the following adaptations to Lisp style :</p>
+<p>The reason this doesn’t work with <code>let</code> is that
+<code>is-even?</code> is not bound in the definition of
+<code>is-odd?</code> and vice versa when <code>let</code> is used,
+whereas <code>letrec</code> makes sure that these bindings are mutually
+available. Although the current implementation always uses
+<code>letrec</code> under the hood, it is best to use <code>let</code>
+whenever it is possible since at least in theory it could be implemented
+more efficiently. Notice that <code>setq</code> can be used to mutate
+local bindings, of course, and is not just intended for toplevel
+symbols. Although beginners should avoid it, sometimes mutating
+variables with <code>setq</code> can make definitions simpler at the
+cost of some elegance.</p>
+<h1 data-number="3" id="gui-programming"><span
+class="header-section-number">3</span> GUI Programming</h1>
+<p>Starting from version 2.4, Z3S5 Lisp has an optional GUI based on
+Go’s <a href="https://fyne.io">Fyne</a> framework. This allows users to
+write GUI applications in Z3S5 Lisp.</p>
+<h2 data-number="3.1" id="embedding-the-gui"><span
+class="header-section-number">3.1</span> Embedding the GUI</h2>
+<p>To activate the GUI in your own application embedding Z3S5 Lisp, you
+need to import the separate library
+<code>import z3ui "github.com/rasteric/z3s5-lisp/gui"</code>. After
+booting the interpreter during application startup, you may then call
+the GUI definitions and help declarations as follows:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode Go"><code class="sourceCode go"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>    z3ui<span class="op">.</span>DefGUI<span class="op">(</span>interp<span class="op">,</span> z3ui<span class="op">.</span>DefaultConfig<span class="op">)</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> err <span class="op">:=</span> z3ui<span class="op">.</span>DefGUIHelp<span class="op">(</span>interp<span class="op">);</span> err <span class="op">!=</span> <span class="ot">nil</span> <span class="op">{</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        fmt<span class="op">.</span>Fprintf<span class="op">(</span>os<span class="op">.</span>Stderr<span class="op">,</span> err<span class="op">.</span>Error<span class="op">())</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">3</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span></code></pre></div>
+<p>Function <code>z3ui.DefGUI()</code> defines the GUI functions in the
+given interpreter and takes a Config structure defined in the GUI
+library. The default configuration provided above allows full access to
+all GUI functions. However, the GUI Config structure may be changed to
+prohibit access to certain functions. For example, links may be
+prohibited or creating new windows may raise an error. This will make it
+possible in the future to use the GUI in an environment where functions
+may only modify a particular window, e.g. to create some embedded GUI
+plugins.</p>
+<p>When the GUI is started using <code>z3ui.RunGUI()</code>, the call
+blocks and events are handled by the GUI and its respective callback
+functions. Therefore, the Z3S5 Lisp interpreter needs to be run
+concurrently using e.g. <code>interp.Run()</code> in a separate
+goroutine. See the implementation in <code>cmd/z3g/z3g.go</code> for an
+example of how to do this.</p>
+<h2 data-number="3.2" id="gui-basics"><span
+class="header-section-number">3.2</span> GUI Basics</h2>
+<p>Functions defined in Lisp are derived from corresponding functions of
+the <a href="https://fyne.io">Fyne</a> framework and listed under the
+’gui label in the help system. If the GUI is present, the symbols
+<code>gui</code> and <code>fyne2</code> are present in the global list
+<code>*reflect*</code>.</p>
+<p>The names of Lisp functions roughly follow those of Fyne functions
+with the following adaptations to Lisp style :</p>
 <ol type="1">
 <li><p>Camelcase is translated to lowercase with hyphens.</p></li>
-<li><p>A function <code>object.VerbQualifier</code> becomes verb-object-qualifier.</p></li>
-<li><p>Getters are written in the form <code>get-object-qualifier</code> and setters <code>set-object-qualifier</code>.</p></li>
-<li><p>As an exception of the previous rules, when the result of a function is a bool, the form is <code>object-predicate?</code>.</p></li>
+<li><p>A function <code>object.VerbQualifier</code> becomes
+verb-object-qualifier.</p></li>
+<li><p>Getters are written in the form <code>get-object-qualifier</code>
+and setters <code>set-object-qualifier</code>.</p></li>
+<li><p>As an exception of the previous rules, when the result of a
+function is a bool, the form is <code>object-predicate?</code>.</p></li>
 </ol>
-<p>Fyne objects are represented by integer numbers. The system internally translates between these numbers and objects in a thread-safe way. This means that they are not automatically garbage-collected. To forget an object no longer in use on the Lisp side, use the function <code>(forget-gui-object id)</code>. This <em>has</em> to be called if you create a lot of objects and want to free them after use. If and when they are garbage-collected depends on the Go and Fyne side, however.</p>
-<p>Occasionally, Fyne objects are also created on the fly for performance reasons. For example, sometimes color lists of the form <code>(r g b a)</code> with integers <code>r</code>, <code>g</code>,<code>b</code>, <code>a</code> are used instead of creating and storing color objects using <code>(nrgba r g b a)</code>. There are also sometimes shortcut accessors using selector symbols and other convenience wrappers for Fyne functions. When in doubt, refer to the Lisp help for details.</p>
-<h2 data-number="3.3" id="examples"><span class="header-section-number">3.3</span> Examples</h2>
-<p>Take a look at the examples in <code>cmd/z3g/demo.lisp</code> to see how the GUI may be used. Here is an example snippet:</p>
+<p>Fyne objects are represented by integer numbers. The system
+internally translates between these numbers and objects in a thread-safe
+way. This means that they are not automatically garbage-collected. To
+forget an object no longer in use on the Lisp side, use the function
+<code>(forget-gui-object id)</code>. This <em>has</em> to be called if
+you create a lot of objects and want to free them after use. If and when
+they are garbage-collected depends on the Go and Fyne side, however.</p>
+<p>Occasionally, Fyne objects are also created on the fly for
+performance reasons. For example, sometimes color lists of the form
+<code>(r g b a)</code> with integers <code>r</code>,
+<code>g</code>,<code>b</code>, <code>a</code> are used instead of
+creating and storing color objects using <code>(nrgba r g b a)</code>.
+There are also sometimes shortcut accessors using selector symbols and
+other convenience wrappers for Fyne functions. When in doubt, refer to
+the Lisp help for details.</p>
+<h2 data-number="3.3" id="examples"><span
+class="header-section-number">3.3</span> Examples</h2>
+<p>Take a look at the examples in <code>cmd/z3g/demo.lisp</code> to see
+how the GUI may be used. Here is an example snippet:</p>
 <pre class="Lisp"><code>(defun demo4 ()
   (letrec ((win (new-window &quot;Demo 4: Forms&quot;))
            (form (new-form)))
@@ -247,8 +682,13 @@ t</code></pre>
     (append-form form &quot;More&quot; (new-hyperlink &quot;Click here for more info&quot; &quot;https://z3s5.com&quot;))
     (set-window-content win form)
     (show-window win)))</code></pre>
-<p>In this example, a window is created and as its only content a <code>form</code> widget is added to it. This form widget displays a label string plus a widget per line and neatly justifies the columns of the form.</p>
-<p>As another example, the following program opens a window with a button that displays a predefined icon from the default theme, and when the button is pressed, the window is closed:</p>
+<p>In this example, a window is created and as its only content a
+<code>form</code> widget is added to it. This form widget displays a
+label string plus a widget per line and neatly justifies the columns of
+the form.</p>
+<p>As another example, the following program opens a window with a
+button that displays a predefined icon from the default theme, and when
+the button is pressed, the window is closed:</p>
 <pre class="Lisp"><code>(defun demo5 ()
   (letrec ((win (new-window &quot;Demo 5: Button with Icon&quot;))
            (button (new-button-with-icon &quot;Press me!&quot; 
@@ -256,38 +696,159 @@ t</code></pre>
                      (lambda () (close-window win)))))
     (set-window-content win button)
     (show-window win)))</code></pre>
-<p>Generally, when windows are closed the GUI keeps being active and new windows can be created again. There is no <code>MasterWindow</code> that causes the application to close when it is closed like in Fyne. To close the GUI entirely, use either <code>z3ui.ShutDownGUI()</code> in Go or <code>(close-gui)</code> in Lisp. After this function has been called, the GUI can no longer be used and using GUI functions may result in undefined behavior.</p>
-<p>Note that Z3S5 Lisp can continue to run once the GUI has been closed. The interpreter is independent of the GUI and keeps running until it is exited by the usual mechanisms like <code>(exit 0)</code>.</p>
-<p>See the help topic <code>'gui</code> for more information about GUI-related function and check the Fyne documentation for more information about the underlying framework. At the time of this writing, not all Fyne functions have been implemented on the Z3S5 Lisp side yet, although the framework is already fairly complete and usable for small GUI programs. More functionality from Fyne and other libraries is on the roadmap.</p>
-<h1 data-number="4" id="advanced-topics"><span class="header-section-number">4</span> Advanced Topics</h1>
-<h2 data-number="4.1" id="error-handling"><span class="header-section-number">4.1</span> Error Handling</h2>
-<p>There are no continuations and there is no fancy stuff like dynamic wind. Instead, there are primitives like <code>push-error-handler</code> and <code>pop-error-handler</code> and macros such as <code>with-final</code> and <code>with-error-handler</code>.</p>
-<h2 data-number="4.2" id="debugging"><span class="header-section-number">4.2</span> Debugging</h2>
-<p>Not only are error messages fairly rudimentary, they also use the expanded macro definitions and are therefore hard to read. Local bindings are implemented with lambda-terms and displayed as such. This makes debugging a challenge, as it should be. Z3S5 programmers have the habit of writing bug-free code from the start and thereby avoid debugging entirely. But you could write your own trace or stepper functions for enhanced debugging features by redefining all toplevel symbols appropriately. Then again, you could also just write your own Lisp with better debugging capabilities. The choice is up to you!</p>
-<h2 data-number="4.3" id="concurrency"><span class="header-section-number">4.3</span> Concurrency</h2>
-<p>Dicts use Go’s <code>sync.Map</code> under the hood and are therefore concurrency-safe. The global symbol table is also cuncurrency-safe. This means that dicts can be accessed safely from futures and tasks and can even be used for synchronization purposes, as the (admittedly horrible) current implementation of tasks in <code>embed/init.lisp</code> illustrates. Generally, futures should be used and can be spawned in large quantities without much of a performance penalty. Tasks need some work to become efficient and there are plans to include a more direct interface to Go’s goroutines with cancelable contexts in the future.</p>
-<h2 data-number="4.4" id="file-access"><span class="header-section-number">4.4</span> File Access</h2>
-<p>For obvious reasons, not all embedded interpreters should provide full file access. Therefore, this option needs to be enabled with build tag <code>fileio</code>, or otherwise none of the filesystem-related functions will be available. The <code>z3</code> Makefile in <code>cmd/z3</code> enables this option by default for the standalone executable.</p>
-<h2 data-number="4.5" id="images"><span class="header-section-number">4.5</span> Images</h2>
-<p>Z3S5 Lisp supports the writing and reading of Lisp images called “zimages”. To save a zimage, use <code>(save-zimage &lt;version&gt; &lt;info&gt; &lt;entry-point&gt; &lt;file&gt;)</code>, where the <code>&lt;version&gt;</code> must be a semver string and <code>&lt;info&gt;</code> a list. The entry point is a procedure that is executed after the image has been loaded and can be <code>nil</code> for not executing anything. The filename <code>&lt;file&gt;</code> by convention ends in <code>.zimage</code>. To load such an image, overwriting the current lisp system, use <code>(load-zimage &lt;file&gt;)</code>.</p>
-<p>Important limitations need to be kept in mind when working with zimages. Symbols will get unprotected when loading a zimage and therefore the interpreter must have the permission to unprotect symbols. See <code>declare-unprotected</code>, <code>protect</code>, <code>unprotect</code>, and <code>protected?</code> for more information. Symbols may also be declared volatile with <code>declare-volatile</code> and some of the predefined global variables such as <code>*tasks*</code> are already declared volatile. A volatile toplevel symbol is neither written to a zimage nor is a symbol marked volatile in the running system overwritten when it is present in a zimage and the image is loaded. This can be a rare source of incompatibility; there is currently no way to force the loading of a symbol in the image when it is declared volatile in the running system and providing such a mechanism would introduce new problems. You should declare as volatile any symbol that cannot be overwritten because it contains data essential to the running system, and at the same time be aware of the possibility that a global symbol might be declared volatile in the future and therefore not be loaded. Use prefixes and sanity checks where necessary to avoid problems.</p>
-<p>Finally, not all values can be externalized. For example, ports, tasks, futures, and mutexes cannot be externalized. If a symbol bound to such a value is declared volatile, then it is neither written nor loaded. If it is <em>not</em> volatile, however, then the value <code>nil</code> is written and loaded for it. For most applications this is desirable. The procedure in your entry point can check for nil and make sure to re-introduce the desired state of such values after loading an image if this is necessary for the proper functioning of the system. In general, it is desirable to use initialization functions and not rely on global variables when dealing with images.</p>
-<h2 data-number="4.6" id="database-access"><span class="header-section-number">4.6</span> Database Access</h2>
-<p>The build tags <code>db</code> and <code>fts5</code> enable a database module with Sqlite3 support. See <code>(dump 'db.)</code> for available functions and consult the reference and help system for more information on them. The tag <code>fts5</code> is required if <code>db</code> is used, since the key-value module <code>kvdb</code> makes use of the fts5 text indexing features of Sqlite. So the tags always have to be combined.</p>
-<p>Take a look at <code>(dump 'kvdb)</code> for more information about the key-value database and look up <code>(help remember)</code> for information on the remember system. Basically, you can use <code>(remember key value)</code> to remember a value, <code>(recall key) =&gt; value</code> to recall it, and <code>(forget key)</code> to forget it. However, this requires <code>(init-remember)</code> to be executed first once. In the <code>z3</code> executable this is loaded in the local <code>init.lisp</code> file that also prints the start banner, but you might want to disable it if you don’t use remember because it slows down startup.</p>
-<h2 data-number="4.7" id="object-oriented-programming"><span class="header-section-number">4.7</span> Object-oriented Programming</h2>
-<p>The extension for object-oriented programming is embedded into the init file and adds the symbol <code>oop</code> in <code>*reflect*</code>. It provides a simple object system with multiple inheritance and more lightweight structure. Both of them are based on arrays whose first element is a symbol starting with <code>%</code>, so it is best not to use arrays starting with such symbols for other purposes.</p>
-<h3 data-number="4.7.1" id="classes-objects-methods"><span class="header-section-number">4.7.1</span> Classes, Objects, Methods</h3>
-<p>Classes should be created with the <code>defclass</code> macro; there are other ways of creating them but this is most convenient. When a class is created, it’s name, a possibly empty list of superclasses, and if necessary some properties can be declared:</p>
+<p>Generally, when windows are closed the GUI keeps being active and new
+windows can be created again. There is no <code>MasterWindow</code> that
+causes the application to close when it is closed like in Fyne. To close
+the GUI entirely, use either <code>z3ui.ShutDownGUI()</code> in Go or
+<code>(close-gui)</code> in Lisp. After this function has been called,
+the GUI can no longer be used and using GUI functions may result in
+undefined behavior.</p>
+<p>Note that Z3S5 Lisp can continue to run once the GUI has been closed.
+The interpreter is independent of the GUI and keeps running until it is
+exited by the usual mechanisms like <code>(exit 0)</code>.</p>
+<p>See the help topic <code>'gui</code> for more information about
+GUI-related function and check the Fyne documentation for more
+information about the underlying framework. At the time of this writing,
+not all Fyne functions have been implemented on the Z3S5 Lisp side yet,
+although the framework is already fairly complete and usable for small
+GUI programs. More functionality from Fyne and other libraries is on the
+roadmap.</p>
+<h1 data-number="4" id="advanced-topics"><span
+class="header-section-number">4</span> Advanced Topics</h1>
+<h2 data-number="4.1" id="error-handling"><span
+class="header-section-number">4.1</span> Error Handling</h2>
+<p>There are no continuations and there is no fancy stuff like dynamic
+wind. Instead, there are primitives like <code>push-error-handler</code>
+and <code>pop-error-handler</code> and macros such as
+<code>with-final</code> and <code>with-error-handler</code>.</p>
+<h2 data-number="4.2" id="debugging"><span
+class="header-section-number">4.2</span> Debugging</h2>
+<p>Not only are error messages fairly rudimentary, they also use the
+expanded macro definitions and are therefore hard to read. Local
+bindings are implemented with lambda-terms and displayed as such. This
+makes debugging a challenge, as it should be. Z3S5 programmers have the
+habit of writing bug-free code from the start and thereby avoid
+debugging entirely. But you could write your own trace or stepper
+functions for enhanced debugging features by redefining all toplevel
+symbols appropriately. Then again, you could also just write your own
+Lisp with better debugging capabilities. The choice is up to you!</p>
+<h2 data-number="4.3" id="concurrency"><span
+class="header-section-number">4.3</span> Concurrency</h2>
+<p>Dicts use Go’s <code>sync.Map</code> under the hood and are therefore
+concurrency-safe. The global symbol table is also cuncurrency-safe. This
+means that dicts can be accessed safely from futures and tasks and can
+even be used for synchronization purposes, as the (admittedly horrible)
+current implementation of tasks in <code>embed/init.lisp</code>
+illustrates. Generally, futures should be used and can be spawned in
+large quantities without much of a performance penalty. Tasks need some
+work to become efficient and there are plans to include a more direct
+interface to Go’s goroutines with cancelable contexts in the future.</p>
+<h2 data-number="4.4" id="file-access"><span
+class="header-section-number">4.4</span> File Access</h2>
+<p>For obvious reasons, not all embedded interpreters should provide
+full file access. Therefore, this option needs to be enabled with build
+tag <code>fileio</code>, or otherwise none of the filesystem-related
+functions will be available. The <code>z3</code> Makefile in
+<code>cmd/z3</code> enables this option by default for the standalone
+executable.</p>
+<h2 data-number="4.5" id="images"><span
+class="header-section-number">4.5</span> Images</h2>
+<p>Z3S5 Lisp supports the writing and reading of Lisp images called
+“zimages”. To save a zimage, use
+<code>(save-zimage &lt;version&gt; &lt;info&gt; &lt;entry-point&gt; &lt;file&gt;)</code>,
+where the <code>&lt;version&gt;</code> must be a semver string and
+<code>&lt;info&gt;</code> a list. The entry point is a procedure that is
+executed after the image has been loaded and can be <code>nil</code> for
+not executing anything. The filename <code>&lt;file&gt;</code> by
+convention ends in <code>.zimage</code>. To load such an image,
+overwriting the current lisp system, use
+<code>(load-zimage &lt;file&gt;)</code>.</p>
+<p>Important limitations need to be kept in mind when working with
+zimages. Symbols will get unprotected when loading a zimage and
+therefore the interpreter must have the permission to unprotect symbols.
+See <code>declare-unprotected</code>, <code>protect</code>,
+<code>unprotect</code>, and <code>protected?</code> for more
+information. Symbols may also be declared volatile with
+<code>declare-volatile</code> and some of the predefined global
+variables such as <code>*tasks*</code> are already declared volatile. A
+volatile toplevel symbol is neither written to a zimage nor is a symbol
+marked volatile in the running system overwritten when it is present in
+a zimage and the image is loaded. This can be a rare source of
+incompatibility; there is currently no way to force the loading of a
+symbol in the image when it is declared volatile in the running system
+and providing such a mechanism would introduce new problems. You should
+declare as volatile any symbol that cannot be overwritten because it
+contains data essential to the running system, and at the same time be
+aware of the possibility that a global symbol might be declared volatile
+in the future and therefore not be loaded. Use prefixes and sanity
+checks where necessary to avoid problems.</p>
+<p>Finally, not all values can be externalized. For example, ports,
+tasks, futures, and mutexes cannot be externalized. If a symbol bound to
+such a value is declared volatile, then it is neither written nor
+loaded. If it is <em>not</em> volatile, however, then the value
+<code>nil</code> is written and loaded for it. For most applications
+this is desirable. The procedure in your entry point can check for nil
+and make sure to re-introduce the desired state of such values after
+loading an image if this is necessary for the proper functioning of the
+system. In general, it is desirable to use initialization functions and
+not rely on global variables when dealing with images.</p>
+<h2 data-number="4.6" id="database-access"><span
+class="header-section-number">4.6</span> Database Access</h2>
+<p>The build tags <code>db</code> and <code>fts5</code> enable a
+database module with Sqlite3 support. See <code>(dump 'db.)</code> for
+available functions and consult the reference and help system for more
+information on them. The tag <code>fts5</code> is required if
+<code>db</code> is used, since the key-value module <code>kvdb</code>
+makes use of the fts5 text indexing features of Sqlite. So the tags
+always have to be combined.</p>
+<p>Take a look at <code>(dump 'kvdb)</code> for more information about
+the key-value database and look up <code>(help remember)</code> for
+information on the remember system. Basically, you can use
+<code>(remember key value)</code> to remember a value,
+<code>(recall key) =&gt; value</code> to recall it, and
+<code>(forget key)</code> to forget it. However, this requires
+<code>(init-remember)</code> to be executed first once. In the
+<code>z3</code> executable this is loaded in the local
+<code>init.lisp</code> file that also prints the start banner, but you
+might want to disable it if you don’t use remember because it slows down
+startup.</p>
+<h2 data-number="4.7" id="object-oriented-programming"><span
+class="header-section-number">4.7</span> Object-oriented
+Programming</h2>
+<p>The extension for object-oriented programming is embedded into the
+init file and adds the symbol <code>oop</code> in
+<code>*reflect*</code>. It provides a simple object system with multiple
+inheritance and more lightweight structure. Both of them are based on
+arrays whose first element is a symbol starting with <code>%</code>, so
+it is best not to use arrays starting with such symbols for other
+purposes.</p>
+<h3 data-number="4.7.1" id="classes-objects-methods"><span
+class="header-section-number">4.7.1</span> Classes, Objects,
+Methods</h3>
+<p>Classes should be created with the <code>defclass</code> macro; there
+are other ways of creating them but this is most convenient. When a
+class is created, it’s name, a possibly empty list of superclasses, and
+if necessary some properties can be declared:</p>
 <pre class="Lisp"><code>(defclass named nil (name &quot;&lt;unknown&gt;&quot;))</code></pre>
-<p>This defines a class called <code>named</code> with no superclasses and a <code>name</code> property with default value <code>"&lt;unknown&gt;"</code>. Methods that subclasses shall inherit must be defined <em>before</em> the respective subclass is defined. So let’s add a convenience method to retrieve the name:</p>
+<p>This defines a class called <code>named</code> with no superclasses
+and a <code>name</code> property with default value
+<code>"&lt;unknown&gt;"</code>. Methods that subclasses shall inherit
+must be defined <em>before</em> the respective subclass is defined. So
+let’s add a convenience method to retrieve the name:</p>
 <pre class="Lisp"><code>(defmethod named-name (this) (prop this &#39;name))</code></pre>
-<p>This method takes the instance of the class as first argument (“this”) and retrieves the instance’s property <code>name</code>. The name in the first unquoted argument must be composed out of a valid class name and the method name. The following definitions illustrate inheritance:</p>
+<p>This method takes the instance of the class as first argument
+(“this”) and retrieves the instance’s property <code>name</code>. The
+name in the first unquoted argument must be composed out of a valid
+class name and the method name. The following definitions illustrate
+inheritance:</p>
 <pre class="Lisp"><code>(defclass point (named) (x 0) (y 0))
 (defmethod point-move (this delta-x delta-y) 
   (setprop this &#39;x (+ (prop this &#39;x) delta-x))
   (setprop this &#39;y (+ (prop this &#39;y) delta-y)))</code></pre>
-<p>This defines a named point with methods <code>point-name</code> and <code>point-move</code>, where the former is inherited from the superclass <code>named</code>. To make instances, use <code>new</code> as follows:</p>
+<p>This defines a named point with methods <code>point-name</code> and
+<code>point-move</code>, where the former is inherited from the
+superclass <code>named</code>. To make instances, use <code>new</code>
+as follows:</p>
 <pre class="Lisp"><code>(setq a (new point (x 10) (y 20) (name &quot;A&quot;)))
 (point-name a)
 ==&gt; &quot;A&quot;
@@ -300,12 +861,40 @@ t</code></pre>
 ==&gt; 100
 (prop a &#39;y)
 ==&gt; 40</code></pre>
-<p>As you can see in the example, the “this” argument must be named in the definition of <code>point-move</code> but when calling the method does not need to be taken into account; when the method is called, the first argument is always the object it is called upon. If no property value is specified in a <code>new</code> call, then a property gets its default value. If no default value has been specified during class definition, then the value is nil. Aside from the direct names bound by <code>defmethod</code>, it is also possible to use the <code>method</code> function to call methods, and properties can be get and set with <code>prop</code> and <code>setprop</code> respectively. There are a few more helper functions such as <code>object?</code> and <code>class?</code> to test for objects and classes, as well as <code>isa?</code> for checking whether an object is a subclass of a given class. Check out the “Object-oriented Programming” section of the Reference Manual for a complete list.</p>
-<p>One thing to bear in mind when using this very simple OOP extension is that everything is defined dynamically at runtime and order matters. If you instantiate a class before all of its methods are defined, the resulting object will not take into account any future changes or definitions of the class, it will just be derived from the current state of the class. Likewise, when a subclass is defined, the methods of the superclass need to be defined already or else they will not become part of the subclass. If you look at the implementation, you can see why: It simply copies symbols and their closure from dictionaries.</p>
-<h3 data-number="4.7.2" id="structures"><span class="header-section-number">4.7.2</span> Structures</h3>
-<p>Structures are more lightweight array-based representations of named fields without inheritance. They are similar to association lists and the corresponding macros allow the getting and setting of values based on a name in the struct (which is just an assessor to the array):</p>
+<p>As you can see in the example, the “this” argument must be named in
+the definition of <code>point-move</code> but when calling the method
+does not need to be taken into account; when the method is called, the
+first argument is always the object it is called upon. If no property
+value is specified in a <code>new</code> call, then a property gets its
+default value. If no default value has been specified during class
+definition, then the value is nil. Aside from the direct names bound by
+<code>defmethod</code>, it is also possible to use the
+<code>method</code> function to call methods, and properties can be get
+and set with <code>prop</code> and <code>setprop</code> respectively.
+There are a few more helper functions such as <code>object?</code> and
+<code>class?</code> to test for objects and classes, as well as
+<code>isa?</code> for checking whether an object is a subclass of a
+given class. Check out the “Object-oriented Programming” section of the
+Reference Manual for a complete list.</p>
+<p>One thing to bear in mind when using this very simple OOP extension
+is that everything is defined dynamically at runtime and order matters.
+If you instantiate a class before all of its methods are defined, the
+resulting object will not take into account any future changes or
+definitions of the class, it will just be derived from the current state
+of the class. Likewise, when a subclass is defined, the methods of the
+superclass need to be defined already or else they will not become part
+of the subclass. If you look at the implementation, you can see why: It
+simply copies symbols and their closure from dictionaries.</p>
+<h3 data-number="4.7.2" id="structures"><span
+class="header-section-number">4.7.2</span> Structures</h3>
+<p>Structures are more lightweight array-based representations of named
+fields without inheritance. They are similar to association lists and
+the corresponding macros allow the getting and setting of values based
+on a name in the struct (which is just an assessor to the array):</p>
 <pre class="Lisp"><code>(defstruct point (x 0) (y 0))</code></pre>
-<p>This is similar to the previous example but no inheritance is possible. Instances of a struct are arays called “records” and created with <code>make</code> and <code>make*</code>:</p>
+<p>This is similar to the previous example but no inheritance is
+possible. Instances of a struct are arays called “records” and created
+with <code>make</code> and <code>make*</code>:</p>
 <pre class="Lisp"><code>(setq a (make point &#39;((x 20)(y 100))))
 (setq b (make* point (x 10) (y 10)))
 (point-x a)
@@ -313,31 +902,100 @@ t</code></pre>
 (point-x! a 30)
 (point-x a)
 ==&gt; 30</code></pre>
-<p>That’s about it. These macros basically just provide conveniently named getter and setter functions for arrays. Consult the Reference Manual for a complete list of all structure-related functions.</p>
-<h2 data-number="4.8" id="language-stability"><span class="header-section-number">4.8</span> Language Stability</h2>
-<p>At this stage, built-in commands may still change. The good news is that any change introduced in Z3S5 Lisp needs to be tracked and checked in Z3S5 Machine, and so no larger changes are planned. However, no guarantees can be made and you should vendor the repository or even fork it if you want to make sure no breaking changes occur. Once the language is stable, it will be marked on the home page.</p>
-<h2 data-number="4.9" id="known-bugs"><span class="header-section-number">4.9</span> Known Bugs</h2>
-<p>Since this language has been ported from a larger system, there may be known bugs not in the issue tracker at Github. A known issue of this version is a problem with the recursive externalization of Dict containing Dict.</p>
-<h2 data-number="4.10" id="roadmap"><span class="header-section-number">4.10</span> Roadmap</h2>
-<p>A library system, a robust key-value database with fulltext search, some basic OOP, and a simple persistence layer will likely be ported from Z3S5 Machine to this embedded Lisp in the future.</p>
-<h1 data-number="5" id="extending-z3s5-lisp"><span class="header-section-number">5</span> Extending Z3S5 Lisp</h1>
-<p>The system is extended by calling <code>interp.Def</code>. As an example, consider the following function from <code>lisp_base.go</code>:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode Go"><code class="sourceCode go"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a>    <span class="co">// (str-&gt;chars s) =&gt; array of int convert a UTF-8 string into an array of runes</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a>    interp.Def(<span class="st">&quot;str-&gt;chars&quot;</span>, <span class="dv">1</span>, <span class="kw">func</span>(a []any) any {</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true"></a>        runes := []<span class="dt">rune</span>(norm.NFC.String(a[<span class="dv">0</span>].(<span class="dt">string</span>)))</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true"></a>        arr := <span class="bu">make</span>([]any, <span class="bu">len</span>(runes), <span class="bu">len</span>(runes))</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true"></a>        <span class="kw">for</span> i := <span class="kw">range</span> runes {</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true"></a>            arr[i] = goarith.AsNumber(runes[i])</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true"></a>        }</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true"></a>        <span class="kw">return</span> arr</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true"></a>    })</span></code></pre></div>
-<p>The <code>Def</code> function takes the function symbol as string, the number <em>n</em> of arguments, and a function that takes an array of <code>any</code> and returns a value <code>any</code> (aka <code>interface{}</code>). The function may explicitly check the type of the arguments for correctness but doesn’t need to. It is normal for functions to panic and even deliberately throw an error. These are caught by the intepreter and displayed to the user. So how much you check depends primarily on what errors you want to provide. By convenience, custom errors thrown in function definitions start with the name of the function such as <code>panic(error.New("foobar: the foobar function has failed"))</code> for a function <code>foobar</code>. If a function returns no value, then the definition should return <code>Void</code>, a special Lisp value that is not printed in the read-eval-print loop.</p>
-<p>Care must be taken with numbers. Pure Go numbers will not do and may lead to bizzare and unexpected runtime behavior. Every number needs to be converted using <code>goarith.AsNumber</code> and other conversion functions from <code>z3s5-lisp</code> and the package <code>github.com/nukata/goarith</code>. Check the source code of some of the implementation files for examples. Again, this is really important: Always convert Go numbers to bigint numbers with <code>goarith.AsNumber</code>!</p>
-<p>There are a few helper functions such as <code>ExpectInts</code> that can be used for checking arguments. Other useful conversion functions are <code>AsBool</code>, <code>ToLispBool</code>, <code>ArrayToList</code>, <code>ListToArray</code>, etc.</p>
-<p>Notice that lists are structures composed by <code>&amp;Cell{Car: a, Cdr: b}</code>, where <code>Cdr</code> might be another Cell and the final Cdr is Nil, just like in any Lisp. If you construct these without the member names <code>Car</code> and <code>Cdr</code> Go will complain about this and refuse to compile, even though in this case it is perfectly fine to use anonymous access. If you want to create a lot of lists by hand in your function definitions without creating runtime performance penalties by using functions like <code>ArrayToList</code>, then it might make sense to switch off this behavior of the <code>go vet</code> command by running <code>go vet -composites=false</code> instead. Of course, this will also disable such checks for other parts of your application where they might be useful. The only other way is to make the list construction fully explicit, as in: <code>&amp;z3.Cell{z3.NewSym("hello"), &amp;z3.Cell{z3.NewSym("world"), z3.Nil}}</code> which yields the list <code>(hello world)</code>.</p>
-<p>Custom data structures: Since there is currently no way to modify the printer for custom structures directly in the Lisp system, it is best to put them into a box using <code>interp.DefBoxed</code>, which takes a symbol for a boxed value and creates a number of auxiliary functions. See <code>lisp_decimal.go</code> for an example of how to use boxed values.</p>
-<h1 data-number="6" id="license"><span class="header-section-number">6</span> License</h1>
-<p><a href="https://github.com/rasteric/z3s5-lisp">Z3S5 Lisp</a> was written by RAST Erich and is based on <a href="https://github.com/nukata/lisp-in-go">Nukata Lisp</a> by SUZUKI Hisao. It is licensed under the MIT License that allows free use and modification as long as the copyright notices remain. Please read the <a href="https://github.com/rasteric/z3s5-lisp/blob/main/LICENSE">LICENSE</a> file for more information.</p>
+<p>That’s about it. These macros basically just provide conveniently
+named getter and setter functions for arrays. Consult the Reference
+Manual for a complete list of all structure-related functions.</p>
+<h2 data-number="4.8" id="language-stability"><span
+class="header-section-number">4.8</span> Language Stability</h2>
+<p>At this stage, built-in commands may still change. The good news is
+that any change introduced in Z3S5 Lisp needs to be tracked and checked
+in Z3S5 Machine, and so no larger changes are planned. However, no
+guarantees can be made and you should vendor the repository or even fork
+it if you want to make sure no breaking changes occur. Once the language
+is stable, it will be marked on the home page.</p>
+<h2 data-number="4.9" id="known-bugs"><span
+class="header-section-number">4.9</span> Known Bugs</h2>
+<p>Since this language has been ported from a larger system, there may
+be known bugs not in the issue tracker at Github. A known issue of this
+version is a problem with the recursive externalization of Dict
+containing Dict.</p>
+<h2 data-number="4.10" id="roadmap"><span
+class="header-section-number">4.10</span> Roadmap</h2>
+<p>A library system, a robust key-value database with fulltext search,
+some basic OOP, and a simple persistence layer will likely be ported
+from Z3S5 Machine to this embedded Lisp in the future.</p>
+<h1 data-number="5" id="extending-z3s5-lisp"><span
+class="header-section-number">5</span> Extending Z3S5 Lisp</h1>
+<p>The system is extended by calling <code>interp.Def</code>. As an
+example, consider the following function from
+<code>lisp_base.go</code>:</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode Go"><code class="sourceCode go"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// (str-&gt;chars s) =&gt; array of int convert a UTF-8 string into an array of runes</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    interp<span class="op">.</span>Def<span class="op">(</span><span class="st">&quot;str-&gt;chars&quot;</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="kw">func</span><span class="op">(</span>a <span class="op">[]</span><span class="dt">any</span><span class="op">)</span> <span class="dt">any</span> <span class="op">{</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>        runes <span class="op">:=</span> <span class="op">[]</span><span class="dt">rune</span><span class="op">(</span>norm<span class="op">.</span>NFC<span class="op">.</span>String<span class="op">(</span>a<span class="op">[</span><span class="dv">0</span><span class="op">].(</span><span class="dt">string</span><span class="op">)))</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>        arr <span class="op">:=</span> <span class="bu">make</span><span class="op">([]</span><span class="dt">any</span><span class="op">,</span> <span class="bu">len</span><span class="op">(</span>runes<span class="op">),</span> <span class="bu">len</span><span class="op">(</span>runes<span class="op">))</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="op">:=</span> <span class="kw">range</span> runes <span class="op">{</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>            arr<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> goarith<span class="op">.</span>AsNumber<span class="op">(</span>runes<span class="op">[</span>i<span class="op">])</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> arr</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">})</span></span></code></pre></div>
+<p>The <code>Def</code> function takes the function symbol as string,
+the number <em>n</em> of arguments, and a function that takes an array
+of <code>any</code> and returns a value <code>any</code> (aka
+<code>interface{}</code>). The function may explicitly check the type of
+the arguments for correctness but doesn’t need to. It is normal for
+functions to panic and even deliberately throw an error. These are
+caught by the intepreter and displayed to the user. So how much you
+check depends primarily on what errors you want to provide. By
+convenience, custom errors thrown in function definitions start with the
+name of the function such as
+<code>panic(error.New("foobar: the foobar function has failed"))</code>
+for a function <code>foobar</code>. If a function returns no value, then
+the definition should return <code>Void</code>, a special Lisp value
+that is not printed in the read-eval-print loop.</p>
+<p>Care must be taken with numbers. Pure Go numbers will not do and may
+lead to bizzare and unexpected runtime behavior. Every number needs to
+be converted using <code>goarith.AsNumber</code> and other conversion
+functions from <code>z3s5-lisp</code> and the package
+<code>github.com/nukata/goarith</code>. Check the source code of some of
+the implementation files for examples. Again, this is really important:
+Always convert Go numbers to bigint numbers with
+<code>goarith.AsNumber</code>!</p>
+<p>There are a few helper functions such as <code>ExpectInts</code> that
+can be used for checking arguments. Other useful conversion functions
+are <code>AsBool</code>, <code>ToLispBool</code>,
+<code>ArrayToList</code>, <code>ListToArray</code>, etc.</p>
+<p>Notice that lists are structures composed by
+<code>&amp;Cell{Car: a, Cdr: b}</code>, where <code>Cdr</code> might be
+another Cell and the final Cdr is Nil, just like in any Lisp. If you
+construct these without the member names <code>Car</code> and
+<code>Cdr</code> Go will complain about this and refuse to compile, even
+though in this case it is perfectly fine to use anonymous access. If you
+want to create a lot of lists by hand in your function definitions
+without creating runtime performance penalties by using functions like
+<code>ArrayToList</code>, then it might make sense to switch off this
+behavior of the <code>go vet</code> command by running
+<code>go vet -composites=false</code> instead. Of course, this will also
+disable such checks for other parts of your application where they might
+be useful. The only other way is to make the list construction fully
+explicit, as in:
+<code>&amp;z3.Cell{z3.NewSym("hello"), &amp;z3.Cell{z3.NewSym("world"), z3.Nil}}</code>
+which yields the list <code>(hello world)</code>.</p>
+<p>Custom data structures: Since there is currently no way to modify the
+printer for custom structures directly in the Lisp system, it is best to
+put them into a box using <code>interp.DefBoxed</code>, which takes a
+symbol for a boxed value and creates a number of auxiliary functions.
+See <code>lisp_decimal.go</code> for an example of how to use boxed
+values.</p>
+<h1 data-number="6" id="license"><span
+class="header-section-number">6</span> License</h1>
+<p><a href="https://github.com/rasteric/z3s5-lisp">Z3S5 Lisp</a> was
+written by RAST Erich and is based on <a
+href="https://github.com/nukata/lisp-in-go">Nukata Lisp</a> by SUZUKI
+Hisao. It is licensed under the MIT License that allows free use and
+modification as long as the copyright notices remain. Please read the <a
+href="https://github.com/rasteric/z3s5-lisp/blob/main/LICENSE">LICENSE</a>
+file for more information.</p>
 <p>This document is Copyright (c) 2022 by Erich Rast.</p>
 </body>
 </html>

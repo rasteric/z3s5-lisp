@@ -10,6 +10,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/adrg/xdg"
@@ -581,6 +582,34 @@ func (interp *Interp) Define_FileIO() {
 		return Void
 	})
 
+	// (file-name file)
+	interp.Def("file-name", 1, func(a []any) any {
+		s := a[0].(string)
+		return filepath.Base(s)
+	})
+
+	// (file-display-name file)
+	interp.Def("file-display-name", 1, func(a []any) any {
+		s := a[0].(string)
+		return strings.TrimSuffix(filepath.Base(s), filepath.Ext(s))
+	})
+
+	// (file-suffix file)
+	interp.Def("file-suffix", 1, func(a []any) any {
+		s := a[0].(string)
+		s = filepath.Ext(s)
+		if len(s) > 0 {
+			s = s[1:]
+		}
+		return s
+	})
+
+	// (file-path file)
+	interp.Def("file-path", 1, func(a []any) any {
+		s := a[0].(string)
+		return filepath.Dir(s)
+	})
+
 	// (fdelete path) remove the file or directory at path
 	interp.Def("fdelete", 1, func(a []any) any {
 		if err := os.RemoveAll(a[0].(string)); err != nil {
@@ -651,7 +680,7 @@ func FilePermissionToInt(caller string, a any) int {
 }
 
 /*
-  Copyright (c) 2019-2022 Erich Rast
+  Copyright (c) 2019-2024 Erich Rast
 
   The above copyright notice and this permission notice shall be included in
   all copies or substantial portions of the Software.

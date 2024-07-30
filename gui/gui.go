@@ -61,6 +61,7 @@ var WrapWordSym = z3.NewSym("word")
 var EditorCaretMove = z3.NewSym("caret-move")
 var EditorWordChange = z3.NewSym("word-change")
 var EditorSelectWord = z3.NewSym("select-word")
+var EditorOnChange = z3.NewSym("on-change")
 var EditorUnknown = z3.NewSym("unknown")
 
 // theme selectors
@@ -1480,7 +1481,7 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 	// (get-zedit-last-line editor) => int
 	interp.Def(fnGetZeditLastLine, 1, func(a []any) any {
 		editor := mustGet(fnGetZeditLastLine, "GUI zedit ID", a, 0).(*zedit.Editor)
-		return goarith.AsNumber(len(editor.Rows))
+		return goarith.AsNumber(editor.LastLine())
 	})
 
 	fnGetZeditLastColumn := pre("get-zedit-last-column")
@@ -1489,6 +1490,24 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		editor := mustGet(fnGetZeditLastColumn, "GUI zedit ID", a, 0).(*zedit.Editor)
 		row := int(z3.ToInt64(fnGetZeditLastColumn, a[1]))
 		return goarith.AsNumber(editor.LastColumn(row))
+	})
+
+	fnLockZeditRefresh := pre("lock-zedit-refresh")
+	// (lock-zedit-refresh editor period)
+	interp.Def(fnLockZeditRefresh, 2, func(a []any) any {
+		editor := mustGet(fnLockZeditRefresh, "GUI zedit ID", a, 0).(*zedit.Editor)
+		n := z3.ToInt(fnLockZeditRefresh, a[1])
+		duration := time.Millisecond * time.Duration(n)
+		editor.LockRefresh(duration)
+		return z3.Void
+	})
+
+	fnUnlockZeditRefresh := pre("unlock-zedit-refresh")
+	// (unlock-zedit-refresh editor period)
+	interp.Def(fnUnlockZeditRefresh, 1, func(a []any) any {
+		editor := mustGet(fnLockZeditRefresh, "GUI zedit ID", a, 0).(*zedit.Editor)
+		editor.UnlockRefresh()
+		return z3.Void
 	})
 
 	fnSetZeditLineNumberStyle := pre("set-zedit-line-number-style")
@@ -1987,6 +2006,23 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		return z3.Void
 	})
 
+	fnClearZeditTags := pre("clear-zedit-tags")
+	// (clear-zedit-tags editor)
+	interp.Def(fnClearZeditTags, 1, func(a []any) any {
+		editor := mustGet(fnClearZeditTags, "GUI zedit ID", a, 0).(*zedit.Editor)
+		editor.Tags.Clear()
+		return z3.Void
+	})
+
+	fnClearZeditTagRange := pre("clear-zedit-tags-in-range")
+	// (clear-zedit-tags-in-range editor range)
+	interp.Def(fnClearZeditTagRange, 2, func(a []any) any {
+		editor := mustGet(fnClearZeditTagRange, "GUI zedit ID", a, 0).(*zedit.Editor)
+		interval := ListToCharInterval(fnClearZeditTagRange, a[1].(*z3.Cell))
+		editor.Tags.ClearRange(interval)
+		return z3.Void
+	})
+
 	fnUpsertZeditTag := pre("upsert-zedit-tag")
 	// (upsert-zedit-tag editor tag range)
 	interp.Def(fnUpsertZeditTag, 3, func(a []any) any {
@@ -2052,15 +2088,15 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 				Style: newStyle,
 			}
 		})
-		return put(zedit.TagStyler{TagName: name, StyleFunc: fn, DrawFullLine: drawFullLine})
+		return put(&zedit.TagStyler{TagName: name, StyleFunc: fn, DrawFullLine: drawFullLine})
 	})
 
 	fnAddZeditStyle := pre("add-zedit-style")
 	// (add-zedit-style editor styler)
 	interp.Def(fnAddZeditStyle, 2, func(a []any) any {
 		editor := mustGet(fnAddZeditStyle, "GUI zedit ID", a, 0).(*zedit.Editor)
-		styler := mustGet(fnAddZeditStyle, "GUI zedit style ID", a, 1).(zedit.TagStyler)
-		editor.Styles.AddStyler(styler)
+		styler := mustGet(fnAddZeditStyle, "GUI zedit style ID", a, 1).(*zedit.TagStyler)
+		editor.Styles.AddStyler(*styler)
 		return z3.Void
 	})
 
@@ -5268,6 +5304,8 @@ func SymToEditorEvent(caller string, s any) zedit.EditorEvent {
 		return zedit.WordChangeEvent
 	case EditorSelectWord:
 		return zedit.SelectWordEvent
+	case EditorOnChange:
+		return zedit.OnChangeEvent
 	default:
 		panic(fmt.Sprintf("%v: unknown editor event '%v", caller, z3.Str(sym)))
 	}
@@ -5281,6 +5319,8 @@ func EditorEventToSym(caller string, evt zedit.EditorEvent) *z3.Sym {
 		return EditorWordChange
 	case zedit.SelectWordEvent:
 		return EditorSelectWord
+	case zedit.OnChangeEvent:
+		return EditorOnChange
 	default:
 		return EditorUnknown
 	}

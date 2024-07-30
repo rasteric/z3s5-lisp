@@ -3083,9 +3083,41 @@
 		  unicode.is-upper? unicode.is-control? unicode.is-digit? unicode.is-letter?
 		  unicode.is-graphic? unicode.is-lower? unicode.is-mark? unicode.is-number?)))
 
+(defhelp file-path
+ (use "(file-path s) => str")
+ (info "Return the directory part of a file path.")
+ (type proc)
+ (arity 1)
+ (topic (system))
+ (see (file-name file-ext file-display-name open)))
+
+(defhelp file-name
+ (use "(file-name s) => str")
+ (info "Return the name part of a file path.")
+ (type proc)
+ (arity 1)
+ (topic (system))
+ (see (file-display-name file-ext file-path)))
+
+(defhelp file-display-name
+ (use "(file-display-name s) => str")
+ (info "Return the name part of a file path without extension.")
+ (type proc)
+ (arity 1)
+ (topic (system))
+ (see (file-name file-ext file-path)))
+
+(defhelp file-suffix
+ (use "(file-suffix s) => str")
+ (info "Return the suffix of a file path without including the dot.")
+ (type proc)
+ (arity 1)
+ (topic (system))
+ (see (file-display-name file-name file-path)))
+
 ;;; Help end
 
-;;;  Copyright (c) 2019-2023 Erich Rast
+;;;  Copyright (c) 2019-2024 Erich Rast
 ;;;
 ;;;  The above copyright notice and this permission notice shall be included in
 ;;;  all copies or substantial portions of the Software.

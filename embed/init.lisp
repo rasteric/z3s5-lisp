@@ -3627,7 +3627,7 @@
 
 (defhelp readall-str
     (use "(readall-str p [buffsize]) => str")
-  (info "Read all content from port #p as string. This method may trigger an error if the content in the stream is not a valid UTF-8 string. The optional #buffzie argument determines the size of the internal buffer.")
+  (info "Read all content from port #p as string. This method may trigger an error if the content in the stream is not a valid UTF-8 string. The optional #buffsize argument determines the size of the internal buffer.")
   (type proc)
   (arity -2)
   (see (readall read-binary read)))
