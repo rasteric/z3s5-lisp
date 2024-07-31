@@ -1594,7 +1594,7 @@
   (info "Blocks execution until the unary predicate #pred returns true for the value at #key in #dict. This function may wait indefinitely if no other thread sets the value in such a way that #pred returns true when applied to it.")
   (type proc)
   (topic (concurrency dict))
-  (arity 2)
+  (arity 3)
   (see (wait-for future force wait-until*))
   (warn  "This cannot be used for synchronization of multiple tasks due to potential race-conditions."))
 
@@ -3544,7 +3544,7 @@
   (see (dump-bindings save-zimage load-zimage)))
 
 (defun find-missing-help-entries ()
-  (filter (dump) (lambda (sym) (get *help* sym nil))))
+  (filter (dump) (lambda (sym) (not (get *help* sym nil)))))
 
 (defhelp find-missing-help-entries
     (use "(find-missing-help-entries) => li")
@@ -3552,13 +3552,36 @@
   (type proc)
   (topic (system))
   (arity 0)
-  (see (dump dump-bindings find-unneeded-help-entries)))
+  (see (dump dump-bindings find-unneeded-help-entries find-help-entries-with-incorrect-arity)))
+
+(defun sanity-check-help-system ()
+ (out "--------------------")(nl)
+ (out "CHECKING HELP SYSTEM")(nl)
+ (out "--------------------")(nl)(nl)
+ (out (fmt "System has %v overt functionals." (len (dump))))(nl)(nl)
+ (out "STEP 1: Looking for missing entries...")
+ (let ((missing (find-missing-help-entries)))
+  (out (fmt "%v entries missing.\n\n%v\n" (len missing) missing)))
+ (out "\nSTEP 2: Looking for potentially unnecessary entries...")
+ (let ((unneeded (find-unneeded-help-entries)))
+  (out (fmt "%v entries might not be needed.\n\n%v\n" (len unneeded) unneeded)))
+ (out "\nSTEP 3: Looking for entries with incorrect arity...")
+ (let ((incorrect (find-help-entries-with-incorrect-arity)))
+  (out (fmt "%v entries with incorrect arity found. This does not necessarily indicate a problem.\n\n%v\n" (len incorrect) incorrect))))
+
+(defhelp sanity-check-help-system
+ (use "(sanity-check-help-system)")
+ (info "Display information about the help system such as missing entries, unnecessary help entries, and faulty help entries.")
+ (type proc)
+ (topic (system))
+ (arity 0)
+ (see (find-missing-help-entries find-unneeded-help-entries find-help-entries-with-incorrect-arity)))
 
 (defun find-unneeded-help-entries ()
   (let ((d (dump))
 	(r nil))
     (dict-foreach *help* (lambda (k v) (unless (memq k d) (setq r (cons k r)))))
-    r))
+   r))
 
 (defhelp find-unneeded-help-entries
     (use "(find-unneeded-help-entries) => li")
@@ -3566,8 +3589,25 @@
   (type proc)
   (topic (system))
   (arity 0)
-  (see (dump dump-bindings find-missing-help-entries))
-  (warn "This function returns false positives! Special forms like setq and macro are listed even though they clearly are useful and should have a help entry."))
+  (see (dump dump-bindings find-missing-help-entries find-help-entries-with-incorrect-arity))
+ (warn "This function returns false positives! Special forms like setq and macro are listed even though they clearly are useful and should have a help entry."))
+
+(defun find-help-entries-with-incorrect-arity ()
+ (let ((r nil))
+  (dict-foreach *help* (lambda (k v) (when (and
+                                            (_bound? k)
+                                            (functional? (eval k))
+                                            (not (equal? (functional-arity* (eval k))
+                                                         (assoc1 'arity v))))
+                                      (setq r (cons k r)))))
+  r))
+
+(defhelp find-help-entries-with-incorrect-arity
+ (use "(find-help-entries-with-incorrect-arity) => li")
+ (info "Return a list of help entries whose real arity in the system differs from the arity specified in the help system. That usually indicates that the arity in the help system is wrong.")
+ (type proc)
+ (arity 0)
+ (see (find-missing-help-entries find-unneeded-help-entries sanity-check-help-system)))
     
 (defun protect-toplevel-symbols ()
   (apply protect (filter (dump-bindings)

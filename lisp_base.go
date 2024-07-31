@@ -277,11 +277,11 @@ func (interp *Interp) Define_Base() {
 		if ok {
 			return goarith.AsNumber(f3.fixedArgs())
 		}
-		panic(fmt.Sprintf("functional-arity: expected procedure, given %v", Str(a[0])))
+		panic(fmt.Sprintf("functional-arity: expected functional, given %v", Str(a[0])))
 	})
 
 	interp.Def("functional-has-rest?", 1, func(a []any) any {
-		f, ok := a[0].(*Func)
+		f, ok := a[0].(*BuiltInFunc)
 		if ok {
 			return AsLispBool(f.hasRest())
 		}
@@ -293,7 +293,23 @@ func (interp *Interp) Define_Base() {
 		if ok {
 			return AsLispBool(f3.hasRest())
 		}
-		panic(fmt.Sprintf("functional-has-rest?: expected procedure, given %v", Str(a[0])))
+		panic(fmt.Sprintf("functional-has-rest?: expected functional, given %v", Str(a[0])))
+	})
+
+	interp.Def("functional-arity*", 1, func(a []any) any {
+		f, ok := a[0].(*BuiltInFunc)
+		if ok {
+			return goarith.AsNumber(f.Carity)
+		}
+		f2, ok := a[0].(*Closure)
+		if ok {
+			return goarith.AsNumber(f2.Carity)
+		}
+		f3, ok := a[0].(*Macro)
+		if ok {
+			return goarith.AsNumber(f3.Carity)
+		}
+		panic(fmt.Sprintf("functional-arity*: expected function, given %v", Str(a[0])))
 	})
 
 	interp.Def("eql?", 2, func(a []any) any {

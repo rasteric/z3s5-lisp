@@ -231,7 +231,16 @@
   (type proc)
   (arity 1)
   (topic (system))
-  (see (functional? functional-has-rest?)))
+ (see (functional-arity* functional? functional-has-rest?)))
+
+(defhelp functional-arity*
+    (use "(functional-arity* proc) => int")
+  (info "Return the extended arity of a functional #proc, which is positive for fixed number of arguments like #functional-arity and -1 for 0 or more arguments, -2 for 1 or more arguments, -3 for 2 or more arguments, and so on.")
+  (type proc)
+  (arity 1)
+  (topic (system))
+  (see (functional-arity functional? functional-has-rest?)))
+
 
 (defhelp functional-has-rest?
     (use "(functional-has-rest? proc) => bool")
@@ -2023,7 +2032,7 @@
   (info "Mutate #li such that its car is #elem. Same as rplaca.")
   (type proc)
   (topic (lisp))
-  (arity 1)
+  (arity 2)
   (see (rplaca rplacd setcdr)))
 
 (defhelp setcdr

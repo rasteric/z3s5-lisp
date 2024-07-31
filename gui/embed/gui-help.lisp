@@ -169,7 +169,7 @@
     (use "(get-window-main-menu window) => int")
   (info "Get the main menu ID of #window.")
   (type proc)
-  (arity 2)
+  (arity 1)
   (topic (gui window menu))
   (see (set-window-main-menu new-main-menu)))
 
