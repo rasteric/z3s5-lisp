@@ -963,7 +963,7 @@ func (interp *Interp) Define_Base() {
 			panic("strbuild: expected an exact int")
 		}
 		r := ""
-		for i := 0; i < n; i++ {
+		for range n {
 			r += s
 		}
 		return r
@@ -1572,7 +1572,7 @@ func (interp *Interp) Define_Base() {
 			panic("list-ref: list index out of range")
 		}
 		li := a[0].(*Cell)
-		for i := 0; i < n; i++ {
+		for range n {
 			if li.Cdr == Nil {
 				panic("list-ref: list index out of range")
 			}

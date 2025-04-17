@@ -3,7 +3,7 @@
 
 (set-help-topic-info 'gui
 		     "Graphical User Interface"
-		     "This section describes the GUI-related functions. These functions are only available when Z3S5 Lisp has been compiled with the embedded GUI package. See the `z3g` executable defined in `cmd/z3g/z3g.go` for an example of how to include the GUI and start it up. The key is that the interpreter must run in its own goroutine because the GUI is blocking once it has been called. GUI functions are threadsafe, or at least as threadsafe as the underlying GUI framework. Functions defined in Lisp are derived from corresponding functions of the `Fyne` framework and listed under the 'gui label in this help system. The naming conventions for translation between Go and Lisp functions are as follows:\n\n1. Camelcase is translated to lowercase with hyphens.\n2. A function `object.VerbQualifier` becomes verb-object-qualifier.\n3. Getters are written in the form `get-object-qualifier` and setters `set-object-qualifier`.\n4. As an exception of the previous rules, when the result of a function is a bool, the form is `object-predicate?`.\n\nFyne objects are represented by integer numbers. The system internally translates between these numbers and objects. Occasionally, Fyne objects are created on the fly for performance reasons. For example, sometimes color lists of the form `(r g b a)` with integers `r`, `g`,`b`, `a` are used instead of creating and storing color objects using `(nrgba r g b a)`. There are also sometimes shortcut accessors using selector symbols and other convenience wrappers for Fyne functions. When in doubt, refer to the Lisp help for details.\n\nWhen importing the GUI with `DefGUI`, a `Config` structure is provided that allows for restricted security. This makes it possible to use the GUI functions in a restricted environment that e.g. does not allow the creation of new windows.")
+		     "This section describes the GUI-related functions. These functions are only available when Z3S5 Lisp has been compiled with the embedded GUI package. See the `z3g` executable defined in `cmd/z3g/z3g.go` for an example of how to include the GUI and start it up. The key is that the interpreter must run in its own goroutine because the GUI is blocking once it has been called. GUI functions must be called with one of the GUI-embedded functions `gui`, `gui+`, and `gui*` at least once, as well as every time when they are called from a future or task in order to ensure they are called in main thread of the operating system. This is a requirement of the `Fyne` framework on which this GUI framework is based. (The Fyne equivalent to `gui` is `fyne.Do` and the equivalent to `gui*` is `fyne.DoAndWait`.) Fyne's functions are mapped to Z3S5 Lisp and listed under the 'gui label in this help system. The naming conventions for translation between Go and Lisp functions are as follows:\n\n1. Camelcase is translated to lowercase with hyphens.\n2. A function `object.VerbQualifier` becomes verb-object-qualifier.\n3. Getters are written in the form `get-object-qualifier` and setters `set-object-qualifier`.\n4. As an exception of the previous rules, when the result of a function is a bool, the form is `object-predicate?`.\n\nFyne objects are represented by integer numbers. The system internally translates between these numbers and objects. Occasionally, Fyne objects are created on the fly for performance reasons. For example, sometimes color lists of the form `(r g b a)` with integers `r`, `g`,`b`, `a` are used instead of creating and storing color objects using `(nrgba r g b a)`. There are also sometimes shortcut accessors using selector symbols and other convenience wrappers for Fyne functions. When in doubt, refer to the Lisp help for details.\n\nWhen importing the GUI with `DefGUI`, a `Config` structure is provided that allows for restricted security. This makes it possible to use the GUI functions in a restricted environment that e.g. does not allow the creation of new windows.")
 
 (defhelp new-window
     (use "(new-window title) => int")
@@ -1689,4 +1689,24 @@
   (arity 2)
   (see (show-file-open)))
 
+(defhelp gui
+ (use "(gui body...)")
+ (info "The #gui macro ensures that all GUI function calls are executed in the OS main thread. Since the interpreter starts in its own thread, methods have to be embedded into #gui, #gui+, or gui* when they are called. Several GUI calls and other Lisp expressions can be put into the body of #gui and will be called sequentially like in #progn. The #gui macros also need to be used whenever a GUI method is called from a task or future. See the GUI demo for examples of how to use them. When a GUI function is not embedded in one of the #gui macros, a warning message is printed.")
+ (topic (gui system))
+ (arity -1)
+ (see (gui+ gui*)))
+
+(defhelp gui+
+ (use "(gui+ body...) => future")
+ (info "Like #gui, this macro ensures that all functions in the body are called in the OS main thread. All GUI functions must be called with one of the #gui macros, see the help entry for #gui for more information. #gui+ returns a future that represents the result of evaluating the last #body expression like in #progn but as a future.")
+ (topic (gui system))
+ (arity -1)
+ (see (gui gui*)))
+
+(defhelp gui*
+ (use "(gui* body...) => any")
+ (info "Like #gui, but this macro blocks execution until all expressions in #body have been evaluated in the main OS thread and returns the result of evaluating the last expression like #progn. All GUI functions must be called with one of the #gui macros, see the help entry for #gui for more information.")
+ (topic (gui system))
+ (arity -1)
+ (see (gui gui*)))
 

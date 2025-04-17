@@ -378,7 +378,7 @@ func RunGUI(id string, onStarted func()) {
 	apl.Lifecycle().SetOnEnteredForeground(func() {
 		go func() {
 			if mainWin != nil {
-				mainWin.Hide()
+				fyne.Do(func() { mainWin.Hide() })
 			}
 		}()
 	})
@@ -388,22 +388,26 @@ func RunGUI(id string, onStarted func()) {
 // ShutdownGUI shuts down the user interface. Any attempt to use it afterwards may result in a panic. This should
 // be called before closing the application, e.g. in a defer statement.
 func ShutDownGUI() {
-	storage.Range(func(key interface{}, value interface{}) bool {
+	storage.Range(func(key any, value any) bool {
 		storage.Delete(key)
 		return true
 	})
-	mainWin.Close()
-	apl.Quit()
+	fyne.Do(func() {
+		mainWin.Close()
+		apl.Quit()
+	})
 }
 
 // CloseGUI closes all existing windows and attempts to free existing resources but does not quit the
 // the internal main application, so new windows can be opened again.
 func CloseGUI() {
-	storage.Range(func(key interface{}, value interface{}) bool {
-		if win, ok := value.(fyne.Window); ok {
-			win.Hide()
-		}
-		return true
+	fyne.Do(func() {
+		storage.Range(func(key any, value any) bool {
+			if win, ok := value.(fyne.Window); ok {
+				win.Hide()
+			}
+			return true
+		})
 	})
 }
 
@@ -448,6 +452,54 @@ func defGUINoFileIO(interp *z3.Interp, config Config) {
 		}
 		return cfg.Prefix + "." + s
 	}
+
+	// DO
+	// Since Fyne 2.6.0
+	fnGUIFuture := pre("_gui+")
+	// (_gui proc)
+	interp.Def(fnGUIFuture, 1, func(a []any) any {
+		ch := make(chan z3.Cell)
+		cl, ok := a[0].(*z3.Closure)
+		if !ok {
+			panic(`_gui+: expected closure as argument`)
+		}
+		fyne.Do(func() {
+			result, err := interp.SafeEval(&z3.Cell{Car: cl, Cdr: z3.Nil}, z3.Nil)
+			resultLi := z3.Cell{Car: result, Cdr: err}
+			ch <- resultLi
+		})
+		return z3.Void
+	})
+
+	fnGUI := pre("_gui")
+	// (_gui proc)
+	interp.Def(fnGUI, 1, func(a []any) any {
+		cl, ok := a[0].(*z3.Closure)
+		if !ok {
+			panic(`_gui: expected closure as argument`)
+		}
+		fyne.Do(func() {
+			interp.SafeEval(&z3.Cell{Car: cl, Cdr: z3.Nil}, z3.Nil)
+		})
+		return z3.Void
+	})
+
+	fnGUI2 := pre("_gui*")
+	// (_gui proc)
+	interp.Def(fnGUI2, 1, func(a []any) any {
+		cl, ok := a[0].(*z3.Closure)
+		if !ok {
+			panic(`_gui+: expected closure as argument`)
+		}
+		var result, err any
+		fyne.DoAndWait(func() {
+			result, err = interp.SafeEval(&z3.Cell{Car: cl, Cdr: z3.Nil}, z3.Nil)
+		})
+		if e, ok := err.(error); ok {
+			panic(e)
+		}
+		return result
+	})
 
 	// APP
 

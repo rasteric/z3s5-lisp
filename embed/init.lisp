@@ -55,7 +55,6 @@
   `(cond
      ((permission? ,perm) ,@body)))
 
-
 ;;; ESSENTIAL MACROS AND FUNCTIONS
 
 (defun dfc! (sym)
