@@ -2,7 +2,7 @@
 title: Z3S5 Lisp User Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: "2.4.2+dd3dfce"
+footer-left: "2.4.2+8ac16c4"
 author: by Erich Rast
 date: 2023-9-24 16:00
 header-includes: |
@@ -13,7 +13,7 @@ header-includes: |
   \usepackage{xcolor}
 ---
 
-for Z3S5 Lisp Version "2.4.2+dd3dfce"
+for Z3S5 Lisp Version "2.4.2+8ac16c4"
 
 # Introduction
 
