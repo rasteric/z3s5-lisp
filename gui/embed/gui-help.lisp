@@ -1622,70 +1622,80 @@
 (defhelp show-custom-without-buttons
     (use "(show-custom-without-buttons title content win)")
   (info "Show a custom dialog without buttons, where #title is the dialog's title, #content is a valid canvas object ID for the content of the dialog such as an ID for an entry or form, and #win is the parent window.")
-  (topic (gui dialog))
+ (topic (gui dialog))
+ (type proc)
   (arity 3)
   (see (show-custom show-custom-confirm show-confirm show-information show-form)))
 
 (defhelp set-app-metadata
     (use "(set-app-metadata id name version build icon release? custom)")
   (info "Set the metadata of the application to the #id string, #name string, #version string, #build integer, #icon resource ID, #release? bool if this version is a release rather than for testing, and a #custom dict containing string to string key-value mappings.")
-  (topic (gui app))
+ (topic (gui app))
+   (type proc)
   (arity 7)
   (see (new-window)))
 
 (defhelp show-folder-open
     (use "(show-folder-open proc win)")
   (info "Show an open folder dialog to select a folder. The procedure #proc takes two arguments. The first argument is an URI string if a folder was chosen, nil otherwise. The second argument is nil if no error occurred, and an error string if an error occurred. Notice that URI can be not-nil and the error string can be non-empty at the same time, indicating that a folder was chosen but some I/O error occurred.")
-  (topic (gui dialog))
+ (topic (gui dialog))
+   (type proc)
   (arity 2)
   (see (list-uri listable-uri? uri?)))
 
 (defhelp list-uri
     (use "(list-uri uri) => vec")
   (info "List a listable URI string #uri if possible. If the URI string is not valid or valid but not listable, an error occurs. A listable URI is a file URI pointing to a folder, for example.")
-  (topic (gui file))
+ (topic (gui file))
+   (type proc)
   (arity 1)
   (see (show-folder-open listable-uri? uri?)))
 
 (defhelp uri?
     (use "(uri? s) => bool")
   (info "Return true if string #s represents a valid URI, nil otherwise.")
-  (topic (gui file))
+ (topic (gui file))
+   (type proc)
   (arity 1)
   (see (list-uri listable-uri?)))
 
 (defhelp listable-uri?
     (use "(listable-uri? s) => bool")
   (info "Return true if the string #s represents a listable URI such as one pointing to a folder on the filesystem; otherwise, nil is returned.")
-  (topic (gui file))
+ (topic (gui file))
+   (type proc)
   (arity 1)
   (see (uri? list-uri)))
 
 (defhelp show-information
     (use "(show-information title message win)")
   (info "Show a dialog with #title and information #message strings, where #win is the parent window.")
-  (topic (gui dialog))
+ (topic (gui dialog))
+   (type proc)
   (arity 3)
   (see (show-custom show-custom-without-buttons show-confirm show-custom-confirm show-form)))
 
 (defhelp show-form
     (use "(show-form title confirm dismiss li proc win)")
   (info "Show a list of form items whose ID must reside in #li and check these items are validated. The #title is the dialog's title, #confirm is the text of the confirm button, #dismiss the text of the dismiss button, #proc is a procedure that takes a boolean argument that is true if all form items have been validated and confirmed, nil otherwise, and #win is the parent window. The form items in #li must be widgets with validators that can be added to a form.")
-  (topic (gui dialog))
+ (topic (gui dialog))
+   (type proc)
   (arity 6)
   (see (show-custom show-custom-without-buttons show-confirm show-custom-confirm)))
 
 (defhelp show-file-save
     (use "(show-file-save proc win)")
   (info "Show a standard file save dialog that allows the user to chose a save file. If the chosen file already exists, the user is asked whether they want to overwrite the file. The procedure #proc takes two arguments. The first argument is a writeable port if the user chose a file, nil if the user canceled. The second argument is nil if no error occurred, and an error string if an error occurred. Notice that the port can be not-nil and the error string can be non-empty at the same time, indicating that a file for saving was chosen but some I/O error occurred.")
-  (topic (gui dialog))
+ (topic (gui dialog))
+   (type proc)
   (arity 2)
   (see (show-file-open)))
 
 (defhelp show-file-open
     (use "(show-file-open proc win)")
   (info "Show a standard file open dialog that allows the user to select an existing file. The procedure #proc takes two arguments. The first argument is a readable port if the user chose a file, nil if the user canceled. The second argument is nil if no error occurred, and an error string if an error occurred. Notice that the port can be not-nil and the error string can be non-empty at the same time, indicating that a file for opening was chosen but some I/O error occurred.")
-  (topic (gui dialog))
+ (topic (gui dialog))
+   (type proc)
   (arity 2)
   (see (show-file-open)))
 
@@ -1693,6 +1703,7 @@
  (use "(gui body...)")
  (info "The #gui macro ensures that all GUI function calls are executed in the OS main thread. Since the interpreter starts in its own thread, methods have to be embedded into #gui, #gui+, or gui* when they are called. Several GUI calls and other Lisp expressions can be put into the body of #gui and will be called sequentially like in #progn. The #gui macros also need to be used whenever a GUI method is called from a task or future. See the GUI demo for examples of how to use them. When a GUI function is not embedded in one of the #gui macros, a warning message is printed.")
  (topic (gui system))
+   (type macro)
  (arity -1)
  (see (gui+ gui*)))
 
@@ -1701,12 +1712,14 @@
  (info "Like #gui, this macro ensures that all functions in the body are called in the OS main thread. All GUI functions must be called with one of the #gui macros, see the help entry for #gui for more information. #gui+ returns a future that represents the result of evaluating the last #body expression like in #progn but as a future.")
  (topic (gui system))
  (arity -1)
+   (type macro)
  (see (gui gui*)))
 
 (defhelp gui*
  (use "(gui* body...) => any")
  (info "Like #gui, but this macro blocks execution until all expressions in #body have been evaluated in the main OS thread and returns the result of evaluating the last expression like #progn. All GUI functions must be called with one of the #gui macros, see the help entry for #gui for more information.")
  (topic (gui system))
+   (type macro)
  (arity -1)
  (see (gui gui*)))
 

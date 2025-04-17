@@ -2,9 +2,9 @@
 title: Z3S5 Lisp Reference Manual
 titlepage: true
 titlepage-background: ../Z3S5.png
-footer-left: Version 2.4.2+8ac16c4-gui.fyne2
+footer-left: Version 2.4.2+d3af7b3-gui.fyne2
 author: by Erich Rast and all Help system contributors
-date: 2025-4-17 18:06
+date: 2025-4-17 18:34
 header-includes: |
     \lstset{% for listings
         basicstyle=\footnotesize\ttfamily,
@@ -13,7 +13,7 @@ header-includes: |
     \usepackage{xcolor}
 ---
 
-For Z3S5 Lisp Version 2.4.2+8ac16c4-gui.fyne2 with installed modules (gui-fileio gui fyne2 oop lib kvdb zimage tasks help beep unicode db fileio decimal ling float console base).
+For Z3S5 Lisp Version 2.4.2+d3af7b3-gui.fyne2 with installed modules (gui-fileio gui fyne2 oop lib kvdb zimage tasks help beep unicode db fileio decimal ling float console base).
 
 # Introduction
 
@@ -2755,7 +2755,7 @@ Get the currently topmost visible line in the editor `zedit.`
 
 See also: [`set-zedit-top-line`](#link7365742d7a656469742d746f702d6c696e65).	 [→index](#idx)
 
-### gui : nil
+### `gui` : macro/0 or more
 
 Usage: `(gui body...)`
 
@@ -2763,7 +2763,7 @@ The `gui` macro ensures that all GUI function calls are executed in the OS main 
 
 See also: [`gui+`](#link6775692b), [`gui*`](#link6775692a).	 [→index](#idx)
 
-### gui* : nil
+### `gui*` : macro/0 or more
 
 Usage: `(gui* body...) => any`
 
@@ -2771,7 +2771,7 @@ Like `gui`, but this macro blocks execution until all expressions in `body` have
 
 See also: [`gui`](#link677569), [`gui*`](#link6775692a).	 [→index](#idx)
 
-### gui+ : nil
+### `gui+` : macro/0 or more
 
 Usage: `(gui+ body...) => future`
 
@@ -2803,7 +2803,7 @@ Insert a new text grid row before `row` in the given text `grid`. If `row` is th
 
 See also: [`remove-text-grid-row`](#link72656d6f76652d746578742d677269642d726f77), [`count-text-grid-rows`](#link636f756e742d746578742d677269642d726f7773), [`new-text-grid`](#link6e65772d746578742d67726964), [`get-text-grid-row`](#link6765742d746578742d677269642d726f77).	 [→index](#idx)
 
-### list-uri : nil
+### `list-uri` : procedure/1
 
 Usage: `(list-uri uri) => vec`
 
@@ -2811,7 +2811,7 @@ List a listable URI string `uri` if possible. If the URI string is not valid or 
 
 See also: [`show-folder-open`](#link73686f772d666f6c6465722d6f70656e), [`listable-uri?`](#link6c69737461626c652d7572693f), [`uri?`](#link7572693f).	 [→index](#idx)
 
-### listable-uri? : nil
+### `listable-uri?` : procedure/1
 
 Usage: `(listable-uri? s) => bool`
 
@@ -3373,7 +3373,7 @@ Resize canvas object `obj` to the given `width` and `height` as floats.
 
 See also: [`disable-object`](#link64697361626c652d6f626a656374), [`enable-object`](#link656e61626c652d6f626a656374), [`show-object`](#link73686f772d6f626a656374), [`hide-object`](#link686964652d6f626a656374), [`object-disabled?`](#link6f626a6563742d64697361626c65643f), [`move-object`](#link6d6f76652d6f626a656374), [`get-object-size`](#link6765742d6f626a6563742d73697a65), [`get-object-min-size`](#link6765742d6f626a6563742d6d696e2d73697a65), [`get-object-position`](#link6765742d6f626a6563742d706f736974696f6e), [`object-visible?`](#link6f626a6563742d76697369626c653f), [`refresh-object`](#link726566726573682d6f626a656374), [`new-entry`](#link6e65772d656e747279), [`new-label`](#link6e65772d6c6162656c).	 [→index](#idx)
 
-### set-app-metadata : nil
+### `set-app-metadata` : procedure/7
 
 Usage: `(set-app-metadata id name version build icon release? custom)`
 
@@ -3805,7 +3805,7 @@ Show a custom confirm dialog, where `title` is the dialog's title, `confirm` is 
 
 See also: [`show-confirm`](#link73686f772d636f6e6669726d), [`show-custom`](#link73686f772d637573746f6d), [`show-custom-without-buttons`](#link73686f772d637573746f6d2d776974686f75742d627574746f6e73), [`show-information`](#link73686f772d696e666f726d6174696f6e), [`show-form`](#link73686f772d666f726d).	 [→index](#idx)
 
-### show-custom-without-buttons : nil
+### `show-custom-without-buttons` : procedure/3
 
 Usage: `(show-custom-without-buttons title content win)`
 
@@ -3813,7 +3813,7 @@ Show a custom dialog without buttons, where `title` is the dialog's title, `cont
 
 See also: [`show-custom`](#link73686f772d637573746f6d), [`show-custom-confirm`](#link73686f772d637573746f6d2d636f6e6669726d), [`show-confirm`](#link73686f772d636f6e6669726d), [`show-information`](#link73686f772d696e666f726d6174696f6e), [`show-form`](#link73686f772d666f726d).	 [→index](#idx)
 
-### show-file-open : nil
+### `show-file-open` : procedure/2
 
 Usage: `(show-file-open proc win)`
 
@@ -3821,7 +3821,7 @@ Show a standard file open dialog that allows the user to select an existing file
 
 See also: [`show-file-open`](#link73686f772d66696c652d6f70656e).	 [→index](#idx)
 
-### show-file-save : nil
+### `show-file-save` : procedure/2
 
 Usage: `(show-file-save proc win)`
 
@@ -3829,7 +3829,7 @@ Show a standard file save dialog that allows the user to chose a save file. If t
 
 See also: [`show-file-open`](#link73686f772d66696c652d6f70656e).	 [→index](#idx)
 
-### show-folder-open : nil
+### `show-folder-open` : procedure/2
 
 Usage: `(show-folder-open proc win)`
 
@@ -3837,7 +3837,7 @@ Show an open folder dialog to select a folder. The procedure `proc` takes two ar
 
 See also: [`list-uri`](#link6c6973742d757269), [`listable-uri?`](#link6c69737461626c652d7572693f), [`uri?`](#link7572693f).	 [→index](#idx)
 
-### show-form : nil
+### `show-form` : procedure/6
 
 Usage: `(show-form title confirm dismiss li proc win)`
 
@@ -3845,7 +3845,7 @@ Show a list of form items whose ID must reside in `li` and check these items are
 
 See also: [`show-custom`](#link73686f772d637573746f6d), [`show-custom-without-buttons`](#link73686f772d637573746f6d2d776974686f75742d627574746f6e73), [`show-confirm`](#link73686f772d636f6e6669726d), [`show-custom-confirm`](#link73686f772d637573746f6d2d636f6e6669726d).	 [→index](#idx)
 
-### show-information : nil
+### `show-information` : procedure/3
 
 Usage: `(show-information title message win)`
 
@@ -3917,7 +3917,7 @@ Remove the focus on any user interface element in `canvas.`
 
 See also: [`get-window-canvas`](#link6765742d77696e646f772d63616e766173), [`focus-canvas-object`](#link666f6375732d63616e7661732d6f626a656374), [`focus-next-canvas-object`](#link666f6375732d6e6578742d63616e7661732d6f626a656374), [`focus-previous-canvas-object`](#link666f6375732d70726576696f75732d63616e7661732d6f626a656374), [`get-focused-canvas-object`](#link6765742d666f63757365642d63616e7661732d6f626a656374).	 [→index](#idx)
 
-### uri? : nil
+### `uri?` : procedure/1
 
 Usage: `(uri? s) => bool`
 
@@ -10045,7 +10045,7 @@ Returns true if `sym` is a global symbol, nil otherwise. By convention, a symbol
 
 See also: [`load`](#link6c6f6164), [`include`](#link696e636c756465), [`sym?`](#link73796d3f).	 [→index](#idx) [→topic](#lib)
 
-## gui : nil {#link677569}
+## `gui` : macro/0 or more {#link677569}
 
 Usage: `(gui body...)`
 
@@ -10053,7 +10053,7 @@ The `gui` macro ensures that all GUI function calls are executed in the OS main 
 
 See also: [`gui+`](#link6775692b), [`gui*`](#link6775692a).	 [→index](#idx) [→topic](#gui)
 
-## gui* : nil {#link6775692a}
+## `gui*` : macro/0 or more {#link6775692a}
 
 Usage: `(gui* body...) => any`
 
@@ -10061,7 +10061,7 @@ Like `gui`, but this macro blocks execution until all expressions in `body` have
 
 See also: [`gui`](#link677569), [`gui*`](#link6775692a).	 [→index](#idx) [→topic](#gui)
 
-## gui+ : nil {#link6775692b}
+## `gui+` : macro/0 or more {#link6775692b}
 
 Usage: `(gui+ body...) => future`
 
@@ -10679,7 +10679,7 @@ Return the slice of the list `li` starting at index `low` (inclusive) and ending
 
 See also: [`slice`](#link736c696365), [`array-slice`](#link61727261792d736c696365).	 [→index](#idx) [→topic](#lisp)
 
-## list-uri : nil {#link6c6973742d757269}
+## `list-uri` : procedure/1 {#link6c6973742d757269}
 
 Usage: `(list-uri uri) => vec`
 
@@ -10695,7 +10695,7 @@ Return true if `obj` is a list, nil otherwise.
 
 See also: [`cons?`](#link636f6e733f), [`atom?`](#link61746f6d3f), [`null?`](#link6e756c6c3f).	 [→index](#idx) [→topic](#lisp)
 
-## listable-uri? : nil {#link6c69737461626c652d7572693f}
+## `listable-uri?` : procedure/1 {#link6c69737461626c652d7572693f}
 
 Usage: `(listable-uri? s) => bool`
 
@@ -12245,7 +12245,7 @@ Convert set `s` to a list of set elements.
 
 See also: [`list->set`](#link6c6973742d3e736574), [`make-set`](#link6d616b652d736574), [`set-element?`](#link7365742d656c656d656e743f), [`set-union`](#link7365742d756e696f6e), [`set-intersection`](#link7365742d696e74657273656374696f6e), [`set-complement`](#link7365742d636f6d706c656d656e74), [`set-difference`](#link7365742d646966666572656e6365), [`set?`](#link7365743f), [`set-empty`](#link7365742d656d707479).	 [→index](#idx) [→topic](#conversion)
 
-## set-app-metadata : nil {#link7365742d6170702d6d65746164617461}
+## `set-app-metadata` : procedure/7 {#link7365742d6170702d6d65746164617461}
 
 Usage: `(set-app-metadata id name version build icon release? custom)`
 
@@ -12805,7 +12805,7 @@ Show a custom confirm dialog, where `title` is the dialog's title, `confirm` is 
 
 See also: [`show-confirm`](#link73686f772d636f6e6669726d), [`show-custom`](#link73686f772d637573746f6d), [`show-custom-without-buttons`](#link73686f772d637573746f6d2d776974686f75742d627574746f6e73), [`show-information`](#link73686f772d696e666f726d6174696f6e), [`show-form`](#link73686f772d666f726d).	 [→index](#idx) [→topic](#gui)
 
-## show-custom-without-buttons : nil {#link73686f772d637573746f6d2d776974686f75742d627574746f6e73}
+## `show-custom-without-buttons` : procedure/3 {#link73686f772d637573746f6d2d776974686f75742d627574746f6e73}
 
 Usage: `(show-custom-without-buttons title content win)`
 
@@ -12813,7 +12813,7 @@ Show a custom dialog without buttons, where `title` is the dialog's title, `cont
 
 See also: [`show-custom`](#link73686f772d637573746f6d), [`show-custom-confirm`](#link73686f772d637573746f6d2d636f6e6669726d), [`show-confirm`](#link73686f772d636f6e6669726d), [`show-information`](#link73686f772d696e666f726d6174696f6e), [`show-form`](#link73686f772d666f726d).	 [→index](#idx) [→topic](#gui)
 
-## show-file-open : nil {#link73686f772d66696c652d6f70656e}
+## `show-file-open` : procedure/2 {#link73686f772d66696c652d6f70656e}
 
 Usage: `(show-file-open proc win)`
 
@@ -12821,7 +12821,7 @@ Show a standard file open dialog that allows the user to select an existing file
 
 See also: [`show-file-open`](#link73686f772d66696c652d6f70656e).	 [→index](#idx) [→topic](#gui)
 
-## show-file-save : nil {#link73686f772d66696c652d73617665}
+## `show-file-save` : procedure/2 {#link73686f772d66696c652d73617665}
 
 Usage: `(show-file-save proc win)`
 
@@ -12829,7 +12829,7 @@ Show a standard file save dialog that allows the user to chose a save file. If t
 
 See also: [`show-file-open`](#link73686f772d66696c652d6f70656e).	 [→index](#idx) [→topic](#gui)
 
-## show-folder-open : nil {#link73686f772d666f6c6465722d6f70656e}
+## `show-folder-open` : procedure/2 {#link73686f772d666f6c6465722d6f70656e}
 
 Usage: `(show-folder-open proc win)`
 
@@ -12837,7 +12837,7 @@ Show an open folder dialog to select a folder. The procedure `proc` takes two ar
 
 See also: [`list-uri`](#link6c6973742d757269), [`listable-uri?`](#link6c69737461626c652d7572693f), [`uri?`](#link7572693f).	 [→index](#idx) [→topic](#gui)
 
-## show-form : nil {#link73686f772d666f726d}
+## `show-form` : procedure/6 {#link73686f772d666f726d}
 
 Usage: `(show-form title confirm dismiss li proc win)`
 
@@ -12845,7 +12845,7 @@ Show a list of form items whose ID must reside in `li` and check these items are
 
 See also: [`show-custom`](#link73686f772d637573746f6d), [`show-custom-without-buttons`](#link73686f772d637573746f6d2d776974686f75742d627574746f6e73), [`show-confirm`](#link73686f772d636f6e6669726d), [`show-custom-confirm`](#link73686f772d637573746f6d2d636f6e6669726d).	 [→index](#idx) [→topic](#gui)
 
-## show-information : nil {#link73686f772d696e666f726d6174696f6e}
+## `show-information` : procedure/3 {#link73686f772d696e666f726d6174696f6e}
 
 Usage: `(show-information title message win)`
 
@@ -13717,7 +13717,7 @@ Evaluate the expressions in `body` until `test` is nil. Unlike a while loop, unt
 
 See also: [`while`](#link7768696c65), [`letrec`](#link6c6574726563), [`dotimes`](#link646f74696d6573), [`dolist`](#link646f6c697374).	 [→index](#idx) [→topic](#lisp)
 
-## uri? : nil {#link7572693f}
+## `uri?` : procedure/1 {#link7572693f}
 
 Usage: `(uri? s) => bool`
 
